@@ -423,3 +423,97 @@ export class MoneyService {
 // In expenses.service.ts
 const claimableGst = this.moneyService.applyBizPercent(expense.gst_cents, expense.biz_percent);
 ```
+
+---
+
+## Error Handling
+
+The application uses a global exception filter to standardize all error responses.
+
+### Architecture
+
+```
+src/common/filters/
+├── all-exceptions.filter.ts       # Global exception filter
+├── all-exceptions.filter.spec.ts  # 26 comprehensive tests
+└── index.ts                       # Barrel export
+```
+
+### Error Response Format
+
+All errors return a consistent JSON structure:
+
+```typescript
+interface ErrorResponse {
+  statusCode: number;    // HTTP status code (400, 404, 500, etc.)
+  message: string;       // Human-readable error message
+  error: string;         // HTTP status text (e.g., "Bad Request")
+  timestamp: string;     // ISO 8601 timestamp
+  path: string;          // Request URL path
+}
+```
+
+### Hybrid Error Strategy
+
+| Error Type | Behavior | Rationale |
+|------------|----------|-----------|
+| **4xx (Client Errors)** | Preserve NestJS detailed messages | Helps debugging, safe to expose |
+| **5xx (Server Errors)** | Generic "An unexpected error occurred" | Security: hides internal details |
+
+### Examples
+
+**400 Bad Request** (validation error):
+```json
+{
+  "statusCode": 400,
+  "message": ["amountCents must be a positive number"],
+  "error": "Bad Request",
+  "timestamp": "2025-01-15T10:30:00.000Z",
+  "path": "/expenses"
+}
+```
+
+**404 Not Found**:
+```json
+{
+  "statusCode": 404,
+  "message": "Provider with ID 999 not found",
+  "error": "Not Found",
+  "timestamp": "2025-01-15T10:30:00.000Z",
+  "path": "/providers/999"
+}
+```
+
+**500 Internal Server Error** (client sees generic message):
+```json
+{
+  "statusCode": 500,
+  "message": "An unexpected error occurred",
+  "error": "Internal Server Error",
+  "timestamp": "2025-01-15T10:30:00.000Z",
+  "path": "/bas/Q1/2025"
+}
+```
+
+### Logging Strategy
+
+| Status Code | Log Level | Details Logged |
+|-------------|-----------|----------------|
+| 4xx | WARN | Request path + error message |
+| 5xx | ERROR | Full stack trace (server-side only) |
+
+**Security Principle:** Stack traces are **never** sent to the client. Internal error messages for 5xx errors are only logged server-side.
+
+### Registration
+
+The filter is registered globally in `main.ts`:
+
+```typescript
+import { AllExceptionsFilter } from './common/filters';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  app.useGlobalFilters(new AllExceptionsFilter());
+  // ...
+}
+```

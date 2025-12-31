@@ -1,9 +1,13 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './common/filters';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
+
+  // Global exception filter for standardized error responses
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   // Global validation pipe for all incoming requests
   app.useGlobalPipes(

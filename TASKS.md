@@ -319,15 +319,15 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 
 | #     | Task                                 | Status |
 | ----- | ------------------------------------ | ------ |
-| 4.2.1 | Create global exception filter       | ⬜     |
-| 4.2.2 | Standardize error response format    | ⬜     |
-| 4.2.3 | Ensure no stack traces in production | ⬜     |
+| 4.2.1 | Create global exception filter       | ✅     |
+| 4.2.2 | Standardize error response format    | ✅     |
+| 4.2.3 | Ensure no stack traces in production | ✅     |
 
 **Tests Required:**
 
-- [ ] 404 returns standard error format
-- [ ] Validation error returns field-level messages
-- [ ] 500 does not expose internal details
+- [x] 404 returns standard error format
+- [x] Validation error returns field-level messages
+- [x] 500 does not expose internal details
 
 ---
 
@@ -370,6 +370,6 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 | ---------------- | ------ | ------ | -------- |
 | 1. Foundation    | 11     | 11     | 100%     |
 | 2. Core Entities | 30     | 30     | 100%     |
-| 3. BAS Reporting | 6      | 0      | 0%       |
-| 4. Integration   | 10     | 0      | 0%       |
-| **Total**        | **57** | **41** | **72%**  |
+| 3. BAS Reporting | 6      | 6      | 100%     |
+| 4. Integration   | 10     | 3      | 30%      |
+| **Total**        | **57** | **50** | **88%**  |
