@@ -445,24 +445,25 @@ All errors return a consistent JSON structure:
 
 ```typescript
 interface ErrorResponse {
-  statusCode: number;    // HTTP status code (400, 404, 500, etc.)
-  message: string;       // Human-readable error message
-  error: string;         // HTTP status text (e.g., "Bad Request")
-  timestamp: string;     // ISO 8601 timestamp
-  path: string;          // Request URL path
+  statusCode: number; // HTTP status code (400, 404, 500, etc.)
+  message: string; // Human-readable error message
+  error: string; // HTTP status text (e.g., "Bad Request")
+  timestamp: string; // ISO 8601 timestamp
+  path: string; // Request URL path
 }
 ```
 
 ### Hybrid Error Strategy
 
-| Error Type | Behavior | Rationale |
-|------------|----------|-----------|
-| **4xx (Client Errors)** | Preserve NestJS detailed messages | Helps debugging, safe to expose |
+| Error Type              | Behavior                               | Rationale                        |
+| ----------------------- | -------------------------------------- | -------------------------------- |
+| **4xx (Client Errors)** | Preserve NestJS detailed messages      | Helps debugging, safe to expose  |
 | **5xx (Server Errors)** | Generic "An unexpected error occurred" | Security: hides internal details |
 
 ### Examples
 
 **400 Bad Request** (validation error):
+
 ```json
 {
   "statusCode": 400,
@@ -474,6 +475,7 @@ interface ErrorResponse {
 ```
 
 **404 Not Found**:
+
 ```json
 {
   "statusCode": 404,
@@ -485,6 +487,7 @@ interface ErrorResponse {
 ```
 
 **500 Internal Server Error** (client sees generic message):
+
 ```json
 {
   "statusCode": 500,
@@ -497,10 +500,10 @@ interface ErrorResponse {
 
 ### Logging Strategy
 
-| Status Code | Log Level | Details Logged |
-|-------------|-----------|----------------|
-| 4xx | WARN | Request path + error message |
-| 5xx | ERROR | Full stack trace (server-side only) |
+| Status Code | Log Level | Details Logged                      |
+| ----------- | --------- | ----------------------------------- |
+| 4xx         | WARN      | Request path + error message        |
+| 5xx         | ERROR     | Full stack trace (server-side only) |
 
 **Security Principle:** Stack traces are **never** sent to the client. Internal error messages for 5xx errors are only logged server-side.
 
