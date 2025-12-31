@@ -122,33 +122,34 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 
 | #     | Task                                                  | Status |
 | ----- | ----------------------------------------------------- | ------ |
-| 2.2.1 | Create `Provider` entity with `is_international` flag | ⬜     |
-| 2.2.2 | Create `CreateProviderDto` with validation            | ⬜     |
-| 2.2.3 | Create `UpdateProviderDto` (partial)                  | ⬜     |
-| 2.2.4 | Implement `ProvidersService` (CRUD)                   | ⬜     |
-| 2.2.5 | Implement `ProvidersController` (REST endpoints)      | ⬜     |
-| 2.2.6 | Create seed data (VentraIP, GitHub, iinet, etc.)      | ⬜     |
+| 2.2.1 | Create `Provider` entity with `is_international` flag | ✅     |
+| 2.2.2 | Create `CreateProviderDto` with validation            | ✅     |
+| 2.2.3 | Create `UpdateProviderDto` (partial)                  | ✅     |
+| 2.2.4 | Implement `ProvidersService` (CRUD)                   | ✅     |
+| 2.2.5 | Implement `ProvidersController` (REST endpoints)      | ✅     |
+| 2.2.6 | Create seed data (VentraIP, GitHub, iinet, etc.)      | ✅     |
 
 **Documentation Required:**
 
-- [ ] TSDoc for all DTO properties
+- [x] TSDoc for all DTO properties
+- [x] TSDoc for service methods
 - [ ] Document `is_international` behavior in ARCHITECTURE.md
-- [ ] Swagger decorators on controller
+- [ ] Swagger decorators on controller (Phase 4)
 
 **Tests Required:**
 
-- [ ] Service: create provider
-- [ ] Service: find all providers
-- [ ] Service: find one by ID
-- [ ] Service: update provider
-- [ ] Service: delete provider (cascade check)
-- [ ] Service: find by `is_international = true`
+- [x] Service: create provider
+- [x] Service: find all providers
+- [x] Service: find one by ID
+- [x] Service: update provider
+- [x] Service: delete provider
+- [x] Service: find by `is_international = true`
 
 **Definition of Done:**
 
-- [ ] All CRUD operations work via API
-- [ ] Seed includes 10+ common providers
-- [ ] 80%+ test coverage on service
+- [x] All CRUD operations work via API
+- [x] Seed includes 10+ common providers
+- [x] 80%+ test coverage on service
 
 ---
 
@@ -364,7 +365,7 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 | Phase            | Tasks  | Done   | Progress |
 | ---------------- | ------ | ------ | -------- |
 | 1. Foundation    | 11     | 11     | 100%     |
-| 2. Core Entities | 30     | 6      | 20%      |
+| 2. Core Entities | 30     | 12     | 40%      |
 | 3. BAS Reporting | 6      | 0      | 0%       |
 | 4. Integration   | 10     | 0      | 0%       |
-| **Total**        | **57** | **17** | **30%**  |
+| **Total**        | **57** | **23** | **40%**  |
