@@ -1,24 +1,37 @@
 services:
   easytax-au-db:
     image: postgres:15-alpine
-    restart: always
+    container_name: easytax-au-db
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: easytax-au
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME:-easytax-au}
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    ports:
+      - '${DB_PORT:-5432}:5432'
     volumes:
       - ./pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USERNAME:-postgres} -d ${DB_NAME:-easytax-au}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - easytax-au-network
 
   easytax-au-api:
     build: .
+    container_name: easytax-au-api
     ports:
-      - '3000:3000'
+      - '${PORT:-3000}:3000'
     env_file: .env
+    environment:
+      DB_HOST: easytax-au-db
     volumes:
-      - ./data:/app/data:ro # Read-only access to your source CSVs
+      - ./data:/app/data:ro
     depends_on:
-      - easytax-au-db
+      easytax-au-db:
+        condition: service_healthy
     networks:
       - easytax-au-network
 
