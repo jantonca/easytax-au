@@ -41,9 +41,7 @@ export class ProvidersSeeder implements OnModuleInit {
     const existingCount = await this.providerRepository.count();
 
     if (existingCount > 0) {
-      this.logger.log(
-        `Skipping provider seeding - ${existingCount} providers already exist`,
-      );
+      this.logger.log(`Skipping provider seeding - ${existingCount} providers already exist`);
       return;
     }
 
@@ -107,9 +105,7 @@ export class ProvidersSeeder implements OnModuleInit {
         if (categoryId) {
           provider.defaultCategoryId = categoryId;
         } else {
-          this.logger.warn(
-            `Category "${seed.categoryName}" not found for provider "${seed.name}"`,
-          );
+          this.logger.warn(`Category "${seed.categoryName}" not found for provider "${seed.name}"`);
         }
       }
 
