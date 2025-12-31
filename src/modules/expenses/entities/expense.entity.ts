@@ -3,6 +3,7 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 import { EncryptedColumnTransformer } from '../../../common/transformers';
 import { Provider } from '../../providers/entities/provider.entity';
 import { Category } from '../../categories/entities/category.entity';
+import { ImportJob } from '../../import-jobs/entities/import-job.entity';
 
 /**
  * Expense entity representing business purchases.
@@ -28,6 +29,7 @@ import { Category } from '../../categories/entities/category.entity';
 @Index('idx_expenses_date', ['date'])
 @Index('idx_expenses_category', ['categoryId'])
 @Index('idx_expenses_provider', ['providerId'])
+@Index('idx_expenses_import_job', ['importJobId'])
 export class Expense extends BaseEntity {
   /**
    * Transaction date.
@@ -111,4 +113,22 @@ export class Expense extends BaseEntity {
    */
   @Column({ name: 'category_id', type: 'uuid' })
   categoryId!: string;
+
+  /**
+   * The import job that created this expense.
+   * Null for manually created expenses.
+   */
+  @ManyToOne(() => ImportJob, (importJob) => importJob.expenses, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'import_job_id' })
+  importJob?: ImportJob | null;
+
+  /**
+   * Foreign key for import job relationship.
+   * Null for manually created expenses.
+   */
+  @Column({ name: 'import_job_id', type: 'uuid', nullable: true })
+  importJobId?: string | null;
 }

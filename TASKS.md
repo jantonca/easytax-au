@@ -380,22 +380,27 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 
 | #     | Task                                              | Status |
 | ----- | ------------------------------------------------- | ------ |
-| 5.1.1 | Create `ImportJob` entity (tracks import batches) | ⬜     |
-| 5.1.2 | Create `CreateImportJobDto` with validation       | ⬜     |
-| 5.1.3 | Implement `ImportJobsService` (CRUD + rollback)   | ⬜     |
-| 5.1.4 | Implement `ImportJobsController`                  | ⬜     |
+| 5.1.1 | Create `ImportJob` entity (tracks import batches) | ✅     |
+| 5.1.2 | Create `CreateImportJobDto` with validation       | ✅     |
+| 5.1.3 | Implement `ImportJobsService` (CRUD + rollback)   | ✅     |
+| 5.1.4 | Implement `ImportJobsController`                  | ✅     |
 
 **Documentation Required:**
 
-- [ ] TSDoc for ImportJob entity and DTOs
-- [ ] Document import workflow in ARCHITECTURE.md
-- [ ] Swagger decorators on controller
+- [x] TSDoc for ImportJob entity and DTOs
+- [x] Document import workflow in ARCHITECTURE.md
+- [x] Swagger decorators on controller
 
 **Tests Required:**
 
-- [ ] Service: create import job
-- [ ] Service: find import jobs (with pagination)
-- [ ] Service: rollback import (delete all expenses from job)
+- [x] Service: create import job
+- [x] Service: find import jobs (with pagination)
+- [x] Service: rollback import (delete all expenses from job)
+- [x] Service: mark completed / failed
+- [x] Service: get statistics
+- [x] Service: all ImportSource enum values
+- [x] Service: all ImportStatus enum values
+- [x] 32 total ImportJob service tests passing
 
 ---
 
@@ -452,13 +457,8 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 | 2. Core Entities    | 30     | 30     | 100%     |
 | 3. BAS Reporting    | 6      | 6      | 100%     |
 | 4. Integration      | 10     | 10     | 100%     |
-| 5. CSV Import (QoL) | 13     | 2      | 15%      |
-| **Total**           | **70** | **59** | **84%**  |
-| 2. Core Entities    | 30     | 30     | 100%     |
-| 3. BAS Reporting    | 6      | 6      | 100%     |
-| 4. Integration      | 10     | 10     | 100%     |
-| 5. CSV Import (QoL) | 13     | 0      | 0%       |
-| **Total**           | **70** | **57** | **81%**  |
+| 5. CSV Import (QoL) | 13     | 6      | 46%      |
+| **Total**           | **70** | **63** | **90%**  |
 
 ---
 
@@ -474,4 +474,4 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 - Swagger/OpenAPI documentation
 - Global exception handling
 - Docker Compose deployment (DB + API)
-- 234 unit tests passing
+- 308 unit tests passing (276 Phase 1 + 32 ImportJob)

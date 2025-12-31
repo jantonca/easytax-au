@@ -67,9 +67,14 @@ npm install -g pnpm
 │         ▼                ▼                ▼            │
 │  ┌─────────────────────────────────────────────────┐   │
 │  │              expenses module                     │   │
-│  │  (references: providers, categories)            │   │
+│  │  (references: providers, categories, importJobs)│   │
 │  └──────────────────────┬──────────────────────────┘   │
 │                         │                              │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │            import-jobs module                    │   │
+│  │  (references: expenses for rollback)            │   │
+│  └─────────────────────────────────────────────────┘   │
+│                                                        │
 │  ┌──────────────────────┼──────────────────────────┐   │
 │  │              incomes module                      │   │
 │  │  (references: clients)                          │   │
@@ -480,6 +485,120 @@ export class FYService {
 const fyInfo = fyService.getFYInfo(expense.date);
 // { financialYear: 2026, quarter: 'Q1', fyLabel: 'FY2026', quarterLabel: 'Q1 FY2026' }
 ```
+
+---
+
+## ImportJob Module (CSV Import Tracking)
+
+The ImportJob module tracks CSV import batches for expenses, enabling rollback functionality and import history.
+
+### Module Architecture
+
+```
+modules/import-jobs/
+├── dto/
+│   ├── create-import-job.dto.ts
+│   ├── update-import-job.dto.ts
+│   └── index.ts
+├── entities/
+│   ├── import-job.entity.ts
+│   └── index.ts
+├── import-jobs.controller.ts
+├── import-jobs.service.ts
+├── import-jobs.service.spec.ts
+├── import-jobs.module.ts
+└── index.ts
+```
+
+### ImportJob Entity
+
+```typescript
+interface ImportJob {
+  id: string; // UUID
+  filename: string; // Original CSV filename
+  source: ImportSource; // Bank source (commbank, nab, westpac, anz, manual, other)
+  status: ImportStatus; // pending, completed, rolled_back, failed
+  totalRows: number; // Total rows in CSV
+  importedCount: number; // Successfully imported
+  skippedCount: number; // Duplicates skipped
+  errorCount: number; // Failed rows
+  completedAt?: Date; // When import finished
+  errorMessage?: string; // Error details if failed
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+### Bank Sources
+
+| Source     | Description                             |
+| ---------- | --------------------------------------- |
+| `commbank` | Commonwealth Bank of Australia          |
+| `nab`      | National Australia Bank                 |
+| `westpac`  | Westpac Banking Corporation             |
+| `anz`      | Australia and New Zealand Banking Group |
+| `manual`   | Custom/manual CSV format                |
+| `other`    | Other bank or source                    |
+
+### Import Status Lifecycle
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   PENDING   │ ──► │  COMPLETED  │ ──► │ ROLLED_BACK │
+└─────────────┘     └─────────────┘     └─────────────┘
+       │                   │
+       │                   │
+       ▼                   ▼
+┌─────────────┐     (can rollback)
+│   FAILED    │
+└─────────────┘
+```
+
+### Rollback Functionality
+
+Rollback performs a **hard delete** of all expenses associated with an import job:
+
+```typescript
+// Service method
+async rollback(id: string): Promise<{ deletedCount: number }>
+
+// What happens:
+// 1. Delete all expenses WHERE import_job_id = id
+// 2. Set import job status to ROLLED_BACK
+// 3. Return count of deleted expenses
+```
+
+**Why hard delete?**
+
+- This is a personal tool - if you rollback, you can re-import the CSV
+- Keeps the database clean without orphan data
+- Simpler than soft delete with `deleted_at` tracking
+
+### Expense Relationship
+
+Expenses have an optional `importJobId` field:
+
+```typescript
+// In Expense entity
+@Column({ name: 'import_job_id', type: 'uuid', nullable: true })
+importJobId?: string | null;
+```
+
+- `null` = Manually created expense
+- UUID = Created via CSV import
+
+### API Endpoints
+
+| Method | Endpoint                      | Description                             |
+| ------ | ----------------------------- | --------------------------------------- |
+| POST   | `/import-jobs`                | Create new import job                   |
+| GET    | `/import-jobs`                | List all import jobs (paginated)        |
+| GET    | `/import-jobs/:id`            | Get single import job                   |
+| GET    | `/import-jobs/:id/expenses`   | Get import job with expenses            |
+| GET    | `/import-jobs/:id/statistics` | Get import statistics                   |
+| PATCH  | `/import-jobs/:id`            | Update import job                       |
+| POST   | `/import-jobs/:id/rollback`   | Rollback import (delete expenses)       |
+| DELETE | `/import-jobs/:id`            | Delete import job (only if no expenses) |
 
 ---
 
