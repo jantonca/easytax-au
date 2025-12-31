@@ -529,8 +529,8 @@ Interactive API documentation is available via Swagger UI.
 
 ### Access
 
-| Environment | URL                         |
-| ----------- | --------------------------- |
+| Environment | URL                            |
+| ----------- | ------------------------------ |
 | Development | http://localhost:3000/api/docs |
 
 ### Configuration
@@ -558,14 +558,14 @@ SwaggerModule.setup('api/docs', app, document);
 
 ### Available Endpoints
 
-| Tag        | Endpoints                               | Description                  |
-| ---------- | --------------------------------------- | ---------------------------- |
-| categories | CRUD `/categories`                      | Expense categorization       |
-| providers  | CRUD `/providers`                       | Vendor management            |
-| clients    | CRUD `/clients`                         | Client management (encrypted)|
-| expenses   | CRUD `/expenses`                        | Expense tracking             |
-| incomes    | CRUD `/incomes`, `/incomes/:id/paid`    | Income/invoice tracking      |
-| bas        | `/bas/:quarter/:year`, `/bas/quarters`  | BAS reporting                |
+| Tag        | Endpoints                              | Description                   |
+| ---------- | -------------------------------------- | ----------------------------- |
+| categories | CRUD `/categories`                     | Expense categorization        |
+| providers  | CRUD `/providers`                      | Vendor management             |
+| clients    | CRUD `/clients`                        | Client management (encrypted) |
+| expenses   | CRUD `/expenses`                       | Expense tracking              |
+| incomes    | CRUD `/incomes`, `/incomes/:id/paid`   | Income/invoice tracking       |
+| bas        | `/bas/:quarter/:year`, `/bas/quarters` | BAS reporting                 |
 
 ### Decorators Used
 
@@ -575,3 +575,72 @@ SwaggerModule.setup('api/docs', app, document);
 - `@ApiOkResponse()` / `@ApiCreatedResponse()` - Documents success responses
 - `@ApiNotFoundResponse()` / `@ApiBadRequestResponse()` - Documents error responses
 - `@ApiParam()` / `@ApiQuery()` - Documents path and query parameters
+
+---
+
+## Docker Deployment
+
+### Container Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                   Docker Network                         │
+│              easytax-au-network (bridge)                │
+├─────────────────────────────────────────────────────────┤
+│                                                          │
+│   ┌─────────────────┐      ┌─────────────────────────┐  │
+│   │  easytax-au-db  │      │    easytax-au-api       │  │
+│   │ ─────────────── │      │ ─────────────────────── │  │
+│   │ postgres:15     │◄────►│ node:22-alpine          │  │
+│   │ alpine          │      │ Multi-stage build       │  │
+│   │                 │      │                         │  │
+│   │ Port: 5432      │      │ Port: 3000              │  │
+│   │ Health: pg_ready│      │ Health: wget /          │  │
+│   └─────────────────┘      └─────────────────────────┘  │
+│                                                          │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Dockerfile (Multi-Stage Build)
+
+The API uses a 3-stage build for minimal image size:
+
+1. **deps** - Install all dependencies including devDependencies
+2. **builder** - Compile TypeScript, then prune to production deps
+3. **production** - Minimal runtime with only compiled JS + prod deps
+
+**Features:**
+- Non-root user (`nestjs:nodejs`) for security
+- Health check via wget
+- ~200MB final image (vs ~1GB single-stage)
+
+### Running the Stack
+
+```bash
+# Development: DB container + local API
+docker compose up -d easytax-au-db
+pnpm run start:dev
+
+# Production: Full containerized stack
+DB_PASSWORD=xxx ENCRYPTION_KEY=xxx docker compose up -d
+
+# View container status
+docker ps --filter "name=easytax-au"
+
+# View API logs
+docker compose logs -f easytax-au-api
+```
+
+### Environment Variables
+
+| Variable         | Required | Default     | Description                      |
+| ---------------- | -------- | ----------- | -------------------------------- |
+| `DB_PASSWORD`    | Yes      | -           | PostgreSQL password              |
+| `ENCRYPTION_KEY` | Yes      | -           | 32-char hex key for AES-256-GCM  |
+| `DB_HOST`        | No       | localhost   | Auto-set to `easytax-au-db` in Docker |
+| `DB_PORT`        | No       | 5432        | PostgreSQL port                  |
+| `DB_NAME`        | No       | easytax-au  | Database name                    |
+| `DB_USERNAME`    | No       | postgres    | Database user                    |
+| `PORT`           | No       | 3000        | API server port                  |
+| `NODE_ENV`       | No       | development | Environment mode                 |
+

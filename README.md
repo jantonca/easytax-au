@@ -50,9 +50,33 @@ pnpm run start:dev
 | `pnpm run build`      | Build for production              |
 | `pnpm run start:prod` | Start production build            |
 | `pnpm run test`       | Run unit tests                    |
+| `pnpm run test:cov`   | Run tests with coverage report    |
 | `pnpm run test:e2e`   | Run end-to-end tests              |
 | `pnpm run lint`       | Run ESLint                        |
 | `pnpm run format`     | Run Prettier                      |
+
+### Docker Deployment (Full Stack)
+
+For production deployment, both API and database run in containers:
+
+```bash
+# Set required environment variables
+export DB_PASSWORD=your_secure_password
+export ENCRYPTION_KEY=your_32_char_hex_key
+
+# Start full stack (DB + API)
+docker compose up -d
+
+# View logs
+docker compose logs -f easytax-au-api
+
+# Stop all services
+docker compose down
+```
+
+**Endpoints:**
+- API: `http://localhost:3000`
+- Swagger Docs: `http://localhost:3000/api/docs`
 
 ---
 

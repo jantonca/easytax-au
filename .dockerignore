@@ -1,0 +1,44 @@
+# Dependencies
+node_modules
+
+# Build output
+dist
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Logs
+*.log
+logs
+
+# Test files
+coverage
+*.spec.ts
+test
+jest*.json
+
+# Documentation
+*.md
+!README.md
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Environment (should use env_file in compose)
+.env
+.env.*
+
+# Database volume
+pgdata
+
+# Local data (mounted as volume)
+data
