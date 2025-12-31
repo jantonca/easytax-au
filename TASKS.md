@@ -190,37 +190,37 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 
 | #     | Task                                                  | Status |
 | ----- | ----------------------------------------------------- | ------ |
-| 2.4.1 | Create `Expense` entity with all fields per SCHEMA.md | ⬜     |
-| 2.4.2 | Create `CreateExpenseDto` with validation             | ⬜     |
-| 2.4.3 | Create `UpdateExpenseDto` (partial)                   | ⬜     |
-| 2.4.4 | Implement `ExpensesService` (CRUD)                    | ⬜     |
-| 2.4.5 | Add GST auto-calculation for international providers  | ⬜     |
-| 2.4.6 | Add `biz_percent` validation (0-100)                  | ⬜     |
-| 2.4.7 | Implement `ExpensesController` (REST endpoints)       | ⬜     |
+| 2.4.1 | Create `Expense` entity with all fields per SCHEMA.md | ✅     |
+| 2.4.2 | Create `CreateExpenseDto` with validation             | ✅     |
+| 2.4.3 | Create `UpdateExpenseDto` (partial)                   | ✅     |
+| 2.4.4 | Implement `ExpensesService` (CRUD)                    | ✅     |
+| 2.4.5 | Add GST auto-calculation for international providers  | ✅     |
+| 2.4.6 | Add `biz_percent` validation (0-100)                  | ✅     |
+| 2.4.7 | Implement `ExpensesController` (REST endpoints)       | ✅     |
 
 **Documentation Required:**
 
-- [ ] TSDoc for all DTO properties
+- [x] TSDoc for all DTO properties
 - [ ] Document GST auto-calc logic in ARCHITECTURE.md
-- [ ] Swagger decorators on controller
+- [ ] Swagger decorators on controller (Phase 4)
 
 **Tests Required:**
 
-- [ ] Service: create expense with domestic provider → GST calculated
-- [ ] Service: create expense with international provider → GST = 0
-- [ ] Service: create expense with 50% biz_percent
-- [ ] Service: reject biz_percent > 100
-- [ ] Service: reject biz_percent < 0
-- [ ] Service: reject gst_cents > amount_cents
-- [ ] Service: find expenses by date range
-- [ ] Service: find expenses by category
+- [x] Service: create expense with domestic provider → GST calculated
+- [x] Service: create expense with international provider → GST = 0
+- [x] Service: create expense with 50% biz_percent
+- [x] Service: reject biz_percent > 100
+- [x] Service: reject biz_percent < 0
+- [x] Service: reject gst_cents > amount_cents
+- [x] Service: find expenses by date range
+- [x] Service: find expenses by category
 
 **Definition of Done:**
 
-- [ ] All CRUD operations work via API
-- [ ] GST auto-sets to 0 for international providers
-- [ ] biz_percent constraints enforced
-- [ ] 80%+ test coverage on service
+- [x] All CRUD operations work via API
+- [x] GST auto-sets to 0 for international providers
+- [x] biz_percent constraints enforced
+- [x] 80%+ test coverage on service
 
 ---
 

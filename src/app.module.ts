@@ -7,6 +7,7 @@ import { CommonModule } from './common';
 import databaseConfig from './common/config/database.config';
 import { CategoriesModule } from './modules/categories';
 import { ClientsModule } from './modules/clients';
+import { ExpensesModule } from './modules/expenses';
 import { ProvidersModule } from './modules/providers';
 
 @Module({
@@ -32,6 +33,7 @@ import { ProvidersModule } from './modules/providers';
     // Feature modules
     CategoriesModule,
     ClientsModule,
+    ExpensesModule,
     ProvidersModule,
   ],
   controllers: [AppController],
