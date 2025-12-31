@@ -53,31 +53,31 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 
 | #     | Task                                                | Status |
 | ----- | --------------------------------------------------- | ------ |
-| 1.2.1 | Create `EncryptedColumnTransformer` (AES-256-GCM)   | ⬜     |
-| 1.2.2 | Create `MoneyService` for GST/currency calculations | ⬜     |
-| 1.2.3 | Create base entity with `created_at`, `updated_at`  | ⬜     |
-| 1.2.4 | Set up global validation pipe (class-validator)     | ⬜     |
+| 1.2.1 | Create `EncryptedColumnTransformer` (AES-256-GCM)   | ✅     |
+| 1.2.2 | Create `MoneyService` for GST/currency calculations | ✅     |
+| 1.2.3 | Create base entity with `created_at`, `updated_at`  | ✅     |
+| 1.2.4 | Set up global validation pipe (class-validator)     | ✅     |
 
 **Documentation Required:**
 
-- [ ] TSDoc for `EncryptedColumnTransformer` explaining usage
-- [ ] TSDoc for `MoneyService` with all method signatures
-- [ ] Add encryption details to SECURITY.md
+- [x] TSDoc for `EncryptedColumnTransformer` explaining usage
+- [x] TSDoc for `MoneyService` with all method signatures
+- [x] Add encryption details to SECURITY.md
 
 **Tests Required:**
 
-- [ ] Encryption: encrypt → decrypt returns original value
-- [ ] Encryption: different IVs for same plaintext
-- [ ] MoneyService: `calcGstFromTotal(11000)` returns `1000` (cents)
-- [ ] MoneyService: `addGst(10000)` returns `11000` (cents)
-- [ ] MoneyService: `applyBizPercent(1000, 50)` returns `500` (cents)
-- [ ] MoneyService: handles edge cases (0, rounding)
+- [x] Encryption: encrypt → decrypt returns original value
+- [x] Encryption: different IVs for same plaintext
+- [x] MoneyService: `calcGstFromTotal(11000)` returns `1000` (cents)
+- [x] MoneyService: `addGst(10000)` returns `11000` (cents)
+- [x] MoneyService: `applyBizPercent(1000, 50)` returns `500` (cents)
+- [x] MoneyService: handles edge cases (0, rounding)
 
 **Definition of Done:**
 
-- [ ] Transformers work in isolation (unit tests pass)
-- [ ] No `any` types
-- [ ] TSDoc comments on all exported functions
+- [x] Transformers work in isolation (unit tests pass)
+- [x] No `any` types
+- [x] TSDoc comments on all exported functions
 
 ---
 
@@ -361,10 +361,10 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 
 ## Progress Tracker
 
-| Phase            | Tasks  | Done  | Progress |
-| ---------------- | ------ | ----- | -------- |
-| 1. Foundation    | 9      | 0     | 0%       |
-| 2. Core Entities | 30     | 0     | 0%       |
-| 3. BAS Reporting | 6      | 0     | 0%       |
-| 4. Integration   | 10     | 0     | 0%       |
-| **Total**        | **55** | **0** | **0%**   |
+| Phase            | Tasks  | Done   | Progress |
+| ---------------- | ------ | ------ | -------- |
+| 1. Foundation    | 11     | 11     | 100%     |
+| 2. Core Entities | 30     | 0      | 0%       |
+| 3. BAS Reporting | 6      | 0      | 0%       |
+| 4. Integration   | 10     | 0      | 0%       |
+| **Total**        | **57** | **11** | **19%**  |
