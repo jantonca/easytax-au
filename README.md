@@ -75,6 +75,7 @@ docker compose down
 ```
 
 **Endpoints:**
+
 - API: `http://localhost:3000`
 - Swagger Docs: `http://localhost:3000/api/docs`
 

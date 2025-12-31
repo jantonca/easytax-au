@@ -610,6 +610,7 @@ The API uses a 3-stage build for minimal image size:
 3. **production** - Minimal runtime with only compiled JS + prod deps
 
 **Features:**
+
 - Non-root user (`nestjs:nodejs`) for security
 - Health check via wget
 - ~200MB final image (vs ~1GB single-stage)
@@ -633,14 +634,13 @@ docker compose logs -f easytax-au-api
 
 ### Environment Variables
 
-| Variable         | Required | Default     | Description                      |
-| ---------------- | -------- | ----------- | -------------------------------- |
-| `DB_PASSWORD`    | Yes      | -           | PostgreSQL password              |
-| `ENCRYPTION_KEY` | Yes      | -           | 32-char hex key for AES-256-GCM  |
+| Variable         | Required | Default     | Description                           |
+| ---------------- | -------- | ----------- | ------------------------------------- |
+| `DB_PASSWORD`    | Yes      | -           | PostgreSQL password                   |
+| `ENCRYPTION_KEY` | Yes      | -           | 32-char hex key for AES-256-GCM       |
 | `DB_HOST`        | No       | localhost   | Auto-set to `easytax-au-db` in Docker |
-| `DB_PORT`        | No       | 5432        | PostgreSQL port                  |
-| `DB_NAME`        | No       | easytax-au  | Database name                    |
-| `DB_USERNAME`    | No       | postgres    | Database user                    |
-| `PORT`           | No       | 3000        | API server port                  |
-| `NODE_ENV`       | No       | development | Environment mode                 |
-
+| `DB_PORT`        | No       | 5432        | PostgreSQL port                       |
+| `DB_NAME`        | No       | easytax-au  | Database name                         |
+| `DB_USERNAME`    | No       | postgres    | Database user                         |
+| `PORT`           | No       | 3000        | API server port                       |
+| `NODE_ENV`       | No       | development | Environment mode                      |

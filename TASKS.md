@@ -391,6 +391,7 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 **Completed:** January 1, 2026
 
 **Summary:**
+
 - Full CRUD for Categories, Providers, Clients, Expenses, Incomes
 - BAS quarterly reporting (G1, 1A, 1B calculations)
 - AES-256-GCM encryption for sensitive fields
