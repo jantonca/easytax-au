@@ -251,12 +251,12 @@ constructor(
 
 ### BAS Calculation Formulas
 
-| BAS Label | Description          | Formula                                            |
-| --------- | -------------------- | -------------------------------------------------- |
-| **G1**    | Total Sales          | `SUM(incomes.total_cents)` for period              |
-| **1A**    | GST Collected        | `SUM(incomes.gst_cents)` for period                |
-| **1B**    | GST Paid (Claimable) | `SUM(expenses.gst_cents × biz_percent / 100)` ¹    |
-| **Net**   | GST Payable/Refund   | `1A - 1B` (positive = pay ATO, negative = refund)  |
+| BAS Label | Description          | Formula                                           |
+| --------- | -------------------- | ------------------------------------------------- |
+| **G1**    | Total Sales          | `SUM(incomes.total_cents)` for period             |
+| **1A**    | GST Collected        | `SUM(incomes.gst_cents)` for period               |
+| **1B**    | GST Paid (Claimable) | `SUM(expenses.gst_cents × biz_percent / 100)` ¹   |
+| **Net**   | GST Payable/Refund   | `1A - 1B` (positive = pay ATO, negative = refund) |
 
 ¹ Only includes expenses where `provider.is_international = false`
 
@@ -279,10 +279,10 @@ private getQuarterDateRange(quarter: Quarter, financialYear: number) {
 
 ### API Endpoints
 
-| Method | Endpoint                | Description                    |
-| ------ | ----------------------- | ------------------------------ |
-| GET    | `/bas/:quarter/:year`   | Get BAS summary for a quarter  |
-| GET    | `/bas/quarters/:year`   | Get all quarter dates for a FY |
+| Method | Endpoint              | Description                    |
+| ------ | --------------------- | ------------------------------ |
+| GET    | `/bas/:quarter/:year` | Get BAS summary for a quarter  |
+| GET    | `/bas/quarters/:year` | Get all quarter dates for a FY |
 
 ### Example Response
 
