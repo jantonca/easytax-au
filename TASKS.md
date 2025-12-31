@@ -157,32 +157,32 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 
 | #     | Task                                                | Status |
 | ----- | --------------------------------------------------- | ------ |
-| 2.3.1 | Create `Client` entity with encrypted `name`, `abn` | ⬜     |
-| 2.3.2 | Create `CreateClientDto` with validation            | ⬜     |
-| 2.3.3 | Create `UpdateClientDto` (partial)                  | ⬜     |
-| 2.3.4 | Implement `ClientsService` (CRUD)                   | ⬜     |
-| 2.3.5 | Implement `ClientsController` (REST endpoints)      | ⬜     |
+| 2.3.1 | Create `Client` entity with encrypted `name`, `abn` | ✅     |
+| 2.3.2 | Create `CreateClientDto` with validation            | ✅     |
+| 2.3.3 | Create `UpdateClientDto` (partial)                  | ✅     |
+| 2.3.4 | Implement `ClientsService` (CRUD)                   | ✅     |
+| 2.3.5 | Implement `ClientsController` (REST endpoints)      | ✅     |
 
 **Documentation Required:**
 
-- [ ] TSDoc for all DTO properties
-- [ ] Note encrypted fields in SCHEMA.md
-- [ ] Swagger decorators on controller
+- [x] TSDoc for all DTO properties
+- [x] Note encrypted fields in SCHEMA.md
+- [ ] Swagger decorators on controller (Phase 4)
 
 **Tests Required:**
 
-- [ ] Service: create client (verify encryption)
-- [ ] Service: find all clients (verify decryption)
-- [ ] Service: find one by ID
-- [ ] Service: update client
-- [ ] Service: delete client (cascade check)
-- [ ] Encryption: `name` and `abn` stored encrypted in DB
+- [x] Service: create client (verify encryption)
+- [x] Service: find all clients (verify decryption)
+- [x] Service: find one by ID
+- [x] Service: update client
+- [x] Service: delete client (cascade check)
+- [x] Encryption: `name` and `abn` stored encrypted in DB
 
 **Definition of Done:**
 
-- [ ] All CRUD operations work via API
-- [ ] Encrypted fields not readable in raw DB query
-- [ ] 80%+ test coverage on service
+- [x] All CRUD operations work via API
+- [x] Encrypted fields not readable in raw DB query
+- [x] 80%+ test coverage on service
 
 ---
 

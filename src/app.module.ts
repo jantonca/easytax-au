@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { CommonModule } from './common';
 import databaseConfig from './common/config/database.config';
 import { CategoriesModule } from './modules/categories';
+import { ClientsModule } from './modules/clients';
 import { ProvidersModule } from './modules/providers';
 
 @Module({
@@ -30,6 +31,7 @@ import { ProvidersModule } from './modules/providers';
     CommonModule,
     // Feature modules
     CategoriesModule,
+    ClientsModule,
     ProvidersModule,
   ],
   controllers: [AppController],
