@@ -374,15 +374,91 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 
 ---
 
+## Phase 2: Quality of Life (CSV Import)
+
+### 5.1 ImportJob Module
+
+| #     | Task                                              | Status |
+| ----- | ------------------------------------------------- | ------ |
+| 5.1.1 | Create `ImportJob` entity (tracks import batches) | ⬜     |
+| 5.1.2 | Create `CreateImportJobDto` with validation       | ⬜     |
+| 5.1.3 | Implement `ImportJobsService` (CRUD + rollback)   | ⬜     |
+| 5.1.4 | Implement `ImportJobsController`                  | ⬜     |
+
+**Documentation Required:**
+
+- [ ] TSDoc for ImportJob entity and DTOs
+- [ ] Document import workflow in ARCHITECTURE.md
+- [ ] Swagger decorators on controller
+
+**Tests Required:**
+
+- [ ] Service: create import job
+- [ ] Service: find import jobs (with pagination)
+- [ ] Service: rollback import (delete all expenses from job)
+
+---
+
+### 5.2 CSV Parser Module
+
+| #     | Task                                                 | Status |
+| ----- | ---------------------------------------------------- | ------ |
+| 5.2.1 | Create CSV parsing service (multer + csv-parse)      | ⬜     |
+| 5.2.2 | Create column mapping configuration                  | ⬜     |
+| 5.2.3 | Implement provider auto-match (fuzzy matching)       | ⬜     |
+| 5.2.4 | Implement duplicate detection (date + amount + desc) | ⬜     |
+| 5.2.5 | Create bulk expense creation with import_job_id      | ⬜     |
+| 5.2.6 | Add `POST /import/expenses` endpoint                 | ⬜     |
+
+**Documentation Required:**
+
+- [ ] Document CSV format requirements
+- [ ] Document provider matching rules
+- [ ] Swagger decorators with file upload
+
+**Tests Required:**
+
+- [ ] Parser: valid CSV creates expenses
+- [ ] Parser: invalid CSV returns validation errors
+- [ ] Parser: duplicate detection warns (not blocks)
+- [ ] Parser: international provider → GST = 0
+- [ ] Parser: unknown provider → creates new or flags for review
+
+---
+
+### 5.3 FY Helper Utilities
+
+| #     | Task                                   | Status |
+| ----- | -------------------------------------- | ------ |
+| 5.3.1 | Add `getFYFromDate(date)` utility      | ✅     |
+| 5.3.2 | Add `getQuarterFromDate(date)` utility | ✅     |
+| 5.3.3 | Add FY/Quarter to expense response     | ⬜     |
+
+**Tests Required:**
+
+- [x] FY helper: July 2025 → FY2026
+- [x] FY helper: June 2025 → FY2025
+- [x] Quarter helper: Aug 2025 → Q1 FY2026
+- [x] Quarter helper: Jan 2026 → Q3 FY2026
+- [x] 42 total FY service tests passing
+
+---
+
 ## Progress Tracker
 
-| Phase            | Tasks  | Done   | Progress |
-| ---------------- | ------ | ------ | -------- |
-| 1. Foundation    | 11     | 11     | 100%     |
-| 2. Core Entities | 30     | 30     | 100%     |
-| 3. BAS Reporting | 6      | 6      | 100%     |
-| 4. Integration   | 10     | 10     | 100%     |
-| **Total**        | **57** | **57** | **100%** |
+| Phase               | Tasks  | Done   | Progress |
+| ------------------- | ------ | ------ | -------- |
+| 1. Foundation       | 11     | 11     | 100%     |
+| 2. Core Entities    | 30     | 30     | 100%     |
+| 3. BAS Reporting    | 6      | 6      | 100%     |
+| 4. Integration      | 10     | 10     | 100%     |
+| 5. CSV Import (QoL) | 13     | 2      | 15%      |
+| **Total**           | **70** | **59** | **84%**  |
+| 2. Core Entities    | 30     | 30     | 100%     |
+| 3. BAS Reporting    | 6      | 6      | 100%     |
+| 4. Integration      | 10     | 10     | 100%     |
+| 5. CSV Import (QoL) | 13     | 0      | 0%       |
+| **Total**           | **70** | **57** | **81%**  |
 
 ---
 

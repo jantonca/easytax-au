@@ -426,6 +426,63 @@ const claimableGst = this.moneyService.applyBizPercent(expense.gst_cents, expens
 
 ---
 
+## FYService (Financial Year Utilities)
+
+Centralized service for Australian Financial Year and BAS quarter calculations.
+
+**Australian FY Rules:**
+
+- FY runs from 1 July to 30 June
+- FY2026 = 1 July 2025 to 30 June 2026
+- The FY number is the calendar year in which the FY **ends**
+
+**BAS Quarters:**
+| Quarter | Months | Example for FY2026 |
+|---------|--------|-------------------|
+| Q1 | July - September | Jul 2025 - Sep 2025 |
+| Q2 | October - December | Oct 2025 - Dec 2025 |
+| Q3 | January - March | Jan 2026 - Mar 2026 |
+| Q4 | April - June | Apr 2026 - Jun 2026 |
+
+```typescript
+@Injectable()
+export class FYService {
+  /**
+   * Get FY number for a date
+   * @example getFYFromDate(new Date('2025-07-01')) // Returns 2026
+   */
+  getFYFromDate(date: Date): number;
+
+  /**
+   * Get BAS quarter for a date
+   * @example getQuarterFromDate(new Date('2025-08-15')) // Returns 'Q1'
+   */
+  getQuarterFromDate(date: Date): AustralianQuarter;
+
+  /**
+   * Get complete FY info including labels
+   * @returns { financialYear, quarter, fyLabel, quarterLabel }
+   */
+  getFYInfo(date: Date): FYInfo;
+
+  /**
+   * Get date range for a specific quarter
+   * @example getQuarterDateRange('Q1', 2026) // Jul 1 2025 - Sep 30 2025
+   */
+  getQuarterDateRange(quarter: AustralianQuarter, financialYear: number): QuarterDateRange;
+}
+```
+
+**Usage Example:**
+
+```typescript
+// Get FY info for a transaction date
+const fyInfo = fyService.getFYInfo(expense.date);
+// { financialYear: 2026, quarter: 'Q1', fyLabel: 'FY2026', quarterLabel: 'Q1 FY2026' }
+```
+
+---
+
 ## Error Handling
 
 The application uses a global exception filter to standardize all error responses.
