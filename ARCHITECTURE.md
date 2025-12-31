@@ -110,6 +110,103 @@ Instead of hardcoding apps, we use a Registry.
 | NordVPN            | true             | VPN              |
 | Google (Workspace) | true             | Software         |
 
+### Provider `is_international` Behavior
+
+The `is_international` flag on a Provider determines GST treatment:
+
+| Flag Value | GST Behavior                                       | Example Provider |
+| ---------- | -------------------------------------------------- | ---------------- |
+| `false`    | GST auto-calculated as 1/11 of total (if not provided) | VentraIP, iinet  |
+| `true`     | GST **always** set to $0, regardless of input      | GitHub, AWS      |
+
+**Implementation in `ExpensesService.create()`:**
+
+```typescript
+if (provider.isInternational) {
+  gstCents = 0; // Override any user-provided GST
+} else if (createExpenseDto.gstCents !== undefined) {
+  gstCents = createExpenseDto.gstCents; // Use provided value
+} else {
+  gstCents = this.moneyService.calcGstFromTotal(amountCents); // Auto-calculate
+}
+```
+
+**Why?** International providers (GitHub, AWS, etc.) don't charge GST to Australian customers. Any GST entered would be incorrect and inflate BAS deductions.
+
+---
+
+## Expenses: GST Auto-Calculation Logic
+
+When creating/updating an expense, GST is handled as follows:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                   CREATE EXPENSE                        │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  Is provider international?                             │
+│  ├─ YES → gst_cents = 0 (always, ignore input)         │
+│  └─ NO  → Is gst_cents provided?                       │
+│           ├─ YES → Use provided value                  │
+│           └─ NO  → Calculate: amount_cents / 11        │
+│                                                         │
+│  Validate: gst_cents ≤ amount_cents                    │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Business Use Percentage (`biz_percent`)
+
+For mixed-use expenses (e.g., home internet), only a portion is deductible:
+
+| Field       | Value | Description                        |
+| ----------- | ----- | ---------------------------------- |
+| amount_cents| 11000 | Total bill: $110.00                |
+| gst_cents   | 1000  | GST component: $10.00              |
+| biz_percent | 50    | 50% business use                   |
+| **Claimable GST** | 500 | $10.00 × 50% = $5.00           |
+
+The `biz_percent` is applied at BAS calculation time, not when saving the expense.
+
+---
+
+## Incomes: Total Auto-Calculation
+
+Income records track freelance revenue with automatic total calculation:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                   CREATE/UPDATE INCOME                  │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  total_cents = subtotal_cents + gst_cents              │
+│                                                         │
+│  Example:                                               │
+│  ├─ subtotal_cents: 100000  ($1,000.00 ex-GST)        │
+│  ├─ gst_cents:       10000  ($100.00 GST)             │
+│  └─ total_cents:    110000  ($1,100.00 inc-GST)       │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Implementation in `IncomesService`:**
+
+```typescript
+// On create
+const totalCents = this.moneyService.addAmounts(
+  createIncomeDto.subtotalCents,
+  createIncomeDto.gstCents,
+);
+
+// On update (always recalculate)
+income.totalCents = this.moneyService.addAmounts(
+  income.subtotalCents,
+  income.gstCents,
+);
+```
+
+**Why auto-calculate?** Ensures data integrity - `total_cents` can never be out of sync with its components. The BAS module relies on accurate totals for G1 calculation.
+
 ---
 
 ## ATO GST Logic (Simpler BAS)

@@ -31,6 +31,21 @@ const GST_DIVISOR = new Decimal('11');
 @Injectable()
 export class MoneyService {
   /**
+   * Adds two amounts in cents.
+   * Used for summing subtotal + GST to get total.
+   *
+   * @param amountACents - First amount in cents
+   * @param amountBCents - Second amount in cents
+   * @returns Sum in cents
+   *
+   * @example
+   * addAmounts(100000, 10000) // $1,000.00 + $100.00 = $1,100.00 = 110000 cents
+   */
+  addAmounts(amountACents: number, amountBCents: number): number {
+    return new Decimal(amountACents).plus(amountBCents).round().toNumber();
+  }
+
+  /**
    * Adds GST (10%) to a subtotal amount.
    *
    * @param subtotalCents - The pre-GST amount in cents

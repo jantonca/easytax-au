@@ -133,7 +133,7 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 
 - [x] TSDoc for all DTO properties
 - [x] TSDoc for service methods
-- [ ] Document `is_international` behavior in ARCHITECTURE.md
+- [x] Document `is_international` behavior in ARCHITECTURE.md
 - [ ] Swagger decorators on controller (Phase 4)
 
 **Tests Required:**
@@ -201,7 +201,7 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 **Documentation Required:**
 
 - [x] TSDoc for all DTO properties
-- [ ] Document GST auto-calc logic in ARCHITECTURE.md
+- [x] Document GST auto-calc logic in ARCHITECTURE.md
 - [ ] Swagger decorators on controller (Phase 4)
 
 **Tests Required:**
@@ -228,32 +228,32 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 
 | #     | Task                                                 | Status |
 | ----- | ---------------------------------------------------- | ------ |
-| 2.5.1 | Create `Income` entity with all fields per SCHEMA.md | ⬜     |
-| 2.5.2 | Create `CreateIncomeDto` with validation             | ⬜     |
-| 2.5.3 | Create `UpdateIncomeDto` (partial)                   | ⬜     |
-| 2.5.4 | Implement `IncomesService` (CRUD)                    | ⬜     |
-| 2.5.5 | Add `total_cents` auto-calculation (subtotal + gst)  | ⬜     |
-| 2.5.6 | Implement `IncomesController` (REST endpoints)       | ⬜     |
+| 2.5.1 | Create `Income` entity with all fields per SCHEMA.md | ✅     |
+| 2.5.2 | Create `CreateIncomeDto` with validation             | ✅     |
+| 2.5.3 | Create `UpdateIncomeDto` (partial)                   | ✅     |
+| 2.5.4 | Implement `IncomesService` (CRUD)                    | ✅     |
+| 2.5.5 | Add `total_cents` auto-calculation (subtotal + gst)  | ✅     |
+| 2.5.6 | Implement `IncomesController` (REST endpoints)       | ✅     |
 
 **Documentation Required:**
 
-- [ ] TSDoc for all DTO properties
-- [ ] Document total calculation in ARCHITECTURE.md
-- [ ] Swagger decorators on controller
+- [x] TSDoc for all DTO properties
+- [x] Document total calculation in ARCHITECTURE.md
+- [ ] Swagger decorators on controller (Phase 4)
 
 **Tests Required:**
 
-- [ ] Service: create income → total = subtotal + gst
-- [ ] Service: find incomes by client
-- [ ] Service: find incomes by date range
-- [ ] Service: find paid vs unpaid incomes
-- [ ] Service: update income (recalculate total)
+- [x] Service: create income → total = subtotal + gst
+- [x] Service: find incomes by client
+- [x] Service: find incomes by date range
+- [x] Service: find paid vs unpaid incomes
+- [x] Service: update income (recalculate total)
 
 **Definition of Done:**
 
-- [ ] All CRUD operations work via API
-- [ ] `total_cents` always equals `subtotal_cents + gst_cents`
-- [ ] 80%+ test coverage on service
+- [x] All CRUD operations work via API
+- [x] `total_cents` always equals `subtotal_cents + gst_cents`
+- [x] 80%+ test coverage on service
 
 ---
 
@@ -365,7 +365,7 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 | Phase            | Tasks  | Done   | Progress |
 | ---------------- | ------ | ------ | -------- |
 | 1. Foundation    | 11     | 11     | 100%     |
-| 2. Core Entities | 30     | 12     | 40%      |
+| 2. Core Entities | 30     | 30     | 100%     |
 | 3. BAS Reporting | 6      | 0      | 0%       |
 | 4. Integration   | 10     | 0      | 0%       |
-| **Total**        | **57** | **23** | **40%**  |
+| **Total**        | **57** | **41** | **72%**  |

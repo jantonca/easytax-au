@@ -7,6 +7,22 @@ describe('MoneyService', () => {
     service = new MoneyService();
   });
 
+  describe('addAmounts', () => {
+    it('should add two amounts in cents', () => {
+      expect(service.addAmounts(100000, 10000)).toBe(110000); // $1000 + $100 = $1100
+    });
+
+    it('should handle zero amounts', () => {
+      expect(service.addAmounts(0, 0)).toBe(0);
+      expect(service.addAmounts(10000, 0)).toBe(10000);
+      expect(service.addAmounts(0, 10000)).toBe(10000);
+    });
+
+    it('should handle large amounts', () => {
+      expect(service.addAmounts(500000000, 50000000)).toBe(550000000); // $5M + $500K
+    });
+  });
+
   describe('addGst', () => {
     it('should add 10% GST to subtotal', () => {
       expect(service.addGst(10000)).toBe(11000); // $100 → $110

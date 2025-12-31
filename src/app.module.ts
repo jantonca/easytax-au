@@ -8,6 +8,7 @@ import databaseConfig from './common/config/database.config';
 import { CategoriesModule } from './modules/categories';
 import { ClientsModule } from './modules/clients';
 import { ExpensesModule } from './modules/expenses';
+import { IncomesModule } from './modules/incomes';
 import { ProvidersModule } from './modules/providers';
 
 @Module({
@@ -34,6 +35,7 @@ import { ProvidersModule } from './modules/providers';
     CategoriesModule,
     ClientsModule,
     ExpensesModule,
+    IncomesModule,
     ProvidersModule,
   ],
   controllers: [AppController],
