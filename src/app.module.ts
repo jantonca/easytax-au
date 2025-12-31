@@ -8,6 +8,7 @@ import databaseConfig from './common/config/database.config';
 import { BasModule } from './modules/bas';
 import { CategoriesModule } from './modules/categories';
 import { ClientsModule } from './modules/clients';
+import { CsvImportModule } from './modules/csv-import';
 import { ExpensesModule } from './modules/expenses';
 import { ImportJobsModule } from './modules/import-jobs';
 import { IncomesModule } from './modules/incomes';
@@ -37,6 +38,7 @@ import { ProvidersModule } from './modules/providers';
     BasModule,
     CategoriesModule,
     ClientsModule,
+    CsvImportModule,
     ExpensesModule,
     ImportJobsModule,
     IncomesModule,
