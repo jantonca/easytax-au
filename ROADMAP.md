@@ -49,19 +49,29 @@
 
 ---
 
-## Phase 2: Quality of Life
+## Phase 2: Quality of Life ✅
 
 **Goal:** Make daily use more convenient.
 
 ### Features
 
-| Task                | Description                                  | Priority  |
-| ------------------- | -------------------------------------------- | --------- |
-| CSV Import          | Bulk import expenses from bank export        | 🟡 Medium |
-| ImportJob entity    | Track imports, allow rollback                | 🟡 Medium |
-| Duplicate detection | Warn if same date + amount + provider exists | 🟡 Medium |
-| FY helper           | Auto-detect FY and quarter from date         | 🟡 Medium |
-| Swagger docs        | Auto-generated API documentation             | 🟡 Medium |
+| Task                | Description                                  | Priority  | Status |
+| ------------------- | -------------------------------------------- | --------- | ------ |
+| CSV Import          | Bulk import expenses from bank export        | 🟡 Medium | ✅     |
+| ImportJob entity    | Track imports, allow rollback                | 🟡 Medium | ✅     |
+| Duplicate detection | Warn if same date + amount + provider exists | 🟡 Medium | ✅     |
+| FY helper           | Auto-detect FY and quarter from date         | 🟡 Medium | ✅     |
+| Swagger docs        | Auto-generated API documentation             | 🟡 Medium | ✅     |
+
+**Completed Features:**
+- CSV Import module with support for custom, CommBank, and Amex formats
+- ImportJob entity with rollback capability and statistics tracking
+- Duplicate detection (same date, amount, provider)
+- FY Helper utilities (getFY, getQuarter, date ranges)
+- Provider fuzzy matching (Levenshtein + aliases)
+- Business use percentage applied to imports
+- GST auto-calculation for domestic providers
+- 419 tests across 16 test suites
 
 ### UI Options (Pick One)
 
@@ -79,12 +89,12 @@
 
 ### Features
 
-| Task                  | Description                                 | Priority |
-| --------------------- | ------------------------------------------- | -------- |
-| Recurring expenses    | Auto-generate monthly entries (e.g., iinet) | 🟢 Low   |
-| Bank statement parser | Map CSV columns to expense fields           | 🟢 Low   |
-| Provider auto-match   | Fuzzy match "GITHUB.COM" → GitHub provider  | 🟢 Low   |
-| Email import          | Forward receipts, extract with OCR          | 🟢 Low   |
+| Task                  | Description                                 | Priority | Status      |
+| --------------------- | ------------------------------------------- | -------- | ----------- |
+| Recurring expenses    | Auto-generate monthly entries (e.g., iinet) | 🟢 Low   | Not started |
+| Bank statement parser | Map CSV columns to expense fields           | 🟢 Low   | ✅ (in CSV) |
+| Provider auto-match   | Fuzzy match "GITHUB.COM" → GitHub provider  | 🟢 Low   | ✅ (in CSV) |
+| Email import          | Forward receipts, extract with OCR          | 🟢 Low   | Not started |
 
 ---
 
