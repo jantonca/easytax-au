@@ -124,6 +124,6 @@ export class ImportJob extends BaseEntity {
    * Expenses created by this import job.
    * Used for rollback functionality.
    */
-  @OneToMany(() => Expense, (expense) => expense.importJob)
+  @OneToMany(() => Expense, (expense: Expense) => expense.importJob)
   expenses?: Expense[];
 }
