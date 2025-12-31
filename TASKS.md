@@ -19,33 +19,33 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 
 | #     | Task                                                  | Status |
 | ----- | ----------------------------------------------------- | ------ |
-| 1.1.1 | Initialize NestJS project with TypeScript strict mode | ⬜     |
-| 1.1.2 | Configure ESLint with strict TypeScript rules         | ⬜     |
-| 1.1.3 | Configure Prettier with project standards             | ⬜     |
-| 1.1.4 | Configure TypeORM with PostgreSQL                     | ⬜     |
-| 1.1.5 | Set up Docker Compose (API + DB)                      | ⬜     |
-| 1.1.6 | Create `.env.example` with all required variables     | ⬜     |
-| 1.1.7 | Verify `docker compose up` starts cleanly             | ⬜     |
+| 1.1.1 | Initialize NestJS project with TypeScript strict mode | ✅     |
+| 1.1.2 | Configure ESLint with strict TypeScript rules         | ✅     |
+| 1.1.3 | Configure Prettier with project standards             | ✅     |
+| 1.1.4 | Configure TypeORM with PostgreSQL                     | ✅     |
+| 1.1.5 | Set up Docker Compose (API + DB)                      | ✅     |
+| 1.1.6 | Create `.env.example` with all required variables     | ✅     |
+| 1.1.7 | Verify `docker compose up` starts cleanly             | ✅     |
 
 **Documentation Required:**
 
-- [ ] Update README.md with installation steps
-- [ ] Document environment variables in `.env.example`
-- [ ] Document ESLint/Prettier rules in ARCHITECTURE.md
+- [x] Update README.md with installation steps
+- [x] Document environment variables in `.env.example`
+- [x] Document ESLint/Prettier rules in ARCHITECTURE.md
 
 **Tests Required:**
 
-- [ ] Health check endpoint returns 200
-- [ ] Database connection successful
-- [ ] ESLint passes with no errors
-- [ ] Prettier check passes
+- [x] Health check endpoint returns 200
+- [x] Database connection successful
+- [x] ESLint passes with no errors
+- [x] Prettier check passes
 
 **Definition of Done:**
 
-- [ ] `pnpm run start:dev` works
-- [ ] `docker compose up` works
-- [ ] No TypeScript errors
-- [ ] README has working quick-start guide
+- [x] `pnpm run start:dev` works
+- [x] `docker compose up` works
+- [x] No TypeScript errors
+- [x] README has working quick-start guide
 
 ---
 
