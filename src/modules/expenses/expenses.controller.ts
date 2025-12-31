@@ -11,6 +11,16 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import {
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
@@ -37,6 +47,7 @@ import { Expense } from './entities/expense.entity';
  * DELETE /expenses/:id                - Delete an expense
  * ```
  */
+@ApiTags('expenses')
 @Controller('expenses')
 export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
@@ -49,6 +60,12 @@ export class ExpensesController {
    * @returns The created expense with provider and category
    */
   @Post()
+  @ApiOperation({
+    summary: 'Create a new expense',
+    description:
+      'Creates an expense with automatic GST handling. International providers get GST=0, domestic auto-calculate GST if not provided.',
+  })
+  @ApiCreatedResponse({ description: 'Expense created successfully', type: Expense })
   async create(@Body() createExpenseDto: CreateExpenseDto): Promise<Expense> {
     return this.expensesService.create(createExpenseDto);
   }
@@ -67,6 +84,12 @@ export class ExpensesController {
    * @returns Array of expenses
    */
   @Get()
+  @ApiOperation({ summary: 'Get all expenses with optional filtering' })
+  @ApiQuery({ name: 'categoryId', required: false, description: 'Filter by category UUID' })
+  @ApiQuery({ name: 'providerId', required: false, description: 'Filter by provider UUID' })
+  @ApiQuery({ name: 'startDate', required: false, description: 'Start date (YYYY-MM-DD)' })
+  @ApiQuery({ name: 'endDate', required: false, description: 'End date (YYYY-MM-DD)' })
+  @ApiOkResponse({ description: 'List of expenses', type: [Expense] })
   async findAll(
     @Query('categoryId') categoryId?: string,
     @Query('providerId') providerId?: string,
@@ -101,6 +124,10 @@ export class ExpensesController {
    * @throws NotFoundException if expense doesn't exist
    */
   @Get(':id')
+  @ApiOperation({ summary: 'Get an expense by ID' })
+  @ApiParam({ name: 'id', description: 'Expense UUID' })
+  @ApiOkResponse({ description: 'The expense', type: Expense })
+  @ApiNotFoundResponse({ description: 'Expense not found' })
   async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Expense> {
     return this.expensesService.findOne(id);
   }
@@ -115,6 +142,10 @@ export class ExpensesController {
    * @throws NotFoundException if expense doesn't exist
    */
   @Patch(':id')
+  @ApiOperation({ summary: 'Update an expense' })
+  @ApiParam({ name: 'id', description: 'Expense UUID' })
+  @ApiOkResponse({ description: 'Expense updated successfully', type: Expense })
+  @ApiNotFoundResponse({ description: 'Expense not found' })
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateExpenseDto: UpdateExpenseDto,
@@ -131,6 +162,10 @@ export class ExpensesController {
    */
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete an expense' })
+  @ApiParam({ name: 'id', description: 'Expense UUID' })
+  @ApiNoContentResponse({ description: 'Expense deleted successfully' })
+  @ApiNotFoundResponse({ description: 'Expense not found' })
   async remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.expensesService.remove(id);
   }

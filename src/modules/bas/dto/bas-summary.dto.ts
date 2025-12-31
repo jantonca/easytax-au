@@ -1,3 +1,5 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 /**
  * DTO representing a BAS (Business Activity Statement) summary for a quarter.
  *
@@ -27,6 +29,7 @@ export class BasSummaryDto {
    * The quarter (Q1, Q2, Q3, Q4).
    * @example "Q1"
    */
+  @ApiProperty({ description: 'Quarter', example: 'Q1' })
   quarter: string;
 
   /**
@@ -34,18 +37,21 @@ export class BasSummaryDto {
    * FY2025 = July 2024 - June 2025.
    * @example 2025
    */
+  @ApiProperty({ description: 'Financial year', example: 2025 })
   financialYear: number;
 
   /**
    * Start date of the BAS period (inclusive).
    * @example "2024-07-01"
    */
+  @ApiProperty({ description: 'Period start date', example: '2024-07-01' })
   periodStart: string;
 
   /**
    * End date of the BAS period (inclusive).
    * @example "2024-09-30"
    */
+  @ApiProperty({ description: 'Period end date', example: '2024-09-30' })
   periodEnd: string;
 
   /**
@@ -53,6 +59,7 @@ export class BasSummaryDto {
    * Sum of all income `total_cents` for the period.
    * @example 1100000 (represents $11,000.00)
    */
+  @ApiProperty({ description: 'G1: Total sales in cents (inc GST)', example: 1100000 })
   g1TotalSalesCents: number;
 
   /**
@@ -60,6 +67,7 @@ export class BasSummaryDto {
    * Sum of all income `gst_cents` for the period.
    * @example 100000 (represents $1,000.00)
    */
+  @ApiProperty({ description: '1A: GST collected in cents', example: 100000 })
   label1aGstCollectedCents: number;
 
   /**
@@ -68,6 +76,7 @@ export class BasSummaryDto {
    * for domestic providers only.
    * @example 50000 (represents $500.00)
    */
+  @ApiProperty({ description: '1B: GST paid in cents (claimable)', example: 50000 })
   label1bGstPaidCents: number;
 
   /**
@@ -76,17 +85,20 @@ export class BasSummaryDto {
    * Positive = you owe ATO, Negative = refund due.
    * @example 50000 (represents $500.00 payable)
    */
+  @ApiProperty({ description: 'Net GST payable in cents (negative = refund)', example: 50000 })
   netGstPayableCents: number;
 
   /**
    * Number of income records in the period.
    * Useful for verification.
    */
+  @ApiProperty({ description: 'Income record count', example: 5 })
   incomeCount: number;
 
   /**
    * Number of expense records in the period.
    * Useful for verification.
    */
+  @ApiProperty({ description: 'Expense record count', example: 12 })
   expenseCount: number;
 }

@@ -1,3 +1,4 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsDateString,
   IsInt,
@@ -34,6 +35,7 @@ export class CreateExpenseDto {
    * Transaction date (ISO 8601 format).
    * @example "2024-01-15"
    */
+  @ApiProperty({ description: 'Transaction date (YYYY-MM-DD)', example: '2024-01-15' })
   @IsDateString({}, { message: 'Date must be a valid ISO 8601 date string' })
   @IsNotEmpty({ message: 'Date is required' })
   date!: string;
@@ -43,6 +45,7 @@ export class CreateExpenseDto {
    * Must be a positive integer.
    * @example 11000 (represents $110.00)
    */
+  @ApiProperty({ description: 'Amount in cents (inc GST)', example: 11000, minimum: 1 })
   @IsInt({ message: 'Amount must be an integer (cents)' })
   @Min(1, { message: 'Amount must be at least 1 cent' })
   amountCents!: number;
@@ -54,6 +57,11 @@ export class CreateExpenseDto {
    * - International provider: set to 0
    * @example 1000 (represents $10.00)
    */
+  @ApiPropertyOptional({
+    description: 'GST in cents (auto-calculated if omitted)',
+    example: 1000,
+    minimum: 0,
+  })
   @IsInt({ message: 'GST must be an integer (cents)' })
   @Min(0, { message: 'GST cannot be negative' })
   @IsOptional()
@@ -65,6 +73,13 @@ export class CreateExpenseDto {
    * @example 100 (100% business use)
    * @example 50 (50% business use, e.g., home internet)
    */
+  @ApiPropertyOptional({
+    description: 'Business use percentage',
+    default: 100,
+    minimum: 0,
+    maximum: 100,
+    example: 100,
+  })
   @IsInt({ message: 'Business percent must be an integer' })
   @Min(0, { message: 'Business percent must be at least 0' })
   @Max(100, { message: 'Business percent cannot exceed 100' })
@@ -74,6 +89,7 @@ export class CreateExpenseDto {
   /**
    * UUID of the provider/vendor.
    */
+  @ApiProperty({ description: 'Provider UUID', example: '123e4567-e89b-12d3-a456-426614174000' })
   @IsUUID('4', { message: 'Provider ID must be a valid UUID' })
   @IsNotEmpty({ message: 'Provider ID is required' })
   providerId!: string;
@@ -81,6 +97,7 @@ export class CreateExpenseDto {
   /**
    * UUID of the expense category.
    */
+  @ApiProperty({ description: 'Category UUID', example: '123e4567-e89b-12d3-a456-426614174000' })
   @IsUUID('4', { message: 'Category ID must be a valid UUID' })
   @IsNotEmpty({ message: 'Category ID is required' })
   categoryId!: string;
@@ -90,6 +107,11 @@ export class CreateExpenseDto {
    * This field is encrypted at rest.
    * @example "GitHub Copilot subscription - January 2024"
    */
+  @ApiPropertyOptional({
+    description: 'Description (encrypted at rest)',
+    example: 'GitHub Copilot subscription',
+    maxLength: 500,
+  })
   @IsString()
   @MaxLength(500, { message: 'Description must be 500 characters or less' })
   @IsOptional()
@@ -99,6 +121,11 @@ export class CreateExpenseDto {
    * Optional reference to receipt file.
    * @example "receipt-github-2024-01.pdf"
    */
+  @ApiPropertyOptional({
+    description: 'Receipt file reference',
+    example: 'receipt-github-2024-01.pdf',
+    maxLength: 255,
+  })
   @IsString()
   @MaxLength(255, { message: 'File reference must be 255 characters or less' })
   @IsOptional()

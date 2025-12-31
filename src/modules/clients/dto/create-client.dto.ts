@@ -1,3 +1,4 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsBoolean, IsNotEmpty, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
 
 /**
@@ -21,6 +22,11 @@ export class CreateClientDto {
    * Must be non-empty and max 255 characters.
    * @example "Acme Corporation Pty Ltd"
    */
+  @ApiProperty({
+    description: 'Client legal name (encrypted at rest)',
+    example: 'Acme Corporation Pty Ltd',
+    maxLength: 255,
+  })
   @IsString()
   @IsNotEmpty({ message: 'Client name is required' })
   @MaxLength(255, { message: 'Client name must be 255 characters or less' })
@@ -31,6 +37,10 @@ export class CreateClientDto {
    * Optional - some clients may not have an ABN.
    * @example "51824753556"
    */
+  @ApiPropertyOptional({
+    description: 'ABN - 11 digits (encrypted at rest)',
+    example: '51824753556',
+  })
   @IsString()
   @IsOptional()
   @Matches(/^\d{11}$/, {
@@ -43,6 +53,10 @@ export class CreateClientDto {
    * PSI rules affect which deductions can be claimed.
    * @default false
    */
+  @ApiPropertyOptional({
+    description: 'PSI eligible (affects deduction rules)',
+    default: false,
+  })
   @IsBoolean()
   @IsOptional()
   isPsiEligible?: boolean;

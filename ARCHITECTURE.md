@@ -520,3 +520,58 @@ async function bootstrap() {
   // ...
 }
 ```
+
+---
+
+## API Documentation (Swagger/OpenAPI)
+
+Interactive API documentation is available via Swagger UI.
+
+### Access
+
+| Environment | URL                         |
+| ----------- | --------------------------- |
+| Development | http://localhost:3000/api/docs |
+
+### Configuration
+
+Swagger is configured in `main.ts`:
+
+```typescript
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
+const config = new DocumentBuilder()
+  .setTitle('EasyTax-AU API')
+  .setDescription('Local-first tax management API for Australian sole traders')
+  .setVersion('1.0')
+  .addTag('categories', 'Expense categories')
+  .addTag('providers', 'Expense providers with GST rules')
+  .addTag('clients', 'Income clients (encrypted)')
+  .addTag('expenses', 'Business expenses with GST tracking')
+  .addTag('incomes', 'Business income/invoices')
+  .addTag('bas', 'BAS reporting')
+  .build();
+
+const document = SwaggerModule.createDocument(app, config);
+SwaggerModule.setup('api/docs', app, document);
+```
+
+### Available Endpoints
+
+| Tag        | Endpoints                               | Description                  |
+| ---------- | --------------------------------------- | ---------------------------- |
+| categories | CRUD `/categories`                      | Expense categorization       |
+| providers  | CRUD `/providers`                       | Vendor management            |
+| clients    | CRUD `/clients`                         | Client management (encrypted)|
+| expenses   | CRUD `/expenses`                        | Expense tracking             |
+| incomes    | CRUD `/incomes`, `/incomes/:id/paid`    | Income/invoice tracking      |
+| bas        | `/bas/:quarter/:year`, `/bas/quarters`  | BAS reporting                |
+
+### Decorators Used
+
+- `@ApiTags()` - Groups endpoints by resource
+- `@ApiOperation()` - Describes endpoint purpose
+- `@ApiProperty()` / `@ApiPropertyOptional()` - Documents DTO fields
+- `@ApiOkResponse()` / `@ApiCreatedResponse()` - Documents success responses
+- `@ApiNotFoundResponse()` / `@ApiBadRequestResponse()` - Documents error responses
+- `@ApiParam()` / `@ApiQuery()` - Documents path and query parameters

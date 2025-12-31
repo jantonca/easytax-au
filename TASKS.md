@@ -303,15 +303,15 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 
 | #     | Task                                      | Status |
 | ----- | ----------------------------------------- | ------ |
-| 4.1.1 | Configure Swagger/OpenAPI                 | ⬜     |
-| 4.1.2 | Add Swagger decorators to all controllers | ⬜     |
-| 4.1.3 | Verify all endpoints documented           | ⬜     |
+| 4.1.1 | Configure Swagger/OpenAPI                 | ✅     |
+| 4.1.2 | Add Swagger decorators to all controllers | ✅     |
+| 4.1.3 | Verify all endpoints documented           | ✅     |
 
 **Definition of Done:**
 
-- [ ] `/api/docs` shows all endpoints
-- [ ] Request/response schemas visible
-- [ ] Can test endpoints from Swagger UI
+- [x] `/api/docs` shows all endpoints
+- [x] Request/response schemas visible
+- [x] Can test endpoints from Swagger UI
 
 ---
 
@@ -371,5 +371,5 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 | 1. Foundation    | 11     | 11     | 100%     |
 | 2. Core Entities | 30     | 30     | 100%     |
 | 3. BAS Reporting | 6      | 6      | 100%     |
-| 4. Integration   | 10     | 3      | 30%      |
-| **Total**        | **57** | **50** | **88%**  |
+| 4. Integration   | 10     | 6      | 60%      |
+| **Total**        | **57** | **53** | **93%**  |

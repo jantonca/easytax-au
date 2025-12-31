@@ -11,6 +11,16 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import {
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
@@ -33,6 +43,7 @@ import { Client } from './entities/client.entity';
  * DELETE /clients/:id       - Delete a client
  * ```
  */
+@ApiTags('clients')
 @Controller('clients')
 export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
@@ -45,6 +56,8 @@ export class ClientsController {
    * @returns The created client
    */
   @Post()
+  @ApiOperation({ summary: 'Create a new client' })
+  @ApiCreatedResponse({ description: 'Client created successfully', type: Client })
   async create(@Body() createClientDto: CreateClientDto): Promise<Client> {
     return this.clientsService.create(createClientDto);
   }
@@ -58,6 +71,13 @@ export class ClientsController {
    * @returns Array of clients
    */
   @Get()
+  @ApiOperation({ summary: 'Get all clients' })
+  @ApiQuery({
+    name: 'psiEligible',
+    required: false,
+    description: 'Filter by PSI eligibility (true/false)',
+  })
+  @ApiOkResponse({ description: 'List of clients', type: [Client] })
   async findAll(@Query('psiEligible') psiEligible?: string): Promise<Client[]> {
     if (psiEligible === 'true') {
       return this.clientsService.findPsiEligible();
@@ -74,6 +94,10 @@ export class ClientsController {
    * @throws NotFoundException if client doesn't exist
    */
   @Get(':id')
+  @ApiOperation({ summary: 'Get a client by ID' })
+  @ApiParam({ name: 'id', description: 'Client UUID' })
+  @ApiOkResponse({ description: 'The client', type: Client })
+  @ApiNotFoundResponse({ description: 'Client not found' })
   async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Client> {
     return this.clientsService.findOne(id);
   }
@@ -88,6 +112,10 @@ export class ClientsController {
    * @throws NotFoundException if client doesn't exist
    */
   @Patch(':id')
+  @ApiOperation({ summary: 'Update a client' })
+  @ApiParam({ name: 'id', description: 'Client UUID' })
+  @ApiOkResponse({ description: 'Client updated successfully', type: Client })
+  @ApiNotFoundResponse({ description: 'Client not found' })
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateClientDto: UpdateClientDto,
@@ -104,6 +132,10 @@ export class ClientsController {
    */
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete a client' })
+  @ApiParam({ name: 'id', description: 'Client UUID' })
+  @ApiNoContentResponse({ description: 'Client deleted successfully' })
+  @ApiNotFoundResponse({ description: 'Client not found' })
   async remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.clientsService.remove(id);
   }

@@ -11,6 +11,16 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import {
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { IncomesService } from './incomes.service';
 import { CreateIncomeDto } from './dto/create-income.dto';
 import { UpdateIncomeDto } from './dto/update-income.dto';
@@ -38,6 +48,7 @@ import { Income } from './entities/income.entity';
  * DELETE /incomes/:id                 - Delete an income
  * ```
  */
+@ApiTags('incomes')
 @Controller('incomes')
 export class IncomesController {
   constructor(private readonly incomesService: IncomesService) {}
@@ -50,6 +61,11 @@ export class IncomesController {
    * @returns The created income with client relation
    */
   @Post()
+  @ApiOperation({
+    summary: 'Create a new income',
+    description: 'Creates an income with automatic total calculation (subtotal + GST).',
+  })
+  @ApiCreatedResponse({ description: 'Income created successfully', type: Income })
   async create(@Body() createIncomeDto: CreateIncomeDto): Promise<Income> {
     return this.incomesService.create(createIncomeDto);
   }
@@ -68,6 +84,16 @@ export class IncomesController {
    * @returns Array of incomes
    */
   @Get()
+  @ApiOperation({ summary: 'Get all incomes with optional filtering' })
+  @ApiQuery({ name: 'clientId', required: false, description: 'Filter by client UUID' })
+  @ApiQuery({
+    name: 'isPaid',
+    required: false,
+    description: 'Filter by payment status (true/false)',
+  })
+  @ApiQuery({ name: 'startDate', required: false, description: 'Start date (YYYY-MM-DD)' })
+  @ApiQuery({ name: 'endDate', required: false, description: 'End date (YYYY-MM-DD)' })
+  @ApiOkResponse({ description: 'List of incomes', type: [Income] })
   async findAll(
     @Query('clientId') clientId?: string,
     @Query('isPaid') isPaid?: string,
@@ -102,6 +128,10 @@ export class IncomesController {
    * @returns The income with client relation
    */
   @Get(':id')
+  @ApiOperation({ summary: 'Get an income by ID' })
+  @ApiParam({ name: 'id', description: 'Income UUID' })
+  @ApiOkResponse({ description: 'The income', type: Income })
+  @ApiNotFoundResponse({ description: 'Income not found' })
   async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Income> {
     return this.incomesService.findOne(id);
   }
@@ -117,6 +147,13 @@ export class IncomesController {
    * @returns The updated income
    */
   @Patch(':id')
+  @ApiOperation({
+    summary: 'Update an income',
+    description: 'Updates an income. Total is recalculated if subtotal or GST changes.',
+  })
+  @ApiParam({ name: 'id', description: 'Income UUID' })
+  @ApiOkResponse({ description: 'Income updated successfully', type: Income })
+  @ApiNotFoundResponse({ description: 'Income not found' })
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateIncomeDto: UpdateIncomeDto,
@@ -132,6 +169,10 @@ export class IncomesController {
    * @returns The updated income
    */
   @Patch(':id/paid')
+  @ApiOperation({ summary: 'Mark income as paid' })
+  @ApiParam({ name: 'id', description: 'Income UUID' })
+  @ApiOkResponse({ description: 'Income marked as paid', type: Income })
+  @ApiNotFoundResponse({ description: 'Income not found' })
   async markAsPaid(@Param('id', ParseUUIDPipe) id: string): Promise<Income> {
     return this.incomesService.markAsPaid(id);
   }
@@ -144,6 +185,10 @@ export class IncomesController {
    * @returns The updated income
    */
   @Patch(':id/unpaid')
+  @ApiOperation({ summary: 'Mark income as unpaid' })
+  @ApiParam({ name: 'id', description: 'Income UUID' })
+  @ApiOkResponse({ description: 'Income marked as unpaid', type: Income })
+  @ApiNotFoundResponse({ description: 'Income not found' })
   async markAsUnpaid(@Param('id', ParseUUIDPipe) id: string): Promise<Income> {
     return this.incomesService.markAsUnpaid(id);
   }
@@ -156,6 +201,10 @@ export class IncomesController {
    */
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete an income' })
+  @ApiParam({ name: 'id', description: 'Income UUID' })
+  @ApiNoContentResponse({ description: 'Income deleted successfully' })
+  @ApiNotFoundResponse({ description: 'Income not found' })
   async remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.incomesService.remove(id);
   }

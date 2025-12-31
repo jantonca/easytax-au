@@ -1,5 +1,6 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters';
 
@@ -20,6 +21,25 @@ async function bootstrap(): Promise<void> {
       },
     }),
   );
+
+  // Swagger/OpenAPI documentation
+  const config = new DocumentBuilder()
+    .setTitle('EasyTax-AU API')
+    .setDescription(
+      'Local-first tax management API for Australian sole traders. ' +
+        'Manages expenses, incomes, and BAS (Business Activity Statement) reporting.',
+    )
+    .setVersion('1.0')
+    .addTag('categories', 'Expense categories (e.g., Hosting, Software, Internet)')
+    .addTag('providers', 'Expense providers with GST rules (e.g., VentraIP, GitHub)')
+    .addTag('clients', 'Income clients (encrypted)')
+    .addTag('expenses', 'Business expenses with GST tracking')
+    .addTag('incomes', 'Business income/invoices')
+    .addTag('bas', 'BAS (Business Activity Statement) reporting')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
 
   await app.listen(process.env.PORT ?? 3000);
 }

@@ -1,4 +1,11 @@
 import { Controller, Get, Param } from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { BasService } from './bas.service';
 import { BasSummaryDto } from './dto/bas-summary.dto';
 
@@ -12,6 +19,7 @@ import { BasSummaryDto } from './dto/bas-summary.dto';
  * GET /bas/Q1/2025 - Get BAS summary for Q1 FY2025
  * GET /bas/quarters/2025 - Get all quarter date ranges for FY2025
  */
+@ApiTags('bas')
 @Controller('bas')
 export class BasController {
   constructor(private readonly basService: BasService) {}
@@ -46,6 +54,19 @@ export class BasController {
    * // }
    */
   @Get(':quarter/:year')
+  @ApiOperation({
+    summary: 'Get BAS summary for a quarter',
+    description:
+      'Calculates G1 (total sales), 1A (GST collected), 1B (GST paid) for Australian BAS reporting.',
+  })
+  @ApiParam({ name: 'quarter', description: 'Quarter (Q1, Q2, Q3, Q4)', example: 'Q1' })
+  @ApiParam({
+    name: 'year',
+    description: 'Financial year (e.g., 2025 for FY2024-25)',
+    example: '2025',
+  })
+  @ApiOkResponse({ description: 'BAS summary for the quarter', type: BasSummaryDto })
+  @ApiBadRequestResponse({ description: 'Invalid quarter format' })
   async getSummary(
     @Param('quarter') quarter: string,
     @Param('year') year: string,
@@ -72,6 +93,26 @@ export class BasController {
    * // ]
    */
   @Get('quarters/:year')
+  @ApiOperation({
+    summary: 'Get all quarter date ranges for a financial year',
+    description:
+      'Returns start and end dates for all four quarters of an Australian financial year.',
+  })
+  @ApiParam({ name: 'year', description: 'Financial year', example: '2025' })
+  @ApiOkResponse({
+    description: 'Array of quarter date ranges',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          quarter: { type: 'string', example: 'Q1' },
+          start: { type: 'string', example: '2024-07-01' },
+          end: { type: 'string', example: '2024-09-30' },
+        },
+      },
+    },
+  })
   getQuarters(@Param('year') year: string): Array<{
     quarter: string;
     start: string;
