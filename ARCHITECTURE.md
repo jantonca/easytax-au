@@ -114,10 +114,10 @@ Instead of hardcoding apps, we use a Registry.
 
 The `is_international` flag on a Provider determines GST treatment:
 
-| Flag Value | GST Behavior                                       | Example Provider |
-| ---------- | -------------------------------------------------- | ---------------- |
+| Flag Value | GST Behavior                                           | Example Provider |
+| ---------- | ------------------------------------------------------ | ---------------- |
 | `false`    | GST auto-calculated as 1/11 of total (if not provided) | VentraIP, iinet  |
-| `true`     | GST **always** set to $0, regardless of input      | GitHub, AWS      |
+| `true`     | GST **always** set to $0, regardless of input          | GitHub, AWS      |
 
 **Implementation in `ExpensesService.create()`:**
 
@@ -159,12 +159,12 @@ When creating/updating an expense, GST is handled as follows:
 
 For mixed-use expenses (e.g., home internet), only a portion is deductible:
 
-| Field       | Value | Description                        |
-| ----------- | ----- | ---------------------------------- |
-| amount_cents| 11000 | Total bill: $110.00                |
-| gst_cents   | 1000  | GST component: $10.00              |
-| biz_percent | 50    | 50% business use                   |
-| **Claimable GST** | 500 | $10.00 × 50% = $5.00           |
+| Field             | Value | Description           |
+| ----------------- | ----- | --------------------- |
+| amount_cents      | 11000 | Total bill: $110.00   |
+| gst_cents         | 1000  | GST component: $10.00 |
+| biz_percent       | 50    | 50% business use      |
+| **Claimable GST** | 500   | $10.00 × 50% = $5.00  |
 
 The `biz_percent` is applied at BAS calculation time, not when saving the expense.
 
@@ -199,13 +199,109 @@ const totalCents = this.moneyService.addAmounts(
 );
 
 // On update (always recalculate)
-income.totalCents = this.moneyService.addAmounts(
-  income.subtotalCents,
-  income.gstCents,
-);
+income.totalCents = this.moneyService.addAmounts(income.subtotalCents, income.gstCents);
 ```
 
 **Why auto-calculate?** Ensures data integrity - `total_cents` can never be out of sync with its components. The BAS module relies on accurate totals for G1 calculation.
+
+---
+
+## BAS (Business Activity Statement) Module
+
+The BAS module generates quarterly GST reports following ATO Simpler BAS requirements.
+
+### Module Architecture
+
+```
+modules/bas/
+├── dto/
+│   ├── bas-summary.dto.ts    # Response type
+│   └── index.ts
+├── bas.controller.ts         # REST endpoints
+├── bas.controller.spec.ts    # 15 tests
+├── bas.service.ts            # Business logic
+├── bas.service.spec.ts       # 38 tests
+├── bas.module.ts
+└── index.ts
+```
+
+### Avoiding Circular Dependencies
+
+Per AGENTS.md guidelines, the BAS module injects **repositories directly** rather than importing full service modules:
+
+```typescript
+// ✅ CORRECT - Direct repository injection
+@Injectable()
+export class BasService {
+  constructor(
+    @InjectRepository(Income)
+    private readonly incomeRepository: Repository<Income>,
+    @InjectRepository(Expense)
+    private readonly expenseRepository: Repository<Expense>,
+    private readonly moneyService: MoneyService,
+  ) {}
+}
+
+// ❌ WRONG - Would cause circular dependencies
+constructor(
+  private expensesService: ExpensesService,  // Bad!
+  private incomesService: IncomesService,    // Bad!
+) {}
+```
+
+### BAS Calculation Formulas
+
+| BAS Label | Description          | Formula                                            |
+| --------- | -------------------- | -------------------------------------------------- |
+| **G1**    | Total Sales          | `SUM(incomes.total_cents)` for period              |
+| **1A**    | GST Collected        | `SUM(incomes.gst_cents)` for period                |
+| **1B**    | GST Paid (Claimable) | `SUM(expenses.gst_cents × biz_percent / 100)` ¹    |
+| **Net**   | GST Payable/Refund   | `1A - 1B` (positive = pay ATO, negative = refund)  |
+
+¹ Only includes expenses where `provider.is_international = false`
+
+### Quarter Date Calculations
+
+Australian Financial Year quarters use string-based dates (YYYY-MM-DD) to avoid timezone issues:
+
+```typescript
+private getQuarterDateRange(quarter: Quarter, financialYear: number) {
+  const fyStartYear = financialYear - 1;
+
+  switch (quarter) {
+    case 'Q1': return { start: `${fyStartYear}-07-01`, end: `${fyStartYear}-09-30` };
+    case 'Q2': return { start: `${fyStartYear}-10-01`, end: `${fyStartYear}-12-31` };
+    case 'Q3': return { start: `${financialYear}-01-01`, end: `${financialYear}-03-31` };
+    case 'Q4': return { start: `${financialYear}-04-01`, end: `${financialYear}-06-30` };
+  }
+}
+```
+
+### API Endpoints
+
+| Method | Endpoint                | Description                    |
+| ------ | ----------------------- | ------------------------------ |
+| GET    | `/bas/:quarter/:year`   | Get BAS summary for a quarter  |
+| GET    | `/bas/quarters/:year`   | Get all quarter dates for a FY |
+
+### Example Response
+
+```json
+GET /bas/Q1/2025
+
+{
+  "quarter": "Q1",
+  "financialYear": 2025,
+  "periodStart": "2024-07-01",
+  "periodEnd": "2024-09-30",
+  "g1TotalSalesCents": 1100000,
+  "label1aGstCollectedCents": 100000,
+  "label1bGstPaidCents": 45000,
+  "netGstPayableCents": 55000,
+  "incomeCount": 8,
+  "expenseCount": 25
+}
+```
 
 ---
 
@@ -295,14 +391,14 @@ export class MoneyService {
    * @param totalCents - Total amount in cents (e.g., 11000 for $110.00)
    * @returns GST component in cents (e.g., 1000 for $10.00)
    */
-  calcGstFromTotal(totalCents: number): number
+  calcGstFromTotal(totalCents: number): number;
 
   /**
    * Add 10% GST to a subtotal
    * @param subtotalCents - Amount before GST in cents
    * @returns Total with GST in cents
    */
-  addGst(subtotalCents: number): number
+  addGst(subtotalCents: number): number;
 
   /**
    * Apply business use percentage to GST
@@ -310,14 +406,14 @@ export class MoneyService {
    * @param bizPercent - Business use percentage (0-100)
    * @returns Claimable GST in cents
    */
-  applyBizPercent(gstCents: number, bizPercent: number): number
+  applyBizPercent(gstCents: number, bizPercent: number): number;
 
   /**
    * Convert cents to display string
    * @param cents - Amount in cents
    * @returns Formatted string (e.g., "$110.00")
    */
-  formatAud(cents: number): string
+  formatAud(cents: number): string;
 }
 ```
 
@@ -325,8 +421,5 @@ export class MoneyService {
 
 ```typescript
 // In expenses.service.ts
-const claimableGst = this.moneyService.applyBizPercent(
-  expense.gst_cents,
-  expense.biz_percent
-)
+const claimableGst = this.moneyService.applyBizPercent(expense.gst_cents, expense.biz_percent);
 ```

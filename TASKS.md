@@ -263,33 +263,37 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 
 | #     | Task                                                  | Status |
 | ----- | ----------------------------------------------------- | ------ |
-| 3.1.1 | Create `BasSummaryDto` response type                  | ⬜     |
-| 3.1.2 | Implement `BasService` with repository injection      | ⬜     |
-| 3.1.3 | Implement G1 calculation (total sales)                | ⬜     |
-| 3.1.4 | Implement 1A calculation (GST collected)              | ⬜     |
-| 3.1.5 | Implement 1B calculation (GST paid, with biz_percent) | ⬜     |
-| 3.1.6 | Implement `BasController` (GET /bas/:quarter/:year)   | ⬜     |
+| 3.1.1 | Create `BasSummaryDto` response type                  | ✅     |
+| 3.1.2 | Implement `BasService` with repository injection      | ✅     |
+| 3.1.3 | Implement G1 calculation (total sales)                | ✅     |
+| 3.1.4 | Implement 1A calculation (GST collected)              | ✅     |
+| 3.1.5 | Implement 1B calculation (GST paid, with biz_percent) | ✅     |
+| 3.1.6 | Implement `BasController` (GET /bas/:quarter/:year)   | ✅     |
 
 **Documentation Required:**
 
-- [ ] TSDoc for `BasSummaryDto` explaining each field
-- [ ] Document BAS calculation formulas in ARCHITECTURE.md
-- [ ] Swagger decorators on controller
+- [x] TSDoc for `BasSummaryDto` explaining each field
+- [x] Document BAS calculation formulas in ARCHITECTURE.md
+- [ ] Swagger decorators on controller (Phase 4)
 
 **Tests Required:**
 
-- [ ] G1: sums all income totals for quarter
-- [ ] 1A: sums all income GST for quarter
-- [ ] 1B: sums expense GST × biz_percent for domestic only
-- [ ] 1B: excludes international provider expenses
-- [ ] Quarter boundary: Q1 = Jul-Sep, Q2 = Oct-Dec, etc.
-- [ ] Empty quarter returns zeros (not null/error)
+- [x] G1: sums all income totals for quarter
+- [x] 1A: sums all income GST for quarter
+- [x] 1B: sums expense GST × biz_percent for domestic only
+- [x] 1B: excludes international provider expenses
+- [x] Quarter boundary: Q1 = Jul-Sep, Q2 = Oct-Dec, etc.
+- [x] Empty quarter returns zeros (not null/error)
+- [x] Invalid quarter throws BadRequestException
+- [x] Lowercase quarter normalized to uppercase
+- [x] Net GST calculation (1A - 1B)
+- [x] Negative net = refund due
 
 **Definition of Done:**
 
-- [ ] GET `/bas/Q1/2025` returns correct G1, 1A, 1B
-- [ ] No circular dependencies (uses repositories, not services)
-- [ ] 90%+ test coverage (this is critical business logic)
+- [x] GET `/bas/Q1/2025` returns correct G1, 1A, 1B
+- [x] No circular dependencies (uses repositories, not services)
+- [x] 90%+ test coverage (38 service tests + 15 controller tests = 53 total)
 
 ---
 

@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CommonModule } from './common';
 import databaseConfig from './common/config/database.config';
+import { BasModule } from './modules/bas';
 import { CategoriesModule } from './modules/categories';
 import { ClientsModule } from './modules/clients';
 import { ExpensesModule } from './modules/expenses';
@@ -32,6 +33,7 @@ import { ProvidersModule } from './modules/providers';
     // Common utilities (MoneyService, etc.)
     CommonModule,
     // Feature modules
+    BasModule,
     CategoriesModule,
     ClientsModule,
     ExpensesModule,
