@@ -1,0 +1,27 @@
+services:
+  easytax-au-db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: easytax-au
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    networks:
+      - easytax-au-network
+
+  easytax-au-api:
+    build: .
+    ports:
+      - '3000:3000'
+    env_file: .env
+    volumes:
+      - ./data:/app/data:ro # Read-only access to your source CSVs
+    depends_on:
+      - easytax-au-db
+    networks:
+      - easytax-au-network
+
+networks:
+  easytax-au-network:
+    driver: bridge

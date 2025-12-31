@@ -1,0 +1,22 @@
+# Data Sovereignty
+/data/
+/imports/
+/uploads/
+*.csv
+*.xlsx
+*.pdf
+
+# Environment & Secrets
+.env
+.env.local
+node_modules/
+dist/
+
+# Backups & Logs
+/backups/
+*.sql
+*.gpg
+logs/
+
+# Docker Volumes
+/pgdata/

@@ -1,0 +1,89 @@
+easytax-au/
+├── .github/
+│   └── workflows/
+│       └── ci.yml                    # Gitleaks scan & NestJS tests
+│
+├── src/
+│   ├── app.module.ts                 # Root module
+│   ├── main.ts                       # Bootstrap
+│   │
+│   ├── common/                       # Shared utilities
+│   │   ├── decorators/
+│   │   │   └── encrypted.decorator.ts
+│   │   ├── transformers/
+│   │   │   └── encrypted-column.transformer.ts  # AES-256-GCM
+│   │   ├── interceptors/
+│   │   │   └── decimal.interceptor.ts           # decimal.js serialization
+│   │   └── config/
+│   │       └── database.config.ts
+│   │
+│   └── modules/
+│       ├── categories/
+│       │   ├── dto/
+│       │   │   ├── create-category.dto.ts
+│       │   │   └── update-category.dto.ts
+│       │   ├── entities/
+│       │   │   └── category.entity.ts
+│       │   ├── categories.controller.ts
+│       │   ├── categories.service.ts
+│       │   └── categories.module.ts
+│       │
+│       ├── providers/
+│       │   ├── dto/
+│       │   ├── entities/
+│       │   │   └── provider.entity.ts
+│       │   ├── seeds/
+│       │   │   └── providers.seed.ts            # VentraIP, GitHub, etc.
+│       │   ├── providers.controller.ts
+│       │   ├── providers.service.ts
+│       │   └── providers.module.ts
+│       │
+│       ├── clients/
+│       │   ├── dto/
+│       │   ├── entities/
+│       │   │   └── client.entity.ts
+│       │   ├── clients.controller.ts
+│       │   ├── clients.service.ts
+│       │   └── clients.module.ts
+│       │
+│       ├── expenses/
+│       │   ├── dto/
+│       │   ├── entities/
+│       │   │   └── expense.entity.ts
+│       │   ├── expenses.controller.ts
+│       │   ├── expenses.service.ts
+│       │   └── expenses.module.ts
+│       │
+│       ├── incomes/
+│       │   ├── dto/
+│       │   ├── entities/
+│       │   │   └── income.entity.ts
+│       │   ├── incomes.controller.ts
+│       │   ├── incomes.service.ts
+│       │   └── incomes.module.ts
+│       │
+│       └── bas/                                 # Read-only reports
+│           ├── dto/
+│           │   └── bas-summary.dto.ts
+│           ├── bas.controller.ts
+│           ├── bas.service.ts                   # Injects Expense/Income Repositories
+│           └── bas.module.ts
+│
+├── data/                   # IGNORED: Your raw CSVs/Invoices
+├── backups/                # IGNORED: Encrypted DB snapshots
+├── pgdata/                 # IGNORED: PostgreSQL data volume
+│
+├── docker-compose.yml
+├── Dockerfile
+├── .env.example
+├── .gitignore
+├── package.json
+├── tsconfig.json
+│
+├── README.md               # Overview & Install
+├── ARCHITECTURE.md         # Domain logic & ATO rules
+├── SCHEMA.md               # Entity definitions & relationships
+├── SECURITY.md             # Data Sovereignty & Encryption
+├── BACKUP.md               # 3-2-1 Strategy & Disaster Recovery
+├── ROADMAP.md              # MVP scope & future phases
+└── AGENTS.md               # Coding rules for AI assistants
