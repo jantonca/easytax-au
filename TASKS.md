@@ -460,6 +460,7 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 | 5.4.4 | Add `POST /import/incomes` endpoint              | ⬜     |
 
 **CSV Format:**
+
 ```csv
 Client,Invoice #,Subtotal,GST,Total
 Aida Tomescu updates,9,$560,$56,$616.00

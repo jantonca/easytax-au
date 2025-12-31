@@ -73,9 +73,9 @@ describe('CsvImportService', () => {
               ...mockImportJob,
               ...data,
             })),
-            save: jest.fn().mockImplementation((job) =>
-              Promise.resolve({ ...mockImportJob, ...job }),
-            ),
+            save: jest
+              .fn()
+              .mockImplementation((job) => Promise.resolve({ ...mockImportJob, ...job })),
             update: jest.fn().mockResolvedValue({ affected: 1 }),
           },
         },
@@ -292,9 +292,9 @@ describe('CsvImportService', () => {
       const csv = `Date,Item,Total
 2025-07-15,Google,$21.99`;
 
-      await expect(
-        service.importFromString(csv, { source: 'unknown' }),
-      ).rejects.toThrow('No column mapping provided');
+      await expect(service.importFromString(csv, { source: 'unknown' })).rejects.toThrow(
+        'No column mapping provided',
+      );
     });
 
     it('should use commbank mapping for commbank source', async () => {
@@ -318,9 +318,7 @@ describe('CsvImportService', () => {
       const csv = `Date,Item,Total,GST,Biz%,Category
 2025-07-15,Google,$21.99,$0.00,100,Software`;
 
-      await expect(
-        service.importFromString(csv, { source: 'custom' }),
-      ).rejects.toThrow('DB error');
+      await expect(service.importFromString(csv, { source: 'custom' })).rejects.toThrow('DB error');
 
       // Import job should be marked as failed
       expect(importJobRepo.update).toHaveBeenCalledWith(
