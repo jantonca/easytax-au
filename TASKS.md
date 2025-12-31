@@ -408,26 +408,27 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 
 | #     | Task                                                 | Status |
 | ----- | ---------------------------------------------------- | ------ |
-| 5.2.1 | Create CSV parsing service (multer + csv-parse)      | ⬜     |
-| 5.2.2 | Create column mapping configuration                  | ⬜     |
-| 5.2.3 | Implement provider auto-match (fuzzy matching)       | ⬜     |
-| 5.2.4 | Implement duplicate detection (date + amount + desc) | ⬜     |
-| 5.2.5 | Create bulk expense creation with import_job_id      | ⬜     |
-| 5.2.6 | Add `POST /import/expenses` endpoint                 | ⬜     |
+| 5.2.1 | Create CSV parsing service (multer + csv-parse)      | ✅     |
+| 5.2.2 | Create column mapping configuration                  | ✅     |
+| 5.2.3 | Implement provider auto-match (fuzzy matching)       | ✅     |
+| 5.2.4 | Implement duplicate detection (date + amount + desc) | ✅     |
+| 5.2.5 | Create bulk expense creation with import_job_id      | ✅     |
+| 5.2.6 | Add `POST /import/expenses` endpoint                 | ✅     |
 
 **Documentation Required:**
 
-- [ ] Document CSV format requirements
-- [ ] Document provider matching rules
-- [ ] Swagger decorators with file upload
+- [x] Document CSV format requirements
+- [x] Document provider matching rules
+- [x] Swagger decorators with file upload
 
 **Tests Required:**
 
-- [ ] Parser: valid CSV creates expenses
-- [ ] Parser: invalid CSV returns validation errors
-- [ ] Parser: duplicate detection warns (not blocks)
-- [ ] Parser: international provider → GST = 0
-- [ ] Parser: unknown provider → creates new or flags for review
+- [x] Parser: valid CSV creates expenses
+- [x] Parser: invalid CSV returns validation errors
+- [x] Parser: duplicate detection warns (not blocks)
+- [x] Parser: international provider → GST = 0
+- [x] Parser: unknown provider → flags for review
+- [x] 55 CsvParser tests + 39 ProviderMatcher tests + 17 CsvImport tests
 
 ---
 
@@ -449,6 +450,30 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 
 ---
 
+### 5.4 Income CSV Import
+
+| #     | Task                                             | Status |
+| ----- | ------------------------------------------------ | ------ |
+| 5.4.1 | Add income column mapping (Client, Invoice, etc) | ⬜     |
+| 5.4.2 | Implement client fuzzy matching                  | ⬜     |
+| 5.4.3 | Create bulk income creation with import_job_id   | ⬜     |
+| 5.4.4 | Add `POST /import/incomes` endpoint              | ⬜     |
+
+**CSV Format:**
+```csv
+Client,Invoice #,Subtotal,GST,Total
+Aida Tomescu updates,9,$560,$56,$616.00
+```
+
+**Tests Required:**
+
+- [ ] Parser: valid income CSV creates incomes
+- [ ] Parser: client fuzzy matching works
+- [ ] Parser: duplicate invoice detection
+- [ ] Parser: GST collected tracked correctly
+
+---
+
 ## Progress Tracker
 
 | Phase               | Tasks  | Done   | Progress |
@@ -457,8 +482,8 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 | 2. Core Entities    | 30     | 30     | 100%     |
 | 3. BAS Reporting    | 6      | 6      | 100%     |
 | 4. Integration      | 10     | 10     | 100%     |
-| 5. CSV Import (QoL) | 13     | 6      | 46%      |
-| **Total**           | **70** | **63** | **90%**  |
+| 5. CSV Import (QoL) | 17     | 12     | 71%      |
+| **Total**           | **74** | **69** | **93%**  |
 
 ---
 
@@ -474,4 +499,4 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 - Swagger/OpenAPI documentation
 - Global exception handling
 - Docker Compose deployment (DB + API)
-- 308 unit tests passing (276 Phase 1 + 32 ImportJob)
+- 419 unit tests passing (16 test suites)

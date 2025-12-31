@@ -49,21 +49,23 @@
 
 ---
 
-## Phase 2: Quality of Life ✅
+## Phase 2: Quality of Life (In Progress)
 
 **Goal:** Make daily use more convenient.
 
 ### Features
 
-| Task                | Description                                  | Priority  | Status |
-| ------------------- | -------------------------------------------- | --------- | ------ |
-| CSV Import          | Bulk import expenses from bank export        | 🟡 Medium | ✅     |
-| ImportJob entity    | Track imports, allow rollback                | 🟡 Medium | ✅     |
-| Duplicate detection | Warn if same date + amount + provider exists | 🟡 Medium | ✅     |
-| FY helper           | Auto-detect FY and quarter from date         | 🟡 Medium | ✅     |
-| Swagger docs        | Auto-generated API documentation             | 🟡 Medium | ✅     |
+| Task                | Description                                  | Priority  | Status      |
+| ------------------- | -------------------------------------------- | --------- | ----------- |
+| CSV Import Expenses | Bulk import expenses from bank export        | 🟡 Medium | ✅          |
+| CSV Import Incomes  | Bulk import incomes from spreadsheet         | 🟡 Medium | Not started |
+| ImportJob entity    | Track imports, allow rollback                | 🟡 Medium | ✅          |
+| Duplicate detection | Warn if same date + amount + provider exists | 🟡 Medium | ✅          |
+| FY helper           | Auto-detect FY and quarter from date         | 🟡 Medium | ✅          |
+| Swagger docs        | Auto-generated API documentation             | 🟡 Medium | ✅          |
 
 **Completed Features:**
+
 - CSV Import module with support for custom, CommBank, and Amex formats
 - ImportJob entity with rollback capability and statistics tracking
 - Duplicate detection (same date, amount, provider)
@@ -72,6 +74,12 @@
 - Business use percentage applied to imports
 - GST auto-calculation for domestic providers
 - 419 tests across 16 test suites
+
+**Remaining:**
+
+- Income CSV import (Client, Invoice #, Subtotal, GST, Total)
+  - Client fuzzy matching to existing clients
+  - GST collected tracking (for BAS G1/1A)
 
 ### UI Options (Pick One)
 
