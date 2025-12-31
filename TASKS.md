@@ -87,34 +87,34 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 
 | #     | Task                                              | Status |
 | ----- | ------------------------------------------------- | ------ |
-| 2.1.1 | Create `Category` entity matching SCHEMA.md       | ⬜     |
-| 2.1.2 | Create `CreateCategoryDto` with validation        | ⬜     |
-| 2.1.3 | Create `UpdateCategoryDto` (partial)              | ⬜     |
-| 2.1.4 | Implement `CategoriesService` (CRUD)              | ⬜     |
-| 2.1.5 | Implement `CategoriesController` (REST endpoints) | ⬜     |
-| 2.1.6 | Create seed data for default categories           | ⬜     |
+| 2.1.1 | Create `Category` entity matching SCHEMA.md       | ✅     |
+| 2.1.2 | Create `CreateCategoryDto` with validation        | ✅     |
+| 2.1.3 | Create `UpdateCategoryDto` (partial)              | ✅     |
+| 2.1.4 | Implement `CategoriesService` (CRUD)              | ✅     |
+| 2.1.5 | Implement `CategoriesController` (REST endpoints) | ✅     |
+| 2.1.6 | Create seed data for default categories           | ✅     |
 
 **Documentation Required:**
 
-- [ ] TSDoc for all DTO properties
-- [ ] TSDoc for service methods
-- [ ] Swagger decorators on controller
+- [x] TSDoc for all DTO properties
+- [x] TSDoc for service methods
+- [ ] Swagger decorators on controller (Phase 4)
 
 **Tests Required:**
 
-- [ ] Service: create category
-- [ ] Service: find all categories
-- [ ] Service: find one by ID (success + not found)
-- [ ] Service: update category
-- [ ] Service: delete category
-- [ ] DTO: validation rejects invalid `bas_label`
-- [ ] DTO: validation rejects empty `name`
+- [x] Service: create category
+- [x] Service: find all categories
+- [x] Service: find one by ID (success + not found)
+- [x] Service: update category
+- [x] Service: delete category
+- [x] DTO: validation rejects invalid `bas_label`
+- [x] DTO: validation rejects empty `name`
 
 **Definition of Done:**
 
-- [ ] All CRUD operations work via API
-- [ ] Seed data populates on first run
-- [ ] 80%+ test coverage on service
+- [x] All CRUD operations work via API
+- [x] Seed data populates on first run
+- [x] 80%+ test coverage on service
 
 ---
 
@@ -364,7 +364,7 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 | Phase            | Tasks  | Done   | Progress |
 | ---------------- | ------ | ------ | -------- |
 | 1. Foundation    | 11     | 11     | 100%     |
-| 2. Core Entities | 30     | 0      | 0%       |
+| 2. Core Entities | 30     | 6      | 20%      |
 | 3. BAS Reporting | 6      | 0      | 0%       |
 | 4. Integration   | 10     | 0      | 0%       |
-| **Total**        | **57** | **11** | **19%**  |
+| **Total**        | **57** | **17** | **30%**  |

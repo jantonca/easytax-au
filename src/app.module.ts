@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CommonModule } from './common';
 import databaseConfig from './common/config/database.config';
+import { CategoriesModule } from './modules/categories';
 
 @Module({
   imports: [
@@ -26,6 +27,8 @@ import databaseConfig from './common/config/database.config';
     }),
     // Common utilities (MoneyService, etc.)
     CommonModule,
+    // Feature modules
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
