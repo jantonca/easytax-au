@@ -786,11 +786,11 @@ location / {
 
 | Phase                | Tasks  | Done  | Progress |
 | -------------------- | ------ | ----- | -------- |
-| F1. Scaffold         | 20     | 0     | 0%       |
+|| F1. Scaffold         | 22     | 22    | 100%     |
 | F2. Core Features    | 44     | 0     | 0%       |
 | F3. Reports & Polish | 26     | 0     | 0%       |
 | F4. Production       | 9      | 0     | 0%       |
-| **Total**            | **99** | **0** | **0%**   |
+|| **Total**            | **101** | **22** | **22%** |
 
 ---
 
