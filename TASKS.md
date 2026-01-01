@@ -438,7 +438,7 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 | ----- | -------------------------------------- | ------ |
 | 5.3.1 | Add `getFYFromDate(date)` utility      | ✅     |
 | 5.3.2 | Add `getQuarterFromDate(date)` utility | ✅     |
-| 5.3.3 | Add FY/Quarter to expense response     | ⬜     |
+| 5.3.3 | Add FY/Quarter to expense response     | ✅     |
 
 **Tests Required:**
 
@@ -447,6 +447,11 @@ Each task follows a **Documentation → Code → Test → Review** workflow.
 - [x] Quarter helper: Aug 2025 → Q1 FY2026
 - [x] Quarter helper: Jan 2026 → Q3 FY2026
 - [x] 42 total FY service tests passing
+- [x] toResponseDto: Q1 expense returns FY2026, Q1
+- [x] toResponseDto: Q2, Q3, Q4 correct
+- [x] toResponseDto: FY boundary (Jun 30 vs Jul 1)
+- [x] toResponseDto: includes provider/category relations
+- [x] toResponseDtoArray: transforms array correctly
 
 ---
 
@@ -485,8 +490,8 @@ Aida Tomescu updates,9,$560,$56,$616.00
 | 2. Core Entities    | 30     | 30     | 100%     |
 | 3. BAS Reporting    | 6      | 6      | 100%     |
 | 4. Integration      | 10     | 10     | 100%     |
-| 5. CSV Import (QoL) | 17     | 16     | 94%      |
-| **Total**           | **74** | **73** | **99%**  |
+| 5. CSV Import (QoL) | 17     | 17     | 100%     |
+| **Total**           | **74** | **74** | **100%** |
 
 ---
 
@@ -506,13 +511,15 @@ Aida Tomescu updates,9,$560,$56,$616.00
 
 ## 🎉 Phase 2 CSV Import Complete!
 
-**Completed:** June 2025
+**Completed:** January 1, 2026
 
 **Summary:**
 
 - Expense CSV Import with provider fuzzy matching
 - Income CSV Import with client fuzzy matching
 - ImportJob tracking for batch imports with rollback support
+- FY/Quarter computed fields on expense responses
+- 500 unit tests passing (18 test suites)
 - Duplicate detection for both expenses and incomes
 - FY/Quarter helper utilities
 - 490 unit tests passing (18 test suites)

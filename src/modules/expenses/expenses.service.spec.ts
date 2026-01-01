@@ -6,6 +6,7 @@ import { Expense } from './entities/expense.entity';
 import { Provider } from '../providers/entities/provider.entity';
 import { Category } from '../categories/entities/category.entity';
 import { MoneyService } from '../../common/services/money.service';
+import { FYService } from '../../common/services/fy.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 
@@ -81,6 +82,7 @@ describe('ExpensesService', () => {
       providers: [
         ExpensesService,
         MoneyService,
+        FYService,
         {
           provide: getRepositoryToken(Expense),
           useValue: mockExpenseRepository,
@@ -459,6 +461,162 @@ describe('ExpensesService', () => {
       const result = service.calculateClaimableGst(expense as Expense);
 
       expect(result).toBe(0);
+    });
+  });
+
+  describe('toResponseDto', () => {
+    it('should transform expense to response DTO with FY info for Q1', () => {
+      // August 2025 = Q1 FY2026
+      const expense = {
+        ...mockExpense,
+        date: new Date('2025-08-15'),
+      } as Expense;
+
+      const result = service.toResponseDto(expense);
+
+      expect(result.id).toBe(mockExpense.id);
+      expect(result.date).toEqual(new Date('2025-08-15'));
+      expect(result.amountCents).toBe(11000);
+      expect(result.gstCents).toBe(1000);
+      expect(result.bizPercent).toBe(100);
+      expect(result.financialYear).toBe(2026);
+      expect(result.quarter).toBe('Q1');
+      expect(result.fyLabel).toBe('FY2026');
+      expect(result.quarterLabel).toBe('Q1 FY2026');
+    });
+
+    it('should transform expense to response DTO with FY info for Q2', () => {
+      // November 2025 = Q2 FY2026
+      const expense = {
+        ...mockExpense,
+        date: new Date('2025-11-15'),
+      } as Expense;
+
+      const result = service.toResponseDto(expense);
+
+      expect(result.financialYear).toBe(2026);
+      expect(result.quarter).toBe('Q2');
+      expect(result.fyLabel).toBe('FY2026');
+      expect(result.quarterLabel).toBe('Q2 FY2026');
+    });
+
+    it('should transform expense to response DTO with FY info for Q3', () => {
+      // February 2026 = Q3 FY2026
+      const expense = {
+        ...mockExpense,
+        date: new Date('2026-02-15'),
+      } as Expense;
+
+      const result = service.toResponseDto(expense);
+
+      expect(result.financialYear).toBe(2026);
+      expect(result.quarter).toBe('Q3');
+      expect(result.fyLabel).toBe('FY2026');
+      expect(result.quarterLabel).toBe('Q3 FY2026');
+    });
+
+    it('should transform expense to response DTO with FY info for Q4', () => {
+      // May 2026 = Q4 FY2026
+      const expense = {
+        ...mockExpense,
+        date: new Date('2026-05-15'),
+      } as Expense;
+
+      const result = service.toResponseDto(expense);
+
+      expect(result.financialYear).toBe(2026);
+      expect(result.quarter).toBe('Q4');
+      expect(result.fyLabel).toBe('FY2026');
+      expect(result.quarterLabel).toBe('Q4 FY2026');
+    });
+
+    it('should include provider details when relation is loaded', () => {
+      const expense = {
+        ...mockExpense,
+        provider: domesticProvider,
+      } as Expense;
+
+      const result = service.toResponseDto(expense);
+
+      expect(result.provider).toEqual({
+        id: domesticProvider.id,
+        name: domesticProvider.name,
+        isInternational: domesticProvider.isInternational,
+      });
+    });
+
+    it('should include category details when relation is loaded', () => {
+      const expense = {
+        ...mockExpense,
+        category: mockCategory,
+      } as Expense;
+
+      const result = service.toResponseDto(expense);
+
+      expect(result.category).toEqual({
+        id: mockCategory.id,
+        name: mockCategory.name,
+        basLabel: mockCategory.basLabel,
+      });
+    });
+
+    it('should handle expense without loaded relations', () => {
+      const expense = {
+        ...mockExpense,
+        provider: undefined,
+        category: undefined,
+      } as unknown as Expense;
+
+      const result = service.toResponseDto(expense);
+
+      expect(result.provider).toBeUndefined();
+      expect(result.category).toBeUndefined();
+    });
+
+    it('should handle FY boundary correctly (June 30 vs July 1)', () => {
+      // June 30, 2025 = Q4 FY2025
+      const expenseJune = {
+        ...mockExpense,
+        date: new Date('2025-06-30'),
+      } as Expense;
+
+      // July 1, 2025 = Q1 FY2026
+      const expenseJuly = {
+        ...mockExpense,
+        date: new Date('2025-07-01'),
+      } as Expense;
+
+      const resultJune = service.toResponseDto(expenseJune);
+      const resultJuly = service.toResponseDto(expenseJuly);
+
+      expect(resultJune.financialYear).toBe(2025);
+      expect(resultJune.quarter).toBe('Q4');
+
+      expect(resultJuly.financialYear).toBe(2026);
+      expect(resultJuly.quarter).toBe('Q1');
+    });
+  });
+
+  describe('toResponseDtoArray', () => {
+    it('should transform array of expenses to response DTOs', () => {
+      const expenses = [
+        { ...mockExpense, id: '1', date: new Date('2025-08-15') },
+        { ...mockExpense, id: '2', date: new Date('2025-11-15') },
+        { ...mockExpense, id: '3', date: new Date('2026-02-15') },
+      ] as Expense[];
+
+      const result = service.toResponseDtoArray(expenses);
+
+      expect(result).toHaveLength(3);
+      expect(result[0].quarter).toBe('Q1');
+      expect(result[1].quarter).toBe('Q2');
+      expect(result[2].quarter).toBe('Q3');
+    });
+
+    it('should return empty array for empty input', () => {
+      const result = service.toResponseDtoArray([]);
+
+      expect(result).toEqual([]);
     });
   });
 });

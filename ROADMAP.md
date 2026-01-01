@@ -49,37 +49,34 @@
 
 ---
 
-## Phase 2: Quality of Life (In Progress)
+## Phase 2: Quality of Life (Complete ✅)
 
 **Goal:** Make daily use more convenient.
 
 ### Features
 
-| Task                | Description                                  | Priority  | Status      |
-| ------------------- | -------------------------------------------- | --------- | ----------- |
-| CSV Import Expenses | Bulk import expenses from bank export        | 🟡 Medium | ✅          |
-| CSV Import Incomes  | Bulk import incomes from spreadsheet         | 🟡 Medium | Not started |
-| ImportJob entity    | Track imports, allow rollback                | 🟡 Medium | ✅          |
-| Duplicate detection | Warn if same date + amount + provider exists | 🟡 Medium | ✅          |
-| FY helper           | Auto-detect FY and quarter from date         | 🟡 Medium | ✅          |
-| Swagger docs        | Auto-generated API documentation             | 🟡 Medium | ✅          |
+| Task                | Description                                  | Priority  | Status |
+| ------------------- | -------------------------------------------- | --------- | ------ |
+| CSV Import Expenses | Bulk import expenses from bank export        | 🟡 Medium | ✅     |
+| CSV Import Incomes  | Bulk import incomes from spreadsheet         | 🟡 Medium | ✅     |
+| ImportJob entity    | Track imports, allow rollback                | 🟡 Medium | ✅     |
+| Duplicate detection | Warn if same date + amount + provider exists | 🟡 Medium | ✅     |
+| FY helper           | Auto-detect FY and quarter from date         | 🟡 Medium | ✅     |
+| Swagger docs        | Auto-generated API documentation             | 🟡 Medium | ✅     |
 
 **Completed Features:**
 
 - CSV Import module with support for custom, CommBank, and Amex formats
+- Income CSV Import with client fuzzy matching
 - ImportJob entity with rollback capability and statistics tracking
-- Duplicate detection (same date, amount, provider)
+- Duplicate detection (same date, amount, provider/client)
 - FY Helper utilities (getFY, getQuarter, date ranges)
+- FY/Quarter computed fields in expense responses
 - Provider fuzzy matching (Levenshtein + aliases)
+- Client fuzzy matching (in-memory for encrypted names)
 - Business use percentage applied to imports
 - GST auto-calculation for domestic providers
-- 419 tests across 16 test suites
-
-**Remaining:**
-
-- Income CSV import (Client, Invoice #, Subtotal, GST, Total)
-  - Client fuzzy matching to existing clients
-  - GST collected tracking (for BAS G1/1A)
+- 500 tests across 18 test suites
 
 ### UI Options (Pick One)
 

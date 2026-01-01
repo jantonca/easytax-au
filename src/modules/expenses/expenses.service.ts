@@ -4,9 +4,11 @@ import { Between, Repository } from 'typeorm';
 import { Expense } from './entities/expense.entity';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
+import { ExpenseResponseDto } from './dto/expense-response.dto';
 import { Provider } from '../providers/entities/provider.entity';
 import { Category } from '../categories/entities/category.entity';
 import { MoneyService } from '../../common/services/money.service';
+import { FYService } from '../../common/services/fy.service';
 
 /**
  * Service for managing Expense entities.
@@ -27,6 +29,7 @@ export class ExpensesService {
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
     private readonly moneyService: MoneyService,
+    private readonly fyService: FYService,
   ) {}
 
   /**
@@ -262,5 +265,65 @@ export class ExpensesService {
    */
   calculateClaimableGst(expense: Expense): number {
     return this.moneyService.applyBizPercent(expense.gstCents, expense.bizPercent);
+  }
+
+  /**
+   * Transforms an Expense entity to ExpenseResponseDto with computed FY/Quarter fields.
+   *
+   * @param expense - The expense entity (with relations loaded)
+   * @returns ExpenseResponseDto with FY info
+   */
+  toResponseDto(expense: Expense): ExpenseResponseDto {
+    const fyInfo = this.fyService.getFYInfo(expense.date);
+
+    return {
+      id: expense.id,
+      date: expense.date,
+      description: expense.description,
+      amountCents: expense.amountCents,
+      gstCents: expense.gstCents,
+      bizPercent: expense.bizPercent,
+      currency: expense.currency,
+      fileRef: expense.fileRef,
+      providerId: expense.providerId,
+      categoryId: expense.categoryId,
+      importJobId: expense.importJobId,
+
+      // Computed FY/Quarter fields
+      financialYear: fyInfo.financialYear,
+      quarter: fyInfo.quarter,
+      fyLabel: fyInfo.fyLabel,
+      quarterLabel: fyInfo.quarterLabel,
+
+      // Timestamps
+      createdAt: expense.createdAt,
+      updatedAt: expense.updatedAt,
+
+      // Relations (if loaded)
+      provider: expense.provider
+        ? {
+            id: expense.provider.id,
+            name: expense.provider.name,
+            isInternational: expense.provider.isInternational,
+          }
+        : undefined,
+      category: expense.category
+        ? {
+            id: expense.category.id,
+            name: expense.category.name,
+            basLabel: expense.category.basLabel,
+          }
+        : undefined,
+    };
+  }
+
+  /**
+   * Transforms an array of Expense entities to ExpenseResponseDto array.
+   *
+   * @param expenses - Array of expense entities
+   * @returns Array of ExpenseResponseDto with FY info
+   */
+  toResponseDtoArray(expenses: Expense[]): ExpenseResponseDto[] {
+    return expenses.map((expense) => this.toResponseDto(expense));
   }
 }

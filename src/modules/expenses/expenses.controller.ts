@@ -24,7 +24,7 @@ import {
 import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
-import { Expense } from './entities/expense.entity';
+import { ExpenseResponseDto } from './dto/expense-response.dto';
 
 /**
  * REST controller for Expense entity operations.
@@ -32,6 +32,8 @@ import { Expense } from './entities/expense.entity';
  * Expenses are business purchases with automatic GST handling:
  * - International providers: GST always 0
  * - Domestic providers: GST auto-calculated if not provided
+ *
+ * All responses include computed FY/Quarter information based on expense date.
  *
  * @route /expenses
  *
@@ -57,17 +59,18 @@ export class ExpensesController {
    *
    * @route POST /expenses
    * @param createExpenseDto - The expense data
-   * @returns The created expense with provider and category
+   * @returns The created expense with provider, category, and FY/Quarter info
    */
   @Post()
   @ApiOperation({
     summary: 'Create a new expense',
     description:
-      'Creates an expense with automatic GST handling. International providers get GST=0, domestic auto-calculate GST if not provided.',
+      'Creates an expense with automatic GST handling. International providers get GST=0, domestic auto-calculate GST if not provided. Response includes computed FY/Quarter fields.',
   })
-  @ApiCreatedResponse({ description: 'Expense created successfully', type: Expense })
-  async create(@Body() createExpenseDto: CreateExpenseDto): Promise<Expense> {
-    return this.expensesService.create(createExpenseDto);
+  @ApiCreatedResponse({ description: 'Expense created successfully', type: ExpenseResponseDto })
+  async create(@Body() createExpenseDto: CreateExpenseDto): Promise<ExpenseResponseDto> {
+    const expense = await this.expensesService.create(createExpenseDto);
+    return this.expensesService.toResponseDto(expense);
   }
 
   /**
@@ -81,7 +84,7 @@ export class ExpensesController {
    * @param providerId - Optional filter by provider UUID
    * @param startDate - Optional start date for range filter (ISO 8601)
    * @param endDate - Optional end date for range filter (ISO 8601)
-   * @returns Array of expenses
+   * @returns Array of expenses with FY/Quarter info
    */
   @Get()
   @ApiOperation({ summary: 'Get all expenses with optional filtering' })
@@ -89,30 +92,36 @@ export class ExpensesController {
   @ApiQuery({ name: 'providerId', required: false, description: 'Filter by provider UUID' })
   @ApiQuery({ name: 'startDate', required: false, description: 'Start date (YYYY-MM-DD)' })
   @ApiQuery({ name: 'endDate', required: false, description: 'End date (YYYY-MM-DD)' })
-  @ApiOkResponse({ description: 'List of expenses', type: [Expense] })
+  @ApiOkResponse({
+    description: 'List of expenses with FY/Quarter info',
+    type: [ExpenseResponseDto],
+  })
   async findAll(
     @Query('categoryId') categoryId?: string,
     @Query('providerId') providerId?: string,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
-  ): Promise<Expense[]> {
+  ): Promise<ExpenseResponseDto[]> {
+    let expenses;
+
     // Filter by category
     if (categoryId) {
-      return this.expensesService.findByCategory(categoryId);
+      expenses = await this.expensesService.findByCategory(categoryId);
     }
-
     // Filter by provider
-    if (providerId) {
-      return this.expensesService.findByProvider(providerId);
+    else if (providerId) {
+      expenses = await this.expensesService.findByProvider(providerId);
     }
-
     // Filter by date range
-    if (startDate && endDate) {
-      return this.expensesService.findByDateRange(new Date(startDate), new Date(endDate));
+    else if (startDate && endDate) {
+      expenses = await this.expensesService.findByDateRange(new Date(startDate), new Date(endDate));
+    }
+    // Return all
+    else {
+      expenses = await this.expensesService.findAll();
     }
 
-    // Return all
-    return this.expensesService.findAll();
+    return this.expensesService.toResponseDtoArray(expenses);
   }
 
   /**
@@ -120,16 +129,17 @@ export class ExpensesController {
    *
    * @route GET /expenses/:id
    * @param id - The expense UUID
-   * @returns The expense with provider and category
+   * @returns The expense with provider, category, and FY/Quarter info
    * @throws NotFoundException if expense doesn't exist
    */
   @Get(':id')
   @ApiOperation({ summary: 'Get an expense by ID' })
   @ApiParam({ name: 'id', description: 'Expense UUID' })
-  @ApiOkResponse({ description: 'The expense', type: Expense })
+  @ApiOkResponse({ description: 'The expense with FY/Quarter info', type: ExpenseResponseDto })
   @ApiNotFoundResponse({ description: 'Expense not found' })
-  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Expense> {
-    return this.expensesService.findOne(id);
+  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<ExpenseResponseDto> {
+    const expense = await this.expensesService.findOne(id);
+    return this.expensesService.toResponseDto(expense);
   }
 
   /**
@@ -138,19 +148,20 @@ export class ExpensesController {
    * @route PATCH /expenses/:id
    * @param id - The expense UUID
    * @param updateExpenseDto - The fields to update
-   * @returns The updated expense
+   * @returns The updated expense with FY/Quarter info
    * @throws NotFoundException if expense doesn't exist
    */
   @Patch(':id')
   @ApiOperation({ summary: 'Update an expense' })
   @ApiParam({ name: 'id', description: 'Expense UUID' })
-  @ApiOkResponse({ description: 'Expense updated successfully', type: Expense })
+  @ApiOkResponse({ description: 'Expense updated successfully', type: ExpenseResponseDto })
   @ApiNotFoundResponse({ description: 'Expense not found' })
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateExpenseDto: UpdateExpenseDto,
-  ): Promise<Expense> {
-    return this.expensesService.update(id, updateExpenseDto);
+  ): Promise<ExpenseResponseDto> {
+    const expense = await this.expensesService.update(id, updateExpenseDto);
+    return this.expensesService.toResponseDto(expense);
   }
 
   /**
