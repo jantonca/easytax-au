@@ -17,20 +17,20 @@ We are building a production-grade, local-first finance tool for **personal use 
 
 ```typescript
 // ✅ CORRECT - Use decimal.js, store as cents
-import Decimal from 'decimal.js'
+import Decimal from 'decimal.js';
 
-const subtotal = new Decimal('100.00')
-const gst = subtotal.times('0.10')
-const total = subtotal.plus(gst)
+const subtotal = new Decimal('100.00');
+const gst = subtotal.times('0.10');
+const total = subtotal.plus(gst);
 
 // Store as integers (cents)
-expense.amount_cents = total.times(100).toNumber()
-expense.gst_cents = gst.times(100).toNumber()
+expense.amount_cents = total.times(100).toNumber();
+expense.gst_cents = gst.times(100).toNumber();
 ```
 
 ```typescript
 // ❌ WRONG - Never use floats for money
-const total = 100.0 * 1.1 // Floating point errors!
+const total = 100.0 * 1.1; // Floating point errors!
 ```
 
 ### Entity Structure
@@ -74,7 +74,7 @@ When creating/updating an expense:
 ```typescript
 // In expenses.service.ts
 if (provider.is_international) {
-  expense.gst_cents = 0 // GST-Free
+  expense.gst_cents = 0; // GST-Free
 }
 ```
 
@@ -88,7 +88,7 @@ export class BasService {
     @InjectRepository(Expense)
     private expenseRepo: Repository<Expense>,
     @InjectRepository(Income)
-    private incomeRepo: Repository<Income>
+    private incomeRepo: Repository<Income>,
   ) {}
 }
 ```
@@ -113,7 +113,136 @@ When parsing my CSVs (e.g., `GST-expenses.xlsx`):
 
 ---
 
+## Frontend Development Rules
+
+### Component Patterns
+
+```typescript
+// ✅ CORRECT - Feature-based organization
+web/src/features/expenses/
+├── expenses-page.tsx
+├── components/
+│   ├── expenses-table.tsx
+│   └── expense-form.tsx
+├── hooks/
+│   ├── use-expenses.ts
+│   └── use-expense-mutations.ts
+└── schemas/
+    └── expense.schema.ts
+```
+
+### Data Fetching
+
+```typescript
+// ✅ CORRECT - Use TanStack Query
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+export function useExpenses(filters?: ExpenseFilters) {
+  return useQuery({
+    queryKey: ['expenses', filters],
+    queryFn: () => api.get('/expenses', { params: filters }),
+  });
+}
+
+export function useCreateExpense() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateExpenseDto) => api.post('/expenses', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+    },
+  });
+}
+```
+
+```typescript
+// ❌ WRONG - Don't use useEffect for data fetching
+useEffect(() => {
+  fetch('/api/expenses').then(setExpenses); // Bad!
+}, []);
+```
+
+### Form Validation
+
+```typescript
+// ✅ CORRECT - Use Zod schemas with React Hook Form
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+const schema = z.object({
+  amountCents: z.number().int().positive('Amount must be positive'),
+  bizPercent: z.number().int().min(0).max(100),
+});
+
+const form = useForm({
+  resolver: zodResolver(schema),
+  defaultValues: { amountCents: 0, bizPercent: 100 },
+});
+```
+
+### Shared Types
+
+```typescript
+// ✅ CORRECT - Import from shared types
+import type { Expense, CreateExpenseDto } from '@shared/types';
+
+// ❌ WRONG - Don't duplicate types
+interface Expense { ... } // Bad!
+```
+
+### Currency Display
+
+```typescript
+// ✅ CORRECT - Format cents to dollars in UI
+function formatCurrency(cents: number): string {
+  return new Intl.NumberFormat('en-AU', {
+    style: 'currency',
+    currency: 'AUD',
+  }).format(cents / 100);
+}
+
+// Display: $110.00
+// Store in API/DB: 11000 (cents)
+```
+
+### Accessibility Requirements
+
+```typescript
+// ✅ CORRECT - Keyboard accessible, ARIA labels
+<Button
+  onClick={onSubmit}
+  disabled={isLoading}
+  aria-busy={isLoading}
+>
+  {isLoading ? 'Saving...' : 'Save Expense'}
+</Button>
+
+// ✅ CORRECT - Form labels
+<Label htmlFor="amount">Amount (AUD)</Label>
+<Input id="amount" type="number" {...register('amountCents')} />
+```
+
+### Error Handling
+
+```typescript
+// ✅ CORRECT - User-friendly error messages
+function ExpensesList() {
+  const { data, error, isLoading } = useExpenses();
+
+  if (isLoading) return <TableSkeleton />;
+  if (error) return <ErrorAlert message="Failed to load expenses" />;
+  if (!data?.length) return <EmptyState action="Add your first expense" />;
+
+  return <ExpensesTable data={data} />;
+}
+```
+
+---
+
 ## Testing Guidelines
+
+### Backend Tests
 
 - Use mock data, never real client names or ABNs
 - Test GST calculations with edge cases:
@@ -122,14 +251,60 @@ When parsing my CSVs (e.g., `GST-expenses.xlsx`):
   - International (0% GST)
   - Exact cent amounts (no rounding errors)
 
+### Frontend Tests
+
+- Use MSW for API mocking
+- Test user interactions, not implementation
+- Cover loading, error, and empty states
+
+```typescript
+// ✅ CORRECT - Test user behavior
+test('creates expense when form is submitted', async () => {
+  render(<ExpenseForm />);
+
+  await userEvent.type(screen.getByLabelText(/amount/i), '110');
+  await userEvent.click(screen.getByRole('button', { name: /save/i }));
+
+  expect(await screen.findByText(/expense created/i)).toBeInTheDocument();
+});
+```
+
 ---
 
 ## Documentation References
 
-| Document          | Purpose                                         |
-| ----------------- | ----------------------------------------------- |
-| `SCHEMA.md`       | Entity definitions, relationships, SQL examples |
-| `ARCHITECTURE.md` | Module structure, tech stack, ATO logic         |
-| `ROADMAP.md`      | MVP scope, phases, definition of done           |
-| `SECURITY.md`     | Encryption rules, public repo guidelines        |
-| `BACKUP.md`       | 3-2-1 backup strategy                           |
+| Document            | Purpose                                         |
+| ------------------- | ----------------------------------------------- |
+| `SCHEMA.md`         | Entity definitions, relationships, SQL examples |
+| `ARCHITECTURE.md`   | Module structure, tech stack, patterns          |
+| `ROADMAP.md`        | MVP scope, phases, definition of done           |
+| `SECURITY.md`       | Encryption rules, public repo guidelines        |
+| `BACKUP.md`         | 3-2-1 backup strategy                           |
+| `TASKS.md`          | Backend development tasks                       |
+| `TASKS-FRONTEND.md` | Frontend development tasks                      |
+
+---
+
+## AI Agent Workflow
+
+### Before Starting Any Task
+
+1. **Read related documentation** - Check TASKS\*.md for context
+2. **Verify API exists** - Test endpoint in Swagger before building UI
+3. **Check shared types** - Ensure types exist in `/shared/types`
+4. **Understand the UX** - Know the user flow before coding
+
+### During Development
+
+1. **Test incrementally** - Run tests after each significant change
+2. **No `any` types** - Use proper TypeScript types
+3. **No console.log** - Use proper logging or remove
+4. **Handle all states** - Loading, error, empty, success
+
+### Before Marking Complete
+
+1. **All tests pass** - `pnpm test` (backend), `pnpm --filter web test` (frontend)
+2. **TypeScript compiles** - No type errors
+3. **ESLint passes** - No warnings
+4. **Commit atomically** - One logical change per commit
+5. **Update docs** - Mark task complete in TASKS\*.md

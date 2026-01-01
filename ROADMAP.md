@@ -169,11 +169,11 @@ All MVP requirements have been completed as of January 1, 2026.
 
 ---
 
-## 🎉 Project Status: Feature Complete
+## 🎉 Backend Status: Feature Complete
 
 **Completed:** January 1, 2026
 
-### Summary
+### Backend Summary
 
 | Metric        | Value              |
 | ------------- | ------------------ |
@@ -182,7 +182,7 @@ All MVP requirements have been completed as of January 1, 2026.
 | API Endpoints | 40+                |
 | Modules       | 12 feature modules |
 
-### Core Features
+### Backend Features
 
 - ✅ Full CRUD for Categories, Providers, Clients, Expenses, Incomes
 - ✅ BAS quarterly reporting (G1, 1A, 1B calculations)
@@ -195,21 +195,65 @@ All MVP requirements have been completed as of January 1, 2026.
 - ✅ Swagger/OpenAPI documentation
 - ✅ Docker Compose deployment
 
-### What's Not Included (By Design)
+---
 
-- Dashboard UI (use Swagger or raw API)
-- Email/OCR import (manual CSV works fine)
-- Multi-user auth (single user, local-only)
+## Phase 5: Web UI (Current)
+
+**Goal:** Build a modern, accessible React frontend for daily use.
+
+**See:** [TASKS-FRONTEND.md](./TASKS-FRONTEND.md) for detailed task breakdown.
+
+### Tech Stack
+
+| Layer     | Choice                   | Rationale                |
+| --------- | ------------------------ | ------------------------ |
+| Build     | Vite                     | Fast HMR, native ESM     |
+| Framework | React 18 + TypeScript    | Mature, type-safe        |
+| Styling   | Tailwind CSS + shadcn/ui | Zero-runtime, accessible |
+| Data      | TanStack Query           | Caching, loading states  |
+| Forms     | React Hook Form + Zod    | Performance, validation  |
+| Routing   | React Router v6          | Standard, lazy loading   |
+
+### Frontend Phases
+
+| Phase                | Description                         | Status         |
+| -------------------- | ----------------------------------- | -------------- |
+| F1. Scaffold         | Project setup, tooling, layout      | ⬜ Not started |
+| F2. Core Features    | Expenses, Incomes, Import, Settings | ⬜ Not started |
+| F3. Reports & Polish | BAS/FY reports, accessibility, E2E  | ⬜ Not started |
+| F4. Production       | Docker, nginx, documentation        | ⬜ Not started |
+
+### Key Screens
+
+1. **Dashboard** - GST position, quick actions, recent activity
+2. **Expenses** - List, add/edit form, filters, CSV import
+3. **Incomes** - List, add/edit form, paid/unpaid toggle
+4. **Import** - CSV upload, preview, selective import
+5. **BAS Report** - Quarter view, PDF download
+6. **FY Report** - Annual summary, PDF download
+7. **Settings** - Providers, Categories, Clients management
+
+---
+
+## Out of Scope (Won't Build)
+
+| Feature                 | Reason                          |
+| ----------------------- | ------------------------------- |
+| Multi-user / Auth       | Single user, local-only         |
+| Bank API integration    | Privacy concern, manual is fine |
+| ATO direct submission   | Use their portal                |
+| Mobile app              | Desktop/web is sufficient       |
+| Asset depreciation      | Can add later if needed         |
+| Superannuation tracking | Separate concern                |
+| Email/OCR import        | Manual CSV works fine           |
 
 ---
 
 ## Timeline Estimate
 
-| Phase             | Effort       | Calendar Time |
-| ----------------- | ------------ | ------------- |
-| Phase 1 (MVP)     | ~20-30 hours | 1-2 weeks     |
-| Phase 2 (QoL)     | ~15-20 hours | 1 week        |
-| Phase 3 (Auto)    | ~20+ hours   | As needed     |
-| Phase 4 (Reports) | ~10-15 hours | As needed     |
+| Phase               | Effort       | Calendar Time |
+| ------------------- | ------------ | ------------- |
+| Phase 1-4 (Backend) | ~65 hours    | ✅ Complete   |
+| Phase 5 (Frontend)  | ~40-50 hours | 2-3 weeks     |
 
-**Recommendation:** Complete Phase 1 before Q3 FY2025 (Jan-Mar 2025) to use it for your next BAS.
+**Goal:** Complete frontend before end of January 2026 for Q2 FY2026 BAS (Oct-Dec 2025).

@@ -1,6 +1,34 @@
-# Architecture: Tax Intelligence
+# Architecture: EasyTax-AU
 
-## Tech Stack
+## System Overview
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                         EasyTax-AU                                  │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌──────────────────────┐     ┌──────────────────────────────────┐ │
+│  │     Web Frontend     │     │        Backend API               │ │
+│  │     (React SPA)      │────▶│        (NestJS)                  │ │
+│  │     Port: 5173       │     │        Port: 3000                │ │
+│  └──────────────────────┘     └──────────────┬───────────────────┘ │
+│                                              │                     │
+│                                              ▼                     │
+│                               ┌──────────────────────────────────┐ │
+│                               │        PostgreSQL                │ │
+│                               │        Port: 5432                │ │
+│                               └──────────────────────────────────┘ │
+│                                                                     │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │                    Shared Types                               │  │
+│  │               /shared/types/*.ts                              │  │
+│  └──────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Backend Tech Stack
 
 | Layer               | Technology      | Version        | Notes                            |
 | ------------------- | --------------- | -------------- | -------------------------------- |
@@ -20,7 +48,174 @@
 | **Formatting**      | Prettier        | 3.x            | Consistent code style            |
 | **Container**       | Docker Compose  | Latest         | Single-host deployment           |
 
-### Prerequisites
+---
+
+## Frontend Tech Stack
+
+| Layer             | Technology      | Version | Bundle Size | Notes                          |
+| ----------------- | --------------- | ------- | ----------- | ------------------------------ |
+| **Build**         | Vite            | 5.x     | N/A         | Fast HMR, native ESM           |
+| **Framework**     | React           | 18.x    | ~45KB       | Mature ecosystem               |
+| **Language**      | TypeScript      | 5.x     | N/A         | Strict mode enabled            |
+| **Styling**       | Tailwind CSS    | 3.x     | ~10KB       | Utility-first, tree-shakes     |
+| **Components**    | shadcn/ui       | Latest  | 0KB runtime | Copied to codebase, accessible |
+| **Routing**       | React Router    | 6.x     | ~13KB       | Lazy loading routes            |
+| **Data Fetching** | TanStack Query  | 5.x     | ~13KB       | Caching, loading states        |
+| **Forms**         | React Hook Form | 7.x     | ~10KB       | Performance, uncontrolled      |
+| **Validation**    | Zod             | 3.x     | ~5KB        | Schema validation, type infer  |
+| **Tables**        | TanStack Table  | 8.x     | ~15KB       | Headless, sorting, filtering   |
+| **Icons**         | Lucide React    | Latest  | Tree-shakes | Only used icons bundled        |
+| **Dates**         | date-fns        | 3.x     | Tree-shakes | Only used functions bundled    |
+| **Toasts**        | Sonner          | Latest  | ~5KB        | Accessible notifications       |
+| **Testing**       | Vitest + RTL    | Latest  | N/A         | Fast, compatible with Jest     |
+| **E2E**           | Playwright      | Latest  | N/A         | Cross-browser testing          |
+
+**Estimated Total Bundle:** ~100KB gzipped
+
+---
+
+## Monorepo Structure
+
+```
+easytax-au/
+├── src/                          # Backend (NestJS)
+│   ├── common/                   # Shared utilities, transformers
+│   ├── modules/                  # Feature modules
+│   │   ├── categories/
+│   │   ├── providers/
+│   │   ├── clients/
+│   │   ├── expenses/
+│   │   ├── incomes/
+│   │   ├── bas/
+│   │   ├── reports/
+│   │   ├── csv-import/
+│   │   ├── import-jobs/
+│   │   └── recurring-expenses/
+│   ├── app.module.ts
+│   └── main.ts
+│
+├── web/                          # Frontend (React)
+│   ├── src/
+│   │   ├── components/           # Reusable UI components
+│   │   │   ├── ui/               # shadcn/ui components
+│   │   │   └── layout/           # App shell, navigation
+│   │   ├── features/             # Feature modules
+│   │   │   ├── dashboard/
+│   │   │   ├── expenses/
+│   │   │   ├── incomes/
+│   │   │   ├── import/
+│   │   │   ├── reports/
+│   │   │   ├── recurring/
+│   │   │   └── settings/
+│   │   ├── hooks/                # Custom React hooks
+│   │   ├── lib/                  # Utilities, API client
+│   │   ├── types/                # Frontend-specific types
+│   │   └── App.tsx
+│   ├── e2e/                      # Playwright tests
+│   ├── package.json
+│   └── vite.config.ts
+│
+├── shared/                       # Shared between frontend & backend
+│   └── types/
+│       ├── expense.ts
+│       ├── income.ts
+│       ├── category.ts
+│       ├── provider.ts
+│       ├── client.ts
+│       ├── bas.ts
+│       ├── reports.ts
+│       └── index.ts
+│
+├── data-examples/                # Sample CSV files
+├── pgdata/                       # PostgreSQL data (gitignored)
+├── docker-compose.yml
+├── pnpm-workspace.yaml
+├── package.json                  # Root workspace config
+└── README.md
+```
+
+---
+
+## Frontend Architecture Patterns
+
+### Component Organization
+
+```
+features/expenses/
+├── expenses-page.tsx           # Page component (route entry)
+├── components/
+│   ├── expenses-table.tsx      # Data table
+│   ├── expense-form.tsx        # Add/edit form
+│   ├── expense-filters.tsx     # Filter controls
+│   ├── provider-select.tsx     # Provider dropdown
+│   └── category-select.tsx     # Category dropdown
+├── hooks/
+│   ├── use-expenses.ts         # TanStack Query hook
+│   └── use-expense-mutations.ts # Create/update/delete
+└── schemas/
+    └── expense.schema.ts       # Zod validation schema
+```
+
+### Data Fetching Pattern
+
+```typescript
+// hooks/use-expenses.ts
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/lib/api-client';
+import type { Expense } from '@shared/types';
+
+export function useExpenses(filters?: ExpenseFilters) {
+  return useQuery({
+    queryKey: ['expenses', filters],
+    queryFn: () => api.get<Expense[]>('/expenses', { params: filters }),
+  });
+}
+```
+
+### Form Pattern
+
+```typescript
+// schemas/expense.schema.ts
+import { z } from 'zod';
+
+export const expenseSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  providerId: z.string().uuid(),
+  categoryId: z.string().uuid(),
+  amountCents: z.number().int().positive(),
+  gstCents: z.number().int().min(0),
+  bizPercent: z.number().int().min(0).max(100),
+  description: z.string().optional(),
+});
+
+export type ExpenseFormData = z.infer<typeof expenseSchema>;
+```
+
+### API Client Pattern
+
+```typescript
+// lib/api-client.ts
+import axios from 'axios';
+
+export const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
+  headers: { 'Content-Type': 'application/json' },
+});
+
+// Global error handling
+api.interceptors.response.use(
+  (response) => response.data,
+  (error) => {
+    // Transform to user-friendly message
+    const message = error.response?.data?.message || 'An error occurred';
+    throw new Error(message);
+  },
+);
+```
+
+---
+
+## Prerequisites
 
 ```bash
 # Install fnm (Fast Node Manager)
