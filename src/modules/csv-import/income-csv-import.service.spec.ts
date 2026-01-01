@@ -27,9 +27,9 @@ describe('IncomeCsvImportService', () => {
     source: ImportSource.MANUAL,
     filename: 'test.csv',
     status: ImportStatus.PENDING,
-    recordsTotal: 0,
-    recordsImported: 0,
-    recordsFailed: 0,
+    totalRows: 0,
+    importedCount: 0,
+    errorCount: 0,
   };
 
   const mockDataSource = {
@@ -78,7 +78,6 @@ describe('IncomeCsvImportService', () => {
     }).compile();
 
     service = module.get<IncomeCsvImportService>(IncomeCsvImportService);
-    clientRepo = module.get<Repository<Client>>(getRepositoryToken(Client));
     incomeRepo = module.get<Repository<Income>>(getRepositoryToken(Income));
     importJobRepo = module.get<Repository<ImportJob>>(getRepositoryToken(ImportJob));
     dataSource = module.get<DataSource>(DataSource);
