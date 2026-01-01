@@ -91,14 +91,24 @@ easytax-au/
 
 | #      | Task                                            | Status |
 | ------ | ----------------------------------------------- | ------ |
-| F1.1.1 | Create `/web` directory with Vite + React + TS  | ⬜     |
-| F1.1.2 | Configure `pnpm-workspace.yaml` for monorepo    | ⬜     |
-| F1.1.3 | Set up TypeScript strict mode (`tsconfig.json`) | ⬜     |
-| F1.1.4 | Configure path aliases (`@/components`, etc.)   | ⬜     |
-| F1.1.5 | Add ESLint + Prettier (match backend rules)     | ⬜     |
-| F1.1.6 | Configure Tailwind CSS                          | ⬜     |
-| F1.1.7 | Set up shadcn/ui with theme configuration       | ⬜     |
-| F1.1.8 | Create `.env.example` with `VITE_API_URL`       | ⬜     |
+| F1.1.1 | Create `/web` directory with Vite + React + TS  | ✅     |
+| F1.1.2 | Configure `pnpm-workspace.yaml` for monorepo    | ✅     |
+| F1.1.3 | Set up TypeScript strict mode (`tsconfig.json`) | ✅     |
+| F1.1.4 | Configure path aliases (`@/components`, etc.)   | ✅     |
+| F1.1.5 | Add ESLint + Prettier (match backend rules)     | ✅     |
+| F1.1.6 | Configure Tailwind CSS                          | ✅     |
+| F1.1.7 | Set up shadcn/ui with theme configuration       | ✅     |
+| F1.1.8 | Create `.env.example` with `VITE_API_URL`       | ✅     |
+
+**Implementation notes (F1.1):**
+
+- Frontend scaffold uses **React 19**, **Vite 7**, **TypeScript 5.9 (strict)**.
+- Tailwind CSS **4.x** using CSS‑driven config in `web/src/index.css`:
+  - `@import "tailwindcss";`
+  - `@plugin "tailwindcss-animate";`
+- Shared UI patterns:
+  - `cn` helper in `web/src/lib/utils.ts`.
+  - `Button` in `web/src/components/ui/button.tsx` (shadcn‑style).
 
 **Files to Create:**
 
