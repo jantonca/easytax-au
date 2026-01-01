@@ -129,17 +129,19 @@ easytax-au/
 
 ### F1.2 Core Infrastructure
 
-| #      | Task                                        | Status |
-| ------ | ------------------------------------------- | ------ |
-| F1.2.1 | Create API client with Axios + interceptors | ⬜     |
-| F1.2.2 | Set up TanStack Query provider + devtools   | ⬜     |
-| F1.2.3 | Create React Router with lazy loading       | ⬜     |
-| F1.2.4 | Create error boundary component             | ⬜     |
-| F1.2.5 | Create toast notification system (sonner)   | ⬜     |
-| F1.2.6 | Set up Vitest + Testing Library             | ⬜     |
+| #      | Task                                          | Status |
+| ------ | --------------------------------------------- | ------ |
+| F1.2.1 | Create API client with Axios + interceptors   | ⬜     |
+| F1.2.2 | Set up TanStack Query provider + devtools     | ⬜     |
+| F1.2.3 | Create React Router with lazy loading         | ⬜     |
+| F1.2.4 | Create error boundary component               | ⬜     |
+| F1.2.5 | Create toast notification system (sonner)     | ⬜     |
+| F1.2.6 | Create currency transformer (dollars ↔ cents) | ⬜     |
+| F1.2.7 | Set up Vitest + Testing Library               | ⬜     |
 
 **Files to Create:**
 
+- `web/src/lib/currency.ts` (toCents, toDollars, formatCurrency)
 - `web/src/lib/api-client.ts`
 - `web/src/lib/query-client.ts`
 - `web/src/lib/router.tsx`
@@ -164,43 +166,43 @@ easytax-au/
 
 ---
 
-### F1.3 Shared Types
+### F1.3 Shared Types (Auto-Generated)
 
-| #      | Task                                           | Status |
-| ------ | ---------------------------------------------- | ------ |
-| F1.3.1 | Create `/shared/types` directory               | ⬜     |
-| F1.3.2 | Extract API response types from backend DTOs   | ⬜     |
-| F1.3.3 | Create Zod schemas matching backend validation | ⬜     |
-| F1.3.4 | Configure both projects to use shared types    | ⬜     |
+| #      | Task                                                      | Status |
+| ------ | --------------------------------------------------------- | ------ |
+| F1.3.1 | Install `openapi-typescript` as dev dependency            | ⬜     |
+| F1.3.2 | Add `pnpm run generate:types` script to root package.json | ⬜     |
+| F1.3.3 | Generate types from `http://localhost:3000/api-json`      | ⬜     |
+| F1.3.4 | Configure path alias `@api-types` in web tsconfig         | ⬜     |
 
 **Files to Create:**
 
-- `shared/types/expense.ts`
-- `shared/types/income.ts`
-- `shared/types/category.ts`
-- `shared/types/provider.ts`
-- `shared/types/client.ts`
-- `shared/types/bas.ts`
-- `shared/types/reports.ts`
-- `shared/types/index.ts`
+- `shared/types/api.d.ts` (auto-generated from OpenAPI spec)
+- Root `package.json` script: `"generate:types": "openapi-typescript http://localhost:3000/api-json -o shared/types/api.d.ts"`
+
+**Benefits:**
+
+- Zero type drift - types always match API
+- Single source of truth (Swagger/OpenAPI)
+- Auto-regenerate on API changes
+- No manual maintenance
 
 **Definition of Done:**
 
-- [ ] Frontend can import types from `@shared/types`
-- [ ] Types match API responses exactly
-- [ ] Zod schemas validate correctly
+- [ ] `pnpm run generate:types` produces valid TypeScript
+- [ ] Frontend can import types from `@api-types`
+- [ ] Types match API responses exactly (guaranteed by generation)
 
 ---
 
 ### F1.4 Layout & Navigation
 
-| #      | Task                                                | Status |
-| ------ | --------------------------------------------------- | ------ |
-| F1.4.1 | Create app shell with sidebar layout                | ⬜     |
-| F1.4.2 | Create responsive navigation (mobile drawer)        | ⬜     |
-| F1.4.3 | Create header with current FY/Quarter display       | ⬜     |
-| F1.4.4 | Add keyboard shortcuts (⌘K for command palette)     | ⬜     |
-| F1.4.5 | Implement dark mode toggle (stored in localStorage) | ⬜     |
+| #      | Task                                            | Status |
+| ------ | ----------------------------------------------- | ------ |
+| F1.4.1 | Create app shell with sidebar layout            | ⬜     |
+| F1.4.2 | Create responsive navigation (mobile drawer)    | ⬜     |
+| F1.4.3 | Create header with current FY/Quarter display   | ⬜     |
+| F1.4.4 | Add keyboard shortcuts (⌘K for command palette) | ⬜     |
 
 **Files to Create:**
 
@@ -208,14 +210,12 @@ easytax-au/
 - `web/src/components/layout/sidebar.tsx`
 - `web/src/components/layout/header.tsx`
 - `web/src/components/layout/mobile-nav.tsx`
-- `web/src/hooks/use-theme.ts`
 - `web/src/hooks/use-keyboard-shortcuts.ts`
 
 **Tests Required:**
 
 - [ ] Sidebar navigation works
 - [ ] Mobile drawer opens/closes
-- [ ] Dark mode persists on reload
 - [ ] Keyboard shortcut triggers command palette
 
 **Definition of Done:**
@@ -582,16 +582,22 @@ easytax-au/
 
 ### F3.4 Polish & Accessibility
 
-| #      | Task                                       | Status |
-| ------ | ------------------------------------------ | ------ |
-| F3.4.1 | Audit all forms for keyboard accessibility | ⬜     |
-| F3.4.2 | Add focus visible styles                   | ⬜     |
-| F3.4.3 | Test with screen reader (VoiceOver/NVDA)   | ⬜     |
-| F3.4.4 | Add skip links for navigation              | ⬜     |
-| F3.4.5 | Ensure color contrast meets WCAG AA        | ⬜     |
-| F3.4.6 | Add loading skeletons for all data fetches | ⬜     |
-| F3.4.7 | Add empty states for all lists             | ⬜     |
-| F3.4.8 | Add success/error toasts for all mutations | ⬜     |
+| #      | Task                                                | Status |
+| ------ | --------------------------------------------------- | ------ |
+| F3.4.1 | Audit all forms for keyboard accessibility          | ⬜     |
+| F3.4.2 | Add focus visible styles                            | ⬜     |
+| F3.4.3 | Test with screen reader (VoiceOver/NVDA)            | ⬜     |
+| F3.4.4 | Add skip links for navigation                       | ⬜     |
+| F3.4.5 | Ensure color contrast meets WCAG AA                 | ⬜     |
+| F3.4.6 | Add loading skeletons for all data fetches          | ⬜     |
+| F3.4.7 | Add empty states for all lists                      | ⬜     |
+| F3.4.8 | Add success/error toasts for all mutations          | ⬜     |
+| F3.4.9 | Implement dark mode toggle (stored in localStorage) | ⬜     |
+
+**Files to Create (dark mode):**
+
+- `web/src/hooks/use-theme.ts`
+- Update `web/src/components/layout/header.tsx` with toggle
 
 **Definition of Done:**
 
@@ -640,13 +646,24 @@ easytax-au/
 | F4.1.1 | Configure production build                   | ⬜     |
 | F4.1.2 | Add to Docker Compose (nginx serving static) | ⬜     |
 | F4.1.3 | Configure API proxy in nginx                 | ⬜     |
-| F4.1.4 | Add frontend health check                    | ⬜     |
+| F4.1.4 | Configure nginx gzip + SPA fallback          | ⬜     |
+| F4.1.5 | Add frontend health check                    | ⬜     |
 
 **Files to Create:**
 
 - `web/Dockerfile`
-- `web/nginx.conf`
+- `web/nginx.conf` (with gzip, `try_files $uri /index.html`)
 - Update `docker-compose.yml`
+
+**nginx.conf essentials:**
+
+```nginx
+gzip on;
+gzip_types text/css application/javascript application/json;
+location / {
+    try_files $uri $uri/ /index.html;  # SPA fallback
+}
+```
 
 **Definition of Done:**
 
@@ -677,11 +694,11 @@ easytax-au/
 
 | Phase                | Tasks  | Done  | Progress |
 | -------------------- | ------ | ----- | -------- |
-| F1. Scaffold         | 21     | 0     | 0%       |
+| F1. Scaffold         | 20     | 0     | 0%       |
 | F2. Core Features    | 44     | 0     | 0%       |
-| F3. Reports & Polish | 25     | 0     | 0%       |
-| F4. Production       | 8      | 0     | 0%       |
-| **Total**            | **98** | **0** | **0%**   |
+| F3. Reports & Polish | 26     | 0     | 0%       |
+| F4. Production       | 9      | 0     | 0%       |
+| **Total**            | **99** | **0** | **0%**   |
 
 ---
 
