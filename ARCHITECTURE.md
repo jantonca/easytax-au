@@ -93,6 +93,13 @@
   - `web/src/lib/toast-context.ts` (`ToastContext`, `useToast`)
   - `web/src/components/ui/toast-provider.tsx` (state management)
   - `web/src/components/ui/toast-viewport.tsx` (Tailwind-styled, accessible UI, bottom-right)
+- **Layout & navigation:**
+  - `web/src/components/layout/layout.tsx` (visual shell using sidebar, header, mobile nav, command palette)
+  - `web/src/components/layout/sidebar.tsx` + `mobile-nav.tsx` (desktop & mobile navigation based on `NAV_ITEMS`)
+  - `web/src/components/layout/header.tsx` (displays current FY/Quarter using `useFYInfo`)
+  - `web/src/components/layout/command-palette.tsx` (stub modal toggled via ⌘K / Ctrl+K)
+  - `web/src/config/navigation.ts` (central navigation config)
+  - `web/src/hooks/use-keyboard-shortcuts.ts` (keyboard shortcut handling)
 - **Testing:**
   - `web/vitest.config.ts` (jsdom env, `@` alias)
   - `web/src/test/setup.ts` (`@testing-library/jest-dom`)
@@ -100,6 +107,8 @@
     - `web/src/components/error-boundary.test.tsx`
     - `web/src/lib/api-client.test.ts`
     - `web/src/components/ui/toast-provider.test.tsx`
+    - `web/src/lib/fy.test.ts`
+    - `web/src/hooks/use-keyboard-shortcuts.test.tsx`
 
 ---
 

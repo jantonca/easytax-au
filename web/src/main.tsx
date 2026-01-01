@@ -9,6 +9,5 @@ createRoot(document.getElementById('root')!).render(
     <AppShell>
       <App />
     </AppShell>
-    ,
   </StrictMode>,
 );

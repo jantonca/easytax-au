@@ -1,27 +1,27 @@
-import { Button } from '@/components/ui/button';
 import type { ReactElement } from 'react';
+import { Route, Routes } from 'react-router-dom';
+import { Layout } from '@/components/layout/layout';
+import { DashboardPage } from '@/features/dashboard/dashboard-page';
+import { ExpensesPage } from '@/features/expenses/expenses-page';
+import { ImportPage } from '@/features/import/import-page';
+import { IncomesPage } from '@/features/incomes/incomes-page';
+import { BasReportPage } from '@/features/reports/bas-report-page';
+import { FyReportPage } from '@/features/reports/fy-report-page';
+import { SettingsPage } from '@/features/settings/settings-page';
 
 function App(): ReactElement {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50">
-      <div className="container mx-auto flex min-h-screen flex-col items-center justify-center gap-6 px-4">
-        <div className="space-y-2 text-center">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
-            EasyTax-AU
-          </p>
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            Simpler BAS &amp; GST for Australian freelancers
-          </h1>
-          <p className="text-sm text-slate-400">Frontend scaffold · Phase F1.1</p>
-        </div>
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <Button size="lg">Open dashboard</Button>
-          <Button variant="outline" size="lg">
-            View API docs
-          </Button>
-        </div>
-      </div>
-    </div>
+    <Routes>
+      <Route element={<Layout />}>
+        <Route index element={<DashboardPage />} />
+        <Route path="expenses" element={<ExpensesPage />} />
+        <Route path="incomes" element={<IncomesPage />} />
+        <Route path="import" element={<ImportPage />} />
+        <Route path="reports/bas" element={<BasReportPage />} />
+        <Route path="reports/fy" element={<FyReportPage />} />
+        <Route path="settings" element={<SettingsPage />} />
+      </Route>
+    </Routes>
   );
 }
 
