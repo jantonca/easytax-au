@@ -121,7 +121,8 @@
 - PDF Export using PDFKit (~500KB, no Chrome)
 - BAS quarterly PDF reports
 - FY annual PDF reports
-- 605 tests across 24 test suites
+- Health endpoint for monitoring (`GET /health`)
+- 608 tests across 24 test suites
 
 ---
 
@@ -129,11 +130,10 @@
 
 These are documented for future consideration, not planned for MVP.
 
-| Feature            | Description                                 | When to Consider                                                        |
-| ------------------ | ------------------------------------------- | ----------------------------------------------------------------------- |
-| `/health` endpoint | Returns `{ status: 'ok', db: 'connected' }` | If using Cloudflare Tunnel health monitoring or container orchestration |
-| Dashboard UI       | Charts for expenses by category, trends     | When visual reporting is needed                                         |
-| Email import       | Forward receipts, OCR extraction            | If manual entry becomes tedious                                         |
+| Feature      | Description                             | When to Consider                |
+| ------------ | --------------------------------------- | ------------------------------- |
+| Dashboard UI | Charts for expenses by category, trends | When visual reporting is needed |
+| Email import | Forward receipts, OCR extraction        | If manual entry becomes tedious |
 
 ---
 
@@ -150,20 +150,56 @@ These are documented for future consideration, not planned for MVP.
 
 ---
 
-## Definition of Done (MVP)
+## Definition of Done (MVP) ✅
 
-- [ ] Can create/read/update/delete Categories
-- [ ] Can create/read/update/delete Providers (with seed data)
-- [ ] Can create/read/update/delete Clients
-- [ ] Can create/read/update/delete Expenses
-- [ ] Can create/read/update/delete Incomes
-- [ ] Selecting international provider auto-sets GST = 0
-- [ ] biz_percent correctly reduces claimable GST
-- [ ] BAS endpoint returns G1, 1A, 1B for given quarter
-- [ ] Sensitive fields encrypted at rest
-- [ ] All currency calculations use decimal.js
-- [ ] Docker Compose starts cleanly
-- [ ] README has install instructions
+All MVP requirements have been completed as of January 1, 2026.
+
+- [x] Can create/read/update/delete Categories
+- [x] Can create/read/update/delete Providers (with seed data)
+- [x] Can create/read/update/delete Clients
+- [x] Can create/read/update/delete Expenses
+- [x] Can create/read/update/delete Incomes
+- [x] Selecting international provider auto-sets GST = 0
+- [x] biz_percent correctly reduces claimable GST
+- [x] BAS endpoint returns G1, 1A, 1B for given quarter
+- [x] Sensitive fields encrypted at rest
+- [x] All currency calculations use decimal.js
+- [x] Docker Compose starts cleanly
+- [x] README has install instructions
+
+---
+
+## 🎉 Project Status: Feature Complete
+
+**Completed:** January 1, 2026
+
+### Summary
+
+| Metric        | Value              |
+| ------------- | ------------------ |
+| Test Suites   | 24                 |
+| Total Tests   | 608                |
+| API Endpoints | 40+                |
+| Modules       | 12 feature modules |
+
+### Core Features
+
+- ✅ Full CRUD for Categories, Providers, Clients, Expenses, Incomes
+- ✅ BAS quarterly reporting (G1, 1A, 1B calculations)
+- ✅ FY annual summary for tax returns
+- ✅ CSV import (expenses + incomes) with fuzzy matching
+- ✅ Recurring expense automation
+- ✅ PDF export for BAS and FY reports
+- ✅ AES-256-GCM encryption for sensitive fields
+- ✅ Health endpoint for monitoring
+- ✅ Swagger/OpenAPI documentation
+- ✅ Docker Compose deployment
+
+### What's Not Included (By Design)
+
+- Dashboard UI (use Swagger or raw API)
+- Email/OCR import (manual CSV works fine)
+- Multi-user auth (single user, local-only)
 
 ---
 
