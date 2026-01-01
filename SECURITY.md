@@ -68,6 +68,51 @@ The application validates `ENCRYPTION_KEY` at startup (in `CommonModule.onModule
 
 This ensures misconfiguration is caught immediately, not on first database access.
 
+## Key Recovery & Backup
+
+### ⚠️ Critical Warning
+
+**If you lose your `ENCRYPTION_KEY`, all encrypted data is permanently unrecoverable.**
+
+The following fields will be lost:
+
+- Client names and ABNs
+- Expense descriptions
+- Income descriptions
+
+### Backup Recommendations
+
+1. **Store key in password manager** (e.g., Bitwarden, 1Password)
+2. **Backup `.env` file** to encrypted storage (not cloud sync!)
+3. **Document the key** in a secure offline location
+4. **Test recovery** periodically:
+   ```bash
+   # Verify key works with a test decrypt
+   docker compose exec easytax-au-api pnpm run start:dev
+   # App should start without encryption errors
+   ```
+
+### Recovery Scenarios
+
+| Scenario                   | Recovery Possible? | Action                        |
+| -------------------------- | ------------------ | ----------------------------- |
+| Key in password manager    | ✅ Yes             | Restore from password manager |
+| Key in `.env` backup       | ✅ Yes             | Restore `.env` file           |
+| Key lost, DB backup exists | ❌ No              | Encrypted fields unreadable   |
+| Key lost, no backup        | ❌ No              | Must re-enter all client data |
+
+### What's NOT Encrypted (Still Recoverable)
+
+Even without the key, you retain:
+
+- Expense/Income amounts (cents)
+- Dates
+- Category assignments
+- Provider associations
+- BAS calculations (uses amounts, not descriptions)
+
+---
+
 ## Remote Access
 
 - Access the UI via **Cloudflare Tunnels** or **Tailscale** to avoid exposing home IP ports.

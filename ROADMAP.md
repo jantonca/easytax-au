@@ -117,6 +117,18 @@
 
 ---
 
+## Future Enhancements (Low Priority)
+
+These are documented for future consideration, not planned for MVP.
+
+| Feature            | Description                                 | When to Consider                                                        |
+| ------------------ | ------------------------------------------- | ----------------------------------------------------------------------- |
+| `/health` endpoint | Returns `{ status: 'ok', db: 'connected' }` | If using Cloudflare Tunnel health monitoring or container orchestration |
+| Dashboard UI       | Charts for expenses by category, trends     | When visual reporting is needed                                         |
+| Email import       | Forward receipts, OCR extraction            | If manual entry becomes tedious                                         |
+
+---
+
 ## Out of Scope (Won't Build)
 
 | Feature                 | Reason                          |
