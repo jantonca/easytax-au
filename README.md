@@ -7,6 +7,7 @@ A modular financial engine for Australian freelancers. Automates Simpler BAS, GS
 - **Self-Hosted:** Optimized for Proxmox LXC / Docker.
 - **Privacy First:** Local-only data processing with database-level encryption.
 - **Dev-Centric:** Metadata-driven provider system (Google, ChatGPT, VentraIP).
+- **Frontend SPA:** React 19 + Vite 7 + Tailwind CSS 4 with shadcn-style components, using a fetch-based API client and TanStack Query for data fetching.
 
 ---
 
