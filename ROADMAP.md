@@ -96,7 +96,7 @@
 
 | Task                  | Description                                 | Priority | Status      |
 | --------------------- | ------------------------------------------- | -------- | ----------- |
-| Recurring expenses    | Auto-generate monthly entries (e.g., iinet) | 🟢 Low   | Not started |
+| Recurring expenses    | Auto-generate monthly entries (e.g., iinet) | 🟢 Low   | ✅          |
 | Bank statement parser | Map CSV columns to expense fields           | 🟢 Low   | ✅ (in CSV) |
 | Provider auto-match   | Fuzzy match "GITHUB.COM" → GitHub provider  | 🟢 Low   | ✅ (in CSV) |
 | Email import          | Forward receipts, extract with OCR          | 🟢 Low   | Not started |

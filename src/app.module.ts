@@ -13,6 +13,7 @@ import { ExpensesModule } from './modules/expenses';
 import { ImportJobsModule } from './modules/import-jobs';
 import { IncomesModule } from './modules/incomes';
 import { ProvidersModule } from './modules/providers';
+import { RecurringExpensesModule } from './modules/recurring-expenses';
 import { ReportsModule } from './modules/reports';
 
 @Module({
@@ -44,6 +45,7 @@ import { ReportsModule } from './modules/reports';
     ImportJobsModule,
     IncomesModule,
     ProvidersModule,
+    RecurringExpensesModule,
     ReportsModule,
   ],
   controllers: [AppController],

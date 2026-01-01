@@ -6,4 +6,5 @@ export * from './expenses';
 export * from './import-jobs';
 export * from './incomes';
 export * from './providers';
+export * from './recurring-expenses';
 export * from './reports';

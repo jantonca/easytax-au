@@ -488,34 +488,35 @@ Aida Tomescu updates,9,$560,$56,$616.00
 
 | #     | Task                                                   | Status |
 | ----- | ------------------------------------------------------ | ------ |
-| 6.1.1 | Create `RecurringExpense` entity (template + schedule) | ⬜     |
-| 6.1.2 | Create `CreateRecurringExpenseDto` with validation     | ⬜     |
-| 6.1.3 | Implement `RecurringExpensesService` (CRUD)            | ⬜     |
-| 6.1.4 | Add schedule logic (monthly, quarterly, yearly)        | ⬜     |
-| 6.1.5 | Implement auto-generation of expenses from templates   | ⬜     |
-| 6.1.6 | Add `POST /recurring-expenses/generate` endpoint       | ⬜     |
+| 6.1.1 | Create `RecurringExpense` entity (template + schedule) | ✅     |
+| 6.1.2 | Create `CreateRecurringExpenseDto` with validation     | ✅     |
+| 6.1.3 | Implement `RecurringExpensesService` (CRUD)            | ✅     |
+| 6.1.4 | Add schedule logic (monthly, quarterly, yearly)        | ✅     |
+| 6.1.5 | Implement auto-generation of expenses from templates   | ✅     |
+| 6.1.6 | Add `POST /recurring-expenses/generate` endpoint       | ✅     |
 
 **Documentation Required:**
 
-- [ ] TSDoc for RecurringExpense entity and DTOs
-- [ ] Document scheduling logic in ARCHITECTURE.md
-- [ ] Swagger decorators on controller
+- [x] TSDoc for RecurringExpense entity and DTOs
+- [x] Document scheduling logic in ARCHITECTURE.md
+- [x] Swagger decorators on controller
 
 **Tests Required:**
 
-- [ ] Service: create recurring expense template
-- [ ] Service: generate monthly expense (e.g., iinet)
-- [ ] Service: generate quarterly expense
-- [ ] Service: skip if already generated for period
-- [ ] Service: respect provider GST rules
-- [ ] Service: apply biz_percent from template
+- [x] Service: create recurring expense template
+- [x] Service: generate monthly expense (e.g., iinet)
+- [x] Service: generate quarterly expense
+- [x] Service: skip if already generated for period
+- [x] Service: respect provider GST rules
+- [x] Service: apply biz_percent from template
+- [x] 45 total tests (35 service + 10 controller)
 
 **Definition of Done:**
 
-- [ ] Can create recurring expense templates
-- [ ] Generate endpoint creates expenses for current period
-- [ ] Duplicate prevention (won't create twice for same period)
-- [ ] 80%+ test coverage on service
+- [x] Can create recurring expense templates
+- [x] Generate endpoint creates expenses for current period
+- [x] Duplicate prevention (won't create twice for same period)
+- [x] 80%+ test coverage on service
 
 ---
 
@@ -677,3 +678,17 @@ Aida Tomescu updates,9,$560,$56,$616.00
 - Expense breakdown by category with BAS labels
 - Net profit and GST position calculations
 - 525 unit tests passing (20 test suites)
+
+## 🎉 Phase 6.1 Recurring Expenses Complete!
+
+**Completed:** January 1, 2026
+
+**Summary:**
+
+- RecurringExpense entity with monthly/quarterly/yearly schedules
+- Full CRUD for recurring expense templates
+- Generate endpoint creates expenses from due templates
+- GST auto-calculation (0 for international providers)
+- Duplicate prevention (tracks lastGeneratedDate)
+- Next due date computation
+- 570 unit tests passing (22 test suites)

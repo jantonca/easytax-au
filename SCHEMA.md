@@ -199,7 +199,40 @@ CREATE INDEX idx_incomes_client ON incomes(client_id);
 
 -- Provider lookups
 CREATE INDEX idx_providers_international ON providers(is_international);
+
+-- Recurring expense lookups
+CREATE INDEX idx_recurring_expenses_provider ON recurring_expenses(provider_id);
+CREATE INDEX idx_recurring_expenses_category ON recurring_expenses(category_id);
+CREATE INDEX idx_recurring_expenses_active ON recurring_expenses(is_active);
+CREATE INDEX idx_recurring_expenses_next_due ON recurring_expenses(next_due_date);
 ```
+
+---
+
+## Recurring Expenses
+
+Templates for automatically generating regular expenses.
+
+| Column                | Type         | Nullable | Encrypted  | Description                   |
+| --------------------- | ------------ | -------- | ---------- | ----------------------------- |
+| `id`                  | UUID         | No       | No         | Primary key                   |
+| `name`                | VARCHAR(100) | No       | No         | Template name (e.g., "iinet") |
+| `description`         | TEXT         | Yes      | **Yes** 🔒 | Description for expenses      |
+| `amount_cents`        | INTEGER      | No       | No         | Amount in cents               |
+| `gst_cents`           | INTEGER      | No       | No         | GST in cents (0 if intl)      |
+| `biz_percent`         | INTEGER      | No       | No         | Business use % (0-100)        |
+| `currency`            | VARCHAR(3)   | No       | No         | Default: "AUD"                |
+| `schedule`            | ENUM         | No       | No         | monthly/quarterly/yearly      |
+| `day_of_month`        | INTEGER      | No       | No         | Day to generate (1-28)        |
+| `start_date`          | DATE         | No       | No         | When to start generating      |
+| `end_date`            | DATE         | Yes      | No         | When to stop generating       |
+| `is_active`           | BOOLEAN      | No       | No         | Can pause/resume              |
+| `last_generated_date` | DATE         | Yes      | No         | Last expense created          |
+| `next_due_date`       | DATE         | No       | No         | Next generation date          |
+| `provider_id`         | UUID (FK)    | No       | No         | Links to Provider             |
+| `category_id`         | UUID (FK)    | No       | No         | Links to Category             |
+| `created_at`          | TIMESTAMP    | No       | No         | Auto-set                      |
+| `updated_at`          | TIMESTAMP    | No       | No         | Auto-updated                  |
 
 ---
 

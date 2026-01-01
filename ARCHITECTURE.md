@@ -386,6 +386,125 @@ GET /reports/fy/2026
 
 ---
 
+## Recurring Expenses (Automation)
+
+The Recurring Expenses feature automates repetitive expense entries.
+
+### API Endpoints
+
+| Method | Endpoint                       | Description                          |
+| ------ | ------------------------------ | ------------------------------------ |
+| POST   | `/recurring-expenses`          | Create recurring expense template    |
+| GET    | `/recurring-expenses`          | List all templates                   |
+| GET    | `/recurring-expenses/due`      | List templates due for generation    |
+| GET    | `/recurring-expenses/:id`      | Get single template                  |
+| PATCH  | `/recurring-expenses/:id`      | Update template                      |
+| DELETE | `/recurring-expenses/:id`      | Delete template                      |
+| POST   | `/recurring-expenses/generate` | Generate expenses from due templates |
+
+### Schedule Types
+
+| Schedule    | Period         | Use Case                    |
+| ----------- | -------------- | --------------------------- |
+| `monthly`   | Every month    | iinet, GitHub subscriptions |
+| `quarterly` | Every 3 months | Quarterly software licenses |
+| `yearly`    | Every year     | Annual domain renewals      |
+
+### Entity Fields
+
+```typescript
+RecurringExpense {
+  // Template fields (same as Expense)
+  name: string;          // e.g., "iinet Internet"
+  amountCents: number;   // $89.99 = 8999
+  gstCents: number;      // Auto-calculated or 0 for international
+  bizPercent: number;    // Business use % (0-100)
+  providerId: string;
+  categoryId: string;
+
+  // Schedule fields
+  schedule: 'monthly' | 'quarterly' | 'yearly';
+  dayOfMonth: number;    // 1-28 (avoids month-end issues)
+  startDate: Date;       // When to start generating
+  endDate?: Date;        // Optional end date
+  isActive: boolean;     // Can pause/resume
+
+  // Tracking
+  lastGeneratedDate?: Date;  // Last expense created
+  nextDueDate: Date;         // Computed next due date
+}
+```
+
+### Generation Logic
+
+```
+┌─────────────────────────────────────────────────────────┐
+│            POST /recurring-expenses/generate            │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  For each RecurringExpense where:                       │
+│  ├─ isActive = true                                    │
+│  ├─ nextDueDate <= today                               │
+│  └─ (endDate is null OR nextDueDate <= endDate)        │
+│                                                         │
+│  Create Expense:                                        │
+│  ├─ date = nextDueDate                                 │
+│  ├─ Copy: amount, gst, bizPercent, provider, category  │
+│  └─ description = template.description or auto-generate│
+│                                                         │
+│  Update RecurringExpense:                              │
+│  ├─ lastGeneratedDate = nextDueDate                    │
+│  └─ nextDueDate = calculateNextDueDate(schedule)       │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Example Usage
+
+```bash
+# Create monthly iinet subscription
+curl -X POST http://localhost:3000/recurring-expenses \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "iinet Internet",
+    "amountCents": 8999,
+    "schedule": "monthly",
+    "dayOfMonth": 15,
+    "startDate": "2025-07-01",
+    "bizPercent": 50,
+    "providerId": "<iinet-uuid>",
+    "categoryId": "<internet-uuid>"
+  }'
+
+# Generate all due expenses
+curl -X POST http://localhost:3000/recurring-expenses/generate
+
+# Response:
+{
+  "generated": 2,
+  "skipped": 0,
+  "expenseIds": ["uuid-1", "uuid-2"],
+  "details": [
+    {
+      "recurringExpenseId": "...",
+      "recurringExpenseName": "iinet Internet",
+      "expenseId": "uuid-1",
+      "date": "2025-07-15",
+      "amountCents": 8999
+    }
+  ]
+}
+```
+
+### Duplicate Prevention
+
+- `lastGeneratedDate` tracks when an expense was last created
+- `nextDueDate` is calculated after each generation
+- Won't create two expenses for the same period
+- Safe to call `generate` multiple times
+
+---
+
 ## ATO GST Logic (Simpler BAS)
 
 | BAS Label | Description                 | Source                                   |
