@@ -156,10 +156,9 @@ export class CsvImportService {
 
     await this.updateImportJob(importJob.id, {
       status: finalStatus,
-      recordsImported: successCount,
-      recordsFailed: failedCount,
-      totalAmountCents,
-      totalGstCents,
+      importedCount: successCount,
+      errorCount: failedCount,
+      completedAt: new Date(),
     });
 
     const processingTimeMs = Date.now() - startTime;
@@ -343,9 +342,9 @@ export class CsvImportService {
       source: importSource,
       filename: `import-${Date.now()}.csv`,
       status: ImportStatus.PENDING,
-      recordsTotal: totalRows,
-      recordsImported: 0,
-      recordsFailed: 0,
+      totalRows: totalRows,
+      importedCount: 0,
+      errorCount: 0,
     });
 
     return this.importJobRepo.save(job);

@@ -105,7 +105,7 @@ export class IncomeCsvImportService {
       skip_empty_lines: true,
       trim: true,
       bom: true,
-    });
+    }) as Record<string, string>[];
 
     const rows: ParsedIncomeCsvRow[] = [];
 
@@ -298,10 +298,9 @@ export class IncomeCsvImportService {
 
     await this.updateImportJob(importJob.id, {
       status: finalStatus,
-      recordsImported: successCount,
-      recordsFailed: failedCount,
-      totalAmountCents,
-      totalGstCents,
+      importedCount: successCount,
+      errorCount: failedCount,
+      completedAt: new Date(),
     });
 
     const processingTimeMs = Date.now() - startTime;
@@ -385,7 +384,7 @@ export class IncomeCsvImportService {
       totalCents: row.calculatedTotalCents, // Use calculated, not CSV value
       isPaid: options.markAsPaid ?? false,
       // Note: importJobId would require adding the field to Income entity
-      // For now, we track via ImportJob.recordsImported
+      // For now, we track via ImportJob.importedCount
     };
 
     return {
@@ -447,9 +446,9 @@ export class IncomeCsvImportService {
       source: ImportSource.MANUAL, // Income imports are typically manual spreadsheets
       filename: `income-import-${Date.now()}.csv`,
       status: ImportStatus.PENDING,
-      recordsTotal: totalRows,
-      recordsImported: 0,
-      recordsFailed: 0,
+      totalRows: totalRows,
+      importedCount: 0,
+      errorCount: 0,
     });
 
     return this.importJobRepo.save(job);

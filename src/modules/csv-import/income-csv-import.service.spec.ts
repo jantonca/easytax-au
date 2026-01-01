@@ -127,8 +127,8 @@ John Smith,2,$1000,$100,$1100`;
         'import-job-1',
         expect.objectContaining({
           status: ImportStatus.COMPLETED,
-          recordsImported: 2,
-          recordsFailed: 0,
+          importedCount: 2,
+          errorCount: 0,
         }),
       );
     });

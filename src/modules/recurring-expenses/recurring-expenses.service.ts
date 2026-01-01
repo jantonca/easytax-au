@@ -200,7 +200,7 @@ export class RecurringExpensesService {
     if (dto.schedule || dto.dayOfMonth || dto.startDate) {
       const schedule = dto.schedule ?? existing.schedule;
       const dayOfMonth = dto.dayOfMonth ?? existing.dayOfMonth;
-      const lastGenerated = existing.lastGeneratedDate;
+      const lastGenerated = existing.lastGeneratedDate ?? null;
 
       existing.nextDueDate = this.calculateNextDueDate(
         startDate,

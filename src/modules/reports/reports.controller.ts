@@ -1,6 +1,6 @@
 import { Controller, Get, Param, ParseIntPipe, Res, StreamableFile } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiProduces } from '@nestjs/swagger';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { ReportsService } from './reports.service';
 import { PdfService } from './pdf.service';
 import { BasService } from '../bas/bas.service';

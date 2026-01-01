@@ -206,7 +206,7 @@ describe('CsvImportService', () => {
         expect.objectContaining({
           source: ImportSource.MANUAL,
           status: ImportStatus.PENDING,
-          recordsTotal: 1,
+          totalRows: 1,
         }),
       );
     });
@@ -221,8 +221,8 @@ describe('CsvImportService', () => {
         expect.any(String),
         expect.objectContaining({
           status: ImportStatus.COMPLETED,
-          recordsImported: 1,
-          recordsFailed: 0,
+          importedCount: 1,
+          errorCount: 0,
         }),
       );
     });
