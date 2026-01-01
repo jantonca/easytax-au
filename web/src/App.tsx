@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
+import type { ReactElement } from 'react';
 
-function App(): JSX.Element {
+function App(): ReactElement {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-50">
       <div className="container mx-auto flex min-h-screen flex-col items-center justify-center gap-6 px-4">
