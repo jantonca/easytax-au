@@ -42,6 +42,24 @@ docker compose up -d easytax-au-db
 pnpm run start:dev
 ```
 
+### Frontend (web SPA)
+
+The React SPA lives in `web/` and talks to the NestJS API.
+
+```bash path=null start=null
+# Dev server
+pnpm --filter web dev    # http://localhost:5173
+
+# Lint
+pnpm --filter web lint
+
+# Tests
+pnpm --filter web test
+
+# Build
+pnpm --filter web build
+```
+
 ### Available Scripts
 
 | Command               | Description                       |

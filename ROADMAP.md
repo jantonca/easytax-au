@@ -214,14 +214,28 @@ All MVP requirements have been completed as of January 1, 2026.
 | Forms     | React Hook Form + Zod    | Performance, validation  |
 | Routing   | React Router v6          | Standard, lazy loading   |
 
-### Frontend Phases
+### Phase F1 – Frontend Scaffold (web SPA)
 
-| Phase                | Description                         | Status         |
-| -------------------- | ----------------------------------- | -------------- |
-| F1. Scaffold         | Project setup, tooling, layout      | ⬜ Not started |
-| F2. Core Features    | Expenses, Incomes, Import, Settings | ⬜ Not started |
-| F3. Reports & Polish | BAS/FY reports, accessibility, E2E  | ⬜ Not started |
-| F4. Production       | Docker, nginx, documentation        | ⬜ Not started |
+Goal: Establish a modern React SPA with tooling, styling, and core infrastructure before building features.
+
+**Status:**
+
+- ✅ F1.1 Initialize Project
+  - Vite + React 19 + TS 5.9 app in `web/`
+  - `pnpm-workspace.yaml` configured (`.`, `web`)
+  - TS strict + `@` alias
+  - ESLint 9 flat config + Prettier
+  - Tailwind 4 configured via `web/src/index.css`
+  - shadcn-style `Button` and initial EasyTax hero screen
+- ✅ F1.2 Core Infrastructure
+  - Fetch-based API client with `ApiError` and `/health` check
+  - TanStack Query `QueryClient` and `AppShell` wiring
+  - Routing shell via `BrowserRouter`
+  - App-level error boundary
+  - Custom toast system (context + viewport)
+  - Vitest + React Testing Library setup and infra tests
+- ⬜ F1.3 Shared Types Auto-Generated
+- ⬜ F1.4 Layout & Navigation
 
 ### Key Screens
 
