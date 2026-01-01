@@ -16,7 +16,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@api-types": ["../shared/types/api.d.ts"]
+      "@api-types": ["../shared/types/api.d.ts"],
+      "@shared/types": ["../shared/types/api.d.ts"]
     },
     "strict": true,
     "noUnusedLocals": true,

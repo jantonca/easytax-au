@@ -61,6 +61,7 @@
 - shadcn-style UI primitives (starting with `Button`)
 - React Router (BrowserRouter shell in `AppShell`)
 - TanStack Query v5 for data fetching and caching
+- OpenAPI-generated shared API types in `shared/types/api.d.ts`, imported via `@shared/types` / `@api-types`
 - Vitest + React Testing Library + jest-dom for unit/integration tests
 
 ### Current frontend infrastructure (Phase F1.1–F1.2)
@@ -145,14 +146,7 @@ easytax-au/
 │
 ├── shared/                       # Shared between frontend & backend
 │   └── types/
-│       ├── expense.ts
-│       ├── income.ts
-│       ├── category.ts
-│       ├── provider.ts
-│       ├── client.ts
-│       ├── bas.ts
-│       ├── reports.ts
-│       └── index.ts
+│       └── api.d.ts              # OpenAPI-generated API types (@shared/types, @api-types)
 │
 ├── data-examples/                # Sample CSV files
 ├── pgdata/                       # PostgreSQL data (gitignored)

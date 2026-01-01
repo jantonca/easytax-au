@@ -1,4 +1,4 @@
-import type { components } from '@api-types';
+import type { components } from '@shared/types';
 
 export class ApiError extends Error {
   readonly status: number;

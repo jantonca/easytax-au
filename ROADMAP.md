@@ -234,7 +234,9 @@ Goal: Establish a modern React SPA with tooling, styling, and core infrastructur
   - App-level error boundary
   - Custom toast system (context + viewport)
   - Vitest + React Testing Library setup and infra tests
-- ⬜ F1.3 Shared Types Auto-Generated
+- ✅ F1.3 Shared Types Auto-Generated
+  - `openapi-typescript` generating `shared/types/api.d.ts` from `/api/docs-json`
+  - Frontend imports backend contracts via `@shared/types` / `@api-types`
 - ⬜ F1.4 Layout & Navigation
 
 ### Key Screens
