@@ -129,15 +129,17 @@ easytax-au/
 
 ### F1.2 Core Infrastructure
 
-| #      | Task                                          | Status |
-| ------ | --------------------------------------------- | ------ |
-| F1.2.1 | Create API client with Axios + interceptors   | ⬜     |
-| F1.2.2 | Set up TanStack Query provider + devtools     | ⬜     |
-| F1.2.3 | Create React Router with lazy loading         | ⬜     |
-| F1.2.4 | Create error boundary component               | ⬜     |
-| F1.2.5 | Create toast notification system (sonner)     | ⬜     |
-| F1.2.6 | Create currency transformer (dollars ↔ cents) | ⬜     |
-| F1.2.7 | Set up Vitest + Testing Library               | ⬜     |
+| #      | Task                                        | Status |
+| ------ | ------------------------------------------- | ------ |
+| F1.2.1 | Create API client with Axios + interceptors | ⬜     |
+| F1.2.2 | Set up TanStack Query provider + devtools   | ⬜     |
+| F1.2.3 | Create React Router with lazy loading       | ⬜     |
+| F1.2.4 | Create error boundary component (app-level) | ⬜     |
+| F1.2.5 | Create toast notification system (sonner)   | ⬜     |
+
+> **Note (F1.2.4):** Start with a single app-level error boundary. Add route-level error boundaries only if crashes in one feature affect unrelated features during testing.
+> | F1.2.6 | Create currency transformer (dollars ↔ cents) | ⬜ |
+> | F1.2.7 | Set up Vitest + Testing Library | ⬜ |
 
 **Files to Create:**
 
