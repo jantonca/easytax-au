@@ -13,7 +13,6 @@ import { ImportJob, ImportStatus, ImportSource } from '../import-jobs/entities/i
 describe('CsvImportService', () => {
   let service: CsvImportService;
   let providerRepo: jest.Mocked<Repository<Provider>>;
-  let categoryRepo: jest.Mocked<Repository<Category>>;
   let expenseRepo: jest.Mocked<Repository<Expense>>;
   let importJobRepo: jest.Mocked<Repository<ImportJob>>;
   let dataSource: jest.Mocked<DataSource>;
@@ -69,33 +68,41 @@ describe('CsvImportService', () => {
         {
           provide: getRepositoryToken(ImportJob),
           useValue: {
-            create: jest.fn().mockImplementation((data) => ({
+            create: jest.fn().mockImplementation((data: Partial<ImportJob>) => ({
               ...mockImportJob,
               ...data,
             })),
             save: jest
               .fn()
-              .mockImplementation((job) => Promise.resolve({ ...mockImportJob, ...job })),
+              .mockImplementation((job: Partial<ImportJob>) =>
+                Promise.resolve({ ...mockImportJob, ...job }),
+              ),
             update: jest.fn().mockResolvedValue({ affected: 1 }),
           },
         },
         {
           provide: DataSource,
           useValue: {
-            transaction: jest.fn().mockImplementation(async (cb) => {
-              const mockManager = {
-                create: jest.fn().mockImplementation((_entity, data) => data),
-                save: jest.fn().mockImplementation((entities) =>
-                  Promise.resolve(
-                    entities.map((e: Partial<Expense>, i: number) => ({
-                      ...e,
-                      id: `expense-${i}`,
-                    })),
-                  ),
-                ),
-              };
-              return cb(mockManager);
-            }),
+            transaction: jest
+              .fn()
+              .mockImplementation(
+                async <T>(
+                  cb: (manager: { create: jest.Mock; save: jest.Mock }) => Promise<T>,
+                ): Promise<T> => {
+                  const mockManager = {
+                    create: jest.fn().mockImplementation((_entity: unknown, data: unknown) => data),
+                    save: jest.fn().mockImplementation((entities: Array<Partial<Expense>>) =>
+                      Promise.resolve(
+                        entities.map((e, i) => ({
+                          ...e,
+                          id: `expense-${i}`,
+                        })),
+                      ),
+                    ),
+                  };
+                  return cb(mockManager);
+                },
+              ),
           },
         },
       ],
@@ -103,7 +110,6 @@ describe('CsvImportService', () => {
 
     service = module.get<CsvImportService>(CsvImportService);
     providerRepo = module.get(getRepositoryToken(Provider));
-    categoryRepo = module.get(getRepositoryToken(Category));
     expenseRepo = module.get(getRepositoryToken(Expense));
     importJobRepo = module.get(getRepositoryToken(ImportJob));
     dataSource = module.get(DataSource);
