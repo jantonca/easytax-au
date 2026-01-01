@@ -103,14 +103,14 @@ easytax-au/
 **Implementation notes (F1.1):**
 
 - Frontend scaffold uses **React 19**, **Vite 7**, **TypeScript 5.9 (strict)**.
-- Tailwind CSS **4.x** using CSS‑driven config in `web/src/index.css`:
+- Tailwind CSS **4.x** using CSS-driven config in `web/src/index.css`:
   - `@import "tailwindcss";`
   - `@plugin "tailwindcss-animate";`
 - Shared UI patterns:
   - `cn` helper in `web/src/lib/utils.ts`.
-  - `Button` in `web/src/components/ui/button.tsx` (shadcn‑style).
+  - `Button` in `web/src/components/ui/button.tsx` (shadcn-style).
 
-**Files to Create:**
+**Files created:**
 
 - `web/package.json`
 - `web/vite.config.ts`
@@ -118,26 +118,99 @@ easytax-au/
 - `web/tailwind.config.js`
 - `web/postcss.config.js`
 - `web/.env.example`
-- `web/src/index.css` (Tailwind directives)
+- `web/src/index.css` (Tailwind v4 entrypoint)
 - `pnpm-workspace.yaml` (root)
 
-**Tests Required:**
+**Tests Required (completed):**
 
-- [ ] `pnpm --filter web dev` starts without errors
-- [ ] TypeScript compiles with no errors
-- [ ] ESLint passes with no warnings
-- [ ] Tailwind classes apply correctly
+- [x] `pnpm --filter web dev` starts without errors
+- [x] TypeScript compiles with no errors (`pnpm --filter web build`)
+- [x] ESLint passes with no errors (`pnpm --filter web lint`)
+- [x] Tailwind classes apply correctly in the rendered UI
 
-**Definition of Done:**
+**Definition of Done (F1.1 – met):**
 
-- [ ] Can run `pnpm --filter web dev` and see React app
-- [ ] Hot reload works
-- [ ] shadcn/ui Button component renders correctly
-- [ ] No TypeScript errors
+- [x] Can run `pnpm --filter web dev` and see the React app
+- [x] Hot reload works
+- [x] shadcn-style `Button` component renders correctly on the landing screen
+- [x] No TypeScript errors
 
 ---
 
 ### F1.2 Core Infrastructure
+
+**Goal:** Provide a stable app shell with API client, data fetching, routing, error handling, and notifications.
+
+| #      | Task                                                  | Status |
+| ------ | ----------------------------------------------------- | ------ |
+| F1.2.1 | Create API client (fetch wrapper, centralized errors) | ✅     |
+| F1.2.2 | Set up TanStack Query provider + devtools             | ✅     |
+| F1.2.3 | Create React Router shell (BrowserRouter + AppShell)  | ✅     |
+| F1.2.4 | Create error boundary component (app-level)           | ✅     |
+| F1.2.5 | Create toast notification system (custom, Tailwind)   | ✅     |
+| F1.2.6 | Vitest + RTL setup and infra tests                    | ✅     |
+
+**Files created / updated:**
+
+- API + currency utilities:
+  - `web/src/lib/api-client.ts` (fetch-based API client + `ApiError` + `checkApiHealth()`)
+  - `web/src/lib/currency.ts` (cents-based helpers: `formatCents`, `parseCurrency`)
+- Data fetching:
+  - `web/src/lib/query-client.ts` (`QueryClient` with sane defaults)
+- App shell & routing:
+  - `web/src/AppShell.tsx` (`QueryClientProvider`, `BrowserRouter`, `ToastProvider`, `ToastViewport`, `ReactQueryDevtools` in dev)
+  - `web/src/main.tsx` (wraps `<App />` in `<AppShell>`)
+- Error handling:
+  - `web/src/components/error-boundary.tsx` (app-level error boundary with friendly fallback UI)
+- Toasts:
+  - `web/src/lib/toast-context.ts` (`ToastContext` + `useToast`)
+  - `web/src/components/ui/toast-provider.tsx` (toast state)
+  - `web/src/components/ui/toast-viewport.tsx` (visual placement, accessible markup)
+- Testing:
+  - `web/vitest.config.ts` (jsdom + `@` alias)
+  - `web/src/test/setup.ts` (`@testing-library/jest-dom`)
+  - `web/src/components/error-boundary.test.tsx`
+  - `web/src/lib/api-client.test.ts`
+  - `web/src/components/ui/toast-provider.test.tsx`
+
+**Tests / Definition of done (F1.2):**
+
+- `pnpm --filter web lint` passes (no ESLint or Prettier errors).
+- `pnpm --filter web test` passes:
+  - API client throws `ApiError` for non-2xx, `checkApiHealth()` returns `true` for `/health` OK and `false` on failures.
+  - Error boundary renders fallback UI when a child throws.
+  - Toast system adds and removes toasts correctly.
+- `pnpm --filter web build` passes (no TypeScript or Vite errors).
+- Dev shell:
+  - App runs under `AppShell` with React Query provider, BrowserRouter, Toasts, and Query devtools (dev only).
+
+> Note: We intentionally use a **native fetch-based client** instead of Axios, and a **custom toast system** instead of `sonner`, to minimize dependencies while keeping behavior explicit and testable.
+
+---
+
+## 2. `ARCHITECTURE.md` – frontend section tweaks
+
+Under the **Frontend Architecture** or equivalent section, add a short bullet list describing the actual infra. For example:
+
+````md path=null start=null
+### Frontend infrastructure (current)
+
+- **API client:** `web/src/lib/api-client.ts`
+  - Thin wrapper around `fetch` using `VITE_API_URL` as base.
+  - Central `ApiError` type and `checkApiHealth()` helper hitting `/health`.
+- **Data fetching:** TanStack Query v5
+  - Shared `QueryClient` in `web/src/lib/query-client.ts`.
+  - Wired via `AppShell` (`QueryClientProvider` + `ReactQueryDevtools` in dev).
+- **Routing shell:** React Router
+  - `BrowserRouter` wrapped in `AppShell` (routes will be expanded in later phases).
+- **Toasts:** custom toast context + provider
+  - `web/src/lib/toast-context.ts`, `web/src/components/ui/toast-provider.tsx`, `toast-viewport.tsx`.
+  - Accessible UI with Tailwind, no third-party toast dependency.
+- **Error handling:**
+  - App-level error boundary in `web/src/components/error-boundary.tsx` with a minimal friendly fallback screen.
+- **Testing:** Vitest + React Testing Library
+  - `web/vitest.config.ts` + `web/src/test/setup.ts`.
+  - Coverage today: infra tests for API client, error boundary, and toast provider.
 
 | #      | Task                                        | Status |
 | ------ | ------------------------------------------- | ------ |
@@ -676,6 +749,7 @@ location / {
     try_files $uri $uri/ /index.html;  # SPA fallback
 }
 ```
+````
 
 **Definition of Done:**
 
