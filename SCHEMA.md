@@ -194,11 +194,18 @@ Revenue from freelance work.
 -- Fast lookups for BAS reporting
 CREATE INDEX idx_expenses_date ON expenses(date);
 CREATE INDEX idx_expenses_category ON expenses(category_id);
+CREATE INDEX idx_expenses_provider ON expenses(provider_id);
+CREATE INDEX idx_expenses_import_job ON expenses(import_job_id);
 CREATE INDEX idx_incomes_date ON incomes(date);
 CREATE INDEX idx_incomes_client ON incomes(client_id);
+CREATE INDEX idx_incomes_is_paid ON incomes(is_paid);
 
 -- Provider lookups
 CREATE INDEX idx_providers_international ON providers(is_international);
+
+-- Import job lookups
+CREATE INDEX idx_import_jobs_status ON import_jobs(status);
+CREATE INDEX idx_import_jobs_created ON import_jobs(created_at);
 
 -- Recurring expense lookups
 CREATE INDEX idx_recurring_expenses_provider ON recurring_expenses(provider_id);
