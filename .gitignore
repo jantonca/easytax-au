@@ -2,6 +2,7 @@
 /data/
 /imports/
 /uploads/
+/data-examples/
 *.csv
 *.xlsx
 *.pdf
