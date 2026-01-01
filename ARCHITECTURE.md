@@ -52,25 +52,53 @@
 
 ## Frontend Tech Stack
 
-| Layer             | Technology      | Version | Bundle Size | Notes                          |
-| ----------------- | --------------- | ------- | ----------- | ------------------------------ |
-| **Build**         | Vite            | 5.x     | N/A         | Fast HMR, native ESM           |
-| **Framework**     | React           | 18.x    | ~45KB       | Mature ecosystem               |
-| **Language**      | TypeScript      | 5.x     | N/A         | Strict mode enabled            |
-| **Styling**       | Tailwind CSS    | 3.x     | ~10KB       | Utility-first, tree-shakes     |
-| **Components**    | shadcn/ui       | Latest  | 0KB runtime | Copied to codebase, accessible |
-| **Routing**       | React Router    | 6.x     | ~13KB       | Lazy loading routes            |
-| **Data Fetching** | TanStack Query  | 5.x     | ~13KB       | Caching, loading states        |
-| **Forms**         | React Hook Form | 7.x     | ~10KB       | Performance, uncontrolled      |
-| **Validation**    | Zod             | 3.x     | ~5KB        | Schema validation, type infer  |
-| **Tables**        | TanStack Table  | 8.x     | ~15KB       | Headless, sorting, filtering   |
-| **Icons**         | Lucide React    | Latest  | Tree-shakes | Only used icons bundled        |
-| **Dates**         | date-fns        | 3.x     | Tree-shakes | Only used functions bundled    |
-| **Toasts**        | Sonner          | Latest  | ~5KB        | Accessible notifications       |
-| **Testing**       | Vitest + RTL    | Latest  | N/A         | Fast, compatible with Jest     |
-| **E2E**           | Playwright      | Latest  | N/A         | Cross-browser testing          |
+### Frontend stack
 
-**Estimated Total Bundle:** ~100KB gzipped
+- React 19 + Vite 7 + TypeScript 5.9 (strict)
+- Tailwind CSS 4.x with CSS-driven config:
+  - `@import "tailwindcss";`
+  - `@plugin "tailwindcss-animate";`
+- shadcn-style UI primitives (starting with `Button`)
+- React Router (BrowserRouter shell in `AppShell`)
+- TanStack Query v5 for data fetching and caching
+- Vitest + React Testing Library + jest-dom for unit/integration tests
+
+### Current frontend infrastructure (Phase F1.1–F1.2)
+
+- **SPA location:** `web/`
+- **App shell:** `web/src/AppShell.tsx`
+  - Wraps the app with:
+    - `QueryClientProvider` (TanStack Query)
+    - `BrowserRouter` (routing shell)
+    - `ToastProvider` + `ToastViewport` (toast notifications)
+    - `ReactQueryDevtools` in development only
+- **Entry point:** `web/src/main.tsx`
+  - Renders `<AppShell><App /></AppShell>` and imports `web/src/index.css`.
+- **Styling:** `web/src/index.css`
+  - Tailwind v4 config via:
+    - `@import "tailwindcss";`
+    - `@plugin "tailwindcss-animate";`
+- **API client:** `web/src/lib/api-client.ts`
+  - Fetch-based wrapper using `VITE_API_URL` as base.
+  - Central `ApiError` type.
+  - `checkApiHealth()` helper calling `/health` and returning `true` / `false`.
+- **Currency helpers:** `web/src/lib/currency.ts`
+  - Cents-based helpers (`formatCents`, `parseCurrency`) aligned with backend money model.
+- **Data fetching:** `web/src/lib/query-client.ts`
+  - Shared `QueryClient` with conservative defaults (short stale time, low retry count, no refetch-on-focus).
+- **Error handling:** `web/src/components/error-boundary.tsx`
+  - App-level error boundary with a simple fallback screen and dev-only logging (no PII).
+- **Toasts:**
+  - `web/src/lib/toast-context.ts` (`ToastContext`, `useToast`)
+  - `web/src/components/ui/toast-provider.tsx` (state management)
+  - `web/src/components/ui/toast-viewport.tsx` (Tailwind-styled, accessible UI, bottom-right)
+- **Testing:**
+  - `web/vitest.config.ts` (jsdom env, `@` alias)
+  - `web/src/test/setup.ts` (`@testing-library/jest-dom`)
+  - Infra tests:
+    - `web/src/components/error-boundary.test.tsx`
+    - `web/src/lib/api-client.test.ts`
+    - `web/src/components/ui/toast-provider.test.tsx`
 
 ---
 
