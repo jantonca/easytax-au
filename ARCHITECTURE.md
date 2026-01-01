@@ -1005,13 +1005,15 @@ docker compose logs -f easytax-au-api
 
 ### Environment Variables
 
-| Variable         | Required | Default     | Description                           |
-| ---------------- | -------- | ----------- | ------------------------------------- |
-| `DB_PASSWORD`    | Yes      | -           | PostgreSQL password                   |
-| `ENCRYPTION_KEY` | Yes      | -           | 32-char hex key for AES-256-GCM       |
-| `DB_HOST`        | No       | localhost   | Auto-set to `easytax-au-db` in Docker |
-| `DB_PORT`        | No       | 5432        | PostgreSQL port                       |
-| `DB_NAME`        | No       | easytax-au  | Database name                         |
-| `DB_USERNAME`    | No       | postgres    | Database user                         |
-| `PORT`           | No       | 3000        | API server port                       |
-| `NODE_ENV`       | No       | development | Environment mode                      |
+| Variable         | Required | Default     | Description                             |
+| ---------------- | -------- | ----------- | --------------------------------------- |
+| `DB_PASSWORD`    | Yes      | -           | PostgreSQL password                     |
+| `ENCRYPTION_KEY` | Yes      | -           | 64 hex chars (32 bytes) for AES-256-GCM |
+| `DB_HOST`        | No       | localhost   | Auto-set to `easytax-au-db` in Docker   |
+| `DB_PORT`        | No       | 5432        | PostgreSQL port                         |
+| `DB_NAME`        | No       | easytax-au  | Database name                           |
+| `DB_USERNAME`    | No       | postgres    | Database user                           |
+| `PORT`           | No       | 3000        | API server port                         |
+| `NODE_ENV`       | No       | development | Environment mode                        |
+
+**Note:** `ENCRYPTION_KEY` is validated at startup. The app will fail to start if it's missing or not exactly 64 hexadecimal characters. Generate one with `openssl rand -hex 32`.

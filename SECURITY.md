@@ -32,12 +32,12 @@ Store the key in `.env` as `ENCRYPTION_KEY` (never commit this file).
 
 ### Encrypted Fields
 
-| Entity   | Field         | Purpose              |
-| -------- | ------------- | -------------------- |
-| Client   | `name`        | Client's legal name  |
-| Client   | `abn`         | Australian Bus. No.  |
-| Expense  | `description` | Transaction details  |
-| Income   | `description` | Invoice descriptions |
+| Entity  | Field         | Purpose              |
+| ------- | ------------- | -------------------- |
+| Client  | `name`        | Client's legal name  |
+| Client  | `abn`         | Australian Bus. No.  |
+| Expense | `description` | Transaction details  |
+| Income  | `description` | Invoice descriptions |
 
 ### Usage in Entities
 
@@ -57,6 +57,16 @@ clientName: string;
 2. **Integrity:** Auth tag detects tampering
 3. **Uniqueness:** Random IV ensures identical values encrypt differently
 4. **Forward Secrecy:** Each field encryption is independent
+
+### Startup Validation
+
+The application validates `ENCRYPTION_KEY` at startup (in `CommonModule.onModuleInit`):
+
+- Fails fast if key is missing or empty
+- Validates exactly 64 hexadecimal characters
+- Provides helpful error message with generation command
+
+This ensures misconfiguration is caught immediately, not on first database access.
 
 ## Remote Access
 
