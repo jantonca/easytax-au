@@ -256,15 +256,15 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 
 | #      | Task                                                      | Status |
 | ------ | --------------------------------------------------------- | ------ |
-| F1.3.1 | Install `openapi-typescript` as dev dependency            | ⬜     |
-| F1.3.2 | Add `pnpm run generate:types` script to root package.json | ⬜     |
-| F1.3.3 | Generate types from `http://localhost:3000/api-json`      | ⬜     |
-| F1.3.4 | Configure path alias `@api-types` in web tsconfig         | ⬜     |
+| F1.3.1 | Install `openapi-typescript` as dev dependency            | ✅     |
+| F1.3.2 | Add `pnpm run generate:types` script to root package.json | ✅     |
+| F1.3.3 | Generate types from `http://localhost:3000/api/docs-json` | ✅     |
+| F1.3.4 | Configure path alias `@api-types` in web tsconfig         | ✅     |
 
 **Files to Create:**
 
 - `shared/types/api.d.ts` (auto-generated from OpenAPI spec)
-- Root `package.json` script: `"generate:types": "openapi-typescript http://localhost:3000/api-json -o shared/types/api.d.ts"`
+- Root `package.json` script: `"generate:types": "openapi-typescript http://localhost:3000/api/docs-json -o shared/types/api.d.ts"`
 
 **Benefits:**
 
@@ -275,9 +275,9 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 
 **Definition of Done:**
 
-- [ ] `pnpm run generate:types` produces valid TypeScript
-- [ ] Frontend can import types from `@api-types`
-- [ ] Types match API responses exactly (guaranteed by generation)
+- [x] `pnpm run generate:types` produces valid TypeScript
+- [x] Frontend can import types from `@api-types`
+- [x] Types match API responses exactly (guaranteed by generation)
 
 ---
 

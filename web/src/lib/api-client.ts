@@ -1,3 +1,5 @@
+import type { components } from '@api-types';
+
 export class ApiError extends Error {
   readonly status: number;
   readonly details?: unknown;
@@ -82,4 +84,10 @@ export async function checkApiHealth(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+export type BasSummaryDto = components['schemas']['BasSummaryDto'];
+
+export async function getBasSummary(quarter: string, year: number): Promise<BasSummaryDto> {
+  return apiClient.get<BasSummaryDto>(`/bas/${quarter}/${year}`);
 }

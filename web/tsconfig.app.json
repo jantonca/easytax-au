@@ -13,9 +13,10 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["*"]
+      "@/*": ["src/*"],
+      "@api-types": ["../shared/types/api.d.ts"]
     },
     "strict": true,
     "noUnusedLocals": true,

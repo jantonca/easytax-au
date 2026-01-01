@@ -1,5 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
-import { apiClient, ApiError, checkApiHealth } from '@/lib/api-client';
+import {
+  apiClient,
+  ApiError,
+  checkApiHealth,
+  getBasSummary,
+  type BasSummaryDto,
+} from '@/lib/api-client';
 
 global.fetch = vi.fn();
 
@@ -34,5 +40,37 @@ describe('checkApiHealth', () => {
     mockedFetch.mockRejectedValueOnce(new Error('Network error'));
 
     await expect(checkApiHealth()).resolves.toBe(false);
+  });
+});
+
+describe('getBasSummary', () => {
+  it('fetches BAS summary with generated type', async () => {
+    const basSummary: BasSummaryDto = {
+      quarter: 'Q1',
+      financialYear: 2025,
+      periodStart: '2024-07-01',
+      periodEnd: '2024-09-30',
+      g1TotalSalesCents: 1100000,
+      label1aGstCollectedCents: 100000,
+      label1bGstPaidCents: 50000,
+      netGstPayableCents: 50000,
+      incomeCount: 5,
+      expenseCount: 12,
+    };
+
+    mockedFetch.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => basSummary,
+    } as Response);
+
+    const result = await getBasSummary('Q1', 2025);
+
+    expect(result).toEqual(basSummary);
+    expect(mockedFetch).toHaveBeenCalledWith(
+      'http://localhost:3000/bas/Q1/2025',
+      expect.objectContaining({ method: 'GET' }),
+    );
   });
 });
