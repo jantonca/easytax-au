@@ -386,6 +386,65 @@ GET /reports/fy/2026
 
 ---
 
+## PDF Export
+
+The PDF Export feature generates downloadable PDF reports for BAS and FY summaries.
+
+### Technology Choice
+
+**PDFKit** (v0.17.x) - ~500KB bundle, pure JavaScript, no external dependencies.
+
+| Option    | Bundle Size | Pros                         | Cons              |
+| --------- | ----------- | ---------------------------- | ----------------- |
+| PDFKit ✅ | ~500KB      | Lightweight, no dependencies | Manual layout     |
+| Puppeteer | ~300MB      | HTML/CSS templates           | Chrome dependency |
+| pdfmake   | ~2MB        | JSON templates               | Large bundle      |
+
+### API Endpoints
+
+| Method | Endpoint                          | Description                 |
+| ------ | --------------------------------- | --------------------------- |
+| GET    | `/reports/fy/:year/pdf`           | Download FY summary as PDF  |
+| GET    | `/reports/bas/:quarter/:year/pdf` | Download BAS summary as PDF |
+
+### PDF Configuration
+
+```typescript
+const PDF_CONFIG = {
+  margin: { left: 50, right: 50, top: 50, bottom: 50 },
+  fontSize: { title: 24, subtitle: 16, heading: 14, body: 11, small: 9 },
+  colors: { primary: '#2c3e50', secondary: '#7f8c8d', accent: '#3498db' },
+  table: { labelWidth: 250, valueWidth: 150, rowHeight: 25 },
+};
+```
+
+### Response Headers
+
+```
+Content-Type: application/pdf
+Content-Disposition: attachment; filename="BAS-Q1-2026.pdf"
+```
+
+### PDF Structure
+
+**BAS Summary PDF:**
+
+- Title with quarter/year
+- Period dates (e.g., "1 Jul 2025 - 30 Sep 2025")
+- GST breakdown table (Collected, Paid, Net Payable)
+- Income and Expense totals
+- Summary section
+
+**FY Summary PDF:**
+
+- Title with financial year
+- Income section (Total, Paid, Unpaid, GST Collected)
+- Expenses by category (with BAS labels)
+- Net profit calculation
+- Generated timestamp footer
+
+---
+
 ## Recurring Expenses (Automation)
 
 The Recurring Expenses feature automates repetitive expense entries.

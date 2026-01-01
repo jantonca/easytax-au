@@ -112,8 +112,16 @@
 | Task       | Description                                           | Priority | Status      |
 | ---------- | ----------------------------------------------------- | -------- | ----------- |
 | Dashboard  | Summary charts (expenses by category, monthly trends) | 🟢 Low   | Not started |
-| PDF export | Generate BAS-ready report                             | 🟢 Low   | Not started |
+| PDF export | Generate BAS-ready report                             | 🟢 Low   | ✅          |
 | FY summary | Annual totals for tax return                          | 🟢 Low   | ✅          |
+
+**Completed Features:**
+
+- FY Summary endpoint with income/expense breakdown
+- PDF Export using PDFKit (~500KB, no Chrome)
+- BAS quarterly PDF reports
+- FY annual PDF reports
+- 605 tests across 24 test suites
 
 ---
 
