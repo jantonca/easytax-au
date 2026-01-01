@@ -45,7 +45,7 @@ easytax-au/
 | Layer             | Choice                | Bundle Size | Rationale                                    |
 | ----------------- | --------------------- | ----------- | -------------------------------------------- |
 | **Build**         | Vite                  | N/A         | Fast HMR, native ESM, simple config          |
-| **Framework**     | React 18              | ~45KB       | Mature ecosystem, your expertise             |
+| **Framework**     | React 19              | ~45KB       | Mature ecosystem, your expertise             |
 | **Language**      | TypeScript (strict)   | N/A         | Type safety, API contract enforcement        |
 | **Styling**       | Tailwind CSS          | ~10KB       | Utility-first, no runtime, tree-shakes       |
 | **Components**    | shadcn/ui             | 0KB runtime | Copied to codebase, full control, accessible |
@@ -184,7 +184,8 @@ easytax-au/
 - Dev shell:
   - App runs under `AppShell` with React Query provider, BrowserRouter, Toasts, and Query devtools (dev only).
 
-> Note: We intentionally use a **native fetch-based client** instead of Axios, and a **custom toast system** instead of `sonner`, to minimize dependencies while keeping behavior explicit and testable.
+> Note: We intentionally use a **native fetch-based client** instead of Axios, and a **custom toast system** instead of `sonner`,
+> to minimize dependencies while keeping behavior explicit and testable.
 
 ---
 
@@ -212,13 +213,13 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
   - `web/vitest.config.ts` + `web/src/test/setup.ts`.
   - Coverage today: infra tests for API client, error boundary, and toast provider.
 
-| #      | Task                                        | Status |
-| ------ | ------------------------------------------- | ------ |
-| F1.2.1 | Create API client with Axios + interceptors | ⬜     |
-| F1.2.2 | Set up TanStack Query provider + devtools   | ⬜     |
-| F1.2.3 | Create React Router with lazy loading       | ⬜     |
-| F1.2.4 | Create error boundary component (app-level) | ⬜     |
-| F1.2.5 | Create toast notification system (sonner)   | ⬜     |
+| #      | Task                                                                    | Status |
+| ------ | ----------------------------------------------------------------------- | ------ |
+| F1.2.1 | Create API client using fetch wrapper + centralized errors (`ApiError`) | ✅     |
+| F1.2.2 | Set up TanStack Query provider + devtools                               | ⬜     |
+| F1.2.3 | Create React Router with lazy loading                                   | ⬜     |
+| F1.2.4 | Create error boundary component (app-level)                             | ⬜     |
+| F1.2.5 | Create toast notification system (custom, Tailwind-based)               | ✅     |
 
 > **Note (F1.2.4):** Start with a single app-level error boundary. Add route-level error boundaries only if crashes in one feature affect unrelated features during testing.
 > | F1.2.6 | Create currency transformer (dollars ↔ cents) | ⬜ |

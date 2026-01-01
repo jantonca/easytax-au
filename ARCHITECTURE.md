@@ -222,23 +222,62 @@ export type ExpenseFormData = z.infer<typeof expenseSchema>;
 ### API Client Pattern
 
 ```typescript
-// lib/api-client.ts
-import axios from 'axios';
+// Simplified example of the frontend API client (see web/src/lib/api-client.ts)
 
-export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
-  headers: { 'Content-Type': 'application/json' },
-});
+export class ApiError extends Error {
+  readonly status: number;
+  readonly details?: unknown;
 
-// Global error handling
-api.interceptors.response.use(
-  (response) => response.data,
-  (error) => {
-    // Transform to user-friendly message
-    const message = error.response?.data?.message || 'An error occurred';
-    throw new Error(message);
+  constructor(message: string, status: number, details?: unknown) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.details = details;
+  }
+}
+
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const envBaseUrl = import.meta.env.VITE_API_URL as unknown;
+  const baseUrl =
+    typeof envBaseUrl === 'string' && envBaseUrl.length > 0 ? envBaseUrl : 'http://localhost:3000';
+
+  const url = new URL(path, baseUrl).toString();
+
+  const response = await fetch(url, {
+    credentials: 'omit',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers ?? {}),
+    },
+    ...options,
+  });
+
+  const contentType = response.headers.get('content-type') ?? '';
+  const isJson = contentType.includes('application/json');
+  const body: unknown = isJson ? await response.json().catch(() => undefined) : undefined;
+
+  if (!response.ok) {
+    let message = `API request failed with status ${response.status}`;
+
+    if (body && typeof body === 'object' && 'message' in body) {
+      const maybeMessage = (body as { message?: unknown }).message;
+      if (typeof maybeMessage === 'string') {
+        message = maybeMessage;
+      }
+    }
+
+    throw new ApiError(message, response.status, body);
+  }
+
+  return (body as T) ?? (undefined as T);
+}
+
+export const apiClient = {
+  get<T>(path: string, init?: RequestInit): Promise<T> {
+    return request<T>(path, { method: 'GET', ...(init ?? {}) });
   },
-);
+  // post/put/patch/delete omitted for brevity…
+};
 ```
 
 ---

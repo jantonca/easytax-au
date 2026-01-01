@@ -208,7 +208,7 @@ All MVP requirements have been completed as of January 1, 2026.
 | Layer     | Choice                   | Rationale                |
 | --------- | ------------------------ | ------------------------ |
 | Build     | Vite                     | Fast HMR, native ESM     |
-| Framework | React 18 + TypeScript    | Mature, type-safe        |
+| Framework | React 19 + TypeScript    | Mature, type-safe        |
 | Styling   | Tailwind CSS + shadcn/ui | Zero-runtime, accessible |
 | Data      | TanStack Query           | Caching, loading states  |
 | Forms     | React Hook Form + Zod    | Performance, validation  |
