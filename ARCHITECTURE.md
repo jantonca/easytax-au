@@ -310,6 +310,82 @@ GET /bas/Q1/2025
 
 ---
 
+## FY Summary Reporting
+
+The FY Summary endpoint provides annual totals for tax return preparation.
+
+### API Endpoint
+
+| Method | Endpoint            | Description                      |
+| ------ | ------------------- | -------------------------------- |
+| GET    | `/reports/fy/:year` | Get complete FY summary for year |
+
+### FY Date Range Calculation
+
+```typescript
+// FY2026 = July 2025 to June 2026
+private getFYDateRange(financialYear: number) {
+  const fyStartYear = financialYear - 1;
+  return {
+    start: `${fyStartYear}-07-01`,  // July 1 of previous calendar year
+    end: `${financialYear}-06-30`,   // June 30 of FY year
+  };
+}
+```
+
+### Response Structure
+
+| Field                         | Description                                |
+| ----------------------------- | ------------------------------------------ |
+| `income.totalIncomeCents`     | All income (including GST)                 |
+| `income.paidIncomeCents`      | Paid invoices only                         |
+| `income.unpaidIncomeCents`    | Outstanding invoices                       |
+| `income.gstCollectedCents`    | Total GST on income                        |
+| `expenses.totalExpensesCents` | All expenses                               |
+| `expenses.gstPaidCents`       | Claimable GST (domestic, with biz_percent) |
+| `expenses.byCategory`         | Breakdown by category with BAS labels      |
+| `netProfitCents`              | Income - Expenses                          |
+| `netGstPayableCents`          | GST Collected - GST Paid                   |
+
+### Example Response
+
+```json
+GET /reports/fy/2026
+
+{
+  "financialYear": 2026,
+  "fyLabel": "FY2026",
+  "periodStart": "2025-07-01",
+  "periodEnd": "2026-06-30",
+  "income": {
+    "totalIncomeCents": 5500000,
+    "paidIncomeCents": 5000000,
+    "unpaidIncomeCents": 500000,
+    "gstCollectedCents": 500000,
+    "count": 45
+  },
+  "expenses": {
+    "totalExpensesCents": 2200000,
+    "gstPaidCents": 200000,
+    "count": 156,
+    "byCategory": [
+      {
+        "categoryId": 1,
+        "name": "Software",
+        "basLabel": "1B",
+        "totalCents": 500000,
+        "gstCents": 45454,
+        "count": 24
+      }
+    ]
+  },
+  "netProfitCents": 3300000,
+  "netGstPayableCents": 300000
+}
+```
+
+---
+
 ## ATO GST Logic (Simpler BAS)
 
 | BAS Label | Description                 | Source                                   |

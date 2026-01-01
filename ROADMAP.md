@@ -109,11 +109,11 @@
 
 ### Features
 
-| Task       | Description                                           | Priority |
-| ---------- | ----------------------------------------------------- | -------- |
-| Dashboard  | Summary charts (expenses by category, monthly trends) | 🟢 Low   |
-| PDF export | Generate BAS-ready report                             | 🟢 Low   |
-| FY summary | Annual totals for tax return                          | 🟢 Low   |
+| Task       | Description                                           | Priority | Status      |
+| ---------- | ----------------------------------------------------- | -------- | ----------- |
+| Dashboard  | Summary charts (expenses by category, monthly trends) | 🟢 Low   | Not started |
+| PDF export | Generate BAS-ready report                             | 🟢 Low   | Not started |
+| FY summary | Annual totals for tax return                          | 🟢 Low   | ✅          |
 
 ---
 

@@ -482,6 +482,147 @@ Aida Tomescu updates,9,$560,$56,$616.00
 
 ---
 
+## Phase 6: Automation
+
+### 6.1 Recurring Expenses
+
+| #     | Task                                                   | Status |
+| ----- | ------------------------------------------------------ | ------ |
+| 6.1.1 | Create `RecurringExpense` entity (template + schedule) | ⬜     |
+| 6.1.2 | Create `CreateRecurringExpenseDto` with validation     | ⬜     |
+| 6.1.3 | Implement `RecurringExpensesService` (CRUD)            | ⬜     |
+| 6.1.4 | Add schedule logic (monthly, quarterly, yearly)        | ⬜     |
+| 6.1.5 | Implement auto-generation of expenses from templates   | ⬜     |
+| 6.1.6 | Add `POST /recurring-expenses/generate` endpoint       | ⬜     |
+
+**Documentation Required:**
+
+- [ ] TSDoc for RecurringExpense entity and DTOs
+- [ ] Document scheduling logic in ARCHITECTURE.md
+- [ ] Swagger decorators on controller
+
+**Tests Required:**
+
+- [ ] Service: create recurring expense template
+- [ ] Service: generate monthly expense (e.g., iinet)
+- [ ] Service: generate quarterly expense
+- [ ] Service: skip if already generated for period
+- [ ] Service: respect provider GST rules
+- [ ] Service: apply biz_percent from template
+
+**Definition of Done:**
+
+- [ ] Can create recurring expense templates
+- [ ] Generate endpoint creates expenses for current period
+- [ ] Duplicate prevention (won't create twice for same period)
+- [ ] 80%+ test coverage on service
+
+---
+
+### 6.2 Email Import (Future)
+
+| #     | Task                                         | Status |
+| ----- | -------------------------------------------- | ------ |
+| 6.2.1 | Design email forwarding architecture         | ⬜     |
+| 6.2.2 | Implement attachment extraction              | ⬜     |
+| 6.2.3 | Add basic receipt OCR (Tesseract or similar) | ⬜     |
+| 6.2.4 | Create expense from extracted data           | ⬜     |
+
+**Note:** This is a stretch goal. May not be implemented.
+
+---
+
+## Phase 7: Reporting
+
+### 7.1 FY Summary Endpoint
+
+| #     | Task                                          | Status |
+| ----- | --------------------------------------------- | ------ |
+| 7.1.1 | Create `FYSummaryDto` response type           | ✅     |
+| 7.1.2 | Implement total income for FY                 | ✅     |
+| 7.1.3 | Implement total expenses for FY (by category) | ✅     |
+| 7.1.4 | Implement total GST collected/paid for FY     | ✅     |
+| 7.1.5 | Add `GET /reports/fy/:year` endpoint          | ✅     |
+
+**Documentation Required:**
+
+- [x] TSDoc for FYSummaryDto
+- [x] Document FY calculation formulas
+- [x] Swagger decorators on controller
+
+**Tests Required:**
+
+- [x] FY2026: sums Jul 2025 - Jun 2026 data
+- [x] Expenses grouped by category
+- [x] Expenses grouped by BAS label (W1, W2, etc.)
+- [x] Net profit calculation (income - expenses)
+- [x] Empty FY returns zeros
+- [x] 18 service tests + 7 controller tests = 25 total
+
+**Definition of Done:**
+
+- [x] GET `/reports/fy/2026` returns annual summary
+- [x] Can use for tax return preparation
+- [x] 80%+ test coverage
+
+---
+
+### 7.2 PDF Export
+
+| #     | Task                                         | Status |
+| ----- | -------------------------------------------- | ------ |
+| 7.2.1 | Choose PDF library (PDFKit, Puppeteer, etc.) | ⬜     |
+| 7.2.2 | Create BAS summary PDF template              | ⬜     |
+| 7.2.3 | Create FY summary PDF template               | ⬜     |
+| 7.2.4 | Add `GET /reports/bas/:quarter/:year/pdf`    | ⬜     |
+| 7.2.5 | Add `GET /reports/fy/:year/pdf`              | ⬜     |
+
+**Documentation Required:**
+
+- [ ] Document PDF generation approach
+- [ ] Swagger decorators with file response
+
+**Tests Required:**
+
+- [ ] PDF generates without errors
+- [ ] PDF contains correct data
+- [ ] Response has correct Content-Type header
+
+**Definition of Done:**
+
+- [ ] Can download BAS PDF for any quarter
+- [ ] Can download FY PDF for any year
+- [ ] PDF is readable and well-formatted
+
+---
+
+### 7.3 Dashboard Data (API Only)
+
+| #     | Task                                             | Status |
+| ----- | ------------------------------------------------ | ------ |
+| 7.3.1 | Create `DashboardDto` response type              | ⬜     |
+| 7.3.2 | Implement expenses by category (pie chart data)  | ⬜     |
+| 7.3.3 | Implement monthly expense trend (bar chart data) | ⬜     |
+| 7.3.4 | Implement income vs expense comparison           | ⬜     |
+| 7.3.5 | Add `GET /reports/dashboard` endpoint            | ⬜     |
+
+**Note:** This provides JSON data for a future UI. No charts rendered server-side.
+
+**Tests Required:**
+
+- [ ] Dashboard returns category breakdown
+- [ ] Dashboard returns monthly totals
+- [ ] Date range filtering works
+- [ ] Empty data returns empty arrays (not errors)
+
+**Definition of Done:**
+
+- [ ] GET `/reports/dashboard` returns chart-ready data
+- [ ] Supports optional date range query params
+- [ ] 80%+ test coverage
+
+---
+
 ## Progress Tracker
 
 | Phase               | Tasks  | Done   | Progress |
@@ -491,7 +632,9 @@ Aida Tomescu updates,9,$560,$56,$616.00
 | 3. BAS Reporting    | 6      | 6      | 100%     |
 | 4. Integration      | 10     | 10     | 100%     |
 | 5. CSV Import (QoL) | 17     | 17     | 100%     |
-| **Total**           | **74** | **74** | **100%** |
+| 6. Automation       | 10     | 0      | 0%       |
+| 7. Reporting        | 14     | 5      | 36%      |
+| **Total**           | **98** | **79** | **81%**  |
 
 ---
 
@@ -522,4 +665,15 @@ Aida Tomescu updates,9,$560,$56,$616.00
 - 500 unit tests passing (18 test suites)
 - Duplicate detection for both expenses and incomes
 - FY/Quarter helper utilities
-- 490 unit tests passing (18 test suites)
+
+## 🎉 Phase 7.1 FY Summary Complete!
+
+**Completed:** January 1, 2026
+
+**Summary:**
+
+- FY Summary endpoint for tax return preparation
+- Income totals with paid/unpaid breakdown
+- Expense breakdown by category with BAS labels
+- Net profit and GST position calculations
+- 525 unit tests passing (20 test suites)
