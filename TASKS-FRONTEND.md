@@ -371,19 +371,19 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 
 ### F2.2 Expenses Module
 
-| #       | Task                                           | Status |
-| ------- | ---------------------------------------------- | ------ |
-| F2.2.1  | Create expenses list page with data table      | ✅     |
-| F2.2.2  | Add sorting (date, amount, provider)           | ✅     |
-| F2.2.3  | Add filtering (category, provider, date range) | ✅     |
-| F2.2.4  | Add pagination                                 | ⬜     |
-| F2.2.5  | Create expense form (add/edit) with validation | ⬜     |
-| F2.2.6  | Implement provider dropdown with search        | ⬜     |
-| F2.2.7  | Implement category dropdown                    | ⬜     |
-| F2.2.8  | Add GST auto-calculation display               | ⬜     |
-| F2.2.9  | Add biz_percent slider (0-100)                 | ⬜     |
-| F2.2.10 | Implement delete with confirmation             | ⬜     |
-| F2.2.11 | Add inline editing for quick updates           | ⬜     |
+|| #       | Task                                           | Status |
+|| ------- | ---------------------------------------------- | ------ |
+|| F2.2.1  | Create expenses list page with data table      | ✅     |
+|| F2.2.2  | Add sorting (date, amount, provider)           | ✅     |
+|| F2.2.3  | Add filtering (category, provider, date range) | ✅     |
+|| F2.2.4  | Add pagination                                 | ⬜     |
+|| F2.2.5  | Create expense form (add/edit) with validation | ✅     |
+|| F2.2.6  | Implement provider dropdown with search        | ⬜     |
+|| F2.2.7  | Implement category dropdown                    | ⬜     |
+|| F2.2.8  | Add GST auto-calculation display               | ⬜     |
+|| F2.2.9  | Add biz_percent slider (0-100)                 | ⬜     |
+|| F2.2.10 | Implement delete with confirmation             | ⬜     |
+|| F2.2.11 | Add inline editing for quick updates           | ⬜     |
 
 - Initial read-only expenses list implemented via `useExpenses` and `ExpensesTable` with default date-desc sorting, loading/error/empty states, and columns for date, description, amount, GST, biz%, and FY/quarter.
 - Expenses table supports client-side sorting on date (default), amount, and provider name, via clickable column headers and `aria-sort` for accessibility.
@@ -392,6 +392,10 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
   - Category filter matches `expense.categoryId`.
   - Date range filter compares the date-only prefix of `expense.date` (`YYYY-MM-DD`).
 - Note: Filters are currently applied on the already-fetched `/expenses` list; a future slice may extend `useExpenses` to pass query params to `/expenses` for server-side filtering if needed.
+- Expense create form implemented as `ExpenseForm` using React Hook Form + Zod (`expenseFormSchema` / `ExpenseFormValues`) and a typed `useCreateExpense` mutation that posts `CreateExpenseDto` and invalidates the `['expenses']` query on success.
+- The Expenses page wires an “Add expense” button to open an accessible modal dialog containing `ExpenseForm`; on successful submit, the modal closes and a success toast is shown; failures surface a generic error toast.
+- The form handles cents conversion via `parseCurrency`, enforces `providerId`/`categoryId` UUIDs and `bizPercent` range, and preselects the first available provider/category when lists are non-empty.
+- Edit and inline editing paths are intentionally deferred to later F2.2 slices (notably F2.2.11).
 
 **Files to Create:**
 
@@ -799,15 +803,15 @@ location / {
 
 ## Progress Tracker
 
-|| Phase | Tasks | Done | Progress |
-|| -------------------- | ------------ | ------- | -------- | ------- |
-|| | F1. Scaffold | 22 | 22 | 100% |
-|| F2. Core Features | 44 | 3 | 7% |
-|| F3. Reports & Polish | 26 | 0 | 0% |
-|| F4. Production | 9 | 0 | 0% |
-|| | **Total** | **101** | **25** | **25%** |
+||| Phase | Tasks | Done | Progress |
+||| -------------------- | ------------ | ------- | -------- | ------- |
+||| | F1. Scaffold | 22 | 22 | 100% |
+||| F2. Core Features | 44 | 5 | 11% |
+||| F3. Reports & Polish | 26 | 0 | 0% |
+||| F4. Production | 9 | 0 | 0% |
+||| | **Total** | **101** | **27** | **27%** |
 
-> Note: Frontend F2 progress counts the completed tasks F2.1, F2.2.1, and F2.2.2. Remaining F2.x tasks are planned but not yet implemented.
+> Note: Frontend F2 progress currently counts the completed tasks F2.1, F2.2.1, F2.2.2, F2.2.3, and F2.2.5. Remaining F2.x tasks (pagination, enhanced dropdowns, GST/biz% UI, delete, inline edit, etc.) are planned but not yet implemented.
 
 ---
 

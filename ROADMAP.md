@@ -259,6 +259,7 @@ Goal: Establish a modern React SPA with tooling, styling, and core infrastructur
   - Backed by a typed `useDashboardData` hook using shared OpenAPI types and TanStack Query.
 
 - [ ] F2.2 – Expenses list & CRUD
+  - Current: read-only expenses table with client-side sorting (date, amount, provider), client-side filters (provider, category, date range), and a create expense form wired to the backend via `useCreateExpense` and toast notifications. Edit/delete/inline editing and pagination are planned for later F2.2 slices.
 - [ ] F2.3 – Incomes list & CRUD
 - [ ] F2.4 – CSV import UI
 - [ ] F2.5 – Reports (BAS/FY) UI

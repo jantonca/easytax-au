@@ -209,10 +209,12 @@ features/expenses/
 - **Expenses list:** `useExpenses` hook (`web/src/features/expenses/hooks/use-expenses.ts`) + `ExpensesTable` (`web/src/features/expenses/components/expenses-table.tsx`) provide a read-only expenses table using `/expenses`, sorted by date (newest first) with loading/error/empty states.
 - **Expenses table:** `ExpensesTable` renders a semantic HTML table with columns for date, description, provider, category, amount, GST, biz%, and BAS period. It uses client-side sorting by date, amount, and provider name (clickable headers, `aria-sort` for a11y).
 - **Expenses filters:** `ExpenseFilters` (`web/src/features/expenses/components/expense-filters.tsx`) provides provider/category/date filters. Filtering is currently client-side in `ExpensesPage` by narrowing the `expenses` array before passing it into `ExpensesTable`. If data volume grows, `useExpenses` can be extended to accept filter params and call `/expenses` with query params for server-side filtering.
+- **Expense create form:** `ExpenseForm` (`web/src/features/expenses/components/expense-form.tsx`) uses React Hook Form plus a Zod `expenseFormSchema` to validate inputs (date, providerId/categoryId UUIDs, amount/gst cents, bizPercent range, optional description/fileRef) and converts user-entered currency strings to cents via `parseCurrency`.
+- **Expense mutations:** `useExpenseMutations` (`web/src/features/expenses/hooks/use-expense-mutations.ts`) currently exposes `useCreateExpense`, which wraps a `POST /expenses` TanStack Query mutation, invalidates the `['expenses']` query on success, and is wired into `ExpenseForm` along with toast notifications for success/error.
 
 ### Data Fetching Pattern
 
-> Note: Filtering by category/provider/date will be added in a later F2.2 slice by extending this hook with filter parameters and filter-aware query keys.
+> Note: Filtering by category/provider/date is currently applied client-side in `ExpensesPage` by narrowing the `expenses` array before passing it into `ExpensesTable`. If data volume grows, this hook can be extended with filter parameters and filter-aware query keys to call `/expenses` with query params for server-side filtering.
 
 ```typescript
 // hooks/use-expenses.ts

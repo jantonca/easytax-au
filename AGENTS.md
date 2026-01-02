@@ -155,6 +155,8 @@ export function useCreateExpense() {
 }
 ```
 
+> In the current frontend, this pattern is implemented by `useCreateExpense` in `web/src/features/expenses/hooks/use-expense-mutations.ts`, which invalidates the `['expenses']` query and surfaces success/error via toasts.
+
 ```typescript
 // ❌ WRONG - Don't use useEffect for data fetching
 useEffect(() => {
