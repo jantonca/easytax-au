@@ -94,8 +94,15 @@ export async function getBasSummary(quarter: string, year: number): Promise<BasS
   return apiClient.get<BasSummaryDto>(`/bas/${quarter}/${year}`);
 }
 
-export async function getRecentExpenses(): Promise<ExpenseResponseDto[]> {
+export async function getExpenses(): Promise<ExpenseResponseDto[]> {
   return apiClient.get<ExpenseResponseDto[]>('/expenses');
+}
+
+export async function getRecentExpenses(): Promise<ExpenseResponseDto[]> {
+  const expenses = await getExpenses();
+
+  // Sort by date descending and take latest 10 for dashboard context
+  return [...expenses].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 10);
 }
 
 export async function getDueRecurringExpenses(

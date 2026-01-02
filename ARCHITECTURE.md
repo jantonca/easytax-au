@@ -206,6 +206,8 @@ features/expenses/
     └── expense.schema.ts       # Zod validation schema
 ```
 
+- **Expenses list:** `useExpenses` hook (`web/src/features/expenses/hooks/use-expenses.ts`) + `ExpensesTable` (`web/src/features/expenses/components/expenses-table.tsx`) provide a read-only expenses table using `/expenses`, sorted by date (newest first) with loading/error/empty states.
+
 ### Data Fetching Pattern
 
 ```typescript

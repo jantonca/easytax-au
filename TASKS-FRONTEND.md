@@ -373,7 +373,7 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 
 | #       | Task                                           | Status |
 | ------- | ---------------------------------------------- | ------ |
-| F2.2.1  | Create expenses list page with data table      | ⬜     |
+| F2.2.1  | Create expenses list page with data table      | ✅     |
 | F2.2.2  | Add sorting (date, amount, provider)           | ⬜     |
 | F2.2.3  | Add filtering (category, provider, date range) | ⬜     |
 | F2.2.4  | Add pagination                                 | ⬜     |
@@ -384,6 +384,8 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 | F2.2.9  | Add biz_percent slider (0-100)                 | ⬜     |
 | F2.2.10 | Implement delete with confirmation             | ⬜     |
 | F2.2.11 | Add inline editing for quick updates           | ⬜     |
+
+- Initial read-only expenses list implemented via `useExpenses` and `ExpensesTable` with default date-desc sorting, loading/error/empty states, and columns for date, description, amount, GST, biz%, and FY/quarter.
 
 **Files to Create:**
 
