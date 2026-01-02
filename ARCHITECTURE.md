@@ -208,6 +208,7 @@ features/expenses/
 
 - **Expenses list:** `useExpenses` hook (`web/src/features/expenses/hooks/use-expenses.ts`) + `ExpensesTable` (`web/src/features/expenses/components/expenses-table.tsx`) provide a read-only expenses table using `/expenses`, sorted by date (newest first) with loading/error/empty states.
 - **Expenses table:** `ExpensesTable` renders a semantic HTML table with columns for date, description, provider, category, amount, GST, biz%, and BAS period. It uses client-side sorting by date, amount, and provider name (clickable headers, `aria-sort` for a11y).
+- **Expenses filters:** `ExpenseFilters` (`web/src/features/expenses/components/expense-filters.tsx`) provides provider/category/date filters. Filtering is currently client-side in `ExpensesPage` by narrowing the `expenses` array before passing it into `ExpensesTable`. If data volume grows, `useExpenses` can be extended to accept filter params and call `/expenses` with query params for server-side filtering.
 
 ### Data Fetching Pattern
 

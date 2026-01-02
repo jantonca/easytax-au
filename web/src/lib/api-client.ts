@@ -90,8 +90,38 @@ export type BasSummaryDto = components['schemas']['BasSummaryDto'];
 export type ExpenseResponseDto = components['schemas']['ExpenseResponseDto'];
 export type RecurringExpenseResponseDto = components['schemas']['RecurringExpenseResponseDto'];
 
+// Provider and Category types based on backend entities
+// These aren't in the OpenAPI schema as response DTOs, so we define them here
+export interface ProviderDto {
+  id: string;
+  name: string;
+  isInternational: boolean;
+  defaultCategoryId?: string | null;
+  abnArn?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CategoryDto {
+  id: string;
+  name: string;
+  basLabel: string;
+  isDeductible: boolean;
+  description?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export async function getBasSummary(quarter: string, year: number): Promise<BasSummaryDto> {
   return apiClient.get<BasSummaryDto>(`/bas/${quarter}/${year}`);
+}
+
+export async function getProviders(): Promise<ProviderDto[]> {
+  return apiClient.get<ProviderDto[]>('/providers');
+}
+
+export async function getCategories(): Promise<CategoryDto[]> {
+  return apiClient.get<CategoryDto[]>('/categories');
 }
 
 export async function getExpenses(): Promise<ExpenseResponseDto[]> {
