@@ -87,7 +87,28 @@ export async function checkApiHealth(): Promise<boolean> {
 }
 
 export type BasSummaryDto = components['schemas']['BasSummaryDto'];
+export type ExpenseResponseDto = components['schemas']['ExpenseResponseDto'];
+export type RecurringExpenseResponseDto = components['schemas']['RecurringExpenseResponseDto'];
 
 export async function getBasSummary(quarter: string, year: number): Promise<BasSummaryDto> {
   return apiClient.get<BasSummaryDto>(`/bas/${quarter}/${year}`);
+}
+
+export async function getRecentExpenses(): Promise<ExpenseResponseDto[]> {
+  return apiClient.get<ExpenseResponseDto[]>('/expenses');
+}
+
+export async function getDueRecurringExpenses(
+  asOfDate?: string,
+): Promise<RecurringExpenseResponseDto[]> {
+  const searchParams = new URLSearchParams();
+
+  if (asOfDate && asOfDate.length > 0) {
+    searchParams.set('asOfDate', asOfDate);
+  }
+
+  const query = searchParams.toString();
+  const path = query.length > 0 ? `/recurring-expenses/due?${query}` : '/recurring-expenses/due';
+
+  return apiClient.get<RecurringExpenseResponseDto[]>(path);
 }

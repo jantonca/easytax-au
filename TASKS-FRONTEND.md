@@ -324,21 +324,21 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 
 ### F2.1 Dashboard
 
-| #      | Task                                               | Status |
-| ------ | -------------------------------------------------- | ------ |
-| F2.1.1 | Create dashboard page with GST summary cards       | ⬜     |
-| F2.1.2 | Show current quarter BAS position (G1, 1A, 1B)     | ⬜     |
-| F2.1.3 | Add quick action buttons (Add Expense, Add Income) | ⬜     |
-| F2.1.4 | Display recent expenses (last 10)                  | ⬜     |
-| F2.1.5 | Display upcoming recurring expenses                | ⬜     |
+|| #      | Task                                               | Status |
+|| ------ | -------------------------------------------------- | ------ |
+|| F2.1.1 | Create dashboard page with GST summary cards       | 🟡     |
+|| F2.1.2 | Show current quarter BAS position (G1, 1A, 1B)     | 🟡     |
+|| F2.1.3 | Add quick action buttons (Add Expense, Add Income) | ✅     |
+|| F2.1.4 | Display recent expenses (last 10)                  | 🟡     |
+|| F2.1.5 | Display upcoming recurring expenses                | 🟡     |
 
-**Files to Create:**
+**Files created / updated (F2.1):**
 
-- `web/src/features/dashboard/dashboard-page.tsx`
-- `web/src/features/dashboard/components/gst-summary-card.tsx`
-- `web/src/features/dashboard/components/recent-expenses.tsx`
-- `web/src/features/dashboard/components/quick-actions.tsx`
-- `web/src/features/dashboard/hooks/use-dashboard-data.ts`
+- `web/src/features/dashboard/dashboard-page.tsx` (dashboard layout + wiring)
+- `web/src/features/dashboard/components/gst-summary-card.tsx` (GST summary cards)
+- `web/src/features/dashboard/components/recent-expenses.tsx` (recent expenses list)
+- `web/src/features/dashboard/components/quick-actions.tsx` (Add expense / Add income links)
+- `web/src/features/dashboard/hooks/use-dashboard-data.ts` (TanStack Query hooks for BAS, expenses, recurring)
 
 **API Endpoints Used:**
 
