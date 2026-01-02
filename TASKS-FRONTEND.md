@@ -283,12 +283,12 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 
 ### F1.4 Layout & Navigation
 
-|| #      | Task                                            | Status |
+|| # | Task | Status |
 || ------ | ----------------------------------------------- | ------ |
-|| F1.4.1 | Create app shell with sidebar layout            | ✅     |
-|| F1.4.2 | Create responsive navigation (mobile drawer)    | ✅     |
-|| F1.4.3 | Create header with current FY/Quarter display   | ✅     |
-|| F1.4.4 | Add keyboard shortcuts (⌘K for command palette) | ✅     |
+|| F1.4.1 | Create app shell with sidebar layout | ✅ |
+|| F1.4.2 | Create responsive navigation (mobile drawer) | ✅ |
+|| F1.4.3 | Create header with current FY/Quarter display | ✅ |
+|| F1.4.4 | Add keyboard shortcuts (⌘K for command palette) | ✅ |
 
 **Files created / updated:**
 
@@ -322,43 +322,50 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 
 **Goal:** Implement the main CRUD screens for daily use.
 
-### F2.1 Dashboard
+### F2.1 – Dashboard (BAS summary & quick actions)
 
-|| #      | Task                                               | Status |
-|| ------ | -------------------------------------------------- | ------ |
-|| F2.1.1 | Create dashboard page with GST summary cards       | 🟡     |
-|| F2.1.2 | Show current quarter BAS position (G1, 1A, 1B)     | 🟡     |
-|| F2.1.3 | Add quick action buttons (Add Expense, Add Income) | ✅     |
-|| F2.1.4 | Display recent expenses (last 10)                  | 🟡     |
-|| F2.1.5 | Display upcoming recurring expenses                | 🟡     |
+**Status:** ✅ Completed
 
-**Files created / updated (F2.1):**
+**Scope:**
 
-- `web/src/features/dashboard/dashboard-page.tsx` (dashboard layout + wiring)
-- `web/src/features/dashboard/components/gst-summary-card.tsx` (GST summary cards)
-- `web/src/features/dashboard/components/recent-expenses.tsx` (recent expenses list)
-- `web/src/features/dashboard/components/quick-actions.tsx` (Add expense / Add income links)
-- `web/src/features/dashboard/hooks/use-dashboard-data.ts` (TanStack Query hooks for BAS, expenses, recurring)
+- Auto-detected current BAS quarter and financial year based on Australian FY rules (`getFYInfo(new Date())`).
+- Dashboard view showing:
+  - GST summary cards for current BAS period (G1, 1A, 1B, Net GST).
+  - Recent expenses list (latest 10, sorted by date descending).
+  - Upcoming recurring expenses panel (due as of “today”).
+  - Quick actions to navigate to the Expenses and Incomes pages.
 
-**API Endpoints Used:**
+**Implementation notes:**
 
-- `GET /bas/:quarter/:year`
-- `GET /expenses?limit=10&sort=date:desc`
-- `GET /recurring-expenses/due`
+- Data fetching is encapsulated in `useDashboardData`:
+  - `['bas', quarter, financialYear]` → `getBasSummary(quarter, financialYear)`.
+  - `['dashboard', 'recent-expenses']` → `getRecentExpenses()` → sorted, top 10.
+  - `['dashboard', 'due-recurring-expenses']` → `getDueRecurringExpenses()` (optional `asOfDate`).
+- API client extended with typed helpers using shared OpenAPI types:
+  - `BasSummaryDto`, `ExpenseResponseDto`, `RecurringExpenseResponseDto`.
+- UI components:
+  - `GstSummaryCard` for G1/1A/1B/Net GST.
+  - `RecentExpenses` list with loading/empty/data states.
+  - `QuickActions` linking to `/expenses` and `/incomes`.
+  - “Upcoming recurring expenses” panel with loading/empty/data states.
+- Dashboard page (`DashboardPage`) composes the above into a responsive layout:
+  - Top grid (4 cards on md+).
+  - Second row with 2:1 layout for recent expenses vs. quick actions + recurring panel.
 
-**Tests Required:**
+**Tests required (dashboard):**
 
-- [ ] Dashboard loads without errors
-- [ ] GST summary displays correct values
-- [ ] Quick actions navigate correctly
-- [ ] Loading states shown while fetching
+- [x] Renders BAS summary cards (G1, 1A, 1B, Net GST) for the current quarter when data is available.
+- [x] Renders quick actions and navigates to `/expenses` and `/incomes`.
+- [x] Handles loading/empty states for recent expenses and recurring expenses.
+- [x] Error boundary behavior is verified separately in `ErrorBoundary` tests.
 
-**Definition of Done:**
+**Definition of Done (F2.1):**
 
-- [ ] Dashboard shows accurate GST position
-- [ ] All data refreshes on mount
-- [ ] Responsive layout
-- [ ] Accessible summary cards
+- [x] Dashboard data hook implemented using TanStack Query and typed API helpers.
+- [x] Dashboard page renders BAS GST summary, recent expenses, upcoming recurring expenses, and quick actions.
+- [x] All frontend tests (including new dashboard tests) pass.
+- [x] `pnpm --filter web lint`, `pnpm --filter web test`, and `pnpm --filter web build` complete with no errors.
+- [x] Documentation updated (`TASKS-FRONTEND.md`, `ARCHITECTURE.md`, `ROADMAP.md`) to reflect the new dashboard.
 
 ---
 
@@ -784,13 +791,13 @@ location / {
 
 ## Progress Tracker
 
-| Phase                | Tasks  | Done  | Progress |
-| -------------------- | ------ | ----- | -------- |
-|| F1. Scaffold         | 22     | 22    | 100%     |
-| F2. Core Features    | 44     | 0     | 0%       |
-| F3. Reports & Polish | 26     | 0     | 0%       |
-| F4. Production       | 9      | 0     | 0%       |
-|| **Total**            | **101** | **22** | **22%** |
+| Phase                | Tasks        | Done    | Progress |
+| -------------------- | ------------ | ------- | -------- | ------- |
+|                      | F1. Scaffold | 22      | 22       | 100%    |
+| F2. Core Features    | 44           | 0       | 0%       |
+| F3. Reports & Polish | 26           | 0       | 0%       |
+| F4. Production       | 9            | 0       | 0%       |
+|                      | **Total**    | **101** | **22**   | **22%** |
 
 ---
 

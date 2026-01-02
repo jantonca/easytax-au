@@ -110,6 +110,25 @@
     - `web/src/lib/fy.test.ts`
     - `web/src/hooks/use-keyboard-shortcuts.test.tsx`
 
+### Dashboard (Phase F2.1)
+
+The web dashboard in `web/src/features/dashboard` provides a high-level BAS overview for the current Australian financial year quarter plus shortcuts for common actions.
+
+- Data is loaded from the backend via `useDashboardData`:
+  - Uses `getFYInfo(new Date())` to determine the active BAS quarter and financial year.
+  - Fetches the BAS summary (`BasSummaryDto`) for that period.
+  - Loads recent expenses (`ExpenseResponseDto[]`), sorted newest-first and limited to the latest 10.
+  - Loads due recurring expenses (`RecurringExpenseResponseDto[]`) as of “today”.
+- Typed API helpers in `web/src/lib/api-client.ts` wrap the shared OpenAPI types:
+  - `getBasSummary(quarter, year)`
+  - `getRecentExpenses()`
+  - `getDueRecurringExpenses(asOfDate?)`
+- `DashboardPage` composes:
+  - GST summary cards for G1, 1A, 1B and Net GST.
+  - A “Recent expenses” list with loading/empty/data states.
+  - A “Quick actions” block linking to `/expenses` and `/incomes`.
+  - An “Upcoming recurring expenses” panel with loading/empty/data states.
+
 ---
 
 ## Monorepo Structure

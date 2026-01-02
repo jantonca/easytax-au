@@ -251,6 +251,18 @@ Goal: Establish a modern React SPA with tooling, styling, and core infrastructur
 6. **FY Report** - Annual summary, PDF download
 7. **Settings** - Providers, Categories, Clients management
 
+### Phase F2 – Core Features (web)
+
+- [x] F2.1 – Dashboard (current BAS summary & shortcuts)
+  - Shows GST summary cards for the current BAS quarter (G1, 1A, 1B, Net GST).
+  - Includes a recent expenses list (latest 10), upcoming recurring expenses, and quick actions to add expenses/incomes.
+  - Backed by a typed `useDashboardData` hook using shared OpenAPI types and TanStack Query.
+
+- [ ] F2.2 – Expenses list & CRUD
+- [ ] F2.3 – Incomes list & CRUD
+- [ ] F2.4 – CSV import UI
+- [ ] F2.5 – Reports (BAS/FY) UI
+
 ---
 
 ## Out of Scope (Won't Build)
