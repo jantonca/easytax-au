@@ -1,4 +1,5 @@
 import type { ReactElement } from 'react';
+import { useMemo, useState } from 'react';
 import type { ExpenseResponseDto } from '@/lib/api-client';
 import { formatCents } from '@/lib/currency';
 
@@ -6,8 +7,105 @@ interface ExpensesTableProps {
   expenses: ExpenseResponseDto[];
 }
 
+type SortColumn = 'date' | 'amount' | 'provider';
+type SortDirection = 'asc' | 'desc';
+
+function getProviderName(expense: ExpenseResponseDto): string {
+  const provider = (expense as unknown as { provider?: { name?: unknown } | null }).provider;
+  const raw = provider?.name;
+  return typeof raw === 'string' && raw.trim().length > 0 ? raw : '';
+}
+
+function getCategoryName(expense: ExpenseResponseDto): string {
+  const category = (expense as unknown as { category?: { name?: unknown } | null }).category;
+  const raw = category?.name;
+  return typeof raw === 'string' && raw.trim().length > 0 ? raw : '';
+}
+
+function getSortIndicator(
+  column: SortColumn,
+  sortBy: SortColumn,
+  direction: SortDirection,
+): string {
+  if (column !== sortBy) {
+    return '';
+  }
+
+  return direction === 'asc' ? '↑' : '↓';
+}
+
+function getAriaSort(
+  column: SortColumn,
+  sortBy: SortColumn,
+  direction: SortDirection,
+): 'ascending' | 'descending' | 'none' {
+  if (column !== sortBy) {
+    return 'none';
+  }
+
+  return direction === 'asc' ? 'ascending' : 'descending';
+}
+
 export function ExpensesTable({ expenses }: ExpensesTableProps): ReactElement {
-  const sorted = [...expenses].sort((a, b) => b.date.localeCompare(a.date));
+  const [sortBy, setSortBy] = useState<SortColumn>('date');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+
+  const sorted = useMemo(() => {
+    if (expenses.length === 0) {
+      return [] as ExpenseResponseDto[];
+    }
+
+    const items = [...expenses];
+
+    items.sort((a, b) => {
+      let baseComparison = 0;
+
+      switch (sortBy) {
+        case 'date': {
+          const aDate = String(a.date);
+          const bDate = String(b.date);
+          baseComparison = aDate.localeCompare(bDate);
+          break;
+        }
+        case 'amount': {
+          baseComparison = a.amountCents - b.amountCents;
+          break;
+        }
+        case 'provider': {
+          const aName = getProviderName(a).toLowerCase();
+          const bName = getProviderName(b).toLowerCase();
+          baseComparison = aName.localeCompare(bName);
+          break;
+        }
+        default: {
+          baseComparison = 0;
+        }
+      }
+
+      if (baseComparison === 0) {
+        // Stable tie-breaker on date to keep ordering deterministic
+        const aDate = String(a.date);
+        const bDate = String(b.date);
+        baseComparison = aDate.localeCompare(bDate);
+      }
+
+      return sortDirection === 'asc' ? baseComparison : -baseComparison;
+    });
+
+    return items;
+  }, [expenses, sortBy, sortDirection]);
+
+  function handleSort(column: SortColumn): void {
+    setSortBy((current) => {
+      if (current === column) {
+        setSortDirection((currentDirection) => (currentDirection === 'asc' ? 'desc' : 'asc'));
+        return current;
+      }
+
+      setSortDirection('asc');
+      return column;
+    });
+  }
 
   if (sorted.length === 0) {
     return (
@@ -24,20 +122,54 @@ export function ExpensesTable({ expenses }: ExpensesTableProps): ReactElement {
     >
       <div className="mb-3 flex items-baseline justify-between gap-2">
         <h2 className="text-sm font-semibold tracking-tight text-slate-50">Expenses</h2>
-        <p className="text-[11px] text-slate-500">Sorted by date (newest first)</p>
+        <p className="text-[11px] text-slate-500">
+          Sorted by {sortBy === 'date' ? 'date (newest first)' : sortBy}
+        </p>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[640px] border-collapse text-left text-xs text-slate-300">
+        <table className="w-full min-w-[760px] border-collapse text-left text-xs text-slate-300">
           <thead>
             <tr className="border-b border-slate-800 text-[11px] uppercase tracking-[0.18em] text-slate-500">
-              <th scope="col" className="py-2 pr-3">
-                Date
+              <th
+                scope="col"
+                className="py-2 pr-3"
+                aria-sort={getAriaSort('date', sortBy, sortDirection)}
+              >
+                <button
+                  type="button"
+                  onClick={() => handleSort('date')}
+                  className="inline-flex items-center gap-1 text-left hover:text-slate-300"
+                >
+                  <span>Date</span>
+                  <span aria-hidden="true" className="text-[9px]">
+                    {getSortIndicator('date', sortBy, sortDirection)}
+                  </span>
+                </button>
               </th>
               <th scope="col" className="py-2 pr-3">
                 Description
               </th>
-              <th scope="col" className="py-2 pr-3 text-right">
-                Amount
+              <th scope="col" className="py-2 pr-3">
+                Provider
+              </th>
+              <th scope="col" className="py-2 pr-3">
+                Category
+              </th>
+              <th
+                scope="col"
+                className="py-2 pr-3 text-right"
+                aria-sort={getAriaSort('amount', sortBy, sortDirection)}
+              >
+                <button
+                  type="button"
+                  onClick={() => handleSort('amount')}
+                  className="inline-flex w-full items-center justify-end gap-1 text-right hover:text-slate-300"
+                >
+                  <span>Amount</span>
+                  <span aria-hidden="true" className="text-[9px]">
+                    {getSortIndicator('amount', sortBy, sortDirection)}
+                  </span>
+                </button>
               </th>
               <th scope="col" className="py-2 pr-3 text-right">
                 GST
@@ -52,12 +184,15 @@ export function ExpensesTable({ expenses }: ExpensesTableProps): ReactElement {
           </thead>
           <tbody>
             {sorted.map((expense) => {
-              const dateLabel = expense.date.slice(0, 10);
+              const dateLabel = String(expense.date).slice(0, 10);
 
               const description = (() => {
                 const raw = (expense as unknown as { description?: unknown }).description;
                 return typeof raw === 'string' && raw.trim().length > 0 ? raw : 'Expense';
               })();
+
+              const providerName = getProviderName(expense) || '—';
+              const categoryName = getCategoryName(expense) || '—';
 
               const periodLabel = `${expense.quarter} ${expense.fyLabel}`;
 
@@ -66,6 +201,12 @@ export function ExpensesTable({ expenses }: ExpensesTableProps): ReactElement {
                   <td className="py-2 pr-3 align-middle text-[11px] text-slate-200">{dateLabel}</td>
                   <td className="py-2 pr-3 align-middle text-[11px] text-slate-100">
                     {description}
+                  </td>
+                  <td className="py-2 pr-3 align-middle text-[11px] text-slate-200">
+                    {providerName}
+                  </td>
+                  <td className="py-2 pr-3 align-middle text-[11px] text-slate-200">
+                    {categoryName}
                   </td>
                   <td className="py-2 pr-3 align-middle text-right text-[11px] font-semibold text-slate-100">
                     {formatCents(expense.amountCents)}

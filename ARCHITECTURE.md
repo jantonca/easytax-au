@@ -207,19 +207,22 @@ features/expenses/
 ```
 
 - **Expenses list:** `useExpenses` hook (`web/src/features/expenses/hooks/use-expenses.ts`) + `ExpensesTable` (`web/src/features/expenses/components/expenses-table.tsx`) provide a read-only expenses table using `/expenses`, sorted by date (newest first) with loading/error/empty states.
+- **Expenses table:** `ExpensesTable` renders a semantic HTML table with columns for date, description, provider, category, amount, GST, biz%, and BAS period. It uses client-side sorting by date, amount, and provider name (clickable headers, `aria-sort` for a11y).
 
 ### Data Fetching Pattern
 
+> Note: Filtering by category/provider/date will be added in a later F2.2 slice by extending this hook with filter parameters and filter-aware query keys.
+
 ```typescript
 // hooks/use-expenses.ts
-import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api-client';
-import type { Expense } from '@shared/types';
+import { useQuery, type UseQueryResult } from '@tanstack/react-query';
+import type { ExpenseResponseDto } from '@/lib/api-client';
+import { getExpenses } from '@/lib/api-client';
 
-export function useExpenses(filters?: ExpenseFilters) {
-  return useQuery({
-    queryKey: ['expenses', filters],
-    queryFn: () => api.get<Expense[]>('/expenses', { params: filters }),
+export function useExpenses(): UseQueryResult<ExpenseResponseDto[]> {
+  return useQuery<ExpenseResponseDto[]>({
+    queryKey: ['expenses'],
+    queryFn: getExpenses,
   });
 }
 ```

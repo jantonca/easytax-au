@@ -374,7 +374,7 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 | #       | Task                                           | Status |
 | ------- | ---------------------------------------------- | ------ |
 | F2.2.1  | Create expenses list page with data table      | ✅     |
-| F2.2.2  | Add sorting (date, amount, provider)           | ⬜     |
+| F2.2.2  | Add sorting (date, amount, provider)           | ✅     |
 | F2.2.3  | Add filtering (category, provider, date range) | ⬜     |
 | F2.2.4  | Add pagination                                 | ⬜     |
 | F2.2.5  | Create expense form (add/edit) with validation | ⬜     |
@@ -386,6 +386,7 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 | F2.2.11 | Add inline editing for quick updates           | ⬜     |
 
 - Initial read-only expenses list implemented via `useExpenses` and `ExpensesTable` with default date-desc sorting, loading/error/empty states, and columns for date, description, amount, GST, biz%, and FY/quarter.
+- Expenses table supports client-side sorting on date (default), amount, and provider name, via clickable column headers and `aria-sort` for accessibility.
 
 **Files to Create:**
 
@@ -793,13 +794,15 @@ location / {
 
 ## Progress Tracker
 
-| Phase                | Tasks        | Done    | Progress |
-| -------------------- | ------------ | ------- | -------- | ------- |
-|                      | F1. Scaffold | 22      | 22       | 100%    |
-| F2. Core Features    | 44           | 0       | 0%       |
-| F3. Reports & Polish | 26           | 0       | 0%       |
-| F4. Production       | 9            | 0       | 0%       |
-|                      | **Total**    | **101** | **22**   | **22%** |
+|| Phase                | Tasks        | Done    | Progress |
+|| -------------------- | ------------ | ------- | -------- | ------- |
+||                      | F1. Scaffold | 22      | 22       | 100%    |
+|| F2. Core Features    | 44           | 3       | 7%       |
+|| F3. Reports & Polish | 26           | 0       | 0%       |
+|| F4. Production       | 9            | 0       | 0%       |
+||                      | **Total**    | **101** | **25**   | **25%** |
+
+> Note: Frontend F2 progress counts the completed tasks F2.1, F2.2.1, and F2.2.2. Remaining F2.x tasks are planned but not yet implemented.
 
 ---
 
