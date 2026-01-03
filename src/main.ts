@@ -7,6 +7,12 @@ import { AllExceptionsFilter } from './common/filters';
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
+  // Enable CORS for frontend development
+  app.enableCors({
+    origin: 'http://localhost:5173', // Vite dev server
+    credentials: true,
+  });
+
   // Global exception filter for standardized error responses
   app.useGlobalFilters(new AllExceptionsFilter());
 
