@@ -267,9 +267,9 @@ features/incomes/
   - GST is always 10% (not variable like expenses with international providers)
   - Total always equals subtotal + GST (no complexity around GST-free items)
 
-### Settings Module (F2.5)
+### Settings Module (F2.5, F2.6)
 
-- **Settings layout:** Shared tab navigation component (`SettingsTabs`) provides consistent navigation between Providers, Categories, and Clients (pending) sections
+- **Settings layout:** Shared tab navigation component (`SettingsTabs`) provides consistent navigation between Providers, Categories, and Clients sections
 - **Nested routing:** Settings uses nested React Router routes under `/settings` with automatic redirect to `/settings/providers` as the default view
 - **Providers CRUD:** Full create/read/update/delete for expense vendors with:
   - International provider toggle (GST-free flag)
@@ -285,7 +285,15 @@ features/incomes/
   - Sortable table by name and BAS label
   - Modal-based create/edit forms
   - Delete confirmation dialog
-- **Module structure:** Both providers and categories follow the established feature pattern:
+- **Clients CRUD (F2.6):** Full create/read/update/delete for income clients with:
+  - Encrypted name and ABN fields (displayed with 🔒 icons in form)
+  - ABN formatted with spaces for readability (12 345 678 901)
+  - PSI (Personal Services Income) eligible flag with tooltip explanation
+  - Related incomes count column (calculated client-side from incomes data)
+  - Sortable table by name and PSI eligible status
+  - Modal-based create/edit forms
+  - Delete confirmation with warning about income references
+- **Module structure:** All three settings modules follow the established feature pattern:
   ```
   features/settings/providers/
   ├── providers-page.tsx          # Main CRUD page with modals
@@ -307,10 +315,20 @@ features/incomes/
   └── schemas/
       └── category.schema.ts      # Zod validation
 
+  features/settings/clients/
+  ├── clients-page.tsx            # Main CRUD page with modals
+  ├── components/
+  │   ├── clients-table.tsx       # Sortable table with ABN formatting
+  │   └── client-form.tsx         # Create/edit form with encryption notices
+  ├── hooks/
+  │   └── use-client-mutations.ts # Create/update/delete
+  └── schemas/
+      └── client.schema.ts        # Zod validation (ABN: 11 digits)
+
   features/settings/components/
   └── settings-tabs.tsx           # Shared tab navigation
   ```
-- **Shared query hooks:** Both modules reuse existing shared hooks from `web/src/hooks/` for data fetching (`useProviders`, `useCategories`) rather than duplicating them
+- **Shared query hooks:** All three modules reuse existing shared hooks from `web/src/hooks/` for data fetching (`useProviders`, `useCategories`, `useClients`) rather than duplicating them
 - **Type safety:** All DTOs imported from `@shared/types` OpenAPI schema. Update mutations use `Partial<CreateDto>` pattern since backend Update DTOs are defined as `Record<string, never>` in the OpenAPI schema
 
 ### Data Fetching Pattern

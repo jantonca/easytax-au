@@ -86,7 +86,7 @@ describe('CategoryForm', () => {
 
     render(<CategoryForm />);
 
-    const basLabelSelect = screen.getByLabelText('BAS label') as HTMLSelectElement;
+    const basLabelSelect = screen.getByLabelText('BAS label');
 
     expect(basLabelSelect.value).toBe('1B');
   });
@@ -104,7 +104,7 @@ describe('CategoryForm', () => {
 
     render(<CategoryForm />);
 
-    const deductibleCheckbox = screen.getByLabelText(/Tax deductible/i) as HTMLInputElement;
+    const deductibleCheckbox = screen.getByLabelText(/Tax deductible/i);
 
     expect(deductibleCheckbox.checked).toBe(true);
   });
@@ -124,7 +124,7 @@ describe('CategoryForm', () => {
 
     render(<CategoryForm />);
 
-    const basLabelSelect = screen.getByLabelText('BAS label') as HTMLSelectElement;
+    const basLabelSelect = screen.getByLabelText('BAS label');
 
     expect(basLabelSelect.value).toBe('1B');
 
@@ -150,7 +150,7 @@ describe('CategoryForm', () => {
 
     render(<CategoryForm />);
 
-    const deductibleCheckbox = screen.getByLabelText(/Tax deductible/i) as HTMLInputElement;
+    const deductibleCheckbox = screen.getByLabelText(/Tax deductible/i);
 
     expect(deductibleCheckbox.checked).toBe(true);
 

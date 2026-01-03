@@ -624,21 +624,49 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 
 ### F2.6 Clients Management
 
+**Status:** ✅ Completed
+
 | #      | Task                          | Status |
 | ------ | ----------------------------- | ------ |
-| F2.6.1 | Create clients list page      | ⬜     |
-| F2.6.2 | Create client form (add/edit) | ⬜     |
-| F2.6.3 | Show related incomes count    | ⬜     |
+| F2.6.1 | Create clients list page      | ✅     |
+| F2.6.2 | Create client form (add/edit) | ✅     |
+| F2.6.3 | Show related incomes count    | ✅     |
 
-**Files to Create:**
+**Implementation notes (F2.6):**
 
-- `web/src/features/settings/clients-page.tsx`
-- `web/src/features/settings/components/client-form.tsx`
+- Full CRUD implementation following the same pattern as Providers & Categories modules (F2.5)
+- Data fetching via `useClients` hook (already existed, reused from Incomes module)
+- Mutations via `useClientMutations`: `useCreateClient`, `useUpdateClient`, `useDeleteClient`
+- Form validation using React Hook Form + Zod (`client.schema.ts`)
+- Client-side sorting by name and PSI eligible status
+- Responsive table with columns: Name, ABN (formatted with spaces), PSI Eligible (badge), Related Incomes (count), Actions
+- Related incomes count calculated client-side by passing incomes data to table and using useMemo
+- ABN display formatted with spaces (12 345 678 901) for readability
+- Encryption notices displayed in form (🔒 icons next to Name and ABN fields)
+- Modal-based create/edit forms with proper success/error toast notifications
+- Delete confirmation using reusable `ConfirmationDialog` component with warning about income references
+- Comprehensive tests: 13 tests passing (7 page, 6 form)
+
+**Files created:**
+
+- `web/src/features/settings/clients/clients-page.tsx` - Main page with filters, table, and modal dialogs
+- `web/src/features/settings/clients/components/clients-table.tsx` - Sortable data table with ABN formatting and income count
+- `web/src/features/settings/clients/components/client-form.tsx` - Create/edit form with validation and encryption notices
+- `web/src/features/settings/clients/hooks/use-client-mutations.ts` - CRUD mutations
+- `web/src/features/settings/clients/schemas/client.schema.ts` - Zod validation schema
+- `web/src/features/settings/clients/clients-page.test.tsx` - Page integration tests
+- `web/src/features/settings/clients/components/client-form.test.tsx` - Form component tests
+- Updated `web/src/App.tsx` - Added `/settings/clients` route
 
 **Definition of Done:**
 
-- [ ] Can manage clients
-- [ ] Shows income association
+- [x] Can manage clients via Settings → Clients
+- [x] Shows related incomes count in table
+- [x] Full CRUD operations work
+- [x] Form is keyboard navigable
+- [x] Loading/error states handled
+- [x] All tests pass (87 total, including 13 new client tests)
+- [x] Linter passes with no errors
 
 ---
 
@@ -859,12 +887,12 @@ location / {
 ||| Phase | Tasks | Done | Progress |
 ||| -------------------- | ------------ | ------- | -------- | ------- |
 ||| | F1. Scaffold | 22 | 22 | 100% |
-||| F2. Core Features | 44 | 22 | 50% |
+||| F2. Core Features | 44 | 25 | 57% |
 ||| F3. Reports & Polish | 26 | 0 | 0% |
 ||| F4. Production | 9 | 0 | 0% |
-||| | **Total** | **101** | **44** | **44%** |
+||| | **Total** | **101** | **47** | **47%** |
 
-> Note: Frontend F2 progress currently counts completed tasks from F2.1 (Dashboard - 5 tasks), F2.2 (Expenses - 5 tasks), F2.3 (Incomes - 6 tasks), and F2.5 (Providers & Categories - 6 tasks). Remaining F2.x tasks include CSV import (F2.4), clients management (F2.6), and optional enhancements like pagination and inline editing.
+> Note: Frontend F2 progress currently counts completed tasks from F2.1 (Dashboard - 5 tasks), F2.2 (Expenses - 5 tasks), F2.3 (Incomes - 10 tasks), F2.5 (Providers & Categories - 6 tasks), and F2.6 (Clients - 3 tasks). Remaining F2.x tasks include CSV import (F2.4 - 10 tasks) and optional enhancements like pagination and inline editing.
 
 ---
 

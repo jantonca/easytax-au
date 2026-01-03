@@ -159,7 +159,10 @@ export function ProviderForm({
           {...register('isInternational')}
         />
         <div className="flex flex-col gap-1">
-          <label htmlFor="provider-international" className="text-[11px] font-medium text-slate-300">
+          <label
+            htmlFor="provider-international"
+            className="text-[11px] font-medium text-slate-300"
+          >
             International provider (GST-free)
           </label>
           <p className="text-[10px] text-slate-500">

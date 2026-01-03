@@ -1,44 +1,44 @@
 import type { ReactElement } from 'react';
 import { useState } from 'react';
-import type { ProviderDto } from '@/lib/api-client';
-import { ProvidersTable } from '@/features/settings/providers/components/providers-table';
-import { ProviderForm } from '@/features/settings/providers/components/provider-form';
-import { useDeleteProvider } from '@/features/settings/providers/hooks/use-provider-mutations';
-import { useProviders } from '@/hooks/use-providers';
-import { useCategories } from '@/hooks/use-categories';
+import type { ClientDto } from '@/lib/api-client';
+import { ClientsTable } from '@/features/settings/clients/components/clients-table';
+import { ClientForm } from '@/features/settings/clients/components/client-form';
+import { useDeleteClient } from '@/features/settings/clients/hooks/use-client-mutations';
+import { useClients } from '@/hooks/use-clients';
+import { useIncomes } from '@/features/incomes/hooks/use-incomes';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useToast } from '@/lib/toast-context';
 import { SettingsTabs } from '@/features/settings/components/settings-tabs';
 
-export function ProvidersPage(): ReactElement {
-  const { data: providers, isLoading: providersLoading, isError: providersError } = useProviders();
-  const { data: categories = [] } = useCategories();
+export function ClientsPage(): ReactElement {
+  const { data: clients, isLoading: clientsLoading, isError: clientsError } = useClients();
+  const { data: incomes = [] } = useIncomes();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [providerToEdit, setProviderToEdit] = useState<ProviderDto | null>(null);
-  const [providerToDelete, setProviderToDelete] = useState<ProviderDto | null>(null);
+  const [clientToEdit, setClientToEdit] = useState<ClientDto | null>(null);
+  const [clientToDelete, setClientToDelete] = useState<ClientDto | null>(null);
 
-  const { mutate: deleteProvider, isPending: isDeleting } = useDeleteProvider();
+  const { mutate: deleteClient, isPending: isDeleting } = useDeleteClient();
   const { showToast } = useToast();
 
   function handleDelete(): void {
-    if (!providerToDelete) {
+    if (!clientToDelete) {
       return;
     }
 
-    deleteProvider(providerToDelete.id, {
+    deleteClient(clientToDelete.id, {
       onSuccess: () => {
         showToast({
-          title: 'Provider deleted',
-          description: 'The provider has been removed successfully.',
+          title: 'Client deleted',
+          description: 'The client has been removed successfully.',
         });
-        setProviderToDelete(null);
+        setClientToDelete(null);
       },
       onError: (error) => {
-        console.error('Error deleting provider:', error);
+        console.error('Error deleting client:', error);
         showToast({
           title: 'Error',
-          description: 'Failed to delete provider. Please try again.',
+          description: 'Failed to delete client. Please try again.',
         });
       },
     });
@@ -49,9 +49,9 @@ export function ProvidersPage(): ReactElement {
       <SettingsTabs />
       <header className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-50">Providers</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-50">Clients</h1>
           <p className="text-sm text-slate-400">
-            Manage expense vendors with GST rules and default categories.
+            Manage income clients. Names and ABNs are encrypted at rest for privacy.
           </p>
         </div>
         <button
@@ -59,42 +59,41 @@ export function ProvidersPage(): ReactElement {
           onClick={() => setIsCreateOpen(true)}
           className="inline-flex h-8 items-center rounded-md bg-emerald-600 px-3 text-xs font-medium text-white hover:bg-emerald-500"
         >
-          Add provider
+          Add client
         </button>
       </header>
 
-      {providersLoading && (
+      {clientsLoading && (
         <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-400">
-          Loading providers…
+          Loading clients…
         </div>
       )}
 
-      {providersError && !providersLoading && (
+      {clientsError && !clientsLoading && (
         <div className="rounded-lg border border-red-900/60 bg-red-950/60 p-4 text-sm text-red-200">
-          We couldn&apos;t load your providers right now. Please try again shortly.
+          We couldn&apos;t load your clients right now. Please try again shortly.
         </div>
       )}
 
-      {!providersLoading && !providersError && (
+      {!clientsLoading && !clientsError && (
         <>
-          <ProvidersTable
-            providers={providers ?? []}
-            onEdit={(provider) => setProviderToEdit(provider)}
-            onDelete={(provider) => setProviderToDelete(provider)}
+          <ClientsTable
+            clients={clients ?? []}
+            incomes={incomes}
+            onEdit={(client) => setClientToEdit(client)}
+            onDelete={(client) => setClientToDelete(client)}
           />
 
           {isCreateOpen && (
             <div
               role="dialog"
               aria-modal="true"
-              aria-label="Add provider"
+              aria-label="Add client"
               className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
             >
               <div className="w-full max-w-lg rounded-lg border border-slate-800 bg-slate-950 p-4 shadow-xl">
                 <div className="mb-3 flex items-center justify-between">
-                  <h2 className="text-sm font-semibold tracking-tight text-slate-50">
-                    Add provider
-                  </h2>
+                  <h2 className="text-sm font-semibold tracking-tight text-slate-50">Add client</h2>
                   <button
                     type="button"
                     onClick={() => setIsCreateOpen(false)}
@@ -103,54 +102,53 @@ export function ProvidersPage(): ReactElement {
                     Close
                   </button>
                 </div>
-                <ProviderForm categories={categories} onSuccess={() => setIsCreateOpen(false)} />
+                <ClientForm onSuccess={() => setIsCreateOpen(false)} />
               </div>
             </div>
           )}
 
-          {providerToEdit && (
+          {clientToEdit && (
             <div
               role="dialog"
               aria-modal="true"
-              aria-label="Edit provider"
+              aria-label="Edit client"
               className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
             >
               <div className="w-full max-w-lg rounded-lg border border-slate-800 bg-slate-950 p-4 shadow-xl">
                 <div className="mb-3 flex items-center justify-between">
                   <h2 className="text-sm font-semibold tracking-tight text-slate-50">
-                    Edit provider
+                    Edit client
                   </h2>
                   <button
                     type="button"
-                    onClick={() => setProviderToEdit(null)}
+                    onClick={() => setClientToEdit(null)}
                     className="text-xs text-slate-400 hover:text-slate-200"
                   >
                     Close
                   </button>
                 </div>
-                <ProviderForm
-                  categories={categories}
-                  initialValues={providerToEdit}
-                  providerId={providerToEdit.id}
-                  onSuccess={() => setProviderToEdit(null)}
+                <ClientForm
+                  initialValues={clientToEdit}
+                  clientId={clientToEdit.id}
+                  onSuccess={() => setClientToEdit(null)}
                 />
               </div>
             </div>
           )}
 
           <ConfirmationDialog
-            open={providerToDelete !== null}
+            open={clientToDelete !== null}
             onOpenChange={(open) => {
               if (!open) {
-                setProviderToDelete(null);
+                setClientToDelete(null);
               }
             }}
-            title="Delete provider"
+            title="Delete client"
             description={
-              providerToDelete ? (
+              clientToDelete ? (
                 <>
-                  Are you sure you want to delete <strong>{providerToDelete.name}</strong>? This
-                  action cannot be undone.
+                  Are you sure you want to delete <strong>{clientToDelete.name}</strong>? This will
+                  not delete associated incomes, but they will lose their client reference.
                 </>
               ) : (
                 ''

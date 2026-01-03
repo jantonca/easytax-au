@@ -9,6 +9,7 @@ import { BasReportPage } from '@/features/reports/bas-report-page';
 import { FyReportPage } from '@/features/reports/fy-report-page';
 import { ProvidersPage } from '@/features/settings/providers/providers-page';
 import { CategoriesPage } from '@/features/settings/categories/categories-page';
+import { ClientsPage } from '@/features/settings/clients/clients-page';
 
 function App(): ReactElement {
   return (
@@ -24,6 +25,7 @@ function App(): ReactElement {
           <Route index element={<Navigate to="/settings/providers" replace />} />
           <Route path="providers" element={<ProvidersPage />} />
           <Route path="categories" element={<CategoriesPage />} />
+          <Route path="clients" element={<ClientsPage />} />
         </Route>
       </Route>
     </Routes>

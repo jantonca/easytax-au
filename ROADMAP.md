@@ -11,7 +11,7 @@
 
 **Goal:** Manual CRUD for expenses/incomes + basic BAS summary.
 
-**Status:** ✅ Backend Complete | 🟡 Frontend In Progress (44%)
+**Status:** ✅ Backend Complete | 🟡 Frontend In Progress (47%)
 
 ### Backend
 
