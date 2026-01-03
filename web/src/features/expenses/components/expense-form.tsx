@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import type { CategoryDto, ExpenseResponseDto, ProviderDto } from '@/lib/api-client';
@@ -34,6 +34,7 @@ export function ExpenseForm({
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    watch,
   } = useForm<ExpenseFormValues>({
     resolver: zodResolver(expenseFormSchema),
     defaultValues: initialValues
@@ -70,6 +71,43 @@ export function ExpenseForm({
   const { showToast } = useToast();
 
   const submitting = isSubmitting || isCreating || isUpdating;
+
+  // Watch form values for real-time calculations
+  const amount = watch('amount');
+  const providerId = watch('providerId');
+  const bizPercent = watch('bizPercent');
+  const gstAmount = watch('gstAmount');
+
+  // Find selected provider
+  const selectedProvider = useMemo(() => {
+    return providers.find((p) => p.id === providerId);
+  }, [providers, providerId]);
+
+  // Calculate GST based on amount and provider type
+  const calculatedGst = useMemo(() => {
+    if (!amount || !selectedProvider) return null;
+
+    const parsed = parseCurrency(amount);
+    if (!parsed || parsed.cents <= 0) return null;
+
+    if (selectedProvider.isInternational) {
+      return { cents: 0, isInternational: true };
+    }
+
+    // GST = 1/11 of total for domestic providers
+    const gstCents = Math.round(parsed.cents / 11);
+    return { cents: gstCents, isInternational: false };
+  }, [amount, selectedProvider]);
+
+  // Calculate claimable GST based on bizPercent
+  const claimableGst = useMemo(() => {
+    // Use manual GST if entered, otherwise use calculated
+    const gst = gstAmount ? parseCurrency(gstAmount)?.cents : calculatedGst?.cents;
+
+    if (!gst || bizPercent === undefined || bizPercent === null) return null;
+
+    return Math.round((gst * bizPercent) / 100);
+  }, [gstAmount, calculatedGst, bizPercent]);
 
   useEffect(() => {
     if (!providers.length || !categories.length) {
@@ -196,6 +234,13 @@ export function ExpenseForm({
             {...register('amount')}
           />
           {errors.amount && <p className="text-[11px] text-red-400">{errors.amount.message}</p>}
+          {calculatedGst && (
+            <p className="text-[10px] text-emerald-400">
+              {calculatedGst.isInternational
+                ? 'GST: $0.00 (international provider)'
+                : `Calculated GST: ${formatCents(calculatedGst.cents)}`}
+            </p>
+          )}
         </div>
       </div>
 
@@ -218,20 +263,41 @@ export function ExpenseForm({
           </p>
         </div>
 
-        <div className="flex flex-col gap-1 text-xs text-slate-200">
-          <label htmlFor="expense-biz" className="text-[11px] font-medium text-slate-300">
-            Business use %
-          </label>
+        <div className="flex flex-col gap-2 text-xs text-slate-200">
+          <div className="flex items-center justify-between">
+            <label htmlFor="expense-biz" className="text-[11px] font-medium text-slate-300">
+              Business use %
+            </label>
+            <span className="text-sm font-semibold text-emerald-400">{bizPercent}%</span>
+          </div>
           <input
             id="expense-biz"
-            type="number"
+            type="range"
             min={0}
             max={100}
-            className="h-8 rounded-md border border-slate-800 bg-slate-950 px-2 text-xs text-slate-100"
+            step={5}
+            aria-label="Business use percentage"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={bizPercent}
+            className="w-full accent-emerald-600"
             {...register('bizPercent', { valueAsNumber: true })}
           />
+          <div className="flex justify-between text-[10px] text-slate-500">
+            <span>0%</span>
+            <span>100%</span>
+          </div>
           {errors.bizPercent && (
             <p className="text-[11px] text-red-400">{errors.bizPercent.message}</p>
+          )}
+          {claimableGst !== null && (
+            <p className="text-[10px] text-slate-400">
+              Claimable GST: {formatCents(claimableGst)} ({bizPercent}% of{' '}
+              {formatCents(
+                gstAmount ? parseCurrency(gstAmount)?.cents || 0 : calculatedGst?.cents || 0,
+              )}
+              )
+            </p>
           )}
         </div>
       </div>

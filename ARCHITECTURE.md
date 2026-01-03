@@ -231,6 +231,20 @@ features/incomes/
   - `useDeleteExpense`: `DELETE /expenses/:id` mutation for deleting expenses
   - All mutations invalidate the `['expenses']` query on success and are wired with toast notifications for success/error feedback
 - **Expense form modes:** `ExpenseForm` supports both create and edit modes via `initialValues` and `expenseId` props. In edit mode, it populates form fields from the expense data and uses `useUpdateExpense`; in create mode, it starts with empty fields and uses `useCreateExpense`.
+- **GST auto-calculation (F2.2.8):** The expense form implements real-time GST calculation using React Hook Form's `watch()` and `useMemo` for performance optimization. Key features:
+  - **Domestic providers:** GST automatically calculated as 1/11 of total amount (e.g., $110.00 → $10.00 GST)
+  - **International providers:** GST always $0.00 (GST-free)
+  - **Display:** Calculated GST shown in emerald text below amount field with provider-specific messaging
+  - **Reactivity:** Updates immediately when amount or provider selection changes
+  - **Manual override:** Users can still manually enter GST in the optional GST field if needed
+  - **Implementation:** Uses `selectedProvider` memo to find provider by ID, then `calculatedGst` memo to compute GST based on `provider.isInternational` flag
+- **Business use percentage slider (F2.2.9):** HTML5 range input (`type="range"`) replaces traditional number input for better UX:
+  - **Range:** 0-100% with 5% step increments for easier control
+  - **Accessibility:** Full ARIA support (aria-label, aria-valuemin/max/now) for screen readers
+  - **Visual feedback:** Current percentage displayed prominently next to label in emerald color
+  - **Claimable GST display:** Shows calculated claimable GST below slider: "Claimable GST: $X.XX (Y% of $Z.ZZ)"
+  - **Reactive calculation:** `claimableGst` memo computes `(GST × bizPercent) / 100` using either manual or auto-calculated GST
+  - **Respects manual GST:** If user enters custom GST amount, claimable calculation uses that value instead of auto-calculated
 - **Actions column:** `ExpensesTable` includes an Actions column with Edit (pencil icon) and Delete (trash icon) buttons using Lucide React icons. Both buttons use accessible aria-labels and tooltips.
 - **Delete confirmation:** Reusable `ConfirmationDialog` component (`web/src/components/ui/confirmation-dialog.tsx`) provides accessible alertdialog for dangerous actions. Features include:
   - Keyboard accessible (Escape to close, auto-focus on confirm button)

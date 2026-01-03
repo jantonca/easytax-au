@@ -380,8 +380,8 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 || F2.2.5 | Create expense form (add/edit) with validation | ✅ |
 || F2.2.6 | Implement provider dropdown with search | ⬜ |
 || F2.2.7 | Implement category dropdown | ⬜ |
-|| F2.2.8 | Add GST auto-calculation display | ⬜ |
-|| F2.2.9 | Add biz_percent slider (0-100) | ⬜ |
+|| F2.2.8 | Add GST auto-calculation display | ✅ |
+|| F2.2.9 | Add biz_percent slider (0-100) | ✅ |
 || F2.2.10 | Implement delete with confirmation | ✅ |
 || F2.2.11 | Add inline editing for quick updates | ⬜ |
 
@@ -397,6 +397,8 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 - The form handles cents conversion via `parseCurrency`, enforces `providerId`/`categoryId` UUIDs and `bizPercent` range, and preselects the first available provider/category when lists are non-empty.
 - **F2.2.10 (Delete):** Implemented delete with confirmation via `useDeleteExpense` mutation hook and reusable `ConfirmationDialog` component. Expenses table includes Actions column with Edit/Delete icon buttons. Delete confirmation shows expense details (amount, description, date) and handles loading/error states with toast notifications.
 - **F2.2.5 (Edit):** Implemented edit via modal reusing `ExpenseForm` with `useUpdateExpense` mutation hook. Form supports both create and edit modes via `initialValues` and `expenseId` props, automatically populating fields and switching button text/toast messages based on mode. Edit flow wired in `ExpensesPage` with separate state management for create vs edit modals.
+- **F2.2.8 (GST auto-calculation display):** Implemented real-time GST calculation in expense form using React Hook Form's `watch()` and `useMemo` for performance. For domestic providers, GST is automatically calculated as 1/11 of the total amount (e.g., $110.00 → $10.00 GST). For international providers, GST is always $0.00. The calculated GST is displayed below the amount field in emerald text with clear labeling. The calculation is reactive - updates immediately when amount or provider selection changes.
+- **F2.2.9 (Business use percentage slider):** Replaced the numeric input with an HTML5 range slider (0-100%, step: 5%) for better UX. The slider includes comprehensive ARIA attributes for screen reader accessibility (aria-label, aria-valuemin/max/now). The current percentage is displayed prominently next to the label. Below the slider, claimable GST is calculated and shown as: "Claimable GST: $X.XX (Y% of $Z.ZZ)" where Y is the business percentage and Z is the full GST amount. The claimable GST calculation is reactive using `useMemo` and respects both auto-calculated and manually-entered GST amounts.
 
 > **Deferred:** F2.2.11 (inline editing) is explicitly deferred to a future iteration. The current modal-based edit flow provides full CRUD functionality while keeping the implementation simpler and more consistent with the create flow. Inline editing would require additional complexity for field-level validation, conflict resolution, and UX patterns that are not essential for MVP.
 
@@ -887,12 +889,12 @@ location / {
 ||| Phase | Tasks | Done | Progress |
 ||| -------------------- | ------------ | ------- | -------- | ------- |
 ||| | F1. Scaffold | 22 | 22 | 100% |
-||| F2. Core Features | 44 | 25 | 57% |
+||| F2. Core Features | 44 | 27 | 61% |
 ||| F3. Reports & Polish | 26 | 0 | 0% |
 ||| F4. Production | 9 | 0 | 0% |
-||| | **Total** | **101** | **47** | **47%** |
+||| | **Total** | **101** | **49** | **49%** |
 
-> Note: Frontend F2 progress currently counts completed tasks from F2.1 (Dashboard - 5 tasks), F2.2 (Expenses - 5 tasks), F2.3 (Incomes - 10 tasks), F2.5 (Providers & Categories - 6 tasks), and F2.6 (Clients - 3 tasks). Remaining F2.x tasks include CSV import (F2.4 - 10 tasks) and optional enhancements like pagination and inline editing.
+> Note: Frontend F2 progress currently counts completed tasks from F2.1 (Dashboard - 5 tasks), F2.2 (Expenses - 7 tasks including GST auto-calc and slider), F2.3 (Incomes - 10 tasks), F2.5 (Providers & Categories - 6 tasks), and F2.6 (Clients - 3 tasks). Remaining F2.x tasks include CSV import (F2.4 - 10 tasks) and optional enhancements like pagination, searchable dropdowns, and inline editing.
 
 ---
 
