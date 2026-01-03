@@ -382,7 +382,7 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 || F2.2.7  | Implement category dropdown                    | ⬜     |
 || F2.2.8  | Add GST auto-calculation display               | ⬜     |
 || F2.2.9  | Add biz_percent slider (0-100)                 | ⬜     |
-|| F2.2.10 | Implement delete with confirmation             | ⬜     |
+|| F2.2.10 | Implement delete with confirmation             | ✅     |
 || F2.2.11 | Add inline editing for quick updates           | ⬜     |
 
 - Initial read-only expenses list implemented via `useExpenses` and `ExpensesTable` with default date-desc sorting, loading/error/empty states, and columns for date, description, amount, GST, biz%, and FY/quarter.
@@ -393,9 +393,12 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
   - Date range filter compares the date-only prefix of `expense.date` (`YYYY-MM-DD`).
 - Note: Filters are currently applied on the already-fetched `/expenses` list; a future slice may extend `useExpenses` to pass query params to `/expenses` for server-side filtering if needed.
 - Expense create form implemented as `ExpenseForm` using React Hook Form + Zod (`expenseFormSchema` / `ExpenseFormValues`) and a typed `useCreateExpense` mutation that posts `CreateExpenseDto` and invalidates the `['expenses']` query on success.
-- The Expenses page wires an “Add expense” button to open an accessible modal dialog containing `ExpenseForm`; on successful submit, the modal closes and a success toast is shown; failures surface a generic error toast.
+- The Expenses page wires an "Add expense" button to open an accessible modal dialog containing `ExpenseForm`; on successful submit, the modal closes and a success toast is shown; failures surface a generic error toast.
 - The form handles cents conversion via `parseCurrency`, enforces `providerId`/`categoryId` UUIDs and `bizPercent` range, and preselects the first available provider/category when lists are non-empty.
-- Edit and inline editing paths are intentionally deferred to later F2.2 slices (notably F2.2.11).
+- **F2.2.10 (Delete):** Implemented delete with confirmation via `useDeleteExpense` mutation hook and reusable `ConfirmationDialog` component. Expenses table includes Actions column with Edit/Delete icon buttons. Delete confirmation shows expense details (amount, description, date) and handles loading/error states with toast notifications.
+- **F2.2.5 (Edit):** Implemented edit via modal reusing `ExpenseForm` with `useUpdateExpense` mutation hook. Form supports both create and edit modes via `initialValues` and `expenseId` props, automatically populating fields and switching button text/toast messages based on mode. Edit flow wired in `ExpensesPage` with separate state management for create vs edit modals.
+
+> **Deferred:** F2.2.11 (inline editing) is explicitly deferred to a future iteration. The current modal-based edit flow provides full CRUD functionality while keeping the implementation simpler and more consistent with the create flow. Inline editing would require additional complexity for field-level validation, conflict resolution, and UX patterns that are not essential for MVP.
 
 **Files to Create:**
 
@@ -806,12 +809,12 @@ location / {
 ||| Phase | Tasks | Done | Progress |
 ||| -------------------- | ------------ | ------- | -------- | ------- |
 ||| | F1. Scaffold | 22 | 22 | 100% |
-||| F2. Core Features | 44 | 5 | 11% |
+||| F2. Core Features | 44 | 7 | 16% |
 ||| F3. Reports & Polish | 26 | 0 | 0% |
 ||| F4. Production | 9 | 0 | 0% |
-||| | **Total** | **101** | **27** | **27%** |
+||| | **Total** | **101** | **29** | **29%** |
 
-> Note: Frontend F2 progress currently counts the completed tasks F2.1, F2.2.1, F2.2.2, F2.2.3, and F2.2.5. Remaining F2.x tasks (pagination, enhanced dropdowns, GST/biz% UI, delete, inline edit, etc.) are planned but not yet implemented.
+> Note: Frontend F2 progress currently counts the completed tasks F2.1, F2.2.1, F2.2.2, F2.2.3, F2.2.5, and F2.2.10. Remaining F2.x tasks (pagination, enhanced dropdowns, GST/biz% UI, inline edit, etc.) are planned but not yet implemented.
 
 ---
 

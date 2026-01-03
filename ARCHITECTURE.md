@@ -210,7 +210,18 @@ features/expenses/
 - **Expenses table:** `ExpensesTable` renders a semantic HTML table with columns for date, description, provider, category, amount, GST, biz%, and BAS period. It uses client-side sorting by date, amount, and provider name (clickable headers, `aria-sort` for a11y).
 - **Expenses filters:** `ExpenseFilters` (`web/src/features/expenses/components/expense-filters.tsx`) provides provider/category/date filters. Filtering is currently client-side in `ExpensesPage` by narrowing the `expenses` array before passing it into `ExpensesTable`. If data volume grows, `useExpenses` can be extended to accept filter params and call `/expenses` with query params for server-side filtering.
 - **Expense create form:** `ExpenseForm` (`web/src/features/expenses/components/expense-form.tsx`) uses React Hook Form plus a Zod `expenseFormSchema` to validate inputs (date, providerId/categoryId UUIDs, amount/gst cents, bizPercent range, optional description/fileRef) and converts user-entered currency strings to cents via `parseCurrency`.
-- **Expense mutations:** `useExpenseMutations` (`web/src/features/expenses/hooks/use-expense-mutations.ts`) currently exposes `useCreateExpense`, which wraps a `POST /expenses` TanStack Query mutation, invalidates the `['expenses']` query on success, and is wired into `ExpenseForm` along with toast notifications for success/error.
+- **Expense mutations:** `use-expense-mutations.ts` (`web/src/features/expenses/hooks/use-expense-mutations.ts`) exposes three mutation hooks:
+  - `useCreateExpense`: `POST /expenses` mutation for creating new expenses
+  - `useUpdateExpense`: `PATCH /expenses/:id` mutation for updating existing expenses
+  - `useDeleteExpense`: `DELETE /expenses/:id` mutation for deleting expenses
+  - All mutations invalidate the `['expenses']` query on success and are wired with toast notifications for success/error feedback
+- **Expense form modes:** `ExpenseForm` supports both create and edit modes via `initialValues` and `expenseId` props. In edit mode, it populates form fields from the expense data and uses `useUpdateExpense`; in create mode, it starts with empty fields and uses `useCreateExpense`.
+- **Actions column:** `ExpensesTable` includes an Actions column with Edit (pencil icon) and Delete (trash icon) buttons using Lucide React icons. Both buttons use accessible aria-labels and tooltips.
+- **Delete confirmation:** Reusable `ConfirmationDialog` component (`web/src/components/ui/confirmation-dialog.tsx`) provides accessible alertdialog for dangerous actions. Features include:
+  - Keyboard accessible (Escape to close, auto-focus on confirm button)
+  - Loading state support (disables buttons during async operations)
+  - Danger variant (red confirm button for destructive actions)
+  - Focus management and `aria-modal` for screen readers
 
 ### Data Fetching Pattern
 
