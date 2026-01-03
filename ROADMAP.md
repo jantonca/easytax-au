@@ -11,7 +11,7 @@
 
 **Goal:** Manual CRUD for expenses/incomes + basic BAS summary.
 
-**Status:** ✅ Backend Complete | 🟡 Frontend In Progress (38%)
+**Status:** ✅ Backend Complete | 🟡 Frontend In Progress (44%)
 
 ### Backend
 
@@ -38,7 +38,7 @@
 | Expenses module     | Full CRUD with filters, sorting, modal forms  | 🔴 High   | ✅     |
 | Incomes module      | Full CRUD with paid toggle, filters, sorting  | 🔴 High   | ✅     |
 | CSV Import          | Bulk import expenses/incomes with preview     | 🟡 Medium | ⬜     |
-| Settings pages      | Manage providers, categories, clients         | 🟡 Medium | ⬜     |
+| Settings pages      | Manage providers, categories (clients pending) | 🟡 Medium | 🟡     |
 
 ### Infrastructure
 

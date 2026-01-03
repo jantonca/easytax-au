@@ -592,19 +592,27 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 
 | #      | Task                                           | Status |
 | ------ | ---------------------------------------------- | ------ |
-| F2.5.1 | Create providers list page                     | ⬜     |
-| F2.5.2 | Create provider form (add/edit)                | ⬜     |
-| F2.5.3 | Add "is_international" toggle with explanation | ⬜     |
-| F2.5.4 | Create categories list page                    | ⬜     |
-| F2.5.5 | Create category form (add/edit)                | ⬜     |
-| F2.5.6 | Show BAS label mapping                         | ⬜     |
+| F2.5.1 | Create providers list page                     | ✅     |
+| F2.5.2 | Create provider form (add/edit)                | ✅     |
+| F2.5.3 | Add "is_international" toggle with explanation | ✅     |
+| F2.5.4 | Create categories list page                    | ✅     |
+| F2.5.5 | Create category form (add/edit)                | ✅     |
+| F2.5.6 | Show BAS label mapping                         | ✅     |
 
-**Files to Create:**
+**Files Created:**
 
-- `web/src/features/settings/providers-page.tsx`
-- `web/src/features/settings/categories-page.tsx`
-- `web/src/features/settings/components/provider-form.tsx`
-- `web/src/features/settings/components/category-form.tsx`
+- `web/src/features/settings/providers/providers-page.tsx` - Main providers CRUD page
+- `web/src/features/settings/providers/components/provider-form.tsx` - Form with validation
+- `web/src/features/settings/providers/components/providers-table.tsx` - Sortable table
+- `web/src/features/settings/providers/hooks/use-provider-mutations.ts` - Create/update/delete hooks
+- `web/src/features/settings/providers/schemas/provider.schema.ts` - Zod validation schema
+- `web/src/features/settings/categories/categories-page.tsx` - Main categories CRUD page
+- `web/src/features/settings/categories/components/category-form.tsx` - Form with BAS labels
+- `web/src/features/settings/categories/components/categories-table.tsx` - Sortable table
+- `web/src/features/settings/categories/hooks/use-category-mutations.ts` - Create/update/delete hooks
+- `web/src/features/settings/categories/schemas/category.schema.ts` - Zod validation schema
+- `web/src/features/settings/components/settings-tabs.tsx` - Shared tab navigation
+- Updated `web/src/App.tsx` - Added nested routes for /settings/providers and /settings/categories
 
 **Definition of Done:**
 
@@ -851,12 +859,12 @@ location / {
 ||| Phase | Tasks | Done | Progress |
 ||| -------------------- | ------------ | ------- | -------- | ------- |
 ||| | F1. Scaffold | 22 | 22 | 100% |
-||| F2. Core Features | 44 | 16 | 36% |
+||| F2. Core Features | 44 | 22 | 50% |
 ||| F3. Reports & Polish | 26 | 0 | 0% |
 ||| F4. Production | 9 | 0 | 0% |
-||| | **Total** | **101** | **38** | **38%** |
+||| | **Total** | **101** | **44** | **44%** |
 
-> Note: Frontend F2 progress currently counts completed tasks from F2.1 (Dashboard - 5 tasks), F2.2 (Expenses - 5 tasks: list, sorting, filtering, create form, delete), and F2.3 (Incomes - 9 tasks: full CRUD except pagination). Remaining F2.x tasks include CSV import (F2.4), settings management (F2.5-F2.6), and optional enhancements like pagination and inline editing.
+> Note: Frontend F2 progress currently counts completed tasks from F2.1 (Dashboard - 5 tasks), F2.2 (Expenses - 5 tasks), F2.3 (Incomes - 6 tasks), and F2.5 (Providers & Categories - 6 tasks). Remaining F2.x tasks include CSV import (F2.4), clients management (F2.6), and optional enhancements like pagination and inline editing.
 
 ---
 

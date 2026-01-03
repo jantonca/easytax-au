@@ -267,6 +267,52 @@ features/incomes/
   - GST is always 10% (not variable like expenses with international providers)
   - Total always equals subtotal + GST (no complexity around GST-free items)
 
+### Settings Module (F2.5)
+
+- **Settings layout:** Shared tab navigation component (`SettingsTabs`) provides consistent navigation between Providers, Categories, and Clients (pending) sections
+- **Nested routing:** Settings uses nested React Router routes under `/settings` with automatic redirect to `/settings/providers` as the default view
+- **Providers CRUD:** Full create/read/update/delete for expense vendors with:
+  - International provider toggle (GST-free flag)
+  - Optional default category selection
+  - Optional ABN/ARN field (9 or 11 digits, validated)
+  - Sortable table by name and international status
+  - Modal-based create/edit forms
+  - Delete confirmation dialog
+- **Categories CRUD:** Full create/read/update/delete for expense categories with:
+  - BAS label selection (1B/G10/G11) with explanatory dropdown
+  - Tax deductible toggle (default: true)
+  - Optional description field
+  - Sortable table by name and BAS label
+  - Modal-based create/edit forms
+  - Delete confirmation dialog
+- **Module structure:** Both providers and categories follow the established feature pattern:
+  ```
+  features/settings/providers/
+  ├── providers-page.tsx          # Main CRUD page with modals
+  ├── components/
+  │   ├── providers-table.tsx     # Sortable table
+  │   └── provider-form.tsx       # Create/edit form
+  ├── hooks/
+  │   └── use-provider-mutations.ts # Create/update/delete
+  └── schemas/
+      └── provider.schema.ts      # Zod validation
+
+  features/settings/categories/
+  ├── categories-page.tsx         # Main CRUD page with modals
+  ├── components/
+  │   ├── categories-table.tsx    # Sortable table
+  │   └── category-form.tsx       # Create/edit form
+  ├── hooks/
+  │   └── use-category-mutations.ts # Create/update/delete
+  └── schemas/
+      └── category.schema.ts      # Zod validation
+
+  features/settings/components/
+  └── settings-tabs.tsx           # Shared tab navigation
+  ```
+- **Shared query hooks:** Both modules reuse existing shared hooks from `web/src/hooks/` for data fetching (`useProviders`, `useCategories`) rather than duplicating them
+- **Type safety:** All DTOs imported from `@shared/types` OpenAPI schema. Update mutations use `Partial<CreateDto>` pattern since backend Update DTOs are defined as `Record<string, never>` in the OpenAPI schema
+
 ### Data Fetching Pattern
 
 > Note: Filtering by category/provider/date is currently applied client-side in `ExpensesPage` by narrowing the `expenses` array before passing it into `ExpensesTable`. If data volume grows, this hook can be extended with filter parameters and filter-aware query keys to call `/expenses` with query params for server-side filtering.
