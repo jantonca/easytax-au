@@ -2,20 +2,33 @@ import type { ReactElement } from 'react';
 import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import type { CategoryDto, ProviderDto } from '@/lib/api-client';
-import { parseCurrency } from '@/lib/currency';
+import type { CategoryDto, ExpenseResponseDto, ProviderDto } from '@/lib/api-client';
+import { formatCents, parseCurrency } from '@/lib/currency';
 import type { ExpenseFormValues } from '@/features/expenses/schemas/expense.schema';
 import { expenseFormSchema } from '@/features/expenses/schemas/expense.schema';
-import { useCreateExpense } from '@/features/expenses/hooks/use-expense-mutations';
+import {
+  useCreateExpense,
+  useUpdateExpense,
+} from '@/features/expenses/hooks/use-expense-mutations';
 import { useToast } from '@/lib/toast-context';
 
 interface ExpenseFormProps {
   providers: ProviderDto[];
   categories: CategoryDto[];
+  initialValues?: ExpenseResponseDto;
+  expenseId?: string;
   onSuccess?: () => void;
 }
 
-export function ExpenseForm({ providers, categories, onSuccess }: ExpenseFormProps): ReactElement {
+export function ExpenseForm({
+  providers,
+  categories,
+  initialValues,
+  expenseId,
+  onSuccess,
+}: ExpenseFormProps): ReactElement {
+  const isEditMode = !!expenseId;
+
   const {
     register,
     handleSubmit,
@@ -23,22 +36,40 @@ export function ExpenseForm({ providers, categories, onSuccess }: ExpenseFormPro
     reset,
   } = useForm<ExpenseFormValues>({
     resolver: zodResolver(expenseFormSchema),
-    defaultValues: {
-      date: '',
-      amount: '',
-      gstAmount: '',
-      bizPercent: 100,
-      providerId: '',
-      categoryId: '',
-      description: '',
-      fileRef: '',
-    },
+    defaultValues: initialValues
+      ? {
+          date: String(initialValues.date).slice(0, 10),
+          amount: formatCents(initialValues.amountCents),
+          gstAmount: formatCents(initialValues.gstCents),
+          bizPercent: initialValues.bizPercent,
+          providerId: initialValues.providerId,
+          categoryId: initialValues.categoryId,
+          description: (() => {
+            const raw = (initialValues as unknown as { description?: unknown }).description;
+            return typeof raw === 'string' ? raw : '';
+          })(),
+          fileRef: (() => {
+            const raw = (initialValues as unknown as { fileRef?: unknown }).fileRef;
+            return typeof raw === 'string' ? raw : '';
+          })(),
+        }
+      : {
+          date: '',
+          amount: '',
+          gstAmount: '',
+          bizPercent: 100,
+          providerId: '',
+          categoryId: '',
+          description: '',
+          fileRef: '',
+        },
   });
 
-  const { mutate, isPending } = useCreateExpense();
+  const { mutate: createExpense, isPending: isCreating } = useCreateExpense();
+  const { mutate: updateExpense, isPending: isUpdating } = useUpdateExpense();
   const { showToast } = useToast();
 
-  const submitting = isSubmitting || isPending;
+  const submitting = isSubmitting || isCreating || isUpdating;
 
   useEffect(() => {
     if (!providers.length || !categories.length) {
@@ -57,37 +88,59 @@ export function ExpenseForm({ providers, categories, onSuccess }: ExpenseFormPro
     const amountCurrency = parseCurrency(values.amount);
     const gstCurrency = values.gstAmount ? parseCurrency(values.gstAmount) : undefined;
 
-    mutate(
-      {
-        data: {
-          date: values.date,
-          amountCents: amountCurrency.cents,
-          gstCents: gstCurrency?.cents,
-          bizPercent: values.bizPercent,
-          providerId: values.providerId,
-          categoryId: values.categoryId,
-          description: values.description || undefined,
-          fileRef: values.fileRef || undefined,
+    const payload = {
+      date: values.date,
+      amountCents: amountCurrency.cents,
+      gstCents: gstCurrency?.cents,
+      bizPercent: values.bizPercent,
+      providerId: values.providerId,
+      categoryId: values.categoryId,
+      description: values.description || undefined,
+      fileRef: values.fileRef || undefined,
+    };
+
+    if (isEditMode) {
+      updateExpense(
+        { id: expenseId, data: payload },
+        {
+          onSuccess: () => {
+            showToast({
+              title: 'Expense updated',
+              description: 'The expense has been updated successfully.',
+            });
+            onSuccess?.();
+          },
+          onError: (error) => {
+            console.error('Error updating expense:', error);
+            showToast({
+              title: 'Error',
+              description: 'Failed to update expense. Please try again.',
+            });
+          },
         },
-      },
-      {
-        onSuccess: () => {
-          showToast({
-            title: 'Expense created',
-            description: 'The expense has been saved successfully.',
-          });
-          reset();
-          onSuccess?.();
+      );
+    } else {
+      createExpense(
+        { data: payload },
+        {
+          onSuccess: () => {
+            showToast({
+              title: 'Expense created',
+              description: 'The expense has been saved successfully.',
+            });
+            reset();
+            onSuccess?.();
+          },
+          onError: (error) => {
+            console.error('Error creating expense:', error);
+            showToast({
+              title: 'Error',
+              description: 'Failed to save expense. Please try again.',
+            });
+          },
         },
-        onError: (error) => {
-          console.error('Error submitting expense form:', error);
-          showToast({
-            title: 'Error',
-            description: 'Failed to save expense. Please try again.',
-          });
-        },
-      },
-    );
+      );
+    }
   }
 
   return (
@@ -243,7 +296,7 @@ export function ExpenseForm({ providers, categories, onSuccess }: ExpenseFormPro
           className="inline-flex h-8 items-center rounded-md bg-emerald-600 px-3 text-xs font-medium text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
           disabled={submitting}
         >
-          {submitting ? 'Saving…' : 'Save expense'}
+          {submitting ? 'Saving…' : isEditMode ? 'Update expense' : 'Save expense'}
         </button>
       </div>
     </form>

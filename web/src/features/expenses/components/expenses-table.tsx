@@ -1,10 +1,13 @@
 import type { ReactElement } from 'react';
 import { useMemo, useState } from 'react';
+import { Pencil, Trash2 } from 'lucide-react';
 import type { ExpenseResponseDto } from '@/lib/api-client';
 import { formatCents } from '@/lib/currency';
 
 interface ExpensesTableProps {
   expenses: ExpenseResponseDto[];
+  onEdit?: (expense: ExpenseResponseDto) => void;
+  onDelete?: (expense: ExpenseResponseDto) => void;
 }
 
 type SortColumn = 'date' | 'amount' | 'provider';
@@ -46,7 +49,7 @@ function getAriaSort(
   return direction === 'asc' ? 'ascending' : 'descending';
 }
 
-export function ExpensesTable({ expenses }: ExpensesTableProps): ReactElement {
+export function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTableProps): ReactElement {
   const [sortBy, setSortBy] = useState<SortColumn>('date');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
@@ -177,8 +180,11 @@ export function ExpensesTable({ expenses }: ExpensesTableProps): ReactElement {
               <th scope="col" className="py-2 pr-3 text-right">
                 Biz %
               </th>
-              <th scope="col" className="py-2 pr-0 text-right">
+              <th scope="col" className="py-2 pr-3 text-right">
                 Period
+              </th>
+              <th scope="col" className="py-2 pr-0 text-right">
+                Actions
               </th>
             </tr>
           </thead>
@@ -217,8 +223,34 @@ export function ExpensesTable({ expenses }: ExpensesTableProps): ReactElement {
                   <td className="py-2 pr-3 align-middle text-right text-[11px] text-slate-200">
                     {expense.bizPercent}%
                   </td>
-                  <td className="py-2 pr-0 align-middle text-right text-[11px] text-slate-300">
+                  <td className="py-2 pr-3 align-middle text-right text-[11px] text-slate-300">
                     {periodLabel}
+                  </td>
+                  <td className="py-2 pr-0 align-middle text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      {onEdit && (
+                        <button
+                          type="button"
+                          onClick={() => onEdit(expense)}
+                          className="inline-flex h-6 w-6 items-center justify-center rounded text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+                          aria-label={`Edit expense: ${description}`}
+                          title="Edit expense"
+                        >
+                          <Pencil size={14} />
+                        </button>
+                      )}
+                      {onDelete && (
+                        <button
+                          type="button"
+                          onClick={() => onDelete(expense)}
+                          className="inline-flex h-6 w-6 items-center justify-center rounded text-slate-400 hover:bg-red-900/40 hover:text-red-400"
+                          aria-label={`Delete expense: ${description}`}
+                          title="Delete expense"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               );

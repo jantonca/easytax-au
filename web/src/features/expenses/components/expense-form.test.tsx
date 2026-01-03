@@ -3,7 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import type { CategoryDto, ProviderDto } from '@/lib/api-client';
 import { ExpenseForm } from '@/features/expenses/components/expense-form';
-import { useCreateExpense } from '@/features/expenses/hooks/use-expense-mutations';
+import {
+  useCreateExpense,
+  useUpdateExpense,
+} from '@/features/expenses/hooks/use-expense-mutations';
 
 vi.mock('@/features/expenses/hooks/use-expense-mutations');
 vi.mock('@/lib/toast-context', () => ({
@@ -12,12 +15,8 @@ vi.mock('@/lib/toast-context', () => ({
   }),
 }));
 
-const mockedUseCreateExpense = vi.mocked(
-  useCreateExpense as () => {
-    mutate: (variables: unknown, options?: unknown) => void;
-    isPending: boolean;
-  },
-);
+const mockedUseCreateExpense = vi.mocked(useCreateExpense);
+const mockedUseUpdateExpense = vi.mocked(useUpdateExpense);
 
 describe('ExpenseForm', () => {
   it('submits form and calls create mutation', async () => {
@@ -53,6 +52,11 @@ describe('ExpenseForm', () => {
       mutate,
       isPending: false,
     } as unknown as ReturnType<typeof useCreateExpense>);
+
+    mockedUseUpdateExpense.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as unknown as ReturnType<typeof useUpdateExpense>);
 
     render(<ExpenseForm providers={providers} categories={categories} />);
 

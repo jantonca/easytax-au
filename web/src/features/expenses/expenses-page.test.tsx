@@ -4,12 +4,19 @@ import { describe, expect, it, vi } from 'vitest';
 import type { CategoryDto, ExpenseResponseDto, ProviderDto } from '@/lib/api-client';
 import { ExpensesPage } from '@/features/expenses/expenses-page';
 import { useExpenses } from '@/features/expenses/hooks/use-expenses';
+import { useDeleteExpense } from '@/features/expenses/hooks/use-expense-mutations';
 import { useCategories } from '@/hooks/use-categories';
 import { useProviders } from '@/hooks/use-providers';
 
 vi.mock('@/features/expenses/hooks/use-expenses');
+vi.mock('@/features/expenses/hooks/use-expense-mutations');
 vi.mock('@/hooks/use-providers');
 vi.mock('@/hooks/use-categories');
+vi.mock('@/lib/toast-context', () => ({
+  useToast: () => ({
+    showToast: vi.fn(),
+  }),
+}));
 
 const mockedUseExpenses = vi.mocked(
   useExpenses as () => {
@@ -30,6 +37,8 @@ const mockedUseCategories = vi.mocked(
     data?: CategoryDto[];
   },
 );
+
+const mockedUseDeleteExpense = vi.mocked(useDeleteExpense);
 
 describe('ExpensesPage', () => {
   it('renders expenses table rows when data is available', () => {
@@ -71,6 +80,11 @@ describe('ExpensesPage', () => {
       data: [],
     });
 
+    mockedUseDeleteExpense.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as unknown as ReturnType<typeof useDeleteExpense>);
+
     render(<ExpensesPage />);
 
     expect(screen.getByRole('heading', { level: 1, name: 'Expenses' })).toBeInTheDocument();
@@ -94,6 +108,11 @@ describe('ExpensesPage', () => {
       data: [],
     });
 
+    mockedUseDeleteExpense.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as unknown as ReturnType<typeof useDeleteExpense>);
+
     render(<ExpensesPage />);
 
     expect(screen.getByText('Loading expenses…')).toBeInTheDocument();
@@ -113,6 +132,11 @@ describe('ExpensesPage', () => {
     mockedUseCategories.mockReturnValue({
       data: [],
     });
+
+    mockedUseDeleteExpense.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as unknown as ReturnType<typeof useDeleteExpense>);
 
     render(<ExpensesPage />);
 
@@ -135,6 +159,11 @@ describe('ExpensesPage', () => {
     mockedUseCategories.mockReturnValue({
       data: [],
     });
+
+    mockedUseDeleteExpense.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as unknown as ReturnType<typeof useDeleteExpense>);
 
     render(<ExpensesPage />);
 
@@ -223,6 +252,11 @@ describe('ExpensesPage', () => {
     mockedUseCategories.mockReturnValue({
       data: [],
     });
+
+    mockedUseDeleteExpense.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as unknown as ReturnType<typeof useDeleteExpense>);
 
     render(<ExpensesPage />);
 
