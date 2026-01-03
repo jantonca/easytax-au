@@ -88,16 +88,34 @@ export function ExpenseForm({
     const amountCurrency = parseCurrency(values.amount);
     const gstCurrency = values.gstAmount ? parseCurrency(values.gstAmount) : undefined;
 
-    const payload = {
+    // Build payload with only defined optional fields
+    const payload: {
+      date: string;
+      amountCents: number;
+      bizPercent: number;
+      providerId: string;
+      categoryId: string;
+      gstCents?: number;
+      description?: string;
+      fileRef?: string;
+    } = {
       date: values.date,
       amountCents: amountCurrency.cents,
-      gstCents: gstCurrency?.cents,
       bizPercent: values.bizPercent,
       providerId: values.providerId,
       categoryId: values.categoryId,
-      description: values.description || undefined,
-      fileRef: values.fileRef || undefined,
     };
+
+    // Only include optional fields if they have values
+    if (gstCurrency) {
+      payload.gstCents = gstCurrency.cents;
+    }
+    if (values.description) {
+      payload.description = values.description;
+    }
+    if (values.fileRef) {
+      payload.fileRef = values.fileRef;
+    }
 
     if (isEditMode) {
       updateExpense(
