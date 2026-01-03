@@ -274,6 +274,7 @@ export class ExpensesService {
    * @returns ExpenseResponseDto with FY info
    */
   toResponseDto(expense: Expense): ExpenseResponseDto {
+    // FYService handles both Date objects and date strings from TypeORM
     const fyInfo = this.fyService.getFYInfo(expense.date);
 
     return {

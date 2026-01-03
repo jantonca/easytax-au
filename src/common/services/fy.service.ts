@@ -83,17 +83,19 @@ export class FYService {
    * Gets the Financial Year number for a given date.
    * The FY number is the calendar year in which the FY ends.
    *
-   * @param date - The date to check
+   * @param date - The date to check (Date object or ISO string)
    * @returns The financial year number (e.g., 2026 for dates between Jul 2025 - Jun 2026)
    *
    * @example
    * getFYFromDate(new Date('2025-06-30')) // Returns 2025 (still in FY2025)
    * getFYFromDate(new Date('2025-07-01')) // Returns 2026 (now in FY2026)
    * getFYFromDate(new Date('2026-01-15')) // Returns 2026 (Q3 of FY2026)
+   * getFYFromDate('2025-07-01') // Returns 2026 (accepts strings too)
    */
-  getFYFromDate(date: Date): number {
-    const month = date.getMonth(); // 0-indexed (0 = January, 6 = July)
-    const year = date.getFullYear();
+  getFYFromDate(date: Date | string): number {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    const month = dateObj.getMonth(); // 0-indexed (0 = January, 6 = July)
+    const year = dateObj.getFullYear();
 
     // If month is July (6) or later, we're in the FY that ends next calendar year
     if (month >= this.FY_START_MONTH) {
@@ -107,17 +109,19 @@ export class FYService {
   /**
    * Gets the Australian BAS quarter for a given date.
    *
-   * @param date - The date to check
-   * @returns The quarter (Q1, Q2, Q3, or Q4)
+   * @param date - The date to check (Date object or ISO string)
+   * @returns The BAS quarter (Q1, Q2, Q3, or Q4)
    *
    * @example
    * getQuarterFromDate(new Date('2025-07-15')) // Returns 'Q1'
    * getQuarterFromDate(new Date('2025-10-01')) // Returns 'Q2'
-   * getQuarterFromDate(new Date('2026-01-31')) // Returns 'Q3'
-   * getQuarterFromDate(new Date('2026-04-15')) // Returns 'Q4'
+   * getQuarterFromDate(new Date('2026-01-15')) // Returns 'Q3'
+   * getQuarterFromDate(new Date('2026-05-01')) // Returns 'Q4'
+   * getQuarterFromDate('2026-01-15') // Returns 'Q3' (accepts strings too)
    */
-  getQuarterFromDate(date: Date): AustralianQuarter {
-    const month = date.getMonth(); // 0-indexed
+  getQuarterFromDate(date: Date | string): AustralianQuarter {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    const month = dateObj.getMonth(); // 0-indexed
 
     // Q1: July (6), August (7), September (8)
     if (month >= 6 && month <= 8) {
@@ -141,7 +145,7 @@ export class FYService {
   /**
    * Gets complete FY information for a given date.
    *
-   * @param date - The date to analyze
+   * @param date - The date to analyze (Date object or ISO string)
    * @returns Complete FY info including year, quarter, and labels
    *
    * @example
@@ -152,8 +156,9 @@ export class FYService {
    * //   fyLabel: 'FY2026',
    * //   quarterLabel: 'Q1 FY2026'
    * // }
+   * getFYInfo('2025-08-15') // Also accepts strings
    */
-  getFYInfo(date: Date): FYInfo {
+  getFYInfo(date: Date | string): FYInfo {
     const financialYear = this.getFYFromDate(date);
     const quarter = this.getQuarterFromDate(date);
 

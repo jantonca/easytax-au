@@ -51,6 +51,18 @@ describe('FYService', () => {
         expect(service.getFYFromDate(date)).toBe(2026);
       });
     });
+
+    describe('string input (TypeORM date columns)', () => {
+      it('should handle ISO date strings', () => {
+        expect(service.getFYFromDate('2025-07-01')).toBe(2026);
+        expect(service.getFYFromDate('2025-06-30')).toBe(2025);
+      });
+
+      it('should handle date strings from TypeORM', () => {
+        // TypeORM returns date columns as strings in format YYYY-MM-DD
+        expect(service.getFYFromDate('2026-01-15')).toBe(2026);
+      });
+    });
   });
 
   describe('getQuarterFromDate', () => {
