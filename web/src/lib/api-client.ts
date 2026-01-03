@@ -112,6 +112,36 @@ export interface CategoryDto {
   updatedAt: string;
 }
 
+// Income and Client types based on backend entities
+export interface IncomeResponseDto {
+  id: string;
+  date: string | Date;
+  clientId: string;
+  invoiceNum?: string | null;
+  description?: string | null;
+  subtotalCents: number;
+  gstCents: number;
+  totalCents: number;
+  isPaid: boolean;
+  createdAt: string;
+  updatedAt: string;
+  client: {
+    id: string;
+    name: string;
+    abn?: string | null;
+    isPsiEligible: boolean;
+  };
+}
+
+export interface ClientDto {
+  id: string;
+  name: string;
+  abn?: string | null;
+  isPsiEligible: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export async function getBasSummary(quarter: string, year: number): Promise<BasSummaryDto> {
   return apiClient.get<BasSummaryDto>(`/bas/${quarter}/${year}`);
 }
@@ -148,4 +178,12 @@ export async function getDueRecurringExpenses(
   const path = query.length > 0 ? `/recurring-expenses/due?${query}` : '/recurring-expenses/due';
 
   return apiClient.get<RecurringExpenseResponseDto[]>(path);
+}
+
+export async function getClients(): Promise<ClientDto[]> {
+  return apiClient.get<ClientDto[]>('/clients');
+}
+
+export async function getIncomes(): Promise<IncomeResponseDto[]> {
+  return apiClient.get<IncomeResponseDto[]>('/incomes');
 }

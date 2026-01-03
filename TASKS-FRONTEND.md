@@ -444,18 +444,60 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 
 ### F2.3 Incomes Module
 
+**Status:** ✅ Completed
+
 | #       | Task                                            | Status |
 | ------- | ----------------------------------------------- | ------ |
-| F2.3.1  | Create incomes list page with data table        | ⬜     |
-| F2.3.2  | Add sorting (date, amount, client)              | ⬜     |
-| F2.3.3  | Add filtering (client, paid/unpaid, date range) | ⬜     |
+| F2.3.1  | Create incomes list page with data table        | ✅     |
+| F2.3.2  | Add sorting (date, amount, client)              | ✅     |
+| F2.3.3  | Add filtering (client, paid/unpaid, date range) | ✅     |
 | F2.3.4  | Add pagination                                  | ⬜     |
-| F2.3.5  | Create income form (add/edit) with validation   | ⬜     |
-| F2.3.6  | Implement client dropdown with search + add new | ⬜     |
-| F2.3.7  | Add GST (10%) auto-calculation                  | ⬜     |
-| F2.3.8  | Add Total auto-calculation (subtotal + GST)     | ⬜     |
-| F2.3.9  | Add paid/unpaid toggle                          | ⬜     |
-| F2.3.10 | Implement delete with confirmation              | ⬜     |
+| F2.3.5  | Create income form (add/edit) with validation   | ✅     |
+| F2.3.6  | Implement client dropdown with search + add new | ✅     |
+| F2.3.7  | Add GST (10%) auto-calculation                  | ✅     |
+| F2.3.8  | Add Total auto-calculation (subtotal + GST)     | ✅     |
+| F2.3.9  | Add paid/unpaid toggle                          | ✅     |
+| F2.3.10 | Implement delete with confirmation              | ✅     |
+
+**Implementation notes (F2.3):**
+
+- Full CRUD implementation following the same pattern as Expenses module (F2.2)
+- Data fetching via `useIncomes` hook with TanStack Query (`['incomes']` query key)
+- Mutations via `useIncomeMutations`: `useCreateIncome`, `useUpdateIncome`, `useDeleteIncome`, `useMarkPaid`, `useMarkUnpaid`
+- Form validation using React Hook Form + Zod (`income.schema.ts`)
+- Client-side filtering by client, paid/unpaid status, and date range
+- Client-side sorting by date (default descending), total, client name, and paid status
+- Responsive table with columns: Date, Invoice #, Client, Description, Subtotal, GST, Total, Paid Status, Actions
+- Paid/unpaid badge is clickable toggle when `onTogglePaid` callback is provided
+- GST auto-calculated as 10% of subtotal (Australian standard)
+- Total auto-calculated as subtotal + GST
+- Client select dropdown with pre-population of first client when available
+- Modal-based create/edit forms with proper success/error toast notifications
+- Delete confirmation using reusable `ConfirmationDialog` component
+- Comprehensive tests: 26 tests passing (7 page, 13 table, 6 form)
+
+**Files created:**
+
+- `web/src/features/incomes/incomes-page.tsx` - Main page with filters, table, and modal dialogs
+- `web/src/features/incomes/components/incomes-table.tsx` - Sortable data table
+- `web/src/features/incomes/components/income-form.tsx` - Create/edit form with validation
+- `web/src/features/incomes/components/income-filters.tsx` - Client, paid status, and date range filters
+- `web/src/features/incomes/components/client-select.tsx` - Client dropdown
+- `web/src/features/incomes/hooks/use-incomes.ts` - TanStack Query hook for data fetching
+- `web/src/features/incomes/hooks/use-income-mutations.ts` - CRUD mutations
+- `web/src/features/incomes/schemas/income.schema.ts` - Zod validation schema
+- `web/src/features/incomes/incomes-page.test.tsx` - Page integration tests
+- `web/src/features/incomes/components/incomes-table.test.tsx` - Table component tests
+- `web/src/features/incomes/components/income-form.test.tsx` - Form component tests
+
+**Key differences from Expenses:**
+
+- Uses Client instead of Provider
+- No category field (incomes don't have categories)
+- No biz_percent (incomes are always 100% business)
+- Has isPaid status with toggle functionality
+- Has invoiceNumber field (optional)
+- GST always 10% (not variable like expenses)
 
 **Files to Create:**
 
@@ -809,12 +851,12 @@ location / {
 ||| Phase | Tasks | Done | Progress |
 ||| -------------------- | ------------ | ------- | -------- | ------- |
 ||| | F1. Scaffold | 22 | 22 | 100% |
-||| F2. Core Features | 44 | 7 | 16% |
+||| F2. Core Features | 44 | 16 | 36% |
 ||| F3. Reports & Polish | 26 | 0 | 0% |
 ||| F4. Production | 9 | 0 | 0% |
-||| | **Total** | **101** | **29** | **29%** |
+||| | **Total** | **101** | **38** | **38%** |
 
-> Note: Frontend F2 progress currently counts the completed tasks F2.1, F2.2.1, F2.2.2, F2.2.3, F2.2.5, and F2.2.10. Remaining F2.x tasks (pagination, enhanced dropdowns, GST/biz% UI, inline edit, etc.) are planned but not yet implemented.
+> Note: Frontend F2 progress currently counts completed tasks from F2.1 (Dashboard - 5 tasks), F2.2 (Expenses - 5 tasks: list, sorting, filtering, create form, delete), and F2.3 (Incomes - 9 tasks: full CRUD except pagination). Remaining F2.x tasks include CSV import (F2.4), settings management (F2.5-F2.6), and optional enhancements like pagination and inline editing.
 
 ---
 

@@ -204,7 +204,22 @@ features/expenses/
 │   └── use-expense-mutations.ts # Create/update/delete
 └── schemas/
     └── expense.schema.ts       # Zod validation schema
+
+features/incomes/
+├── incomes-page.tsx            # Page component (route entry)
+├── components/
+│   ├── incomes-table.tsx       # Data table with paid toggle
+│   ├── income-form.tsx         # Add/edit form with GST calc
+│   ├── income-filters.tsx      # Filter controls
+│   └── client-select.tsx       # Client dropdown
+├── hooks/
+│   ├── use-incomes.ts          # TanStack Query hook
+│   └── use-income-mutations.ts # Create/update/delete/toggle paid
+└── schemas/
+    └── income.schema.ts        # Zod validation schema
 ```
+
+### Expenses Module (F2.2)
 
 - **Expenses list:** `useExpenses` hook (`web/src/features/expenses/hooks/use-expenses.ts`) + `ExpensesTable` (`web/src/features/expenses/components/expenses-table.tsx`) provide a read-only expenses table using `/expenses`, sorted by date (newest first) with loading/error/empty states.
 - **Expenses table:** `ExpensesTable` renders a semantic HTML table with columns for date, description, provider, category, amount, GST, biz%, and BAS period. It uses client-side sorting by date, amount, and provider name (clickable headers, `aria-sort` for a11y).
@@ -222,6 +237,35 @@ features/expenses/
   - Loading state support (disables buttons during async operations)
   - Danger variant (red confirm button for destructive actions)
   - Focus management and `aria-modal` for screen readers
+
+### Incomes Module (F2.3)
+
+- **Incomes list:** `useIncomes` hook (`web/src/features/incomes/hooks/use-incomes.ts`) + `IncomesTable` (`web/src/features/incomes/components/incomes-table.tsx`) provide a sortable incomes table using `/incomes`, sorted by date descending (newest first) with loading/error/empty states.
+- **Incomes table:** `IncomesTable` renders a semantic HTML table with columns for date, invoice #, client, description, subtotal, GST, total, paid status (as clickable badge), and actions. Supports client-side sorting by date, total, client name, and paid status via clickable column headers with `aria-sort` for accessibility.
+- **Paid status toggle:** The paid/unpaid badge in the table becomes a clickable button when `onTogglePaid` callback is provided, allowing quick status changes without opening a modal. Badge colors: green for paid, amber for unpaid.
+- **Incomes filters:** `IncomeFilters` (`web/src/features/incomes/components/income-filters.tsx`) provides client/paid-status/date-range filters. Like expenses, filtering is currently client-side by narrowing the `incomes` array in `IncomesPage` before rendering.
+- **Income create/edit form:** `IncomeForm` (`web/src/features/incomes/components/income-form.tsx`) uses React Hook Form + Zod `incomeFormSchema` for validation. Key features:
+  - GST auto-calculated as 10% of subtotal (Australian standard)
+  - Total auto-calculated as subtotal + GST
+  - Real-time calculation updates as user types
+  - Client selection dropdown with pre-population
+  - Optional invoice number field
+  - Paid status checkbox
+  - Supports both create and edit modes via `initialValues` and `incomeId` props
+- **Income mutations:** `use-income-mutations.ts` (`web/src/features/incomes/hooks/use-income-mutations.ts`) exposes five mutation hooks:
+  - `useCreateIncome`: `POST /incomes` for creating new incomes
+  - `useUpdateIncome`: `PATCH /incomes/:id` for updating incomes
+  - `useDeleteIncome`: `DELETE /incomes/:id` for deleting incomes
+  - `useMarkPaid`: `PATCH /incomes/:id/paid` for marking income as paid
+  - `useMarkUnpaid`: `PATCH /incomes/:id/paid` for marking income as unpaid
+  - All mutations use optimistic updates, invalidate the `['incomes']` query on success, and show toast notifications
+- **Key differences from Expenses:**
+  - Uses Client instead of Provider (no category field)
+  - No biz_percent (incomes are always 100% business)
+  - Has isPaid boolean status with quick toggle
+  - Has optional invoiceNumber field
+  - GST is always 10% (not variable like expenses with international providers)
+  - Total always equals subtotal + GST (no complexity around GST-free items)
 
 ### Data Fetching Pattern
 

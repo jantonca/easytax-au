@@ -11,41 +11,58 @@
 
 **Goal:** Manual CRUD for expenses/incomes + basic BAS summary.
 
+**Status:** ✅ Backend Complete | 🟡 Frontend In Progress (38%)
+
 ### Backend
 
-| Task              | Description                                    | Priority |
-| ----------------- | ---------------------------------------------- | -------- |
-| NestJS scaffold   | Initialize project with TypeORM + PostgreSQL   | 🔴 High  |
-| Categories module | CRUD + seed default categories                 | 🔴 High  |
-| Providers module  | CRUD + seed common providers                   | 🔴 High  |
-| Clients module    | CRUD for freelance clients                     | 🔴 High  |
-| Expenses module   | Full CRUD with provider auto-fill              | 🔴 High  |
-| Incomes module    | Full CRUD for invoices                         | 🔴 High  |
-| BAS module        | Read-only quarterly summary (G1, 1A, 1B)       | 🔴 High  |
-| Encryption        | AES-256-GCM transformer for sensitive columns  | 🔴 High  |
-| decimal.js        | All currency math uses Decimal, store as cents | 🔴 High  |
+| Task              | Description                                    | Priority | Status |
+| ----------------- | ---------------------------------------------- | -------- | ------ |
+| NestJS scaffold   | Initialize project with TypeORM + PostgreSQL   | 🔴 High  | ✅     |
+| Categories module | CRUD + seed default categories                 | 🔴 High  | ✅     |
+| Providers module  | CRUD + seed common providers                   | 🔴 High  | ✅     |
+| Clients module    | CRUD for freelance clients                     | 🔴 High  | ✅     |
+| Expenses module   | Full CRUD with provider auto-fill              | 🔴 High  | ✅     |
+| Incomes module    | Full CRUD for invoices                         | 🔴 High  | ✅     |
+| BAS module        | Read-only quarterly summary (G1, 1A, 1B)       | 🔴 High  | ✅     |
+| Encryption        | AES-256-GCM transformer for sensitive columns  | 🔴 High  | ✅     |
+| decimal.js        | All currency math uses Decimal, store as cents | 🔴 High  | ✅     |
+
+### Frontend (React SPA)
+
+| Task                | Description                                     | Priority | Status |
+| ------------------- | ----------------------------------------------- | -------- | ------ |
+| Project scaffold    | Vite + React 19 + TypeScript + Tailwind CSS 4   | 🔴 High  | ✅     |
+| Infrastructure      | API client, TanStack Query, routing, toasts    | 🔴 High  | ✅     |
+| Layout & navigation | Responsive shell with sidebar, header, mobile   | 🔴 High  | ✅     |
+| Dashboard           | BAS summary, recent expenses, quick actions     | 🔴 High  | ✅     |
+| Expenses module     | Full CRUD with filters, sorting, modal forms    | 🔴 High  | ✅     |
+| Incomes module      | Full CRUD with paid toggle, filters, sorting    | 🔴 High  | ✅     |
+| CSV Import          | Bulk import expenses/incomes with preview       | 🟡 Medium | ⬜     |
+| Settings pages      | Manage providers, categories, clients           | 🟡 Medium | ⬜     |
 
 ### Infrastructure
 
-| Task           | Description                    | Priority  |
-| -------------- | ------------------------------ | --------- |
-| Docker Compose | PostgreSQL 15 + API container  | 🔴 High   |
-| .env.example   | Template with required secrets | 🔴 High   |
-| Healthcheck    | `pg_isready` in docker-compose | 🟡 Medium |
+| Task           | Description                    | Priority  | Status |
+| -------------- | ------------------------------ | --------- | ------ |
+| Docker Compose | PostgreSQL 15 + API container  | 🔴 High   | ✅     |
+| .env.example   | Template with required secrets | 🔴 High   | ✅     |
+| Healthcheck    | `pg_isready` in docker-compose | 🟡 Medium | ✅     |
 
 ### Validation
 
-| Task           | Description                         | Priority |
-| -------------- | ----------------------------------- | -------- |
-| DTO validation | class-validator on all inputs       | 🔴 High  |
-| GST auto-calc  | If international provider → GST = 0 | 🔴 High  |
-| biz_percent    | Validate 0-100 range                | 🔴 High  |
+| Task           | Description                         | Priority | Status |
+| -------------- | ----------------------------------- | -------- | ------ |
+| DTO validation | class-validator on all inputs       | 🔴 High  | ✅     |
+| GST auto-calc  | If international provider → GST = 0 | 🔴 High  | ✅     |
+| biz_percent    | Validate 0-100 range                | 🔴 High  | ✅     |
 
 ### Deliverable
 
-- API running on `localhost:3000`
-- Can manually add expenses/incomes via REST
-- Can query BAS summary for any quarter
+- ✅ API running on `localhost:3000`
+- ✅ Can manually add expenses/incomes via REST and Web UI
+- ✅ Can query BAS summary for any quarter
+- ✅ Frontend SPA with full CRUD for expenses and incomes
+- ✅ Dashboard showing current BAS period and recent activity
 
 ---
 
