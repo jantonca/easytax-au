@@ -89,6 +89,10 @@ export async function checkApiHealth(): Promise<boolean> {
 export type BasSummaryDto = components['schemas']['BasSummaryDto'];
 export type ExpenseResponseDto = components['schemas']['ExpenseResponseDto'];
 export type RecurringExpenseResponseDto = components['schemas']['RecurringExpenseResponseDto'];
+export type FYSummaryDto = components['schemas']['FYSummaryDto'];
+export type FYIncomeSummaryDto = components['schemas']['FYIncomeSummaryDto'];
+export type FYExpenseSummaryDto = components['schemas']['FYExpenseSummaryDto'];
+export type CategoryExpenseDto = components['schemas']['CategoryExpenseDto'];
 
 // Provider and Category types based on backend entities
 // These aren't in the OpenAPI schema as response DTOs, so we define them here
@@ -196,4 +200,31 @@ export async function getClients(): Promise<ClientDto[]> {
 
 export async function getIncomes(): Promise<IncomeResponseDto[]> {
   return apiClient.get<IncomeResponseDto[]>('/incomes');
+}
+
+export async function getFYSummary(year: number): Promise<FYSummaryDto> {
+  return apiClient.get<FYSummaryDto>(`/reports/fy/${year}`);
+}
+
+export async function downloadFYReportPdf(year: number): Promise<void> {
+  const envBaseUrl = import.meta.env.VITE_API_URL as unknown;
+  const baseUrl =
+    typeof envBaseUrl === 'string' && envBaseUrl.length > 0 ? envBaseUrl : 'http://localhost:3000';
+  const url = new URL(`/reports/fy/${year}/pdf`, baseUrl).toString();
+
+  const response = await fetch(url, {
+    credentials: 'omit',
+  });
+
+  if (!response.ok) {
+    throw new ApiError(`Failed to download PDF: ${response.status}`, response.status);
+  }
+
+  const blob = await response.blob();
+  const downloadUrl = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = downloadUrl;
+  a.download = `FY-${year}-Report.pdf`;
+  a.click();
+  window.URL.revokeObjectURL(downloadUrl);
 }

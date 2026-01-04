@@ -345,6 +345,52 @@ features/incomes/
 - **Shared query hooks:** All three modules reuse existing shared hooks from `web/src/hooks/` for data fetching (`useProviders`, `useCategories`, `useClients`) rather than duplicating them
 - **Type safety:** All DTOs imported from `@shared/types` OpenAPI schema. Update mutations use `Partial<CreateDto>` pattern since backend Update DTOs are defined as `Record<string, never>` in the OpenAPI schema
 
+### Reports Module (F3.1, F3.2)
+
+- **BAS Reports (F3.1):** Quarterly BAS summaries with G1, 1A, 1B calculations
+  - Quarter/year selector with current period highlighted
+  - Date ranges displayed for each quarter (e.g., "Q1 (1 Jul - 30 Sep 2025)")
+  - GST summary cards reusing `GstSummaryCard` component from dashboard
+  - PDF download functionality with toast notifications
+  - Income and expense record counts
+- **FY Reports (F3.2):** Annual financial year summaries for tax return preparation
+  - Year selector showing current FY + last 3 years (e.g., "FY2026 (Jul 2025 - Jun 2026)")
+  - Comprehensive income summary: Total, Paid, Unpaid, GST Collected
+  - Expense summary: Total, GST Paid, Category count
+  - Net position cards: Profit/Loss and Net GST Payable/Refund (color-coded)
+  - Category breakdown table: All expenses by category, sorted by amount descending, with totals row
+  - BAS label breakdown: Expenses grouped by BAS label (1B, G10, G11) with:
+    - Descriptive headers for each label
+    - Nested category details within each label
+    - Subtotals for multi-category labels
+  - PDF download functionality using blob download pattern
+  - Comprehensive loading, error, and empty states
+- **Module structure:**
+  ```
+  features/reports/
+  ├── bas-report-page.tsx         # BAS quarterly reports page
+  ├── fy-report-page.tsx          # FY annual reports page
+  ├── components/
+  │   ├── quarter-selector.tsx    # Quarter/year selector (BAS)
+  │   ├── year-selector.tsx       # Year selector (FY)
+  │   ├── bas-summary.tsx         # BAS summary cards
+  │   ├── fy-summary.tsx          # FY summary cards
+  │   ├── category-breakdown.tsx  # Expense breakdown by category table
+  │   └── bas-label-breakdown.tsx # Expense breakdown by BAS label (grouped)
+  └── hooks/
+      ├── use-bas-report.ts       # TanStack Query hook for BAS data
+      ├── use-fy-report.ts        # TanStack Query hook for FY data
+      └── use-available-quarters.ts # Quarter date ranges hook
+  ```
+- **API helpers:** `web/src/lib/api-client.ts` provides typed helpers:
+  - `getBasSummary(quarter, year)` → `BasSummaryDto`
+  - `getFYSummary(year)` → `FYSummaryDto`
+  - `getQuartersForYear(year)` → `QuarterDateRange[]`
+  - `downloadFYReportPdf(year)` → PDF blob download
+- **Type safety:** All report DTOs imported from `@shared/types` OpenAPI schema:
+  - `FYSummaryDto`, `FYIncomeSummaryDto`, `FYExpenseSummaryDto`, `CategoryExpenseDto`
+  - `BasSummaryDto`, `QuarterDateRange`
+
 ### Data Fetching Pattern
 
 > Note: Filtering by category/provider/date is currently applied client-side in `ExpensesPage` by narrowing the `expenses` array before passing it into `ExpensesTable`. If data volume grows, this hook can be extended with filter parameters and filter-aware query keys to call `/expenses` with query params for server-side filtering.

@@ -765,33 +765,59 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 
 ### F3.2 FY Reports
 
+**Status:** ✅ Completed
+
 | #      | Task                                          | Status |
 | ------ | --------------------------------------------- | ------ |
-| F3.2.1 | Create FY report page with year selector      | ⬜     |
-| F3.2.2 | Display income summary (total, GST collected) | ⬜     |
-| F3.2.3 | Display expense breakdown by category         | ⬜     |
-| F3.2.4 | Display expense breakdown by BAS label        | ⬜     |
-| F3.2.5 | Show net profit calculation                   | ⬜     |
-| F3.2.6 | Add PDF download button                       | ⬜     |
+| F3.2.1 | Create FY report page with year selector      | ✅     |
+| F3.2.2 | Display income summary (total, GST collected) | ✅     |
+| F3.2.3 | Display expense breakdown by category         | ✅     |
+| F3.2.4 | Display expense breakdown by BAS label        | ✅     |
+| F3.2.5 | Show net profit calculation                   | ✅     |
+| F3.2.6 | Add PDF download button                       | ✅     |
 
-**Files to Create:**
+**Implementation notes (F3.2):**
 
-- `web/src/features/reports/fy-report-page.tsx`
-- `web/src/features/reports/components/year-selector.tsx`
-- `web/src/features/reports/components/fy-summary.tsx`
-- `web/src/features/reports/components/category-breakdown.tsx`
-- `web/src/features/reports/hooks/use-fy-report.ts`
+- Full FY reporting UI with year selector showing current FY + last 3 years
+- Year selector displays FY labels with period dates (e.g., "FY2026 (Jul 2025 - Jun 2026)")
+- FY summary displays comprehensive income and expense metrics:
+  - Income: Total, Paid, Unpaid, GST Collected (with invoice counts)
+  - Expenses: Total, GST Paid, Category count
+  - Net Position: Profit/Loss and Net GST Payable/Refund (color-coded)
+- Category breakdown table shows all expenses by category (sorted by amount desc) with totals row
+- BAS label breakdown groups categories by BAS label (1B, G10, G11) with:
+  - Collapsible sections for each label with descriptions
+  - Nested category details within each label
+  - Subtotals for multi-category labels
+- PDF download functionality using blob download pattern with toast notifications
+- Comprehensive loading, error, and empty states
+- Accessible: keyboard navigable, ARIA labels, semantic HTML
+- All 151 tests passing (including existing tests)
+
+**Files Created:**
+
+- `web/src/features/reports/fy-report-page.tsx` - Main FY reports page (updated from placeholder)
+- `web/src/features/reports/components/year-selector.tsx` - Year selector dropdown
+- `web/src/features/reports/components/fy-summary.tsx` - Summary cards for income/expenses/net position
+- `web/src/features/reports/components/category-breakdown.tsx` - Expense breakdown by category table
+- `web/src/features/reports/components/bas-label-breakdown.tsx` - Expense breakdown by BAS label (grouped)
+- `web/src/features/reports/hooks/use-fy-report.ts` - TanStack Query hook for FY data
+- Updated `web/src/lib/api-client.ts` - Added `getFYSummary()` and `downloadFYReportPdf()` helpers
 
 **API Endpoints Used:**
 
-- `GET /reports/fy/:year`
-- `GET /reports/fy/:year/pdf`
+- `GET /reports/fy/:year` - Fetch FY summary (using `FYSummaryDto` type)
+- `GET /reports/fy/:year/pdf` - Download PDF report
 
 **Definition of Done:**
 
-- [ ] Can view any FY's summary
-- [ ] PDF downloads correctly
-- [ ] Useful for tax return preparation
+- [x] Can view any FY's summary (current + last 3 years)
+- [x] PDF downloads correctly with proper filename
+- [x] Numbers match API exactly (using shared types)
+- [x] All tests passing (151 tests)
+- [x] Linting clean for new code
+- [x] Accessible and keyboard navigable
+- [x] Useful for tax return preparation (income/expense breakdowns by category and BAS label)
 
 ---
 
@@ -946,11 +972,11 @@ location / {
 ||| -------------------- | ------------ | ------- | -------- | ------- |
 ||| | F1. Scaffold | 22 | 22 | 100% |
 ||| F2. Core Features | 44 | 37 | 84% |
-||| F3. Reports & Polish | 26 | 5 | 19% |
+||| F3. Reports & Polish | 26 | 11 | 42% |
 ||| F4. Production | 9 | 0 | 0% |
-||| | **Total** | **101** | **64** | **63%** |
+||| | **Total** | **101** | **70** | **69%** |
 
-> Note: Frontend F2 progress currently counts completed tasks from F2.1 (Dashboard - 5 tasks), F2.2 (Expenses - 7 tasks including GST auto-calc and slider), F2.3 (Incomes - 10 tasks), F2.4 (CSV Import - 10 tasks), F2.5 (Providers & Categories - 6 tasks), and F2.6 (Clients - 3 tasks). F3 progress includes F3.1 (BAS Reports - 5 tasks). Remaining F2.x tasks include optional enhancements like pagination, searchable dropdowns, and inline editing.
+> Note: Frontend F2 progress currently counts completed tasks from F2.1 (Dashboard - 5 tasks), F2.2 (Expenses - 7 tasks including GST auto-calc and slider), F2.3 (Incomes - 10 tasks), F2.4 (CSV Import - 10 tasks), F2.5 (Providers & Categories - 6 tasks), and F2.6 (Clients - 3 tasks). F3 progress includes F3.1 (BAS Reports - 5 tasks) and F3.2 (FY Reports - 6 tasks). Remaining F2.x tasks include optional enhancements like pagination, searchable dropdowns, and inline editing.
 
 ---
 
