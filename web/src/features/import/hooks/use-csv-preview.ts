@@ -6,7 +6,7 @@ type CsvImportResponseDto = components['schemas']['CsvImportResponseDto'];
 
 interface PreviewCsvImportParams {
   file: File;
-  source: 'custom' | 'commbank' | 'amex' | 'nab' | 'westpac' | 'anz';
+  source: 'commbank' | 'amex' | 'custom' | 'nab' | 'westpac' | 'anz';
   matchThreshold?: number;
   skipDuplicates?: boolean;
 }
@@ -19,8 +19,9 @@ async function previewCsvImport(params: PreviewCsvImportParams): Promise<CsvImpo
   formData.append('source', source);
   formData.append('matchThreshold', matchThreshold.toString());
   formData.append('skipDuplicates', skipDuplicates.toString());
+  formData.append('dryRun', 'true'); // Preview mode
 
-  const response = await fetch('http://localhost:3000/import/expenses/preview', {
+  const response = await fetch('http://localhost:3000/api/import/expenses/preview', {
     method: 'POST',
     body: formData,
   });

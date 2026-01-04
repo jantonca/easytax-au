@@ -15,7 +15,7 @@ interface ImportJob {
 }
 
 async function fetchImportJobs(): Promise<ImportJob[]> {
-  const response = await fetch('http://localhost:3000/import/jobs');
+  const response = await fetch('http://localhost:3000/api/import/jobs');
 
   if (!response.ok) {
     const error = (await response.json()) as { message?: string };
