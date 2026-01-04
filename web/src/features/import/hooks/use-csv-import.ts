@@ -21,7 +21,8 @@ async function importCsv(params: ImportCsvParams): Promise<CsvImportResponseDto>
   formData.append('skipDuplicates', skipDuplicates.toString());
   formData.append('dryRun', 'false'); // Actual import, not preview
 
-  const response = await fetch('http://localhost:3000/api/import/expenses', {
+  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  const response = await fetch(`${baseUrl}/import/expenses`, {
     method: 'POST',
     body: formData,
   });

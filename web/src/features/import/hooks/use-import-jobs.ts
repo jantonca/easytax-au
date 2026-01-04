@@ -15,7 +15,8 @@ interface ImportJob {
 }
 
 async function fetchImportJobs(): Promise<ImportJob[]> {
-  const response = await fetch('http://localhost:3000/api/import/jobs');
+  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  const response = await fetch(`${baseUrl}/import/jobs`);
 
   if (!response.ok) {
     const error = (await response.json()) as { message?: string };

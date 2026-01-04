@@ -7,7 +7,7 @@ import { usePreviewCsvImport } from './hooks/use-csv-preview';
 import { useImportCsv } from './hooks/use-csv-import';
 import { Loader2 } from 'lucide-react';
 
-type ImportSource = 'commbank' | 'amex' | 'manual' | 'nab' | 'westpac' | 'anz' | 'custom';
+type ImportSource = 'commbank' | 'amex' | 'custom' | 'nab' | 'westpac' | 'anz';
 
 interface SourceOption {
   value: ImportSource;
@@ -27,7 +27,7 @@ const SOURCE_OPTIONS: SourceOption[] = [
     description: 'Amex statement export',
   },
   {
-    value: 'manual',
+    value: 'custom',
     label: 'Manual CSV',
     description: 'Custom format with date, description, amount columns',
   },
@@ -50,7 +50,7 @@ const SOURCE_OPTIONS: SourceOption[] = [
 
 export function ImportPage(): ReactElement {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [source, setSource] = useState<ImportSource>('manual');
+  const [source, setSource] = useState<ImportSource>('custom');
   const [step, setStep] = useState<'upload' | 'preview' | 'progress'>('upload');
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
 

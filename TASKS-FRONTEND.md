@@ -544,7 +544,7 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 | #       | Task                                          | Status |
 | ------- | --------------------------------------------- | ------ |
 | F2.4.1  | Create import page with file dropzone         | ✅     |
-| F2.4.2  | Add file type detection (expenses vs incomes) | ✅     |
+| F2.4.2  | Add file type detection (expenses vs incomes) | 🟡     |
 | F2.4.3  | Create preview table showing parsed rows      | ✅     |
 | F2.4.4  | Show validation errors per row                | ✅     |
 | F2.4.5  | Show duplicate warnings                       | ✅     |
@@ -564,29 +564,56 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 - `web/src/features/import/hooks/use-csv-preview.ts`
 - `web/src/features/import/hooks/use-import.ts`
 
+**Implementation notes (F2.4):**
+
+- **Expense import:** ✅ Fully working in UI
+- **Income import:** 🟡 Backend API ready, frontend UI not yet implemented
+- Fixed 404/400 errors by:
+  1. Removing hardcoded `/api` prefix from frontend hooks (backend has no global prefix)
+  2. Creating custom `CsvFileValidator` to replace unreliable MIME type validation
+  3. Validator checks `.csv` extension and accepts multiple MIME types (text/csv, application/octet-stream, etc.)
+- Backend endpoints: `/import/expenses`, `/import/expenses/preview`, `/import/incomes`, `/import/incomes/preview`
+- Frontend hooks: `use-csv-preview.ts`, `use-csv-import.ts`, `use-import-jobs.ts`
+- All hooks now use `VITE_API_URL` environment variable instead of hardcoded URLs
+
 **API Endpoints Used:**
 
-- `POST /import/expenses/preview`
-- `POST /import/expenses`
-- `POST /import/incomes/preview`
-- `POST /import/incomes`
-- `GET /import-jobs/:id`
+- `POST /import/expenses` - Import expenses from CSV
+- `POST /import/expenses/preview` - Preview without creating (dryRun=true)
+- `POST /import/incomes` - Import incomes from CSV (backend only)
+- `POST /import/incomes/preview` - Preview incomes import (backend only)
+- `GET /import/jobs` - List import history
+
+**Files Created:**
+
+- `web/src/features/import/import-page.tsx` - Main import UI with 3-step wizard
+- `web/src/features/import/components/file-dropzone.tsx` - File upload dropzone
+- `web/src/features/import/components/preview-table.tsx` - Preview with row selection
+- `web/src/features/import/components/import-progress.tsx` - Success/error display
+- `web/src/features/import/hooks/use-csv-preview.ts` - Preview mutation hook
+- `web/src/features/import/hooks/use-csv-import.ts` - Import mutation hook
+- `web/src/features/import/hooks/use-import-jobs.ts` - Import history query
+- `src/modules/csv-import/validators/csv-file.validator.ts` - Custom file validator (backend)
+- `src/modules/csv-import/validators/csv-file.validator.spec.ts` - Validator tests (8 passing)
 
 **Tests Required:**
 
-- [ ] File dropzone accepts CSV files only
-- [ ] Preview shows parsed data correctly
-- [ ] Validation errors display per row
-- [ ] Duplicate rows are highlighted
-- [ ] Import only includes selected rows
-- [ ] Progress indicator works
+- [x] File dropzone accepts CSV files only
+- [x] Preview shows parsed data correctly
+- [x] Validation errors display per row
+- [x] Duplicate rows are highlighted
+- [x] Import only includes selected rows
+- [x] Progress indicator works
+- [x] Backend validator accepts .csv files with various MIME types
+- [x] Backend validator rejects non-CSV files
 
 **Definition of Done:**
 
-- [ ] Can preview CSV before import
-- [ ] Can selectively import rows
-- [ ] Errors clearly displayed
-- [ ] Success shows import statistics
+- [x] Can preview expense CSV before import
+- [x] Can selectively import rows
+- [x] Errors clearly displayed (provider/client not found)
+- [x] Success shows import statistics
+- [ ] Income import UI (currently API-only)
 
 ---
 

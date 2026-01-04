@@ -7,12 +7,12 @@ import {
   BadRequestException,
   ParseFilePipe,
   MaxFileSizeValidator,
-  FileTypeValidator,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { CsvImportService } from './csv-import.service';
 import { IncomeCsvImportService } from './income-csv-import.service';
+import { CsvFileValidator } from './validators';
 import {
   CsvImportRequestDto,
   CsvImportResponseDto,
@@ -118,7 +118,7 @@ Expenses with same date, amount, and provider are considered duplicates.
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // 5MB
-          new FileTypeValidator({ fileType: 'text/csv' }),
+          new CsvFileValidator({}),
         ],
         fileIsRequired: true,
       }),
@@ -209,7 +209,7 @@ Expenses with same date, amount, and provider are considered duplicates.
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }),
-          new FileTypeValidator({ fileType: 'text/csv' }),
+          new CsvFileValidator({}),
         ],
         fileIsRequired: true,
       }),
@@ -351,7 +351,7 @@ Incomes with same invoice number OR same date+amount+client are considered dupli
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // 5MB
-          new FileTypeValidator({ fileType: 'text/csv' }),
+          new CsvFileValidator({}),
         ],
         fileIsRequired: true,
       }),
@@ -433,7 +433,7 @@ Incomes with same invoice number OR same date+amount+client are considered dupli
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }),
-          new FileTypeValidator({ fileType: 'text/csv' }),
+          new CsvFileValidator({}),
         ],
         fileIsRequired: true,
       }),
