@@ -29,16 +29,16 @@
 
 ### Frontend (React SPA)
 
-| Task                | Description                                   | Priority  | Status |
-| ------------------- | --------------------------------------------- | --------- | ------ |
-| Project scaffold    | Vite + React 19 + TypeScript + Tailwind CSS 4 | 🔴 High   | ✅     |
-| Infrastructure      | API client, TanStack Query, routing, toasts   | 🔴 High   | ✅     |
-| Layout & navigation | Responsive shell with sidebar, header, mobile | 🔴 High   | ✅     |
-| Dashboard           | BAS summary, recent expenses, quick actions   | 🔴 High   | ✅     |
-| Expenses module     | Full CRUD with filters, sorting, modal forms  | 🔴 High   | ✅     |
-| Incomes module      | Full CRUD with paid toggle, filters, sorting  | 🔴 High   | ✅     |
-| CSV Import          | Bulk import expenses/incomes with preview     | 🟡 Medium | ⬜     |
-| Settings pages      | Manage providers, categories (clients pending) | 🟡 Medium | 🟡     |
+| Task                | Description                                               | Priority  | Status |
+| ------------------- | --------------------------------------------------------- | --------- | ------ |
+| Project scaffold    | Vite + React 19 + TypeScript + Tailwind CSS 4             | 🔴 High   | ✅     |
+| Infrastructure      | API client, TanStack Query, routing, toasts               | 🔴 High   | ✅     |
+| Layout & navigation | Responsive shell with sidebar, header, mobile             | 🔴 High   | ✅     |
+| Dashboard           | BAS summary, recent expenses, quick actions               | 🔴 High   | ✅     |
+| Expenses module     | Full CRUD with filters, sorting, modal forms              | 🔴 High   | ✅     |
+| Incomes module      | Full CRUD with paid toggle, filters, sorting              | 🔴 High   | ✅     |
+| CSV Import          | Bulk import expenses with preview (incomes backend-ready) | 🟡 Medium | ✅     |
+| Settings pages      | Manage providers, categories (clients pending)            | 🟡 Medium | 🟡     |
 
 ### Infrastructure
 
@@ -63,6 +63,7 @@
 - ✅ Can query BAS summary for any quarter
 - ✅ Frontend SPA with full CRUD for expenses and incomes
 - ✅ Dashboard showing current BAS period and recent activity
+- ✅ CSV import for expenses with preview, validation, and duplicate detection
 
 ---
 

@@ -8,6 +8,7 @@ A modular financial engine for Australian freelancers. Automates Simpler BAS, GS
 - **Privacy First:** Local-only data processing with database-level encryption.
 - **Dev-Centric:** Metadata-driven provider system (Google, ChatGPT, VentraIP).
 - **Frontend SPA:** React 19 + Vite 7 + Tailwind CSS 4 with shadcn-style components, using a fetch-based API client and TanStack Query for data fetching.
+- **CSV Import:** Bulk import expenses/incomes with preview, validation, and duplicate detection.
 
 ---
 
@@ -63,17 +64,17 @@ pnpm --filter web build
 
 ### Available Scripts
 
-|| Command                    | Description                                      |
+|| Command | Description |
 || -------------------------- | ------------------------------------------------ |
-|| `pnpm run start:dev`       | Start API in development mode (watch)           |
-|| `pnpm run build`           | Build API for production                         |
-|| `pnpm run start:prod`      | Start production API build                       |
-|| `pnpm run test`            | Run backend unit tests                           |
-|| `pnpm run test:cov`        | Run backend tests with coverage report           |
-|| `pnpm run test:e2e`        | Run backend end-to-end tests                     |
-|| `pnpm run lint`            | Run backend ESLint                               |
-|| `pnpm run format`          | Run Prettier on backend source                   |
-|| `pnpm run generate:types`  | Generate shared API types to `shared/types/api.d.ts` |
+|| `pnpm run start:dev` | Start API in development mode (watch) |
+|| `pnpm run build` | Build API for production |
+|| `pnpm run start:prod` | Start production API build |
+|| `pnpm run test` | Run backend unit tests |
+|| `pnpm run test:cov` | Run backend tests with coverage report |
+|| `pnpm run test:e2e` | Run backend end-to-end tests |
+|| `pnpm run lint` | Run backend ESLint |
+|| `pnpm run format` | Run Prettier on backend source |
+|| `pnpm run generate:types` | Generate shared API types to `shared/types/api.d.ts` |
 
 ### Docker Deployment (Full Stack)
 

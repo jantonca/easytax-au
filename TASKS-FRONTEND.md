@@ -148,6 +148,7 @@ easytax-au/
 | F1.2.3 | Create React Router shell (BrowserRouter + AppShell)  | ✅     |
 | F1.2.4 | Create error boundary component (app-level)           | ✅     |
 | F1.2.5 | Create toast notification system (custom, Tailwind)   | ✅     |
+| F1.2.6 | CSV Import - Expense upload with preview & validation | ✅     |
 | F1.2.6 | Vitest + RTL setup and infra tests                    | ✅     |
 
 **Files created / updated:**
@@ -568,13 +569,18 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 
 - **Expense import:** ✅ Fully working in UI
 - **Income import:** 🟡 Backend API ready, frontend UI not yet implemented
-- Fixed 404/400 errors by:
-  1. Removing hardcoded `/api` prefix from frontend hooks (backend has no global prefix)
-  2. Creating custom `CsvFileValidator` to replace unreliable MIME type validation
-  3. Validator checks `.csv` extension and accepts multiple MIME types (text/csv, application/octet-stream, etc.)
+- Fixed multiple critical issues during implementation:
+  1. **404 errors:** Removed hardcoded `/api` prefix from 3 frontend hooks (backend has no global prefix)
+  2. **400 file validation errors:** Created custom `CsvFileValidator` checking `.csv` extension instead of unreliable MIME types
+  3. **Data not saving issue:** NestJS `@Transform` decorators don't work for multipart/form-data. **Solution:** Separate endpoints with hardcoded `dryRun` values:
+     - `/import/expenses/preview` → `dryRun: true` (preview only, no database save)
+     - `/import/expenses` → `dryRun: false` (actual import with database save)
+  4. **NaN database error:** Fixed CSV test data with comma in amount (`$1,250.00` → `$1250.00`)
+  5. **Preview saving to database:** Fixed frontend hook to call correct `/import/expenses/preview` endpoint
+- **Critical lesson:** NestJS boolean parameter conversion fails for multipart uploads. Always use separate endpoints or explicit controller-level normalization (see `AGENTS.md` section "Multipart/Form-Data and Boolean Parameters")
 - Backend endpoints: `/import/expenses`, `/import/expenses/preview`, `/import/incomes`, `/import/incomes/preview`
 - Frontend hooks: `use-csv-preview.ts`, `use-csv-import.ts`, `use-import-jobs.ts`
-- All hooks now use `VITE_API_URL` environment variable instead of hardcoded URLs
+- All hooks use `VITE_API_URL` environment variable (never hardcoded URLs)
 
 **API Endpoints Used:**
 

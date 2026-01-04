@@ -104,16 +104,35 @@ constructor(
 
 **Known Issue**: NestJS `@Transform` decorators don't work reliably with multipart/form-data. When sending booleans via FormData (e.g., file uploads with metadata), they're sent as strings but may not convert properly.
 
-**Solution**: Explicitly handle boolean conversion in the controller before passing to services:
+**Solution 1 (Recommended)**: Use separate endpoints for different boolean values:
 
 ```typescript
-// ✅ CORRECT - Manual conversion for multipart endpoints
+// ✅ BEST - Separate endpoints make intent explicit
+@Post('import/expenses/preview')
+@UseInterceptors(FileInterceptor('file'))
+async previewImport(@UploadedFile() file: Express.Multer.File, @Body() dto: CsvImportDto) {
+  const options = this.buildOptions({ ...dto, dryRun: true });  // Hardcoded
+  return this.service.importFromBuffer(file.buffer, options);
+}
+
+@Post('import/expenses')
+@UseInterceptors(FileInterceptor('file'))
+async actualImport(@UploadedFile() file: Express.Multer.File, @Body() dto: CsvImportDto) {
+  const options = this.buildOptions({ ...dto, dryRun: false });  // Hardcoded
+  return this.service.importFromBuffer(file.buffer, options);
+}
+```
+
+**Solution 2 (Alternative)**: Explicitly handle boolean conversion in controller:
+
+```typescript
+// ✅ ACCEPTABLE - Manual conversion for multipart endpoints
 @Post()
 @UseInterceptors(FileInterceptor('file'))
 async uploadFile(@UploadedFile() file: Express.Multer.File, @Body() dto: MyDto) {
   const normalizedDto = {
     ...dto,
-    dryRun: false,  // Or explicit: dto.dryRun === 'true' || dto.dryRun === true
+    dryRun: dto.dryRun === 'true' || dto.dryRun === true,
   };
   return this.service.process(file, normalizedDto);
 }
@@ -124,9 +143,11 @@ async uploadFile(@UploadedFile() file: Express.Multer.File, @Body() dto: MyDto) 
 // This may not work as expected:
 export class MyDto {
   @Transform(({ value }) => value === 'true')
-  dryRun?: boolean;  // May receive 'false' string and convert to true!
+  dryRun?: boolean; // May receive 'false' string and convert to true!
 }
 ```
+
+**Real-World Example**: CSV Import module uses separate endpoints (`/import/expenses/preview` and `/import/expenses`) to avoid boolean conversion issues entirely. See `src/modules/csv-import/csv-import.controller.ts` lines 43 and 201.
 
 ---
 

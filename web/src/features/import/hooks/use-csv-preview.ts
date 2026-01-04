@@ -22,7 +22,7 @@ async function previewCsvImport(params: PreviewCsvImportParams): Promise<CsvImpo
   formData.append('dryRun', 'true'); // Preview mode
 
   const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-  const response = await fetch(`${baseUrl}/import/expenses`, {
+  const response = await fetch(`${baseUrl}/import/expenses/preview`, {
     method: 'POST',
     body: formData,
   });
