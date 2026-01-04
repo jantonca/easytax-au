@@ -543,16 +543,16 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 
 | #       | Task                                          | Status |
 | ------- | --------------------------------------------- | ------ |
-| F2.4.1  | Create import page with file dropzone         | ⬜     |
-| F2.4.2  | Add file type detection (expenses vs incomes) | ⬜     |
-| F2.4.3  | Create preview table showing parsed rows      | ⬜     |
-| F2.4.4  | Show validation errors per row                | ⬜     |
-| F2.4.5  | Show duplicate warnings                       | ⬜     |
-| F2.4.6  | Allow row-level include/exclude toggle        | ⬜     |
-| F2.4.7  | Show provider/client match confidence         | ⬜     |
-| F2.4.8  | Add "Import Selected" confirmation            | ⬜     |
-| F2.4.9  | Show import progress and results              | ⬜     |
-| F2.4.10 | Link to ImportJob for rollback option         | ⬜     |
+| F2.4.1  | Create import page with file dropzone         | ✅     |
+| F2.4.2  | Add file type detection (expenses vs incomes) | ✅     |
+| F2.4.3  | Create preview table showing parsed rows      | ✅     |
+| F2.4.4  | Show validation errors per row                | ✅     |
+| F2.4.5  | Show duplicate warnings                       | ✅     |
+| F2.4.6  | Allow row-level include/exclude toggle        | ✅     |
+| F2.4.7  | Show provider/client match confidence         | ✅     |
+| F2.4.8  | Add "Import Selected" confirmation            | ✅     |
+| F2.4.9  | Show import progress and results              | ✅     |
+| F2.4.10 | Link to ImportJob for rollback option         | ✅     |
 
 **Files to Create:**
 
@@ -889,12 +889,12 @@ location / {
 ||| Phase | Tasks | Done | Progress |
 ||| -------------------- | ------------ | ------- | -------- | ------- |
 ||| | F1. Scaffold | 22 | 22 | 100% |
-||| F2. Core Features | 44 | 27 | 61% |
+||| F2. Core Features | 44 | 37 | 84% |
 ||| F3. Reports & Polish | 26 | 0 | 0% |
 ||| F4. Production | 9 | 0 | 0% |
-||| | **Total** | **101** | **49** | **49%** |
+||| | **Total** | **101** | **59** | **58%** |
 
-> Note: Frontend F2 progress currently counts completed tasks from F2.1 (Dashboard - 5 tasks), F2.2 (Expenses - 7 tasks including GST auto-calc and slider), F2.3 (Incomes - 10 tasks), F2.5 (Providers & Categories - 6 tasks), and F2.6 (Clients - 3 tasks). Remaining F2.x tasks include CSV import (F2.4 - 10 tasks) and optional enhancements like pagination, searchable dropdowns, and inline editing.
+> Note: Frontend F2 progress currently counts completed tasks from F2.1 (Dashboard - 5 tasks), F2.2 (Expenses - 7 tasks including GST auto-calc and slider), F2.3 (Incomes - 10 tasks), F2.4 (CSV Import - 10 tasks), F2.5 (Providers & Categories - 6 tasks), and F2.6 (Clients - 3 tasks). Remaining F2.x tasks include optional enhancements like pagination, searchable dropdowns, and inline editing.
 
 ---
 
