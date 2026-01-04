@@ -21,7 +21,7 @@ async function previewCsvImport(params: PreviewCsvImportParams): Promise<CsvImpo
   formData.append('skipDuplicates', skipDuplicates.toString());
   formData.append('dryRun', 'true'); // Preview mode
 
-  const response = await fetch('http://localhost:3000/api/import/expenses/preview', {
+  const response = await fetch('http://localhost:3000/api/import/expenses', {
     method: 'POST',
     body: formData,
   });
