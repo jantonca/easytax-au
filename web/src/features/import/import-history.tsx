@@ -1,0 +1,124 @@
+import type { ReactElement } from 'react';
+import { Loader2, AlertCircle, FileX } from 'lucide-react';
+import { useImportJobs } from './hooks/use-import-jobs';
+
+function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat('en-AU', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date);
+}
+
+function formatCurrency(cents: number): string {
+  return new Intl.NumberFormat('en-AU', {
+    style: 'currency',
+    currency: 'AUD',
+  }).format(cents / 100);
+}
+
+function formatSource(source: string): string {
+  const sourceMap: Record<string, string> = {
+    commbank: 'CommBank',
+    amex: 'Amex',
+    manual: 'Manual',
+    nab: 'NAB',
+    westpac: 'Westpac',
+    anz: 'ANZ',
+    custom: 'Custom',
+  };
+  return sourceMap[source] || source;
+}
+
+export function ImportHistory(): ReactElement {
+  const { data: jobs, isLoading, isError, error } = useImportJobs();
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-emerald-500" />
+          <p className="text-slate-400">Loading import history...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (isError) {
+    return (
+      <div className="rounded-lg border border-red-800 bg-red-950/40 p-8">
+        <div className="flex items-center gap-3">
+          <AlertCircle className="h-8 w-8 text-red-400" />
+          <div>
+            <h2 className="text-xl font-semibold text-red-400">Error Loading Import History</h2>
+            <p className="mt-1 text-slate-300">{error?.message || 'An error occurred'}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Empty state
+  if (!jobs || jobs.length === 0) {
+    return (
+      <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-12 text-center">
+        <FileX className="mx-auto mb-4 h-16 w-16 text-slate-600" />
+        <h2 className="mb-2 text-xl font-semibold text-slate-300">No Import History</h2>
+        <p className="text-slate-400">
+          You haven't imported any CSV files yet. Start importing to see your history here.
+        </p>
+      </div>
+    );
+  }
+
+  // Sort jobs by date descending (newest first)
+  const sortedJobs = [...jobs].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+
+  return (
+    <div className="overflow-hidden rounded-lg border border-slate-800 bg-slate-900/40">
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="border-b border-slate-800 bg-slate-900/60">
+            <tr>
+              <th className="px-4 py-3 text-left font-medium text-slate-300">Date</th>
+              <th className="px-4 py-3 text-left font-medium text-slate-300">Source</th>
+              <th className="px-4 py-3 text-right font-medium text-slate-300">Total</th>
+              <th className="px-4 py-3 text-right font-medium text-slate-300">Success</th>
+              <th className="px-4 py-3 text-right font-medium text-slate-300">Failed</th>
+              <th className="px-4 py-3 text-right font-medium text-slate-300">Amount</th>
+              <th className="px-4 py-3 text-right font-medium text-slate-300">GST</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-800">
+            {sortedJobs.map((job) => (
+              <tr key={job.id} className="hover:bg-slate-800/50">
+                <td className="px-4 py-3 text-slate-300">{formatDate(job.createdAt)}</td>
+                <td className="px-4 py-3 text-slate-300">{formatSource(job.source)}</td>
+                <td className="px-4 py-3 text-right text-slate-300">{job.totalRows}</td>
+                <td className="px-4 py-3 text-right text-emerald-400">{job.successCount}</td>
+                <td
+                  className={`px-4 py-3 text-right ${job.failedCount > 0 ? 'text-red-400' : 'text-slate-500'}`}
+                >
+                  {job.failedCount}
+                </td>
+                <td className="px-4 py-3 text-right tabular-nums text-slate-300">
+                  {formatCurrency(job.totalAmountCents)}
+                </td>
+                <td className="px-4 py-3 text-right tabular-nums text-slate-300">
+                  {formatCurrency(job.totalGstCents)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
