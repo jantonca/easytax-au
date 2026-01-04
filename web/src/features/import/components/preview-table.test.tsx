@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { PreviewTable } from './preview-table';
 import type { components } from '@shared/types';
 
@@ -233,5 +234,205 @@ describe('PreviewTable', () => {
 
     // Duplicate row - amber background
     expect(tableRows[2]).toHaveClass('bg-amber-950/30');
+  });
+
+  // Row Selection Tests
+  describe('Row Selection', () => {
+    it('renders checkboxes for each row when selection enabled', () => {
+      const rows: CsvRowResultDto[] = [
+        { rowNumber: 1, success: true, amountCents: 1000 },
+        { rowNumber: 2, success: true, amountCents: 2000 },
+      ];
+
+      render(<PreviewTable rows={rows} selectable onSelectionChange={vi.fn()} />);
+
+      const checkboxes = screen.getAllByRole('checkbox');
+      // Should have 2 row checkboxes + 1 "select all" checkbox
+      expect(checkboxes).toHaveLength(3);
+    });
+
+    it('allows selecting and deselecting individual rows', async () => {
+      const user = userEvent.setup();
+      let currentSelection = new Set<number>();
+
+      const rows: CsvRowResultDto[] = [
+        { rowNumber: 1, success: true, amountCents: 1000 },
+        { rowNumber: 2, success: true, amountCents: 2000 },
+      ];
+
+      const { rerender } = render(
+        <PreviewTable
+          rows={rows}
+          selectable
+          selectedRows={currentSelection}
+          onSelectionChange={(selected) => {
+            currentSelection = selected;
+          }}
+        />,
+      );
+
+      let checkboxes = screen.getAllByRole('checkbox', { name: /select row/i });
+
+      // Select first row
+      await user.click(checkboxes[0]);
+      rerender(
+        <PreviewTable
+          rows={rows}
+          selectable
+          selectedRows={currentSelection}
+          onSelectionChange={(selected) => {
+            currentSelection = selected;
+          }}
+        />,
+      );
+      expect(currentSelection).toEqual(new Set([1]));
+
+      checkboxes = screen.getAllByRole('checkbox', { name: /select row/i });
+
+      // Select second row
+      await user.click(checkboxes[1]);
+      rerender(
+        <PreviewTable
+          rows={rows}
+          selectable
+          selectedRows={currentSelection}
+          onSelectionChange={(selected) => {
+            currentSelection = selected;
+          }}
+        />,
+      );
+      expect(currentSelection).toEqual(new Set([1, 2]));
+
+      checkboxes = screen.getAllByRole('checkbox', { name: /select row/i });
+
+      // Deselect first row
+      await user.click(checkboxes[0]);
+      rerender(
+        <PreviewTable
+          rows={rows}
+          selectable
+          selectedRows={currentSelection}
+          onSelectionChange={(selected) => {
+            currentSelection = selected;
+          }}
+        />,
+      );
+      expect(currentSelection).toEqual(new Set([2]));
+    });
+
+    it('implements "Select All" functionality', async () => {
+      const onSelectionChange = vi.fn();
+      const user = userEvent.setup();
+
+      const rows: CsvRowResultDto[] = [
+        { rowNumber: 1, success: true, amountCents: 1000 },
+        { rowNumber: 2, success: true, amountCents: 2000 },
+        { rowNumber: 3, success: true, amountCents: 3000 },
+      ];
+
+      render(<PreviewTable rows={rows} selectable onSelectionChange={onSelectionChange} />);
+
+      const selectAllCheckbox = screen.getByRole('checkbox', { name: /select all/i });
+
+      await user.click(selectAllCheckbox);
+      expect(onSelectionChange).toHaveBeenCalledWith(new Set([1, 2, 3]));
+    });
+
+    it('implements "Deselect All" functionality', async () => {
+      const onSelectionChange = vi.fn();
+      const user = userEvent.setup();
+
+      const rows: CsvRowResultDto[] = [
+        { rowNumber: 1, success: true, amountCents: 1000 },
+        { rowNumber: 2, success: true, amountCents: 2000 },
+      ];
+
+      render(
+        <PreviewTable
+          rows={rows}
+          selectable
+          selectedRows={new Set([1, 2])}
+          onSelectionChange={onSelectionChange}
+        />,
+      );
+
+      const selectAllCheckbox = screen.getByRole('checkbox', { name: /select all/i });
+
+      await user.click(selectAllCheckbox);
+      expect(onSelectionChange).toHaveBeenCalledWith(new Set([]));
+    });
+
+    it('pre-selects valid rows and excludes error rows', () => {
+      const rows: CsvRowResultDto[] = [
+        { rowNumber: 1, success: true, amountCents: 1000 },
+        { rowNumber: 2, success: false, error: 'Invalid' },
+        { rowNumber: 3, success: true, amountCents: 3000 },
+      ];
+
+      render(
+        <PreviewTable
+          rows={rows}
+          selectable
+          selectedRows={new Set([1, 3])} // Error row 2 not selected
+          onSelectionChange={vi.fn()}
+        />,
+      );
+
+      const checkboxes = screen.getAllByRole('checkbox', { name: /select row/i });
+
+      expect(checkboxes[0]).toBeChecked(); // Row 1
+      expect(checkboxes[1]).not.toBeChecked(); // Row 2 (error)
+      expect(checkboxes[2]).toBeChecked(); // Row 3
+    });
+
+    it('displays selection count', () => {
+      const rows: CsvRowResultDto[] = [
+        { rowNumber: 1, success: true, amountCents: 1000 },
+        { rowNumber: 2, success: true, amountCents: 2000 },
+        { rowNumber: 3, success: true, amountCents: 3000 },
+      ];
+
+      render(
+        <PreviewTable
+          rows={rows}
+          selectable
+          selectedRows={new Set([1, 3])}
+          onSelectionChange={vi.fn()}
+        />,
+      );
+
+      expect(screen.getByText(/2 of 3 rows selected/i)).toBeInTheDocument();
+    });
+
+    it('disables checkboxes for error rows', () => {
+      const rows: CsvRowResultDto[] = [
+        { rowNumber: 1, success: true, amountCents: 1000 },
+        { rowNumber: 2, success: false, error: 'Invalid' },
+      ];
+
+      render(<PreviewTable rows={rows} selectable onSelectionChange={vi.fn()} />);
+
+      const checkboxes = screen.getAllByRole('checkbox', { name: /select row/i });
+
+      expect(checkboxes[0]).not.toBeDisabled(); // Valid row
+      expect(checkboxes[1]).toBeDisabled(); // Error row
+    });
+
+    it('allows selecting duplicate rows with warning', async () => {
+      const onSelectionChange = vi.fn();
+      const user = userEvent.setup();
+
+      const rows: CsvRowResultDto[] = [
+        { rowNumber: 1, success: true, isDuplicate: true, amountCents: 1000 },
+      ];
+
+      render(<PreviewTable rows={rows} selectable onSelectionChange={onSelectionChange} />);
+
+      const checkbox = screen.getByRole('checkbox', { name: /select row 1/i });
+
+      expect(checkbox).not.toBeDisabled(); // Duplicates are selectable
+      await user.click(checkbox);
+      expect(onSelectionChange).toHaveBeenCalledWith(new Set([1]));
+    });
   });
 });

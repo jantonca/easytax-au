@@ -6,6 +6,9 @@ type CsvRowResultDto = components['schemas']['CsvRowResultDto'];
 
 interface PreviewTableProps {
   rows: CsvRowResultDto[];
+  selectable?: boolean;
+  selectedRows?: Set<number>;
+  onSelectionChange?: (selected: Set<number>) => void;
 }
 
 function formatCurrency(cents?: number): string {
@@ -45,7 +48,12 @@ function getConfidenceBadge(score?: number): ReactElement | null {
   );
 }
 
-export function PreviewTable({ rows }: PreviewTableProps): ReactElement {
+export function PreviewTable({
+  rows,
+  selectable = false,
+  selectedRows = new Set(),
+  onSelectionChange,
+}: PreviewTableProps): ReactElement {
   if (rows.length === 0) {
     return (
       <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-12 text-center">
@@ -54,12 +62,60 @@ export function PreviewTable({ rows }: PreviewTableProps): ReactElement {
     );
   }
 
+  const selectableRows = rows.filter((row) => row.success);
+  const allSelectableSelected =
+    selectableRows.length > 0 && selectableRows.every((row) => selectedRows.has(row.rowNumber));
+
+  const handleToggleAll = (): void => {
+    if (!onSelectionChange) return;
+
+    if (allSelectableSelected) {
+      // Deselect all
+      onSelectionChange(new Set());
+    } else {
+      // Select all selectable rows
+      onSelectionChange(new Set(selectableRows.map((row) => row.rowNumber)));
+    }
+  };
+
+  const handleToggleRow = (rowNumber: number): void => {
+    if (!onSelectionChange) return;
+
+    const newSelected = new Set(selectedRows);
+    if (newSelected.has(rowNumber)) {
+      newSelected.delete(rowNumber);
+    } else {
+      newSelected.add(rowNumber);
+    }
+    onSelectionChange(newSelected);
+  };
+
   return (
     <div className="overflow-hidden rounded-lg border border-slate-800 bg-slate-900/40">
+      {/* Selection Count */}
+      {selectable && (
+        <div className="border-b border-slate-800 bg-slate-900/60 px-4 py-2">
+          <p className="text-sm text-slate-400">
+            {selectedRows.size} of {rows.length} rows selected
+          </p>
+        </div>
+      )}
+
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="border-b border-slate-800 bg-slate-900/60">
             <tr>
+              {selectable && (
+                <th className="px-4 py-3 text-left font-medium text-slate-300">
+                  <input
+                    type="checkbox"
+                    checked={allSelectableSelected}
+                    onChange={handleToggleAll}
+                    className="h-4 w-4 rounded border-slate-700 bg-slate-800 text-emerald-600 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+                    aria-label="Select all rows"
+                  />
+                </th>
+              )}
               <th className="px-4 py-3 text-left font-medium text-slate-300">Row</th>
               <th className="px-4 py-3 text-left font-medium text-slate-300">Status</th>
               <th className="px-4 py-3 text-left font-medium text-slate-300">Provider</th>
@@ -76,8 +132,25 @@ export function PreviewTable({ rows }: PreviewTableProps): ReactElement {
                   ? 'bg-amber-950/30'
                   : '';
 
+              const isRowSelected = selectedRows.has(row.rowNumber);
+              const isRowDisabled = !row.success;
+
               return (
                 <tr key={row.rowNumber} className={rowBgClass}>
+                  {/* Checkbox */}
+                  {selectable && (
+                    <td className="px-4 py-3">
+                      <input
+                        type="checkbox"
+                        checked={isRowSelected}
+                        disabled={isRowDisabled}
+                        onChange={() => handleToggleRow(row.rowNumber)}
+                        className="h-4 w-4 rounded border-slate-700 bg-slate-800 text-emerald-600 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
+                        aria-label={`Select row ${row.rowNumber}`}
+                      />
+                    </td>
+                  )}
+
                   {/* Row Number */}
                   <td className="px-4 py-3 text-slate-400">{row.rowNumber}</td>
 
