@@ -1,0 +1,236 @@
+import { useState } from 'react';
+import { Plus } from 'lucide-react';
+import { useRecurringExpenses } from './hooks/use-recurring';
+import { useDeleteRecurring } from './hooks/use-recurring-mutations';
+import { RecurringTable } from './components/recurring-table';
+import { RecurringForm } from './components/recurring-form';
+import { GenerateButton } from './components/generate-button';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
+import { useToast } from '@/lib/toast-context';
+import type { RecurringExpenseResponseDto } from '@/lib/api-client';
+import { formatCents } from '@/lib/currency';
+
+export function RecurringPage() {
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingRecurring, setEditingRecurring] = useState<RecurringExpenseResponseDto | null>(
+    null,
+  );
+  const [deletingRecurring, setDeletingRecurring] = useState<RecurringExpenseResponseDto | null>(
+    null,
+  );
+
+  const { data: recurringExpenses = [], isLoading, error } = useRecurringExpenses();
+  const { mutate: deleteRecurring, isPending: isDeleting } = useDeleteRecurring();
+  const { showToast } = useToast();
+
+  const handleCreateSuccess = (): void => {
+    setShowCreateModal(false);
+    showToast({
+      title: 'Success',
+      description: 'Recurring expense created successfully',
+      variant: 'success',
+    });
+  };
+
+  const handleEditSuccess = (): void => {
+    setEditingRecurring(null);
+    showToast({
+      title: 'Success',
+      description: 'Recurring expense updated successfully',
+      variant: 'success',
+    });
+  };
+
+  const handleDelete = (): void => {
+    if (!deletingRecurring) return;
+
+    deleteRecurring(deletingRecurring.id, {
+      onSuccess: () => {
+        setDeletingRecurring(null);
+        showToast({
+          title: 'Success',
+          description: 'Recurring expense deleted successfully',
+          variant: 'success',
+        });
+      },
+      onError: () => {
+        showToast({
+          title: 'Error',
+          description: 'Failed to delete recurring expense',
+          variant: 'error',
+        });
+      },
+    });
+  };
+
+  const handleGenerateSuccess = (): void => {
+    showToast({
+      title: 'Success',
+      description: 'Expenses generated successfully',
+      variant: 'success',
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <section className="mx-auto flex max-w-5xl flex-col gap-3">
+        <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-400">
+          Loading recurring expenses…
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="mx-auto flex max-w-5xl flex-col gap-3">
+        <div className="rounded-lg border border-red-900/60 bg-red-950/60 p-4 text-sm text-red-200">
+          Error loading recurring expenses: {String(error)}
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="mx-auto flex max-w-5xl flex-col gap-3">
+      {/* Header */}
+      <header className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-50">
+            Recurring Expenses
+          </h1>
+          <p className="text-sm text-slate-400">
+            Automate repetitive expense entries with recurring templates
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <GenerateButton onSuccess={handleGenerateSuccess} />
+          <button
+            type="button"
+            onClick={() => setShowCreateModal(true)}
+            className="inline-flex h-8 items-center gap-2 rounded-md bg-emerald-600 px-3 text-xs font-medium text-white hover:bg-emerald-500"
+          >
+            <Plus className="h-4 w-4" />
+            Add Recurring Expense
+          </button>
+        </div>
+      </header>
+
+      {/* Table */}
+      {recurringExpenses.length === 0 ? (
+        <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-8 text-center">
+          <p className="mb-4 text-sm text-slate-400">No recurring expenses yet.</p>
+          <button
+            type="button"
+            onClick={() => setShowCreateModal(true)}
+            className="inline-flex h-8 items-center gap-2 rounded-md bg-emerald-600 px-3 text-xs font-medium text-white hover:bg-emerald-500"
+          >
+            <Plus className="h-4 w-4" />
+            Create Your First Recurring Expense
+          </button>
+        </div>
+      ) : (
+        <RecurringTable
+          recurringExpenses={recurringExpenses}
+          onEdit={setEditingRecurring}
+          onDelete={setDeletingRecurring}
+        />
+      )}
+
+      {/* Create Modal */}
+      {showCreateModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Create recurring expense"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+        >
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-lg border border-slate-800 bg-slate-950 p-4 shadow-xl">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-sm font-semibold tracking-tight text-slate-50">
+                Create Recurring Expense
+              </h2>
+              <button
+                type="button"
+                onClick={() => setShowCreateModal(false)}
+                className="text-xs text-slate-400 hover:text-slate-200"
+              >
+                Close
+              </button>
+            </div>
+            <RecurringForm
+              onSuccess={handleCreateSuccess}
+              onCancel={() => setShowCreateModal(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {editingRecurring && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Edit recurring expense"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+        >
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-lg border border-slate-800 bg-slate-950 p-4 shadow-xl">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-sm font-semibold tracking-tight text-slate-50">
+                Edit Recurring Expense
+              </h2>
+              <button
+                type="button"
+                onClick={() => setEditingRecurring(null)}
+                className="text-xs text-slate-400 hover:text-slate-200"
+              >
+                Close
+              </button>
+            </div>
+            <RecurringForm
+              onSuccess={handleEditSuccess}
+              onCancel={() => setEditingRecurring(null)}
+              initialValues={editingRecurring}
+              recurringId={editingRecurring.id}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation */}
+      {deletingRecurring && (
+        <ConfirmationDialog
+          open={true}
+          onOpenChange={(open) => {
+            if (!open) setDeletingRecurring(null);
+          }}
+          title="Delete Recurring Expense?"
+          description={
+            <>
+              <p className="mb-2">Are you sure you want to delete this recurring expense?</p>
+              <div className="rounded bg-slate-800 p-3 text-sm">
+                <p className="font-medium text-slate-50">{deletingRecurring.name}</p>
+                <p className="text-slate-300">
+                  Amount: ${formatCents(deletingRecurring.amountCents)}
+                </p>
+                <p className="text-slate-300">
+                  Schedule:{' '}
+                  {deletingRecurring.schedule.charAt(0).toUpperCase() +
+                    deletingRecurring.schedule.slice(1)}
+                </p>
+              </div>
+              <p className="mt-3 text-amber-400">
+                Note: This will only delete the template. Previously generated expenses will remain.
+              </p>
+            </>
+          }
+          confirmLabel="Delete"
+          cancelLabel="Cancel"
+          variant="danger"
+          onConfirm={handleDelete}
+          isLoading={isDeleting}
+        />
+      )}
+    </section>
+  );
+}

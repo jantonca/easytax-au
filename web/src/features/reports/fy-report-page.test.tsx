@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
@@ -112,7 +112,9 @@ describe('FyReportPage', () => {
 
     expect(screen.getByText('FY Reports')).toBeInTheDocument();
     expect(
-      screen.getByText('View financial year summaries for tax return preparation and download PDF reports'),
+      screen.getByText(
+        'View financial year summaries for tax return preparation and download PDF reports',
+      ),
     ).toBeInTheDocument();
   });
 
@@ -163,7 +165,9 @@ describe('FyReportPage', () => {
     render(<FyReportPage />, { wrapper: createWrapper() });
 
     expect(screen.getByText(/No data available for FY2026/)).toBeInTheDocument();
-    expect(screen.getByText(/Add expenses and incomes to generate a financial year report/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Add expenses and incomes to generate a financial year report/),
+    ).toBeInTheDocument();
   });
 
   it('renders FY summary when data is loaded', () => {
@@ -190,9 +194,9 @@ describe('FyReportPage', () => {
     render(<FyReportPage />, { wrapper: createWrapper() });
 
     expect(screen.getByText('Expense Breakdown by Category')).toBeInTheDocument();
-    expect(screen.getAllByText('Software')).length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Hosting')).length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Hardware')).length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Software').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Hosting').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Hardware').length).toBeGreaterThan(0);
   });
 
   it('renders BAS label breakdown section', () => {

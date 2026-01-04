@@ -825,33 +825,60 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 
 | #      | Task                                     | Status |
 | ------ | ---------------------------------------- | ------ |
-| F3.3.1 | Create recurring expenses list page      | ⬜     |
-| F3.3.2 | Create recurring expense form (add/edit) | ⬜     |
-| F3.3.3 | Show next due date prominently           | ⬜     |
-| F3.3.4 | Add "Generate Now" button                | ⬜     |
-| F3.3.5 | Show generated expenses history          | ⬜     |
+| F3.3.1 | Create recurring expenses list page      | ✅     |
+| F3.3.2 | Create recurring expense form (add/edit) | ✅     |
+| F3.3.3 | Show next due date prominently           | ✅     |
+| F3.3.4 | Add "Generate Now" button                | ✅     |
+| F3.3.5 | Show generated expenses history          | ✅     |
 
-**Files to Create:**
+**Implementation Summary:**
+
+- Implemented full CRUD for recurring expense templates with `RecurringPage` as the main orchestrator
+- Created `RecurringForm` component using React Hook Form + Zod validation with support for:
+  - Monthly/quarterly/yearly schedules with day-of-month (1-28) selection
+  - Auto-calculated GST based on provider type (domestic vs international)
+  - Business use percentage slider (0-100%) with real-time claimable GST calculation
+  - Start and optional end dates for template lifecycle management
+  - Active/paused toggle for temporary suspension without deletion
+- Built `RecurringTable` with client-side sorting by name, amount, schedule, next due date, and active status
+- Next due dates displayed with color-coding: red (overdue), amber (due within 7 days), green (future)
+- `GenerateButton` component shows confirmation dialog with list of due templates and total amount before generation
+- Generation results displayed in modal showing count of generated/skipped expenses
+- All API client helpers added: `getRecurringExpenses`, `createRecurringExpense`, `updateRecurringExpense`, `deleteRecurringExpense`, `generateRecurringExpenses`
+- TanStack Query hooks: `useRecurringExpenses`, `useDueRecurringExpenses`, `useCreateRecurring`, `useUpdateRecurring`, `useDeleteRecurring`, `useGenerateRecurring`
+- Integrated into navigation with `/recurring` route and "Recurring" nav item with Repeat icon
+- Delete confirmation warns that generated expenses will remain after template deletion
+- Currency handling uses `parseCurrency().cents` for backend compatibility with integer cents storage
+
+**Files Created:**
 
 - `web/src/features/recurring/recurring-page.tsx`
 - `web/src/features/recurring/components/recurring-form.tsx`
 - `web/src/features/recurring/components/recurring-table.tsx`
+- `web/src/features/recurring/components/generate-button.tsx`
 - `web/src/features/recurring/hooks/use-recurring.ts`
+- `web/src/features/recurring/hooks/use-recurring-mutations.ts`
+- `web/src/features/recurring/schemas/recurring.schema.ts`
 
 **API Endpoints Used:**
 
 - `GET /recurring-expenses`
+- `GET /recurring-expenses/due`
 - `POST /recurring-expenses`
 - `PATCH /recurring-expenses/:id`
 - `DELETE /recurring-expenses/:id`
 - `POST /recurring-expenses/generate`
-- `GET /recurring-expenses/due`
 
 **Definition of Done:**
 
-- [ ] Can manage recurring templates
-- [ ] Generate creates expenses correctly
-- [ ] Due dates clearly visible
+- [x] Can manage recurring templates (create, edit, delete, pause/resume)
+- [x] Generate creates expenses correctly from due templates
+- [x] Due dates clearly visible with color-coded status indicators
+- [x] Next due dates auto-calculated based on schedule (monthly/quarterly/yearly)
+- [x] Forms are keyboard navigable and ARIA-accessible
+- [x] Loading/error/empty states handled throughout
+- [x] Success/error toasts for all mutations
+- [x] Confirmation dialogs prevent accidental deletions
 
 ---
 
@@ -968,15 +995,15 @@ location / {
 
 ## Progress Tracker
 
-||| Phase | Tasks | Done | Progress |
-||| -------------------- | ------------ | ------- | -------- | ------- |
-||| | F1. Scaffold | 22 | 22 | 100% |
-||| F2. Core Features | 44 | 37 | 84% |
-||| F3. Reports & Polish | 26 | 11 | 42% |
-||| F4. Production | 9 | 0 | 0% |
-||| | **Total** | **101** | **70** | **69%** |
+| Phase                | Tasks | Done | Progress |
+| -------------------- | ----- | ---- | -------- |
+| F1. Scaffold         | 22    | 22   | 100%     |
+| F2. Core Features    | 44    | 37   | 84%      |
+| F3. Reports & Polish | 26    | 16   | 62%      |
+| F4. Production       | 9     | 0    | 0%       |
+| **Total**            | **101** | **75** | **74%**  |
 
-> Note: Frontend F2 progress currently counts completed tasks from F2.1 (Dashboard - 5 tasks), F2.2 (Expenses - 7 tasks including GST auto-calc and slider), F2.3 (Incomes - 10 tasks), F2.4 (CSV Import - 10 tasks), F2.5 (Providers & Categories - 6 tasks), and F2.6 (Clients - 3 tasks). F3 progress includes F3.1 (BAS Reports - 5 tasks) and F3.2 (FY Reports - 6 tasks). Remaining F2.x tasks include optional enhancements like pagination, searchable dropdowns, and inline editing.
+> Note: Frontend F2 progress currently counts completed tasks from F2.1 (Dashboard - 5 tasks), F2.2 (Expenses - 7 tasks including GST auto-calc and slider), F2.3 (Incomes - 10 tasks), F2.4 (CSV Import - 10 tasks), F2.5 (Providers & Categories - 6 tasks), and F2.6 (Clients - 3 tasks). F3 progress includes F3.1 (BAS Reports - 5 tasks), F3.2 (FY Reports - 6 tasks), and F3.3 (Recurring Expenses - 5 tasks). Remaining F2.x tasks include optional enhancements like pagination, searchable dropdowns, and inline editing.
 
 ---
 

@@ -39,8 +39,12 @@ describe('YearSelector', () => {
   it('displays correct year labels with periods', () => {
     render(<YearSelector value={2026} onChange={mockOnChange} />);
 
-    expect(screen.getByRole('option', { name: 'FY2026 (Jul 2025 - Jun 2026)' })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'FY2025 (Jul 2024 - Jun 2025)' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('option', { name: 'FY2026 (Jul 2025 - Jun 2026)' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('option', { name: 'FY2025 (Jul 2024 - Jun 2025)' }),
+    ).toBeInTheDocument();
   });
 
   it('shows current period indicator when current FY is selected', () => {
@@ -70,7 +74,7 @@ describe('YearSelector', () => {
   it('displays selected year correctly', () => {
     render(<YearSelector value={2024} onChange={mockOnChange} />);
 
-    const select = screen.getByLabelText('Financial Year') as HTMLSelectElement;
+    const select = screen.getByLabelText('Financial Year');
     expect(select.value).toBe('2024');
   });
 

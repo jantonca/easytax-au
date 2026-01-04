@@ -217,6 +217,18 @@ features/incomes/
 │   └── use-income-mutations.ts # Create/update/delete/toggle paid
 └── schemas/
     └── income.schema.ts        # Zod validation schema
+
+features/recurring/
+├── recurring-page.tsx          # Page component (route entry)
+├── components/
+│   ├── recurring-table.tsx     # Data table with color-coded due dates
+│   ├── recurring-form.tsx      # Add/edit template form
+│   └── generate-button.tsx     # Generation workflow component
+├── hooks/
+│   ├── use-recurring.ts        # TanStack Query hooks (all + due)
+│   └── use-recurring-mutations.ts # Create/update/delete/generate
+└── schemas/
+    └── recurring.schema.ts     # Zod validation schema
 ```
 
 ### Expenses Module (F2.2)
@@ -280,6 +292,46 @@ features/incomes/
   - Has optional invoiceNumber field
   - GST is always 10% (not variable like expenses with international providers)
   - Total always equals subtotal + GST (no complexity around GST-free items)
+
+### Recurring Expenses Module (F3.3)
+
+- **Recurring expenses list:** `useRecurringExpenses` hook (`web/src/features/recurring/hooks/use-recurring.ts`) + `RecurringTable` (`web/src/features/recurring/components/recurring-table.tsx`) provide a sortable recurring expense templates table using `/recurring-expenses`, with loading/error/empty states.
+- **Recurring table:** `RecurringTable` renders a semantic HTML table with columns for name, provider, category, amount, schedule, next due date, last generated date, active status (badge), and actions (edit/delete). Supports client-side sorting by name, amount, schedule, next due date, and active status via clickable column headers with `aria-sort` for accessibility.
+- **Next due date color coding:** Due dates are color-coded for visual priority:
+  - **Red (overdue):** Next due date is in the past, labeled "(overdue)"
+  - **Amber (due soon):** Next due date is within 7 days, labeled "(due soon)"
+  - **Green (future):** Next due date is more than 7 days away
+- **Recurring expense form:** `RecurringForm` (`web/src/features/recurring/components/recurring-form.tsx`) uses React Hook Form + Zod `recurringExpenseSchema` for validation. Key features:
+  - **Schedule configuration:** Monthly/quarterly/yearly frequency with day-of-month (1-28) to avoid month-end date issues
+  - **GST auto-calculation:** Identical to expense form - 1/11 for domestic providers, $0 for international
+  - **Business use slider:** 0-100% slider with real-time claimable GST calculation
+  - **Date lifecycle:** Start date (required) and optional end date for template expiration
+  - **Active/paused toggle:** Checkbox to temporarily suspend a template without deletion
+  - **Supports create and edit modes** via `initialValues` and `recurringId` props
+  - **Currency handling:** Uses `parseCurrency().cents` to extract integer cents from user input for backend compatibility
+- **Generation workflow:** `GenerateButton` (`web/src/features/recurring/components/generate-button.tsx`) orchestrates the expense generation process:
+  - Uses `useDueRecurringExpenses` hook to fetch templates where `nextDueDate <= today`
+  - Shows confirmation dialog with list of due templates and total amount
+  - Calls `POST /recurring-expenses/generate` on confirmation
+  - Displays results modal showing count of generated/skipped expenses
+  - Invalidates both `['recurring-expenses']` and `['expenses']` queries on success
+  - Shows toast notifications for success/error states
+- **Recurring mutations:** `use-recurring-mutations.ts` (`web/src/features/recurring/hooks/use-recurring-mutations.ts`) exposes five mutation hooks:
+  - `useCreateRecurring`: `POST /recurring-expenses` for creating templates (requires `currency: 'AUD'` field)
+  - `useUpdateRecurring`: `PATCH /recurring-expenses/:id` for updating templates
+  - `useDeleteRecurring`: `DELETE /recurring-expenses/:id` for deleting templates
+  - `useGenerateRecurring`: `POST /recurring-expenses/generate` for creating expenses from due templates
+  - All mutations invalidate the `['recurring-expenses']` query on success; generate also invalidates `['expenses']`
+- **Delete confirmation:** Warns user that generated expenses will remain after template deletion, showing template details (name, amount, schedule) in a dark-themed confirmation dialog
+- **Empty state:** Shows empty state message "No recurring expenses yet" with "Create Your First Recurring Expense" button when no templates exist
+- **Navigation integration:** Added to main navigation with `/recurring` route and "Recurring" label using Lucide's `Repeat` icon
+- **Key differences from regular expenses:**
+  - Templates are for future expense generation, not actual expenses
+  - Includes schedule configuration (frequency, day of month)
+  - Has next due date and last generated date tracking
+  - Active/paused status for temporary suspension
+  - Generation creates multiple actual expenses over time from a single template
+  - Backend auto-calculates next due date based on schedule after each generation
 
 ### Settings Module (F2.5, F2.6)
 

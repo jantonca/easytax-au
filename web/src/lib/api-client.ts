@@ -89,6 +89,9 @@ export async function checkApiHealth(): Promise<boolean> {
 export type BasSummaryDto = components['schemas']['BasSummaryDto'];
 export type ExpenseResponseDto = components['schemas']['ExpenseResponseDto'];
 export type RecurringExpenseResponseDto = components['schemas']['RecurringExpenseResponseDto'];
+export type CreateRecurringExpenseDto = components['schemas']['CreateRecurringExpenseDto'];
+export type UpdateRecurringExpenseDto = components['schemas']['UpdateRecurringExpenseDto'];
+export type GenerateExpensesResultDto = components['schemas']['GenerateExpensesResultDto'];
 export type FYSummaryDto = components['schemas']['FYSummaryDto'];
 export type FYIncomeSummaryDto = components['schemas']['FYIncomeSummaryDto'];
 export type FYExpenseSummaryDto = components['schemas']['FYExpenseSummaryDto'];
@@ -227,4 +230,42 @@ export async function downloadFYReportPdf(year: number): Promise<void> {
   a.download = `FY-${year}-Report.pdf`;
   a.click();
   window.URL.revokeObjectURL(downloadUrl);
+}
+
+// Recurring Expenses API helpers
+export async function getRecurringExpenses(): Promise<RecurringExpenseResponseDto[]> {
+  return apiClient.get<RecurringExpenseResponseDto[]>('/recurring-expenses');
+}
+
+export async function createRecurringExpense(
+  dto: CreateRecurringExpenseDto,
+): Promise<RecurringExpenseResponseDto> {
+  return apiClient.post<RecurringExpenseResponseDto>('/recurring-expenses', dto);
+}
+
+export async function updateRecurringExpense(
+  id: string,
+  dto: UpdateRecurringExpenseDto,
+): Promise<RecurringExpenseResponseDto> {
+  return apiClient.patch<RecurringExpenseResponseDto>(`/recurring-expenses/${id}`, dto);
+}
+
+export async function deleteRecurringExpense(id: string): Promise<void> {
+  return apiClient.delete<void>(`/recurring-expenses/${id}`);
+}
+
+export async function generateRecurringExpenses(
+  asOfDate?: string,
+): Promise<GenerateExpensesResultDto> {
+  const searchParams = new URLSearchParams();
+
+  if (asOfDate && asOfDate.length > 0) {
+    searchParams.set('asOfDate', asOfDate);
+  }
+
+  const query = searchParams.toString();
+  const path =
+    query.length > 0 ? `/recurring-expenses/generate?${query}` : '/recurring-expenses/generate';
+
+  return apiClient.post<GenerateExpensesResultDto>(path);
 }

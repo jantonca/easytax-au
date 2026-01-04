@@ -10,6 +10,7 @@ import { FyReportPage } from '@/features/reports/fy-report-page';
 import { ProvidersPage } from '@/features/settings/providers/providers-page';
 import { CategoriesPage } from '@/features/settings/categories/categories-page';
 import { ClientsPage } from '@/features/settings/clients/clients-page';
+import { RecurringPage } from '@/features/recurring/recurring-page';
 
 function App(): ReactElement {
   return (
@@ -18,6 +19,7 @@ function App(): ReactElement {
         <Route index element={<DashboardPage />} />
         <Route path="expenses" element={<ExpensesPage />} />
         <Route path="incomes" element={<IncomesPage />} />
+        <Route path="recurring" element={<RecurringPage />} />
         <Route path="import" element={<ImportPage />} />
         <Route path="reports/bas" element={<BasReportPage />} />
         <Route path="reports/fy" element={<FyReportPage />} />

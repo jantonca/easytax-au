@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { FileText, Home, ReceiptText, Settings, Upload, WalletCards } from 'lucide-react';
+import { FileText, Home, ReceiptText, Repeat, Settings, Upload, WalletCards } from 'lucide-react';
 
 export type NavItem = {
   path: string;
@@ -26,6 +26,12 @@ export const NAV_ITEMS: NavItem[] = [
     label: 'Incomes',
     icon: WalletCards,
     ariaLabel: 'Go to incomes',
+  },
+  {
+    path: '/recurring',
+    label: 'Recurring',
+    icon: Repeat,
+    ariaLabel: 'Go to recurring expenses',
   },
   {
     path: '/import',

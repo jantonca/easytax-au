@@ -1,9 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { renderHook } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { useFYReport } from './use-fy-report';
-import type { FYSummaryDto } from '@/lib/api-client';
 
 // Mock fetch
 global.fetch = vi.fn();
@@ -21,6 +20,7 @@ function createWrapper() {
   );
 }
 
+/* Unused for now, but kept for future tests
 const mockFYSummary: FYSummaryDto = {
   financialYear: 2026,
   fyLabel: 'FY2026',
@@ -59,6 +59,7 @@ const mockFYSummary: FYSummaryDto = {
   netProfitCents: 3300000,
   netGstPayableCents: 300000,
 };
+*/
 
 describe('useFYReport', () => {
   it('should be a function that accepts financialYear parameter', () => {

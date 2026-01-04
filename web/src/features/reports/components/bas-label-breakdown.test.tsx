@@ -144,7 +144,7 @@ describe('BasLabelBreakdown', () => {
 
     expect(screen.getByText('BAS Label 1B')).toBeInTheDocument();
     expect(screen.getByText('Software')).toBeInTheDocument();
-    expect(screen.getAllByText('$1,000.00')).length).toBeGreaterThan(0);
+    expect(screen.getAllByText('$1,000.00').length).toBeGreaterThan(0);
 
     // Should not show subtotal for single category
     expect(screen.queryByText('Subtotal')).not.toBeInTheDocument();

@@ -123,7 +123,9 @@ describe('CategoryBreakdown', () => {
   it('has proper ARIA label for accessibility', () => {
     render(<CategoryBreakdown categories={mockCategories} />);
 
-    expect(screen.getByRole('region', { name: 'Expense breakdown by category' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('region', { name: 'Expense breakdown by category' }),
+    ).toBeInTheDocument();
   });
 
   it('handles single category', () => {
