@@ -215,29 +215,33 @@ describe('RecurringExpensesService', () => {
       );
     });
 
-    it('should use default values when not provided', async () => {
+    it('should create with all required fields provided', async () => {
       providerRepository.findOne.mockResolvedValue(mockDomesticProvider as Provider);
       categoryRepository.count.mockResolvedValue(1);
       recurringExpenseRepository.create.mockReturnValue(mockRecurringExpense as RecurringExpense);
       recurringExpenseRepository.save.mockResolvedValue(mockRecurringExpense as RecurringExpense);
 
-      const minimalDto: CreateRecurringExpenseDto = {
+      const completeDto: CreateRecurringExpenseDto = {
         name: 'Test',
         amountCents: 1000,
+        bizPercent: 100,
+        currency: 'AUD',
+        dayOfMonth: 1,
+        isActive: true,
         schedule: RecurringSchedule.MONTHLY,
         startDate: '2025-07-01',
         providerId: 'provider-domestic-uuid',
         categoryId: 'category-uuid',
       };
 
-      await service.create(minimalDto);
+      await service.create(completeDto);
 
       expect(recurringExpenseRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          bizPercent: 100, // Default
-          currency: 'AUD', // Default
-          dayOfMonth: 1, // Default
-          isActive: true, // Default
+          bizPercent: 100,
+          currency: 'AUD',
+          dayOfMonth: 1,
+          isActive: true,
         }),
       );
     });

@@ -86,7 +86,7 @@ export class RecurringExpensesService {
     const nextDueDate = this.calculateNextDueDate(
       new Date(dto.startDate),
       dto.schedule,
-      dto.dayOfMonth ?? 1,
+      dto.dayOfMonth,
       null,
     );
 
@@ -95,13 +95,13 @@ export class RecurringExpensesService {
       description: dto.description,
       amountCents: dto.amountCents,
       gstCents,
-      bizPercent: dto.bizPercent ?? 100,
-      currency: dto.currency ?? 'AUD',
+      bizPercent: dto.bizPercent,
+      currency: dto.currency,
       schedule: dto.schedule,
-      dayOfMonth: dto.dayOfMonth ?? 1,
+      dayOfMonth: dto.dayOfMonth,
       startDate: new Date(dto.startDate),
       endDate: dto.endDate ? new Date(dto.endDate) : null,
-      isActive: dto.isActive ?? true,
+      isActive: dto.isActive,
       nextDueDate,
       providerId: dto.providerId,
       categoryId: dto.categoryId,
@@ -395,13 +395,13 @@ export class RecurringExpensesService {
       description: entity.description,
       amountCents: entity.amountCents,
       gstCents: entity.gstCents,
-      bizPercent: entity.bizPercent,
-      currency: entity.currency,
+      bizPercent: entity.bizPercent ?? 100, // Default to 100 if null
+      currency: entity.currency ?? 'AUD', // Default to AUD if null
       schedule: entity.schedule,
-      dayOfMonth: entity.dayOfMonth,
+      dayOfMonth: entity.dayOfMonth ?? 1, // Default to 1 if null
       startDate: this.formatDate(entity.startDate),
       endDate: entity.endDate ? this.formatDate(entity.endDate) : null,
-      isActive: entity.isActive,
+      isActive: entity.isActive ?? true, // Default to true if null
       lastGeneratedDate: entity.lastGeneratedDate
         ? this.formatDate(entity.lastGeneratedDate)
         : null,
@@ -418,7 +418,12 @@ export class RecurringExpensesService {
   /**
    * Formats a Date to YYYY-MM-DD string.
    */
-  private formatDate(date: Date): string {
+  private formatDate(date: Date | string): string {
+    // If date is already a string in YYYY-MM-DD format, return it
+    if (typeof date === 'string') {
+      return date.split('T')[0]; // Handle both 'YYYY-MM-DD' and ISO timestamp strings
+    }
+    // Convert Date object to YYYY-MM-DD
     return date.toISOString().split('T')[0];
   }
 }

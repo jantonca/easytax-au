@@ -37,26 +37,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/bas/{quarter}/{year}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get BAS summary for a quarter
-         * @description Calculates G1 (total sales), 1A (GST collected), 1B (GST paid) for Australian BAS reporting.
-         */
-        get: operations["BasController_getSummary"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/bas/quarters/{year}": {
         parameters: {
             query?: never;
@@ -69,6 +49,26 @@ export interface paths {
          * @description Returns start and end dates for all four quarters of an Australian financial year.
          */
         get: operations["BasController_getQuarters"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bas/{quarter}/{year}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get BAS summary for a quarter
+         * @description Calculates G1 (total sales), 1A (GST collected), 1B (GST paid) for Australian BAS reporting.
+         */
+        get: operations["BasController_getSummary"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1679,6 +1679,36 @@ export interface operations {
             };
         };
     };
+    BasController_getQuarters: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Financial year */
+                year: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of quarter date ranges */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @example Q1 */
+                        quarter?: string;
+                        /** @example 2024-07-01 */
+                        start?: string;
+                        /** @example 2024-09-30 */
+                        end?: string;
+                    }[];
+                };
+            };
+        };
+    };
     BasController_getSummary: {
         parameters: {
             query?: never;
@@ -1708,36 +1738,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-        };
-    };
-    BasController_getQuarters: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Financial year */
-                year: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Array of quarter date ranges */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example Q1 */
-                        quarter?: string;
-                        /** @example 2024-07-01 */
-                        start?: string;
-                        /** @example 2024-09-30 */
-                        end?: string;
-                    }[];
-                };
             };
         };
     };

@@ -35,7 +35,7 @@ export class CsvParserService {
       skip_empty_lines: true,
       trim: true,
       relax_column_count: true,
-    });
+    }) as Record<string, string>[];
 
     const results: ParsedCsvRow[] = [];
     let rowNumber = 0;

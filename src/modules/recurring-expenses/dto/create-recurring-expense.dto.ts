@@ -99,32 +99,30 @@ export class CreateRecurringExpenseDto {
    * Default: 100 (fully business use)
    * @example 50 (50% business use)
    */
-  @ApiPropertyOptional({
+  @ApiProperty({
     description: 'Business use percentage (0-100)',
     example: 100,
     minimum: 0,
     maximum: 100,
     default: 100,
   })
-  @IsOptional()
   @IsInt({ message: 'Business percentage must be an integer' })
   @Min(0, { message: 'Business percentage cannot be negative' })
   @Max(100, { message: 'Business percentage cannot exceed 100' })
-  bizPercent?: number;
+  bizPercent!: number;
 
   /**
    * Currency code (ISO 4217).
    * @default "AUD"
    */
-  @ApiPropertyOptional({
+  @ApiProperty({
     description: 'Currency code (ISO 4217)',
     example: 'AUD',
     default: 'AUD',
   })
-  @IsOptional()
   @IsString({ message: 'Currency must be a string' })
   @MaxLength(3, { message: 'Currency must be 3 characters' })
-  currency?: string;
+  currency!: string;
 
   /**
    * Schedule frequency for expense generation.
@@ -144,18 +142,17 @@ export class CreateRecurringExpenseDto {
    * Day of month when expense is due (1-28).
    * @example 15
    */
-  @ApiPropertyOptional({
+  @ApiProperty({
     description: 'Day of month (1-28)',
     example: 1,
     minimum: 1,
     maximum: 28,
     default: 1,
   })
-  @IsOptional()
   @IsInt({ message: 'Day of month must be an integer' })
   @Min(1, { message: 'Day of month must be at least 1' })
   @Max(28, { message: 'Day of month cannot exceed 28' })
-  dayOfMonth?: number;
+  dayOfMonth!: number;
 
   /**
    * Date when recurring expense starts being active (ISO 8601).
@@ -185,14 +182,13 @@ export class CreateRecurringExpenseDto {
    * Whether this recurring expense is active.
    * @default true
    */
-  @ApiPropertyOptional({
+  @ApiProperty({
     description: 'Whether template is active',
     example: true,
     default: true,
   })
-  @IsOptional()
   @IsBoolean({ message: 'isActive must be a boolean' })
-  isActive?: boolean;
+  isActive!: boolean;
 
   /**
    * Provider ID for this recurring expense.
