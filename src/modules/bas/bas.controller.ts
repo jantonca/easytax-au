@@ -25,6 +25,53 @@ export class BasController {
   constructor(private readonly basService: BasService) {}
 
   /**
+   * Retrieves all quarter date ranges for a financial year.
+   *
+   * Useful for building UI selectors or understanding period boundaries.
+   *
+   * @param year - The financial year
+   * @returns Array of quarter objects with start and end dates
+   *
+   * @example
+   * // Request: GET /bas/quarters/2025
+   * // Response:
+   * // [
+   * //   { "quarter": "Q1", "start": "2024-07-01", "end": "2024-09-30" },
+   * //   { "quarter": "Q2", "start": "2024-10-01", "end": "2024-12-31" },
+   * //   { "quarter": "Q3", "start": "2025-01-01", "end": "2025-03-31" },
+   * //   { "quarter": "Q4", "start": "2025-04-01", "end": "2025-06-30" }
+   * // ]
+   */
+  @Get('quarters/:year')
+  @ApiOperation({
+    summary: 'Get all quarter date ranges for a financial year',
+    description:
+      'Returns start and end dates for all four quarters of an Australian financial year.',
+  })
+  @ApiParam({ name: 'year', description: 'Financial year', example: '2025' })
+  @ApiOkResponse({
+    description: 'Array of quarter date ranges',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          quarter: { type: 'string', example: 'Q1' },
+          start: { type: 'string', example: '2024-07-01' },
+          end: { type: 'string', example: '2024-09-30' },
+        },
+      },
+    },
+  })
+  getQuarters(@Param('year') year: string): Array<{
+    quarter: string;
+    start: string;
+    end: string;
+  }> {
+    return this.basService.getQuartersForYear(parseInt(year, 10));
+  }
+
+  /**
    * Retrieves a BAS summary for a specific quarter and financial year.
    *
    * Australian Financial Year quarters:
@@ -72,52 +119,5 @@ export class BasController {
     @Param('year') year: string,
   ): Promise<BasSummaryDto> {
     return this.basService.getSummary(quarter.toUpperCase(), parseInt(year, 10));
-  }
-
-  /**
-   * Retrieves all quarter date ranges for a financial year.
-   *
-   * Useful for building UI selectors or understanding period boundaries.
-   *
-   * @param year - The financial year
-   * @returns Array of quarter objects with start and end dates
-   *
-   * @example
-   * // Request: GET /bas/quarters/2025
-   * // Response:
-   * // [
-   * //   { "quarter": "Q1", "start": "2024-07-01", "end": "2024-09-30" },
-   * //   { "quarter": "Q2", "start": "2024-10-01", "end": "2024-12-31" },
-   * //   { "quarter": "Q3", "start": "2025-01-01", "end": "2025-03-31" },
-   * //   { "quarter": "Q4", "start": "2025-04-01", "end": "2025-06-30" }
-   * // ]
-   */
-  @Get('quarters/:year')
-  @ApiOperation({
-    summary: 'Get all quarter date ranges for a financial year',
-    description:
-      'Returns start and end dates for all four quarters of an Australian financial year.',
-  })
-  @ApiParam({ name: 'year', description: 'Financial year', example: '2025' })
-  @ApiOkResponse({
-    description: 'Array of quarter date ranges',
-    schema: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          quarter: { type: 'string', example: 'Q1' },
-          start: { type: 'string', example: '2024-07-01' },
-          end: { type: 'string', example: '2024-09-30' },
-        },
-      },
-    },
-  })
-  getQuarters(@Param('year') year: string): Array<{
-    quarter: string;
-    start: string;
-    end: string;
-  }> {
-    return this.basService.getQuartersForYear(parseInt(year, 10));
   }
 }

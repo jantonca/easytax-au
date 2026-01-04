@@ -222,7 +222,7 @@ export class ReportsService {
       .groupBy('category.id')
       .addGroupBy('category.name')
       .addGroupBy('category.bas_label')
-      .orderBy('totalCents', 'DESC')
+      .orderBy('"totalCents"', 'DESC')
       .getRawMany<{
         categoryId: number;
         name: string;
