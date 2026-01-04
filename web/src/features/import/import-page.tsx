@@ -1,8 +1,13 @@
 import type { ReactElement } from 'react';
 import { useState } from 'react';
 import { FileDropzone } from './components/file-dropzone';
+import { PreviewTable } from './components/preview-table';
+import { ImportProgress } from './components/import-progress';
+import { usePreviewCsvImport } from './hooks/use-csv-preview';
+import { useImportCsv } from './hooks/use-csv-import';
+import { Loader2 } from 'lucide-react';
 
-type ImportSource = 'commbank' | 'amex' | 'manual' | 'other';
+type ImportSource = 'commbank' | 'amex' | 'manual' | 'nab' | 'westpac' | 'anz' | 'custom';
 
 interface SourceOption {
   value: ImportSource;
@@ -27,9 +32,19 @@ const SOURCE_OPTIONS: SourceOption[] = [
     description: 'Custom format with date, description, amount columns',
   },
   {
-    value: 'other',
-    label: 'Other Bank',
-    description: 'Generic bank statement format',
+    value: 'nab',
+    label: 'NAB',
+    description: 'National Australia Bank CSV export',
+  },
+  {
+    value: 'westpac',
+    label: 'Westpac',
+    description: 'Westpac bank statement export',
+  },
+  {
+    value: 'anz',
+    label: 'ANZ',
+    description: 'ANZ bank statement export',
   },
 ];
 
@@ -37,6 +52,10 @@ export function ImportPage(): ReactElement {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [source, setSource] = useState<ImportSource>('manual');
   const [step, setStep] = useState<'upload' | 'preview' | 'progress'>('upload');
+  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+
+  const previewMutation = usePreviewCsvImport();
+  const importMutation = useImportCsv();
 
   const handleFileSelect = (file: File): void => {
     setSelectedFile(file);
@@ -46,10 +65,57 @@ export function ImportPage(): ReactElement {
     setSource(newSource);
   };
 
-  const handleNext = (): void => {
+  const handlePreview = (): void => {
     if (!selectedFile) return;
-    // TODO: In Block 2, we'll call the preview API and show the preview step
-    setStep('preview');
+
+    previewMutation.mutate(
+      {
+        file: selectedFile,
+        source,
+        matchThreshold: 0.6,
+        skipDuplicates: true,
+      },
+      {
+        onSuccess: (data) => {
+          // Auto-select all successful rows
+          const successfulRows = data.rows.filter((row) => row.success).map((row) => row.rowNumber);
+          setSelectedRows(new Set(successfulRows));
+          setStep('preview');
+        },
+      },
+    );
+  };
+
+  const handleImport = (): void => {
+    if (!selectedFile || selectedRows.size === 0) return;
+
+    importMutation.mutate(
+      {
+        file: selectedFile,
+        source,
+        matchThreshold: 0.6,
+        skipDuplicates: true,
+      },
+      {
+        onSuccess: () => {
+          setStep('progress');
+        },
+      },
+    );
+  };
+
+  const handleStartOver = (): void => {
+    setSelectedFile(null);
+    setSource('manual');
+    setStep('upload');
+    setSelectedRows(new Set());
+    previewMutation.reset();
+    importMutation.reset();
+  };
+
+  const handleViewExpenses = (): void => {
+    // Navigate to expenses page
+    window.location.href = '/expenses';
   };
 
   return (
@@ -151,34 +217,101 @@ export function ImportPage(): ReactElement {
             <FileDropzone onFileSelect={handleFileSelect} />
           </div>
 
-          {/* Next Button */}
+          {/* Preview Button */}
           <div className="flex justify-end">
             <button
               type="button"
-              onClick={handleNext}
-              disabled={!selectedFile}
-              className="rounded-md bg-emerald-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-600"
+              onClick={handlePreview}
+              disabled={!selectedFile || previewMutation.isPending}
+              className="flex items-center gap-2 rounded-md bg-emerald-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-600"
             >
-              Preview Import
+              {previewMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              {previewMutation.isPending ? 'Loading Preview...' : 'Preview Import'}
+            </button>
+          </div>
+
+          {/* Preview Error */}
+          {previewMutation.isError && (
+            <div className="rounded-lg border border-red-800 bg-red-950/40 p-4">
+              <p className="text-sm text-red-400">
+                {previewMutation.error?.message || 'Failed to preview CSV file'}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {step === 'preview' && previewMutation.data && (
+        <div className="flex flex-col gap-6">
+          {/* Summary Stats */}
+          <div className="grid gap-4 sm:grid-cols-4">
+            <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-4">
+              <p className="text-sm text-slate-400">Total Rows</p>
+              <p className="text-2xl font-semibold text-slate-200">
+                {previewMutation.data.totalRows}
+              </p>
+            </div>
+            <div className="rounded-lg border border-emerald-800 bg-emerald-950/40 p-4">
+              <p className="text-sm text-emerald-400">Valid</p>
+              <p className="text-2xl font-semibold text-emerald-400">
+                {previewMutation.data.successCount}
+              </p>
+            </div>
+            <div className="rounded-lg border border-red-800 bg-red-950/40 p-4">
+              <p className="text-sm text-red-400">Errors</p>
+              <p className="text-2xl font-semibold text-red-400">
+                {previewMutation.data.failedCount}
+              </p>
+            </div>
+            <div className="rounded-lg border border-amber-800 bg-amber-950/40 p-4">
+              <p className="text-sm text-amber-400">Duplicates</p>
+              <p className="text-2xl font-semibold text-amber-400">
+                {previewMutation.data.duplicateCount}
+              </p>
+            </div>
+          </div>
+
+          {/* Preview Table */}
+          <PreviewTable
+            rows={previewMutation.data.rows}
+            selectable
+            selectedRows={selectedRows}
+            onSelectionChange={setSelectedRows}
+          />
+
+          {/* Action Buttons */}
+          <div className="flex justify-between">
+            <button
+              type="button"
+              onClick={handleStartOver}
+              className="rounded-md border border-slate-700 bg-slate-800 px-6 py-2.5 text-sm font-medium text-slate-200 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+            >
+              Start Over
+            </button>
+            <button
+              type="button"
+              onClick={handleImport}
+              disabled={selectedRows.size === 0 || importMutation.isPending}
+              className="flex items-center gap-2 rounded-md bg-emerald-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-600"
+            >
+              {importMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              {importMutation.isPending
+                ? 'Importing...'
+                : `Import ${selectedRows.size} Selected Row${selectedRows.size !== 1 ? 's' : ''}`}
             </button>
           </div>
         </div>
       )}
 
-      {step === 'preview' && (
-        <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-12 text-center">
-          <p className="text-slate-400">
-            Preview step will be implemented in Block 2 (CSV Preview)
-          </p>
-          <p className="mt-2 text-sm text-slate-500">
-            File: {selectedFile?.name} | Source: {source}
-          </p>
-        </div>
-      )}
-
       {step === 'progress' && (
-        <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-12 text-center">
-          <p className="text-slate-400">Import progress will be implemented in Block 4</p>
+        <div className="flex flex-col gap-6">
+          <ImportProgress
+            isLoading={importMutation.isPending}
+            data={importMutation.data}
+            error={importMutation.error}
+            onViewExpenses={handleViewExpenses}
+            onImportMore={handleStartOver}
+          />
         </div>
       )}
     </section>
