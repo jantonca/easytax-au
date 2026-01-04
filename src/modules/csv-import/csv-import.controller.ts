@@ -130,7 +130,13 @@ Expenses with same date, amount, and provider are considered duplicates.
       throw new BadRequestException('CSV file is required');
     }
 
-    const options = this.buildOptions(dto);
+    // Fix: Force dryRun to false since Transform decorator converts "false" string incorrectly
+    const normalizedDto = {
+      ...dto,
+      dryRun: false, // Always false for actual imports (preview uses different endpoint)
+    };
+
+    const options = this.buildOptions(normalizedDto);
     const result = await this.csvImportService.importFromBuffer(file.buffer, options);
 
     return this.mapToResponse(result);
@@ -227,6 +233,7 @@ Expenses with same date, amount, and provider are considered duplicates.
    * Build import options from DTO.
    */
   private buildOptions(dto: CsvImportRequestDto): CsvImportOptions {
+    // DTO has already been normalized in the controller endpoint
     return {
       source: dto.source,
       mapping: dto.mapping,
@@ -451,13 +458,25 @@ Incomes with same invoice number OR same date+amount+client are considered dupli
    * Build income import options from DTO.
    */
   private buildIncomeOptions(dto: IncomeCsvImportRequestDto): IncomeCsvImportOptions {
+    // Ensure boolean conversion for form-data (strings like "true"/"false")
+    const dryRun =
+      dto.dryRun === true || (dto.dryRun as unknown) === 'true' || (dto.dryRun as unknown) === '1';
+    const skipDuplicates =
+      dto.skipDuplicates !== false &&
+      (dto.skipDuplicates as unknown) !== 'false' &&
+      (dto.skipDuplicates as unknown) !== '0';
+    const markAsPaid =
+      dto.markAsPaid === true ||
+      (dto.markAsPaid as unknown) === 'true' ||
+      (dto.markAsPaid as unknown) === '1';
+
     return {
       source: dto.source,
       mapping: dto.mapping,
       matchThreshold: dto.matchThreshold ?? 0.6,
-      skipDuplicates: dto.skipDuplicates ?? true,
-      dryRun: dto.dryRun ?? false,
-      markAsPaid: dto.markAsPaid ?? false,
+      skipDuplicates,
+      dryRun,
+      markAsPaid,
     };
   }
 

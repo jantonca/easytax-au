@@ -100,6 +100,34 @@ constructor(
 ) {}
 ```
 
+### Multipart/Form-Data and Boolean Parameters
+
+**Known Issue**: NestJS `@Transform` decorators don't work reliably with multipart/form-data. When sending booleans via FormData (e.g., file uploads with metadata), they're sent as strings but may not convert properly.
+
+**Solution**: Explicitly handle boolean conversion in the controller before passing to services:
+
+```typescript
+// ✅ CORRECT - Manual conversion for multipart endpoints
+@Post()
+@UseInterceptors(FileInterceptor('file'))
+async uploadFile(@UploadedFile() file: Express.Multer.File, @Body() dto: MyDto) {
+  const normalizedDto = {
+    ...dto,
+    dryRun: false,  // Or explicit: dto.dryRun === 'true' || dto.dryRun === true
+  };
+  return this.service.process(file, normalizedDto);
+}
+```
+
+```typescript
+// ❌ WRONG - Relying on @Transform with multipart/form-data
+// This may not work as expected:
+export class MyDto {
+  @Transform(({ value }) => value === 'true')
+  dryRun?: boolean;  // May receive 'false' string and convert to true!
+}
+```
+
 ---
 
 ## Parser Rules (Phase 2)

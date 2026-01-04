@@ -9,7 +9,7 @@ import {
   ValidateNested,
   IsIn,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 
 /**
  * DTO for column mapping configuration.
@@ -97,6 +97,15 @@ export class CsvImportRequestDto {
     description: 'Skip duplicate expenses',
     default: true,
   })
+  @Transform(
+    ({ value }) => {
+      if (typeof value === 'string') {
+        return value === 'true' || value === '1';
+      }
+      return Boolean(value);
+    },
+    { toClassOnly: true },
+  )
   @IsBoolean()
   @IsOptional()
   skipDuplicates?: boolean;
@@ -105,6 +114,15 @@ export class CsvImportRequestDto {
     description: 'Preview mode - do not create expenses',
     default: false,
   })
+  @Transform(
+    ({ value }) => {
+      if (typeof value === 'string') {
+        return value === 'true' || value === '1';
+      }
+      return Boolean(value);
+    },
+    { toClassOnly: true },
+  )
   @IsBoolean()
   @IsOptional()
   dryRun?: boolean;
@@ -260,6 +278,12 @@ export class IncomeCsvImportRequestDto {
     description: 'Skip duplicate incomes',
     default: true,
   })
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      return value === 'true' || value === '1';
+    }
+    return Boolean(value);
+  })
   @IsBoolean()
   @IsOptional()
   skipDuplicates?: boolean;
@@ -268,6 +292,12 @@ export class IncomeCsvImportRequestDto {
     description: 'Preview mode - do not create incomes',
     default: false,
   })
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      return value === 'true' || value === '1';
+    }
+    return Boolean(value);
+  })
   @IsBoolean()
   @IsOptional()
   dryRun?: boolean;
@@ -275,6 +305,12 @@ export class IncomeCsvImportRequestDto {
   @ApiPropertyOptional({
     description: 'Mark all imported incomes as paid',
     default: false,
+  })
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      return value === 'true' || value === '1';
+    }
+    return Boolean(value);
   })
   @IsBoolean()
   @IsOptional()
