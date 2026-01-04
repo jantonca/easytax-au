@@ -105,7 +105,7 @@ export class IncomeCsvImportService {
       skip_empty_lines: true,
       trim: true,
       bom: true,
-    }) as Record<string, string>[];
+    });
 
     const rows: ParsedIncomeCsvRow[] = [];
 
