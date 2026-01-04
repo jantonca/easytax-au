@@ -3,17 +3,20 @@
 ## Issue Summary
 
 CSV import was failing with two errors:
+
 1. **404 Not Found**: `POST http://localhost:3000/api/import/expenses 404 (Not Found)`
 2. **400 Bad Request**: `Validation failed (current file type is text/csv, expected type is text/csv)`
 
 ## Root Causes
 
 ### Issue 1: Incorrect API Path
+
 - **Problem**: Frontend was calling `/api/import/expenses` but backend has no global `/api` prefix
 - **Backend routes**: `/import/expenses`, `/import/incomes`, etc.
 - **Frontend was hardcoding**: `http://localhost:3000/api/import/...`
 
 ### Issue 2: Unreliable MIME Type Validation
+
 - **Problem**: NestJS's `FileTypeValidator` was checking for exact `text/csv` MIME type
 - **Reality**: Browsers/systems send different MIME types:
   - `text/csv` (Chrome sometimes)
@@ -27,11 +30,13 @@ CSV import was failing with two errors:
 ### 1. Fixed Frontend API Routes ✅
 
 **Files changed:**
+
 - `web/src/features/import/hooks/use-csv-preview.ts`
 - `web/src/features/import/hooks/use-csv-import.ts`
 - `web/src/features/import/hooks/use-import-jobs.ts`
 
 **Changes:**
+
 ```typescript
 // Before:
 const response = await fetch('http://localhost:3000/api/import/expenses', {
@@ -42,6 +47,7 @@ const response = await fetch(`${baseUrl}/import/expenses`, {
 ```
 
 **Benefits:**
+
 - Removed hardcoded `/api` prefix
 - Now uses `VITE_API_URL` environment variable
 - Consistent with other API calls in `api-client.ts`
@@ -69,7 +75,7 @@ export class CsvFileValidator extends FileValidator<CsvFileValidatorOptions> {
         'text/csv',
         'application/csv',
         'text/x-csv',
-        'application/octet-stream',  // Most common!
+        'application/octet-stream', // Most common!
       ];
       if (!acceptedTypes.includes(file.mimetype)) return false;
     }
@@ -80,18 +86,21 @@ export class CsvFileValidator extends FileValidator<CsvFileValidatorOptions> {
 ```
 
 **Files changed:**
+
 - `src/modules/csv-import/csv-import.controller.ts` (4 endpoints updated)
 
 **Changes:**
+
 ```typescript
 // Before:
-new FileTypeValidator({ fileType: 'text/csv' })
+new FileTypeValidator({ fileType: 'text/csv' });
 
 // After:
-new CsvFileValidator({})
+new CsvFileValidator({});
 ```
 
 **Benefits:**
+
 - Prioritizes file extension (reliable) over MIME type (unreliable)
 - Accepts all common CSV MIME types including `application/octet-stream`
 - Clear error messages: "File must be a CSV file (.csv extension)"
@@ -102,6 +111,7 @@ new CsvFileValidator({})
 **New file:** `src/modules/csv-import/validators/csv-file.validator.spec.ts`
 
 **Test coverage:**
+
 - ✅ Accepts `.csv` files with `text/csv` MIME type
 - ✅ Accepts `.csv` files with `application/octet-stream` MIME type
 - ✅ Case-insensitive extension matching (`.CSV`, `.csv`)
@@ -115,6 +125,7 @@ new CsvFileValidator({})
 ## Verification
 
 ### Backend Tests
+
 ```bash
 $ pnpm test -- csv-import
 PASS src/modules/csv-import/validators/csv-file.validator.spec.ts
@@ -129,6 +140,7 @@ Tests:       190 passed, 190 total
 ```
 
 ### Manual Testing
+
 ```bash
 # ✅ CSV upload works
 $ curl -X POST http://localhost:3000/import/expenses \
@@ -143,6 +155,7 @@ Response: 400 "File must be a CSV file (.csv extension)"
 ```
 
 ### Frontend Testing
+
 - ✅ File upload successful
 - ✅ Preview shows parsed rows
 - ✅ Validation errors display correctly
@@ -151,22 +164,26 @@ Response: 400 "File must be a CSV file (.csv extension)"
 ## Files Modified
 
 ### Frontend
+
 1. `web/src/features/import/hooks/use-csv-preview.ts` - Fixed API URL
 2. `web/src/features/import/hooks/use-csv-import.ts` - Fixed API URL
 3. `web/src/features/import/hooks/use-import-jobs.ts` - Fixed API URL
 
 ### Backend
+
 4. `src/modules/csv-import/csv-import.controller.ts` - Use custom validator (4 endpoints)
 5. `src/modules/csv-import/validators/csv-file.validator.ts` - New custom validator
 6. `src/modules/csv-import/validators/csv-file.validator.spec.ts` - Validator tests
 7. `src/modules/csv-import/validators/index.ts` - Export validator
 
 ### Documentation
+
 8. `TASKS-FRONTEND.md` - Updated CSV import section with implementation notes
 
 ## Known Limitations
 
 ### Income Import UI Not Implemented
+
 - **Status**: Backend API ready, frontend UI missing
 - **Workaround**: Use API directly
   ```bash
@@ -176,6 +193,7 @@ Response: 400 "File must be a CSV file (.csv extension)"
 - **Future work**: Add tab/toggle to import page for expense vs income selection
 
 ### Provider/Client Matching
+
 - Fuzzy matching requires providers/clients to exist in database first
 - Match threshold fixed at 0.6 (60% similarity)
 - Missing entities show clear error: "No matching provider found for 'X'"
@@ -184,12 +202,15 @@ Response: 400 "File must be a CSV file (.csv extension)"
 ## Migration Impact
 
 ### Breaking Changes
+
 None - This is a bug fix.
 
 ### Database Changes
+
 None
 
 ### API Changes
+
 None - Backend endpoints unchanged, only validation logic improved.
 
 ## Deployment Notes
