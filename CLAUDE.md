@@ -33,6 +33,8 @@
 - `SCHEMA.md`: Database and API contract definitions.
 - `SECURITY.md`: Authentication and authorization rules.
 - `.github/copilot-instructions.md`: UI "vibe" and coding patterns.
+- `AGENTS.MD`: AI Agent Directives for EasyTax-AU
+- `CHANGELOG-CSV-IMPORT-FIX.md`: CSV import fix
 
 ## ⚠️ Guardrails
 
