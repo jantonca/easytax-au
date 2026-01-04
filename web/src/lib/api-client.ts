@@ -142,8 +142,18 @@ export interface ClientDto {
   updatedAt: string;
 }
 
+export interface QuarterDateRange {
+  quarter: string;
+  start: string;
+  end: string;
+}
+
 export async function getBasSummary(quarter: string, year: number): Promise<BasSummaryDto> {
   return apiClient.get<BasSummaryDto>(`/bas/${quarter}/${year}`);
+}
+
+export async function getQuartersForYear(year: number): Promise<QuarterDateRange[]> {
+  return apiClient.get<QuarterDateRange[]>(`/bas/quarters/${year}`);
 }
 
 export async function getProviders(): Promise<ProviderDto[]> {
