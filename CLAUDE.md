@@ -11,8 +11,8 @@
 
 ## 🛠 Mandatory Workflow (TDD)
 
-1. **Planning (Opus 4.5):** Analyze `TASKS-FRONTEND.md` and `ROADMAP.md` to define the next logical sub-task.
-2. **Test First (Sonnet 4.5):** - You MUST create or update the unit test file (`.test.ts/tsx`) before writing implementation code.
+1. **Planning (Opus):** Analyze `TASKS-FRONTEND.md` and `ROADMAP.md` to define the next logical sub-task.
+2. **Test First (Sonnet):** - You MUST create or update the unit test file (`.test.ts/tsx`) before writing implementation code.
    - Run `pnpm --filter web test [path]` to verify the test fails.
 3. **Implementation:** Write the minimal code needed to pass the test.
 4. **Verification:** Run `pnpm --filter web lint` and `pnpm --filter web test` again.
