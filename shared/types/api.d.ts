@@ -802,6 +802,10 @@ export interface components {
             matchScore?: number;
             /** @description Matched category name */
             categoryName?: string;
+            /** @description Transaction date (ISO 8601) */
+            date?: string;
+            /** @description Expense description */
+            description?: string;
             /** @description Amount in cents */
             amountCents?: number;
             /** @description GST in cents */

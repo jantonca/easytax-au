@@ -153,6 +153,12 @@ export class CsvRowResultDto {
   @ApiPropertyOptional({ description: 'Matched category name' })
   categoryName?: string;
 
+  @ApiPropertyOptional({ description: 'Transaction date (ISO 8601)' })
+  date?: string;
+
+  @ApiPropertyOptional({ description: 'Expense description' })
+  description?: string;
+
   @ApiPropertyOptional({ description: 'Amount in cents' })
   amountCents?: number;
 

@@ -1,6 +1,7 @@
 import type { ReactElement } from 'react';
 import type { components } from '@shared/types';
 import { CheckCircle2, AlertCircle, AlertTriangle } from 'lucide-react';
+import { formatDate } from '@/lib/currency';
 
 type CsvRowResultDto = components['schemas']['CsvRowResultDto'];
 
@@ -118,8 +119,10 @@ export function PreviewTable({
               )}
               <th className="px-4 py-3 text-left font-medium text-slate-300">Row</th>
               <th className="px-4 py-3 text-left font-medium text-slate-300">Status</th>
+              <th className="px-4 py-3 text-left font-medium text-slate-300">Date</th>
               <th className="px-4 py-3 text-left font-medium text-slate-300">Provider</th>
               <th className="px-4 py-3 text-left font-medium text-slate-300">Category</th>
+              <th className="px-4 py-3 text-left font-medium text-slate-300">Description</th>
               <th className="px-4 py-3 text-right font-medium text-slate-300">Amount</th>
               <th className="px-4 py-3 text-right font-medium text-slate-300">GST</th>
             </tr>
@@ -174,6 +177,17 @@ export function PreviewTable({
                     )}
                   </td>
 
+                  {/* Date */}
+                  <td className="px-4 py-3">
+                    {(row as { date?: string }).date ? (
+                      <span className="text-slate-200">
+                        {formatDate((row as { date?: string }).date!)}
+                      </span>
+                    ) : (
+                      <span className="text-slate-500">-</span>
+                    )}
+                  </td>
+
                   {/* Provider */}
                   <td className="px-4 py-3">
                     {row.providerName ? (
@@ -190,6 +204,17 @@ export function PreviewTable({
                   <td className="px-4 py-3">
                     {row.categoryName ? (
                       <span className="text-slate-200">{row.categoryName}</span>
+                    ) : (
+                      <span className="text-slate-500">-</span>
+                    )}
+                  </td>
+
+                  {/* Description */}
+                  <td className="px-4 py-3">
+                    {(row as { description?: string }).description ? (
+                      <span className="text-slate-200 truncate max-w-xs block">
+                        {(row as { description?: string }).description}
+                      </span>
                     ) : (
                       <span className="text-slate-500">-</span>
                     )}

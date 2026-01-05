@@ -267,6 +267,8 @@ Expenses with same date, amount, and provider are considered duplicates.
         providerName: r.providerMatch?.providerName,
         matchScore: r.providerMatch?.score,
         categoryName: r.categoryName,
+        date: r.expenseData?.date?.toISOString(),
+        description: r.expenseData?.description ?? undefined,
         amountCents: r.expenseData?.amountCents,
         gstCents: r.expenseData?.gstCents,
       })),
