@@ -555,20 +555,28 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 | F2.4.9  | Show import progress and results              | ✅     |
 | F2.4.10 | Link to ImportJob for rollback option         | ✅     |
 
-**Files to Create:**
+**Files Created:**
 
-- `web/src/features/import/import-page.tsx`
+- `web/src/features/import/unified-import-page.tsx` - Container with tabs
+- `web/src/features/import/expenses-import-tab.tsx` - Expense import workflow
+- `web/src/features/import/incomes-import-tab.tsx` - Income import workflow
+- `web/src/features/import/components/import-tabs.tsx` - Tab navigation
+- `web/src/features/import/components/progress-steps.tsx` - Step indicator
+- `web/src/features/import/components/summary-stats.tsx` - Stats grid
 - `web/src/features/import/components/file-dropzone.tsx`
 - `web/src/features/import/components/preview-table.tsx`
-- `web/src/features/import/components/row-validation.tsx`
+- `web/src/features/import/components/income-preview-table.tsx`
 - `web/src/features/import/components/import-progress.tsx`
 - `web/src/features/import/hooks/use-csv-preview.ts`
-- `web/src/features/import/hooks/use-import.ts`
+- `web/src/features/import/hooks/use-csv-import.ts`
+- `web/src/features/import/hooks/use-income-csv-preview.ts`
+- `web/src/features/import/hooks/use-income-csv-import.ts`
 
 **Implementation notes (F2.4):**
 
 - **Expense import:** ✅ Fully working in UI
-- **Income import:** 🟡 Backend API ready, frontend UI not yet implemented
+- **Income import:** ✅ Fully working in UI with unified tabbed interface
+- **Unified Import Page:** ✅ Route-based tabs (`/import/expenses` and `/import/incomes`)
 - Fixed multiple critical issues during implementation:
   1. **404 errors:** Removed hardcoded `/api` prefix from 3 frontend hooks (backend has no global prefix)
   2. **400 file validation errors:** Created custom `CsvFileValidator` checking `.csv` extension instead of unreliable MIME types

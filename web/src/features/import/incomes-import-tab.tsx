@@ -1,10 +1,13 @@
 import type { ReactElement } from 'react';
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { FileDropzone } from './components/file-dropzone';
-import { PreviewTable } from './components/preview-table';
+import { IncomePreviewTable } from './components/income-preview-table';
 import { ImportProgress } from './components/import-progress';
-import { usePreviewCsvImport } from './hooks/use-csv-preview';
-import { useImportCsv } from './hooks/use-csv-import';
+import { ProgressSteps } from './components/progress-steps';
+import { SummaryStats } from './components/summary-stats';
+import { usePreviewIncomeCsvImport } from './hooks/use-income-csv-preview';
+import { useImportIncomeCsv } from './hooks/use-income-csv-import';
 import { Loader2 } from 'lucide-react';
 
 type ImportSource = 'commbank' | 'amex' | 'custom' | 'nab' | 'westpac' | 'anz' | 'manual';
@@ -29,7 +32,7 @@ const SOURCE_OPTIONS: SourceOption[] = [
   {
     value: 'custom',
     label: 'Manual CSV',
-    description: 'Custom format with date, description, amount columns',
+    description: 'Custom format with date, client, invoice, subtotal, gst columns',
   },
   {
     value: 'nab',
@@ -48,14 +51,15 @@ const SOURCE_OPTIONS: SourceOption[] = [
   },
 ];
 
-export function ImportPage(): ReactElement {
+export function IncomesImportTab(): ReactElement {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [source, setSource] = useState<ImportSource>('custom');
   const [step, setStep] = useState<'upload' | 'preview' | 'progress'>('upload');
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
 
-  const previewMutation = usePreviewCsvImport();
-  const importMutation = useImportCsv();
+  const queryClient = useQueryClient();
+  const previewMutation = usePreviewIncomeCsvImport();
+  const importMutation = useImportIncomeCsv();
 
   const handleFileSelect = (file: File): void => {
     setSelectedFile(file);
@@ -68,10 +72,13 @@ export function ImportPage(): ReactElement {
   const handlePreview = (): void => {
     if (!selectedFile) return;
 
+    // Use 'custom' if 'manual' is selected (they're equivalent)
+    const apiSource = source === 'manual' ? 'custom' : source;
+
     previewMutation.mutate(
       {
         file: selectedFile,
-        source,
+        source: apiSource,
         matchThreshold: 0.6,
         skipDuplicates: true,
       },
@@ -89,15 +96,20 @@ export function ImportPage(): ReactElement {
   const handleImport = (): void => {
     if (!selectedFile || selectedRows.size === 0) return;
 
+    // Use 'custom' if 'manual' is selected (they're equivalent)
+    const apiSource = source === 'manual' ? 'custom' : source;
+
     importMutation.mutate(
       {
         file: selectedFile,
-        source,
+        source: apiSource,
         matchThreshold: 0.6,
         skipDuplicates: true,
       },
       {
         onSuccess: () => {
+          // Invalidate incomes query to refresh the list
+          void queryClient.invalidateQueries({ queryKey: ['incomes'] });
           setStep('progress');
         },
       },
@@ -106,77 +118,22 @@ export function ImportPage(): ReactElement {
 
   const handleStartOver = (): void => {
     setSelectedFile(null);
-    setSource('manual');
+    setSource('custom');
     setStep('upload');
     setSelectedRows(new Set());
     previewMutation.reset();
     importMutation.reset();
   };
 
-  const handleViewExpenses = (): void => {
-    // Navigate to expenses page
-    window.location.href = '/expenses';
+  const handleViewIncomes = (): void => {
+    // Navigate to incomes page
+    window.location.href = '/incomes';
   };
 
   return (
-    <section className="mx-auto flex max-w-5xl flex-col gap-6">
-      {/* Header */}
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-50">CSV Import</h1>
-        <p className="text-sm text-slate-400">Import expenses from your bank statement CSV files</p>
-      </header>
-
+    <div className="flex flex-col gap-6">
       {/* Progress Steps */}
-      <div className="flex items-center gap-2">
-        <div
-          className={`flex items-center gap-2 ${step === 'upload' ? 'text-emerald-400' : 'text-slate-500'}`}
-        >
-          <div
-            className={`flex h-8 w-8 items-center justify-center rounded-full border-2 ${
-              step === 'upload'
-                ? 'border-emerald-500 bg-emerald-500/10'
-                : 'border-slate-700 bg-slate-900'
-            }`}
-          >
-            1
-          </div>
-          <span className="text-sm font-medium">Upload</span>
-        </div>
-
-        <div className="h-px w-12 bg-slate-800" />
-
-        <div
-          className={`flex items-center gap-2 ${step === 'preview' ? 'text-emerald-400' : 'text-slate-500'}`}
-        >
-          <div
-            className={`flex h-8 w-8 items-center justify-center rounded-full border-2 ${
-              step === 'preview'
-                ? 'border-emerald-500 bg-emerald-500/10'
-                : 'border-slate-700 bg-slate-900'
-            }`}
-          >
-            2
-          </div>
-          <span className="text-sm font-medium">Preview</span>
-        </div>
-
-        <div className="h-px w-12 bg-slate-800" />
-
-        <div
-          className={`flex items-center gap-2 ${step === 'progress' ? 'text-emerald-400' : 'text-slate-500'}`}
-        >
-          <div
-            className={`flex h-8 w-8 items-center justify-center rounded-full border-2 ${
-              step === 'progress'
-                ? 'border-emerald-500 bg-emerald-500/10'
-                : 'border-slate-700 bg-slate-900'
-            }`}
-          >
-            3
-          </div>
-          <span className="text-sm font-medium">Import</span>
-        </div>
-      </div>
+      <ProgressSteps currentStep={step} />
 
       {/* Step Content */}
       {step === 'upload' && (
@@ -244,35 +201,10 @@ export function ImportPage(): ReactElement {
       {step === 'preview' && previewMutation.data && (
         <div className="flex flex-col gap-6">
           {/* Summary Stats */}
-          <div className="grid gap-4 sm:grid-cols-4">
-            <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-4">
-              <p className="text-sm text-slate-400">Total Rows</p>
-              <p className="text-2xl font-semibold text-slate-200">
-                {previewMutation.data.totalRows}
-              </p>
-            </div>
-            <div className="rounded-lg border border-emerald-800 bg-emerald-950/40 p-4">
-              <p className="text-sm text-emerald-400">Valid</p>
-              <p className="text-2xl font-semibold text-emerald-400">
-                {previewMutation.data.successCount}
-              </p>
-            </div>
-            <div className="rounded-lg border border-red-800 bg-red-950/40 p-4">
-              <p className="text-sm text-red-400">Errors</p>
-              <p className="text-2xl font-semibold text-red-400">
-                {previewMutation.data.failedCount}
-              </p>
-            </div>
-            <div className="rounded-lg border border-amber-800 bg-amber-950/40 p-4">
-              <p className="text-sm text-amber-400">Duplicates</p>
-              <p className="text-2xl font-semibold text-amber-400">
-                {previewMutation.data.duplicateCount}
-              </p>
-            </div>
-          </div>
+          <SummaryStats data={previewMutation.data} />
 
           {/* Preview Table */}
-          <PreviewTable
+          <IncomePreviewTable
             rows={previewMutation.data.rows}
             selectable
             selectedRows={selectedRows}
@@ -309,11 +241,11 @@ export function ImportPage(): ReactElement {
             isLoading={importMutation.isPending}
             data={importMutation.data}
             error={importMutation.error}
-            onViewExpenses={handleViewExpenses}
+            onViewExpenses={handleViewIncomes}
             onImportMore={handleStartOver}
           />
         </div>
       )}
-    </section>
+    </div>
   );
 }

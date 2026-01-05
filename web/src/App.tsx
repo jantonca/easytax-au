@@ -3,7 +3,9 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { Layout } from '@/components/layout/layout';
 import { DashboardPage } from '@/features/dashboard/dashboard-page';
 import { ExpensesPage } from '@/features/expenses/expenses-page';
-import { ImportPage } from '@/features/import/import-page';
+import { UnifiedImportPage } from '@/features/import/unified-import-page';
+import { ExpensesImportTab } from '@/features/import/expenses-import-tab';
+import { IncomesImportTab } from '@/features/import/incomes-import-tab';
 import { IncomesPage } from '@/features/incomes/incomes-page';
 import { BasReportPage } from '@/features/reports/bas-report-page';
 import { FyReportPage } from '@/features/reports/fy-report-page';
@@ -20,7 +22,11 @@ function App(): ReactElement {
         <Route path="expenses" element={<ExpensesPage />} />
         <Route path="incomes" element={<IncomesPage />} />
         <Route path="recurring" element={<RecurringPage />} />
-        <Route path="import" element={<ImportPage />} />
+        <Route path="import" element={<UnifiedImportPage />}>
+          <Route index element={<Navigate to="/import/expenses" replace />} />
+          <Route path="expenses" element={<ExpensesImportTab />} />
+          <Route path="incomes" element={<IncomesImportTab />} />
+        </Route>
         <Route path="reports/bas" element={<BasReportPage />} />
         <Route path="reports/fy" element={<FyReportPage />} />
         <Route path="settings">
