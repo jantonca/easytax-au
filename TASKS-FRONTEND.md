@@ -900,7 +900,7 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 | F3.4.4 | Add skip links for navigation                       | ⬜     |
 | F3.4.5 | Ensure color contrast meets WCAG AA                 | ⬜     |
 | F3.4.6 | Add loading skeletons for all data fetches          | ✅     |
-| F3.4.7 | Add empty states for all lists                      | ⬜     |
+| F3.4.7 | Add empty states for all lists                      | ✅     |
 | F3.4.8 | Add success/error toasts for all mutations          | ⬜     |
 | F3.4.9 | Implement dark mode toggle (stored in localStorage) | ⬜     |
 
@@ -937,6 +937,28 @@ Created reusable skeleton components for consistent loading states across the ap
 
 All page tests updated to check for skeleton ARIA labels instead of loading text. Total: 272/275 tests passing (99.1%).
 
+**F3.4.7 Implementation Details (Empty States):**
+
+Created reusable EmptyState component for consistent empty state messaging across the application:
+
+- **EmptyState Component** (`web/src/components/ui/empty-state.tsx`)
+  - Props: `title`, `description`, `actionLabel?`, `onAction?`, `icon?`
+  - Semantic HTML with `<section>`, `<h3>`, `<p>`, and optional `<button>`
+  - Accessible with `role="status"` and `aria-live="polite"`
+  - Optional Lucide React icon support (48px size)
+  - 9 unit tests covering all variants and accessibility
+
+**Pages Updated with Empty States:**
+- ✅ ExpensesPage (Receipt icon) - "No expenses yet"
+- ✅ IncomesPage (DollarSign icon) - "No incomes yet"
+- ✅ RecurringPage (Repeat icon) - "No recurring expenses yet"
+- ✅ DashboardPage (existing compact empty states retained for multi-panel layout)
+- ✅ ProvidersPage (Store icon) - "No providers yet"
+- ✅ CategoriesPage (FolderOpen icon) - "No categories yet"
+- ✅ ClientsPage (Users icon) - "No clients yet"
+
+All page tests updated to check for new empty state text. EmptyState component follows project patterns with strict TypeScript and proper return types.
+
 **Files to Create (dark mode):**
 
 - `web/src/hooks/use-theme.ts`
@@ -947,7 +969,7 @@ All page tests updated to check for skeleton ARIA labels instead of loading text
 - [ ] All interactive elements keyboard accessible
 - [ ] Screen reader announces correctly
 - [x] Loading states for all async operations (F3.4.6 complete)
-- [ ] Empty states guide user action
+- [x] Empty states guide user action (F3.4.7 complete)
 
 ---
 
@@ -1040,11 +1062,11 @@ location / {
 | -------------------- | ----- | ---- | -------- |
 | F1. Scaffold         | 22    | 22   | 100%     |
 | F2. Core Features    | 44    | 37   | 84%      |
-| F3. Reports & Polish | 26    | 16   | 62%      |
+| F3. Reports & Polish | 26    | 17   | 65%      |
 | F4. Production       | 9     | 0    | 0%       |
-| **Total**            | **101** | **75** | **74%**  |
+| **Total**            | **101** | **76** | **75%**  |
 
-> Note: Frontend F2 progress currently counts completed tasks from F2.1 (Dashboard - 5 tasks), F2.2 (Expenses - 7 tasks including GST auto-calc and slider), F2.3 (Incomes - 10 tasks), F2.4 (CSV Import - 10 tasks), F2.5 (Providers & Categories - 6 tasks), and F2.6 (Clients - 3 tasks). F3 progress includes F3.1 (BAS Reports - 5 tasks), F3.2 (FY Reports - 6 tasks), and F3.3 (Recurring Expenses - 5 tasks). Remaining F2.x tasks include optional enhancements like pagination, searchable dropdowns, and inline editing.
+> Note: Frontend F2 progress currently counts completed tasks from F2.1 (Dashboard - 5 tasks), F2.2 (Expenses - 7 tasks including GST auto-calc and slider), F2.3 (Incomes - 10 tasks), F2.4 (CSV Import - 10 tasks), F2.5 (Providers & Categories - 6 tasks), and F2.6 (Clients - 3 tasks). F3 progress includes F3.1 (BAS Reports - 5 tasks), F3.2 (FY Reports - 6 tasks), F3.3 (Recurring Expenses - 5 tasks), and F3.4 (Polish & Accessibility - 2 tasks: F3.4.6 Loading Skeletons and F3.4.7 Empty States). Remaining F2.x tasks include optional enhancements like pagination, searchable dropdowns, and inline editing.
 
 ---
 

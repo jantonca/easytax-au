@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react';
 import { useState } from 'react';
+import { Store } from 'lucide-react';
 import type { ProviderDto } from '@/lib/api-client';
 import { ProvidersTable } from '@/features/settings/providers/components/providers-table';
 import { ProviderForm } from '@/features/settings/providers/components/provider-form';
@@ -7,6 +8,7 @@ import { useDeleteProvider } from '@/features/settings/providers/hooks/use-provi
 import { useProviders } from '@/hooks/use-providers';
 import { useCategories } from '@/hooks/use-categories';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useToast } from '@/lib/toast-context';
 import { SettingsTabs } from '@/features/settings/components/settings-tabs';
 import { TableSkeleton } from '@/components/skeletons/table-skeleton';
@@ -74,11 +76,19 @@ export function ProvidersPage(): ReactElement {
 
       {!providersLoading && !providersError && (
         <>
-          <ProvidersTable
-            providers={providers ?? []}
-            onEdit={(provider) => setProviderToEdit(provider)}
-            onDelete={(provider) => setProviderToDelete(provider)}
-          />
+          {!providers || providers.length === 0 ? (
+            <EmptyState
+              title="No providers yet"
+              description="Add providers to track which vendors you pay for expenses"
+              icon={<Store size={48} />}
+            />
+          ) : (
+            <ProvidersTable
+              providers={providers}
+              onEdit={(provider) => setProviderToEdit(provider)}
+              onDelete={(provider) => setProviderToDelete(provider)}
+            />
+          )}
 
           {isCreateOpen && (
             <div

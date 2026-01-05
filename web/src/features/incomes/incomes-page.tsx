@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react';
 import { useMemo, useState } from 'react';
+import { DollarSign } from 'lucide-react';
 import type { IncomeResponseDto } from '@/lib/api-client';
 import { IncomesTable } from '@/features/incomes/components/incomes-table';
 import {
@@ -15,6 +16,7 @@ import {
 } from '@/features/incomes/hooks/use-income-mutations';
 import { useClients } from '@/hooks/use-clients';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useToast } from '@/lib/toast-context';
 import { formatCents } from '@/lib/currency';
 import { TableSkeleton } from '@/components/skeletons/table-skeleton';
@@ -141,13 +143,23 @@ export function IncomesPage(): ReactElement {
 
       {!incomesLoading && !incomesError && (
         <>
-          <IncomeFilters clients={clients} value={filters} onChange={setFilters} />
-          <IncomesTable
-            incomes={filteredIncomes}
-            onEdit={(income) => setIncomeToEdit(income)}
-            onDelete={(income) => setIncomeToDelete(income)}
-            onTogglePaid={handleTogglePaid}
-          />
+          {filteredIncomes.length === 0 ? (
+            <EmptyState
+              title="No incomes yet"
+              description="Track your business income by adding your first invoice"
+              icon={<DollarSign size={48} />}
+            />
+          ) : (
+            <>
+              <IncomeFilters clients={clients} value={filters} onChange={setFilters} />
+              <IncomesTable
+                incomes={filteredIncomes}
+                onEdit={(income) => setIncomeToEdit(income)}
+                onDelete={(income) => setIncomeToDelete(income)}
+                onTogglePaid={handleTogglePaid}
+              />
+            </>
+          )}
 
           {isCreateOpen && (
             <div

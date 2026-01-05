@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react';
 import { useState } from 'react';
+import { Users } from 'lucide-react';
 import type { ClientDto } from '@/lib/api-client';
 import { ClientsTable } from '@/features/settings/clients/components/clients-table';
 import { ClientForm } from '@/features/settings/clients/components/client-form';
@@ -7,6 +8,7 @@ import { useDeleteClient } from '@/features/settings/clients/hooks/use-client-mu
 import { useClients } from '@/hooks/use-clients';
 import { useIncomes } from '@/features/incomes/hooks/use-incomes';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useToast } from '@/lib/toast-context';
 import { SettingsTabs } from '@/features/settings/components/settings-tabs';
 import { TableSkeleton } from '@/components/skeletons/table-skeleton';
@@ -74,12 +76,20 @@ export function ClientsPage(): ReactElement {
 
       {!clientsLoading && !clientsError && (
         <>
-          <ClientsTable
-            clients={clients ?? []}
-            incomes={incomes}
-            onEdit={(client) => setClientToEdit(client)}
-            onDelete={(client) => setClientToDelete(client)}
-          />
+          {!clients || clients.length === 0 ? (
+            <EmptyState
+              title="No clients yet"
+              description="Add clients to track income sources"
+              icon={<Users size={48} />}
+            />
+          ) : (
+            <ClientsTable
+              clients={clients}
+              incomes={incomes}
+              onEdit={(client) => setClientToEdit(client)}
+              onDelete={(client) => setClientToDelete(client)}
+            />
+          )}
 
           {isCreateOpen && (
             <div

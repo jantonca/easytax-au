@@ -226,7 +226,10 @@ describe('IncomesPage', () => {
 
     render(<IncomesPage />);
 
-    expect(screen.getByText('No incomes recorded yet.')).toBeInTheDocument();
+    expect(screen.getByText('No incomes yet')).toBeInTheDocument();
+    expect(
+      screen.getByText('Track your business income by adding your first invoice'),
+    ).toBeInTheDocument();
   });
 
   it('filters incomes by client', async () => {

@@ -167,7 +167,10 @@ describe('ExpensesPage', () => {
 
     render(<ExpensesPage />);
 
-    expect(screen.getByText('No expenses recorded yet.')).toBeInTheDocument();
+    expect(screen.getByText('No expenses yet')).toBeInTheDocument();
+    expect(
+      screen.getByText('Get started by adding your first business expense or import from CSV'),
+    ).toBeInTheDocument();
   });
 
   it('filters expenses by provider', async () => {

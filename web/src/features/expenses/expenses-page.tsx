@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react';
 import { useMemo, useState } from 'react';
+import { Receipt } from 'lucide-react';
 import type { ExpenseResponseDto } from '@/lib/api-client';
 import { ExpensesTable } from '@/features/expenses/components/expenses-table';
 import {
@@ -12,6 +13,7 @@ import { useDeleteExpense } from '@/features/expenses/hooks/use-expense-mutation
 import { useCategories } from '@/hooks/use-categories';
 import { useProviders } from '@/hooks/use-providers';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useToast } from '@/lib/toast-context';
 import { formatCents } from '@/lib/currency';
 import { TableSkeleton } from '@/components/skeletons/table-skeleton';
@@ -113,17 +115,27 @@ export function ExpensesPage(): ReactElement {
 
       {!expensesLoading && !expensesError && (
         <>
-          <ExpenseFilters
-            providers={providers}
-            categories={categories}
-            value={filters}
-            onChange={setFilters}
-          />
-          <ExpensesTable
-            expenses={filteredExpenses}
-            onEdit={(expense) => setExpenseToEdit(expense)}
-            onDelete={(expense) => setExpenseToDelete(expense)}
-          />
+          {filteredExpenses.length === 0 ? (
+            <EmptyState
+              title="No expenses yet"
+              description="Get started by adding your first business expense or import from CSV"
+              icon={<Receipt size={48} />}
+            />
+          ) : (
+            <>
+              <ExpenseFilters
+                providers={providers}
+                categories={categories}
+                value={filters}
+                onChange={setFilters}
+              />
+              <ExpensesTable
+                expenses={filteredExpenses}
+                onEdit={(expense) => setExpenseToEdit(expense)}
+                onDelete={(expense) => setExpenseToDelete(expense)}
+              />
+            </>
+          )}
 
           {isCreateOpen && (
             <div

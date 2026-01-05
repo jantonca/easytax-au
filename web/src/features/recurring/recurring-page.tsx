@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Repeat } from 'lucide-react';
 import { useRecurringExpenses } from './hooks/use-recurring';
 import { useDeleteRecurring } from './hooks/use-recurring-mutations';
 import { RecurringTable } from './components/recurring-table';
 import { RecurringForm } from './components/recurring-form';
 import { GenerateButton } from './components/generate-button';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useToast } from '@/lib/toast-context';
 import type { RecurringExpenseResponseDto } from '@/lib/api-client';
 import { formatCents } from '@/lib/currency';
@@ -118,17 +119,11 @@ export function RecurringPage(): JSX.Element {
 
       {/* Table */}
       {recurringExpenses.length === 0 ? (
-        <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-8 text-center">
-          <p className="mb-4 text-sm text-slate-400">No recurring expenses yet.</p>
-          <button
-            type="button"
-            onClick={() => setShowCreateModal(true)}
-            className="inline-flex h-8 items-center gap-2 rounded-md bg-emerald-600 px-3 text-xs font-medium text-white hover:bg-emerald-500"
-          >
-            <Plus className="h-4 w-4" />
-            Create Your First Recurring Expense
-          </button>
-        </div>
+        <EmptyState
+          title="No recurring expenses yet"
+          description="Automate repetitive expenses like monthly subscriptions"
+          icon={<Repeat size={48} />}
+        />
       ) : (
         <RecurringTable
           recurringExpenses={recurringExpenses}

@@ -1,11 +1,13 @@
 import type { ReactElement } from 'react';
 import { useState } from 'react';
+import { FolderOpen } from 'lucide-react';
 import type { CategoryDto } from '@/lib/api-client';
 import { CategoriesTable } from '@/features/settings/categories/components/categories-table';
 import { CategoryForm } from '@/features/settings/categories/components/category-form';
 import { useDeleteCategory } from '@/features/settings/categories/hooks/use-category-mutations';
 import { useCategories } from '@/hooks/use-categories';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useToast } from '@/lib/toast-context';
 import { SettingsTabs } from '@/features/settings/components/settings-tabs';
 import { TableSkeleton } from '@/components/skeletons/table-skeleton';
@@ -76,11 +78,19 @@ export function CategoriesPage(): ReactElement {
 
       {!categoriesLoading && !categoriesError && (
         <>
-          <CategoriesTable
-            categories={categories ?? []}
-            onEdit={(category) => setCategoryToEdit(category)}
-            onDelete={(category) => setCategoryToDelete(category)}
-          />
+          {!categories || categories.length === 0 ? (
+            <EmptyState
+              title="No categories yet"
+              description="Organize expenses by category for better BAS reporting"
+              icon={<FolderOpen size={48} />}
+            />
+          ) : (
+            <CategoriesTable
+              categories={categories}
+              onEdit={(category) => setCategoryToEdit(category)}
+              onDelete={(category) => setCategoryToDelete(category)}
+            />
+          )}
 
           {isCreateOpen && (
             <div

@@ -201,7 +201,7 @@ describe('ClientsPage', () => {
     );
 
     expect(screen.getByText('No clients yet')).toBeInTheDocument();
-    expect(screen.getByText('Add your first income client to get started.')).toBeInTheDocument();
+    expect(screen.getByText('Add clients to track income sources')).toBeInTheDocument();
   });
 
   it('opens create modal when Add client button is clicked', async () => {

@@ -205,7 +205,9 @@ describe('ProvidersPage', () => {
     );
 
     expect(screen.getByText('No providers yet')).toBeInTheDocument();
-    expect(screen.getByText('Add your first vendor to get started.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Add providers to track which vendors you pay for expenses'),
+    ).toBeInTheDocument();
   });
 
   it('opens create modal when Add provider button is clicked', async () => {

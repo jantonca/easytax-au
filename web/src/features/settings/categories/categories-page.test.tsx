@@ -182,7 +182,9 @@ describe('CategoriesPage', () => {
     );
 
     expect(screen.getByText('No categories yet')).toBeInTheDocument();
-    expect(screen.getByText('Add your first category to get started.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Organize expenses by category for better BAS reporting'),
+    ).toBeInTheDocument();
   });
 
   it('opens create modal when Add category button is clicked', async () => {

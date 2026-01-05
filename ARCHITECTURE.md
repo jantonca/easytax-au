@@ -103,6 +103,17 @@
     - Settings: Providers, Categories, Clients (table skeletons)
   - All skeletons use proper ARIA labels for accessibility
   - 23 skeleton-related unit tests (6 base + 9 table + 8 card)
+- **Empty States:**
+  - `web/src/components/ui/empty-state.tsx` (reusable empty state component)
+  - Props: `title`, `description`, `actionLabel?`, `onAction?`, `icon?`
+  - Semantic HTML with `<section>`, `<h3>`, `<p>`, and optional `<button>`
+  - Accessible with `role="status"` and `aria-live="polite"`
+  - Integrated across all data-listing pages:
+    - Expenses (Receipt icon) - "No expenses yet"
+    - Incomes (DollarSign icon) - "No incomes yet"
+    - Recurring Expenses (Repeat icon) - "No recurring expenses yet"
+    - Settings: Providers (Store icon), Categories (FolderOpen icon), Clients (Users icon)
+  - 9 unit tests covering all variants, accessibility, and keyboard navigation
 - **Layout & navigation:**
   - `web/src/components/layout/layout.tsx` (visual shell using sidebar, header, mobile nav, command palette)
   - `web/src/components/layout/sidebar.tsx` + `mobile-nav.tsx` (desktop & mobile navigation based on `NAV_ITEMS`)
