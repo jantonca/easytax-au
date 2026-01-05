@@ -112,6 +112,8 @@ describe('RecurringExpensesService', () => {
       dayOfMonth: 15,
       startDate: '2025-07-01',
       bizPercent: 50,
+      currency: 'AUD',
+      isActive: true,
       providerId: 'provider-domestic-uuid',
       categoryId: 'category-uuid',
     };
