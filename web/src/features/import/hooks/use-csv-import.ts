@@ -1,6 +1,7 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { UseMutationResult } from '@tanstack/react-query';
 import type { components } from '@shared/types';
+import { useToast } from '@/lib/toast-context';
 
 type CsvImportResponseDto = components['schemas']['CsvImportResponseDto'];
 
@@ -31,8 +32,14 @@ async function importCsv(params: ImportCsvParams): Promise<CsvImportResponseDto>
 
   if (!response.ok) {
     const errorData = (await response.json()) as unknown;
-    const error = errorData as { message?: string };
-    throw new Error(error.message || 'Failed to import CSV');
+    const error = errorData as { message?: string; status?: number };
+
+    // Create error with status for proper error handling
+    const apiError = new Error(error.message || 'Failed to import CSV') as Error & {
+      status?: number;
+    };
+    apiError.status = response.status;
+    throw apiError;
   }
 
   return (await response.json()) as CsvImportResponseDto;
@@ -40,7 +47,41 @@ async function importCsv(params: ImportCsvParams): Promise<CsvImportResponseDto>
 /* eslint-enable @typescript-eslint/no-unsafe-assignment */
 
 export function useImportCsv(): UseMutationResult<CsvImportResponseDto, Error, ImportCsvParams> {
+  const queryClient = useQueryClient();
+  const { showToast } = useToast();
+
   return useMutation({
     mutationFn: importCsv,
+    onSuccess: (data) => {
+      void queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      showToast({
+        title: `Expense import completed: ${data.imported} imported, ${data.skipped} skipped`,
+      });
+    },
+    onError: (error: Error) => {
+      const errorMessage = getErrorMessage(error, 'import expenses');
+      showToast({ title: errorMessage });
+    },
   });
+}
+
+/**
+ * Helper function to extract error messages for toast notifications.
+ * - For 4xx errors (client errors): Show specific API error message
+ * - For 5xx errors (server errors): Show generic message for security
+ */
+function getErrorMessage(error: unknown, action: string): string {
+  if (
+    error &&
+    typeof error === 'object' &&
+    'status' in error &&
+    'message' in error &&
+    typeof error.status === 'number' &&
+    typeof error.message === 'string'
+  ) {
+    if (error.status >= 400 && error.status < 500) {
+      return `Failed to ${action}: ${error.message}`;
+    }
+  }
+  return `Failed to ${action}`;
 }

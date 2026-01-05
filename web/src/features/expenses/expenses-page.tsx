@@ -14,7 +14,6 @@ import { useCategories } from '@/hooks/use-categories';
 import { useProviders } from '@/hooks/use-providers';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { EmptyState } from '@/components/ui/empty-state';
-import { useToast } from '@/lib/toast-context';
 import { formatCents } from '@/lib/currency';
 import { TableSkeleton } from '@/components/skeletons/table-skeleton';
 
@@ -28,7 +27,6 @@ export function ExpensesPage(): ReactElement {
   const [expenseToDelete, setExpenseToDelete] = useState<ExpenseResponseDto | null>(null);
 
   const { mutate: deleteExpense, isPending: isDeleting } = useDeleteExpense();
-  const { showToast } = useToast();
 
   const [filters, setFilters] = useState<ExpenseFiltersValue>({
     providerId: 'all',
@@ -70,18 +68,7 @@ export function ExpensesPage(): ReactElement {
 
     deleteExpense(expenseToDelete.id, {
       onSuccess: () => {
-        showToast({
-          title: 'Expense deleted',
-          description: 'The expense has been removed successfully.',
-        });
         setExpenseToDelete(null);
-      },
-      onError: (error) => {
-        console.error('Error deleting expense:', error);
-        showToast({
-          title: 'Error',
-          description: 'Failed to delete expense. Please try again.',
-        });
       },
     });
   }

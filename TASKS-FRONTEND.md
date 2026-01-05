@@ -901,7 +901,7 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 | F3.4.5 | Ensure color contrast meets WCAG AA                 | ⬜     |
 | F3.4.6 | Add loading skeletons for all data fetches          | ✅     |
 | F3.4.7 | Add empty states for all lists                      | ✅     |
-| F3.4.8 | Add success/error toasts for all mutations          | ⬜     |
+| F3.4.8 | Add success/error toasts for all mutations          | ✅     |
 | F3.4.9 | Implement dark mode toggle (stored in localStorage) | ⬜     |
 
 **F3.4.6 Implementation Details (Loading Skeletons):**
@@ -1062,11 +1062,11 @@ location / {
 | -------------------- | ----- | ---- | -------- |
 | F1. Scaffold         | 22    | 22   | 100%     |
 | F2. Core Features    | 44    | 37   | 84%      |
-| F3. Reports & Polish | 26    | 17   | 65%      |
+| F3. Reports & Polish | 26    | 18   | 69%      |
 | F4. Production       | 9     | 0    | 0%       |
-| **Total**            | **101** | **76** | **75%**  |
+| **Total**            | **101** | **77** | **76%**  |
 
-> Note: Frontend F2 progress currently counts completed tasks from F2.1 (Dashboard - 5 tasks), F2.2 (Expenses - 7 tasks including GST auto-calc and slider), F2.3 (Incomes - 10 tasks), F2.4 (CSV Import - 10 tasks), F2.5 (Providers & Categories - 6 tasks), and F2.6 (Clients - 3 tasks). F3 progress includes F3.1 (BAS Reports - 5 tasks), F3.2 (FY Reports - 6 tasks), F3.3 (Recurring Expenses - 5 tasks), and F3.4 (Polish & Accessibility - 2 tasks: F3.4.6 Loading Skeletons and F3.4.7 Empty States). Remaining F2.x tasks include optional enhancements like pagination, searchable dropdowns, and inline editing.
+> Note: Frontend F2 progress currently counts completed tasks from F2.1 (Dashboard - 5 tasks), F2.2 (Expenses - 7 tasks including GST auto-calc and slider), F2.3 (Incomes - 10 tasks), F2.4 (CSV Import - 10 tasks), F2.5 (Providers & Categories - 6 tasks), and F2.6 (Clients - 3 tasks). F3 progress includes F3.1 (BAS Reports - 5 tasks), F3.2 (FY Reports - 6 tasks), F3.3 (Recurring Expenses - 5 tasks), and F3.4 (Polish & Accessibility - 3 tasks: F3.4.6 Loading Skeletons, F3.4.7 Empty States, and F3.4.8 Toast Notifications). Remaining F2.x tasks include optional enhancements like pagination, searchable dropdowns, and inline editing.
 
 ---
 

@@ -10,7 +10,6 @@ import {
   useCreateExpense,
   useUpdateExpense,
 } from '@/features/expenses/hooks/use-expense-mutations';
-import { useToast } from '@/lib/toast-context';
 
 interface ExpenseFormProps {
   providers: ProviderDto[];
@@ -68,7 +67,6 @@ export function ExpenseForm({
 
   const { mutate: createExpense, isPending: isCreating } = useCreateExpense();
   const { mutate: updateExpense, isPending: isUpdating } = useUpdateExpense();
-  const { showToast } = useToast();
 
   const submitting = isSubmitting || isCreating || isUpdating;
 
@@ -160,18 +158,7 @@ export function ExpenseForm({
         { id: expenseId, data: payload },
         {
           onSuccess: () => {
-            showToast({
-              title: 'Expense updated',
-              description: 'The expense has been updated successfully.',
-            });
             onSuccess?.();
-          },
-          onError: (error) => {
-            console.error('Error updating expense:', error);
-            showToast({
-              title: 'Error',
-              description: 'Failed to update expense. Please try again.',
-            });
           },
         },
       );
@@ -180,19 +167,8 @@ export function ExpenseForm({
         { data: payload },
         {
           onSuccess: () => {
-            showToast({
-              title: 'Expense created',
-              description: 'The expense has been saved successfully.',
-            });
             reset();
             onSuccess?.();
-          },
-          onError: (error) => {
-            console.error('Error creating expense:', error);
-            showToast({
-              title: 'Error',
-              description: 'Failed to save expense. Please try again.',
-            });
           },
         },
       );

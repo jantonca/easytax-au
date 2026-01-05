@@ -7,6 +7,13 @@ import { useImportIncomeCsv } from './use-income-csv-import';
 // Mock fetch
 global.fetch = vi.fn();
 
+// Mock useToast
+vi.mock('@/lib/toast-context', () => ({
+  useToast: () => ({
+    showToast: vi.fn(),
+  }),
+}));
+
 function createWrapper() {
   const queryClient = new QueryClient({
     defaultOptions: {
