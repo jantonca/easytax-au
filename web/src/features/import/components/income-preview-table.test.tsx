@@ -11,7 +11,7 @@ type CsvRowResultDto = BaseCsvRowResultDto & {
   clientName?: string;
   subtotalCents?: number;
   totalCents?: number;
-  invoiceNumber?: string;
+  invoiceNum?: string;
   isPaid?: boolean;
 };
 
@@ -53,7 +53,7 @@ describe('IncomePreviewTable', () => {
         success: true,
         clientName: 'Acme Corp',
         matchScore: 0.95,
-        invoiceNumber: 'INV-001',
+        invoiceNum: 'INV-001',
         subtotalCents: 100000,
         gstCents: 10000,
         totalCents: 110000,

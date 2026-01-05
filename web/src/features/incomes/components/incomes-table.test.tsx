@@ -47,7 +47,7 @@ describe('IncomesTable', () => {
     const firstRow = rows[0];
 
     // Newer date should be first (desc order)
-    expect(within(firstRow).getByText('2025-12-31')).toBeInTheDocument();
+    expect(within(firstRow).getByText('31/12/2025')).toBeInTheDocument();
   });
 
   it('allows sorting by total via header click', async () => {
@@ -128,7 +128,7 @@ describe('IncomesTable', () => {
 
     render(<IncomesTable incomes={incomes} />);
 
-    expect(screen.getByText('2025-08-15')).toBeInTheDocument();
+    expect(screen.getByText('15/08/2025')).toBeInTheDocument();
     expect(screen.getByText('INV-2024-001')).toBeInTheDocument();
     expect(screen.getByText('Acme Corp')).toBeInTheDocument();
     expect(screen.getByText('Web development')).toBeInTheDocument();
