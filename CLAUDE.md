@@ -1,43 +1,45 @@
-# Project Overview: [Project Name]
+# 🤖 CLAUDE.md | Project Intelligence & Agent Directives
+
+## 🎯 Role & Persona
+
+You act as an expert senior front-end developer. You must follow the **Collaboration Protocol** in `.github/copilot-instructions.md`, specifically the **"Propose, Justify, Recommend"** framework for all architectural decisions.
 
 ## 🏗 Architecture & Stack
 
-- **Monorepo Structure:** Managed via `pnpm`.
-  - `/web`: Primary frontend (React/Next.js).
-  - `/shared`: Shared logic and `@shared/types`.
-- **Type System:** Strict TypeScript. **Never duplicate types**; always import from `@shared/types` or `@api-types`.
-- **Styling:** Tailwind CSS following "Vibe Coding" rules in `.github/copilot-instructions.md`.
-- **Data:** All currency amounts are stored and handled as **integers in cents**. Use `formatCents()` for display logic.
+- **Monorepo:** Managed via `pnpm`. `/web` (React/Next.js) and `/shared` (logic/types).
+- **Type System:** Strict TypeScript. **Never duplicate types**; import from `@shared/types`.
+- **Data:** All currency amounts MUST be **integers in cents**. Use `formatCents()` for display logic.
+- **Styling:** Tailwind CSS following "Vibe Coding" rules (Atomic components, accessible, performant).
 
 ## 🛠 Mandatory Workflow (TDD)
 
-1. **Planning (Opus):** Analyze `TASKS-FRONTEND.md` and `ROADMAP.md` to define the next logical sub-task.
-2. **Test First (Sonnet):** - You MUST create or update the unit test file (`.test.ts/tsx`) before writing implementation code.
-   - Run `pnpm --filter web test [path]` to verify the test fails.
-3. **Implementation:** Write the minimal code needed to pass the test.
-4. **Verification:** Run `pnpm --filter web lint` and `pnpm --filter web test` again.
-5. **Documentation:** Update relevant `.md` files (TASKS, ARCHITECTURE, etc.) upon completion.
+1. **Planning (Opus):** Analyze `TASKS-FRONTEND.md` and `.github/copilot-instructions.md` to define the sub-task.
+2. **Test First (Sonnet):** Create/update `.test.ts/tsx` before implementation.
+   - Run `pnpm --filter web test [path]` to verify failure.
+3. **Implementation:** Write minimal code to pass tests. Follow **Security First** and **A11y** principles.
+4. **Verification:** Run `pnpm --filter web lint` and `pnpm --filter web test`.
+5. **Vibe Check:** Self-audit against the **Pre-Submission Checklist** in `copilot-instructions.md`.
+6. **Documentation:** Update `.md` files and use **Conventional Commits** for git.
 
-## 💻 Common Commands
+## 💻 CLI & Commands
 
-- **Lint:** `pnpm --filter web lint`
-- **Build:** `pnpm --filter web build`
-- **Test (All):** `pnpm --filter web test`
-- **Test (File):** `pnpm --filter web test [filename]`
+Use these via the `Bash` tool. Preferred aliases:
+
+- **Test:** `pnpm --filter web test` (or `/test`)
+- **Lint:** `pnpm --filter web lint` (or `/lint`)
 - **Format:** `pnpm --filter web format`
-
-## 📚 Key Context Files
-
-- `ARCHITECTURE.md`: High-level system design.
-- `TASKS-FRONTEND.md`: Current frontend backlog and progress.
-- `SCHEMA.md`: Database and API contract definitions.
-- `SECURITY.md`: Authentication and authorization rules.
-- `.github/copilot-instructions.md`: UI "vibe" and coding patterns.
-- `AGENTS.MD`: AI Agent Directives for EasyTax-AU
-- `CHANGELOG-CSV-IMPORT-FIX.md`: CSV import fix
+- **Build:** `pnpm --filter web build`
 
 ## ⚠️ Guardrails
 
-- **No `any`:** Forbidden. Use proper interfaces.
-- **Optimistic UI:** All mutations must implement optimistic updates with rollback logic.
-- **Accessibility:** Mandatory ARIA labels and keyboard navigation for all interactive components.
+- **No `any`:** Forbidden.
+- **No `console.log`:** Remove before completion.
+- **Optimistic UI:** Mandatory for mutations with rollback logic.
+- **Accessibility:** Mandatory ARIA labels and semantic HTML.
+- **Security:** Sanitize all inputs; no hardcoded secrets.
+
+## 📚 Key Context Files
+
+- `.github/copilot-instructions.md`: Detailed UI/UX and Collaboration protocol.
+- `ARCHITECTURE.md`: High-level design.
+- `TASKS-FRONTEND.md`: Current backlog.
