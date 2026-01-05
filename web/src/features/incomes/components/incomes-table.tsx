@@ -131,7 +131,7 @@ export function IncomesTable({
         </p>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[900px] border-collapse text-left text-xs text-slate-300">
+        <table className="w-full min-w-225 border-collapse text-left text-xs text-slate-300">
           <thead>
             <tr className="border-b border-slate-800 text-[11px] uppercase tracking-[0.18em] text-slate-500">
               <th

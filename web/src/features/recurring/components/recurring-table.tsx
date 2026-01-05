@@ -118,7 +118,7 @@ export function RecurringTable({
         </p>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[880px] border-collapse text-left text-xs text-slate-300">
+        <table className="w-full min-w-220 border-collapse text-left text-xs text-slate-300">
           <thead>
             <tr className="border-b border-slate-800 text-[11px] uppercase tracking-[0.18em] text-slate-500">
               <th

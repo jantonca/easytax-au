@@ -352,7 +352,7 @@ export function ExpenseForm({
         </label>
         <textarea
           id="expense-description"
-          className="min-h-[72px] rounded-md border border-slate-800 bg-slate-950 px-2 py-1 text-xs text-slate-100"
+          className="min-h-18 rounded-md border border-slate-800 bg-slate-950 px-2 py-1 text-xs text-slate-100"
           {...register('description')}
         />
         {errors.description && (
