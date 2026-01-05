@@ -146,7 +146,7 @@ describe('IncomesPage', () => {
 
     render(<IncomesPage />);
 
-    expect(screen.getByText('Loading incomes…')).toBeInTheDocument();
+    expect(screen.getByLabelText('Loading incomes')).toBeInTheDocument();
   });
 
   it('shows error state when loading fails', () => {

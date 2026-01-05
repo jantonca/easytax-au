@@ -115,7 +115,7 @@ describe('ExpensesPage', () => {
 
     render(<ExpensesPage />);
 
-    expect(screen.getByText('Loading expenses…')).toBeInTheDocument();
+    expect(screen.getByLabelText('Loading expenses')).toBeInTheDocument();
   });
 
   it('shows error state when loading fails', () => {

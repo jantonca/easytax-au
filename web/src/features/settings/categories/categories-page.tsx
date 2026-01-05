@@ -8,6 +8,7 @@ import { useCategories } from '@/hooks/use-categories';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useToast } from '@/lib/toast-context';
 import { SettingsTabs } from '@/features/settings/components/settings-tabs';
+import { TableSkeleton } from '@/components/skeletons/table-skeleton';
 
 export function CategoriesPage(): ReactElement {
   const {
@@ -65,11 +66,7 @@ export function CategoriesPage(): ReactElement {
         </button>
       </header>
 
-      {categoriesLoading && (
-        <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-400">
-          Loading categories…
-        </div>
-      )}
+      {categoriesLoading && <TableSkeleton columns={5} rows={6} ariaLabel="Loading categories" />}
 
       {categoriesError && !categoriesLoading && (
         <div className="rounded-lg border border-red-900/60 bg-red-950/60 p-4 text-sm text-red-200">

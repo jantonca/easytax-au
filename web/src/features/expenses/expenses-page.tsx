@@ -14,6 +14,7 @@ import { useProviders } from '@/hooks/use-providers';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useToast } from '@/lib/toast-context';
 import { formatCents } from '@/lib/currency';
+import { TableSkeleton } from '@/components/skeletons/table-skeleton';
 
 export function ExpensesPage(): ReactElement {
   const { data: expenses, isLoading: expensesLoading, isError: expensesError } = useExpenses();
@@ -102,11 +103,7 @@ export function ExpensesPage(): ReactElement {
         </button>
       </header>
 
-      {expensesLoading && (
-        <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-400">
-          Loading expenses…
-        </div>
-      )}
+      {expensesLoading && <TableSkeleton columns={9} rows={8} ariaLabel="Loading expenses" />}
 
       {expensesError && !expensesLoading && (
         <div className="rounded-lg border border-red-900/60 bg-red-950/60 p-4 text-sm text-red-200">

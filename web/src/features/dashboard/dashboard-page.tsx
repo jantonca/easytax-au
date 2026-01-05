@@ -3,6 +3,7 @@ import { GstSummaryCard } from '@/features/dashboard/components/gst-summary-card
 import { QuickActions } from '@/features/dashboard/components/quick-actions';
 import { RecentExpenses } from '@/features/dashboard/components/recent-expenses';
 import { useDashboardData } from '@/features/dashboard/hooks/use-dashboard-data';
+import { CardSkeleton } from '@/components/skeletons/card-skeleton';
 
 export function DashboardPage(): ReactElement {
   const {
@@ -21,11 +22,12 @@ export function DashboardPage(): ReactElement {
     <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-4 py-2">
       <div className="grid gap-3 md:grid-cols-4">
         {basLoading && !bas ? (
-          <GstSummaryCard
-            label="Current quarter (loading)"
-            valueCents={0}
-            description="Fetching BAS summary…"
-          />
+          <>
+            <CardSkeleton showDescription ariaLabel="Loading G1" />
+            <CardSkeleton showDescription ariaLabel="Loading 1A" />
+            <CardSkeleton showDescription ariaLabel="Loading 1B" />
+            <CardSkeleton showDescription ariaLabel="Loading Net GST" />
+          </>
         ) : bas && !showError ? (
           <>
             <GstSummaryCard

@@ -9,6 +9,7 @@ import { useIncomes } from '@/features/incomes/hooks/use-incomes';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useToast } from '@/lib/toast-context';
 import { SettingsTabs } from '@/features/settings/components/settings-tabs';
+import { TableSkeleton } from '@/components/skeletons/table-skeleton';
 
 export function ClientsPage(): ReactElement {
   const { data: clients, isLoading: clientsLoading, isError: clientsError } = useClients();
@@ -63,11 +64,7 @@ export function ClientsPage(): ReactElement {
         </button>
       </header>
 
-      {clientsLoading && (
-        <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-400">
-          Loading clients…
-        </div>
-      )}
+      {clientsLoading && <TableSkeleton columns={5} rows={6} ariaLabel="Loading clients" />}
 
       {clientsError && !clientsLoading && (
         <div className="rounded-lg border border-red-900/60 bg-red-950/60 p-4 text-sm text-red-200">

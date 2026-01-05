@@ -10,6 +10,7 @@ import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useToast } from '@/lib/toast-context';
 import type { RecurringExpenseResponseDto } from '@/lib/api-client';
 import { formatCents } from '@/lib/currency';
+import { TableSkeleton } from '@/components/skeletons/table-skeleton';
 
 export function RecurringPage(): JSX.Element {
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -75,9 +76,7 @@ export function RecurringPage(): JSX.Element {
   if (isLoading) {
     return (
       <section className="mx-auto flex max-w-5xl flex-col gap-3">
-        <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-400">
-          Loading recurring expenses…
-        </div>
+        <TableSkeleton columns={9} rows={5} ariaLabel="Loading recurring expenses" />
       </section>
     );
   }

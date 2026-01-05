@@ -128,7 +128,7 @@ describe('ClientsPage', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByText('Loading clients…')).toBeInTheDocument();
+    expect(screen.getByLabelText('Loading clients')).toBeInTheDocument();
   });
 
   it('shows error state when loading fails', () => {

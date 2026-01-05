@@ -117,7 +117,7 @@ describe('CategoriesPage', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByText('Loading categories…')).toBeInTheDocument();
+    expect(screen.getByLabelText('Loading categories')).toBeInTheDocument();
   });
 
   it('shows error state when loading fails', () => {

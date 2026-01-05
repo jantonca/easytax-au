@@ -132,7 +132,7 @@ describe('ProvidersPage', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByText('Loading providers…')).toBeInTheDocument();
+    expect(screen.getByLabelText('Loading providers')).toBeInTheDocument();
   });
 
   it('shows error state when loading fails', () => {

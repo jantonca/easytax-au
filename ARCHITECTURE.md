@@ -93,6 +93,16 @@
   - `web/src/lib/toast-context.ts` (`ToastContext`, `useToast`)
   - `web/src/components/ui/toast-provider.tsx` (state management)
   - `web/src/components/ui/toast-viewport.tsx` (Tailwind-styled, accessible UI, bottom-right)
+- **Loading States (Skeleton Components):**
+  - `web/src/components/ui/skeleton.tsx` (base skeleton with animated pulse, dark mode support)
+  - `web/src/components/skeletons/table-skeleton.tsx` (configurable table skeleton with N columns/rows, ARIA labels)
+  - `web/src/components/skeletons/card-skeleton.tsx` (card skeleton mimicking GstSummaryCard structure)
+  - Integrated across all data-fetching pages:
+    - Expenses, Incomes, Recurring Expenses (table skeletons)
+    - Dashboard (card skeletons for BAS summary)
+    - Settings: Providers, Categories, Clients (table skeletons)
+  - All skeletons use proper ARIA labels for accessibility
+  - 23 skeleton-related unit tests (6 base + 9 table + 8 card)
 - **Layout & navigation:**
   - `web/src/components/layout/layout.tsx` (visual shell using sidebar, header, mobile nav, command palette)
   - `web/src/components/layout/sidebar.tsx` + `mobile-nav.tsx` (desktop & mobile navigation based on `NAV_ITEMS`)

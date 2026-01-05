@@ -17,6 +17,7 @@ import { useClients } from '@/hooks/use-clients';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { useToast } from '@/lib/toast-context';
 import { formatCents } from '@/lib/currency';
+import { TableSkeleton } from '@/components/skeletons/table-skeleton';
 
 export function IncomesPage(): ReactElement {
   const { data: incomes, isLoading: incomesLoading, isError: incomesError } = useIncomes();
@@ -130,11 +131,7 @@ export function IncomesPage(): ReactElement {
         </button>
       </header>
 
-      {incomesLoading && (
-        <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-400">
-          Loading incomes…
-        </div>
-      )}
+      {incomesLoading && <TableSkeleton columns={9} rows={8} ariaLabel="Loading incomes" />}
 
       {incomesError && !incomesLoading && (
         <div className="rounded-lg border border-red-900/60 bg-red-950/60 p-4 text-sm text-red-200">
