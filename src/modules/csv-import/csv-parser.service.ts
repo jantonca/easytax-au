@@ -29,8 +29,7 @@ export class CsvParserService {
    * @returns Array of parsed rows
    */
   parseString(content: string, mapping: CsvColumnMapping): ParsedCsvRow[] {
-    // csv-parse/sync returns unknown, cast to our expected type
-    const records = parse(content, {
+    const records: Record<string, string>[] = parse(content, {
       columns: true,
       skip_empty_lines: true,
       trim: true,

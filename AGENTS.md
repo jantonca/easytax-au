@@ -148,6 +148,7 @@ export class MyDto {
 ```
 
 **Real-World Example**: CSV Import module uses separate endpoints with hardcoded `dryRun` values:
+
 - Expense import: `/import/expenses` (line ~137: `dryRun: false`) and `/import/expenses/preview` (line ~229: `dryRun: true`)
 - Income import: `/import/incomes` (line ~380: `dryRun: false`) and `/import/incomes/preview` (line ~TBD: `dryRun: true`)
 
