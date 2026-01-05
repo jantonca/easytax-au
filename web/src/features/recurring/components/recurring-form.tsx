@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from 'react';
+import type { JSX } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -24,7 +25,7 @@ export function RecurringForm({
   onCancel,
   initialValues,
   recurringId,
-}: RecurringFormProps) {
+}: RecurringFormProps): JSX.Element {
   const isEditMode = Boolean(recurringId && initialValues);
   const { data: providers = [] } = useProviders();
   const { data: categories = [] } = useCategories();

@@ -11,6 +11,8 @@ interface ImportCsvParams {
   skipDuplicates?: boolean;
 }
 
+// FormData.append() accepts any value by design - disable unsafe assignment for this function
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 async function importCsv(params: ImportCsvParams): Promise<CsvImportResponseDto> {
   const { file, source, matchThreshold = 0.6, skipDuplicates = true } = params;
 
@@ -22,18 +24,20 @@ async function importCsv(params: ImportCsvParams): Promise<CsvImportResponseDto>
   formData.append('dryRun', 'false'); // Actual import, not preview
 
   const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-  const response = await fetch(`${baseUrl}/import/expenses`, {
+  const response: Response = await fetch(`${baseUrl}/import/expenses`, {
     method: 'POST',
     body: formData,
   });
 
   if (!response.ok) {
-    const error = (await response.json()) as { message?: string };
+    const errorData = (await response.json()) as unknown;
+    const error = errorData as { message?: string };
     throw new Error(error.message || 'Failed to import CSV');
   }
 
   return (await response.json()) as CsvImportResponseDto;
 }
+/* eslint-enable @typescript-eslint/no-unsafe-assignment */
 
 export function useImportCsv(): UseMutationResult<CsvImportResponseDto, Error, ImportCsvParams> {
   return useMutation({

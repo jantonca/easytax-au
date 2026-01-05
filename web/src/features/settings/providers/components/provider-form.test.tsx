@@ -197,7 +197,9 @@ describe('ProviderForm', () => {
 
     render(<ProviderForm categories={categories} />);
 
-    const internationalCheckbox = screen.getByLabelText(/International provider/i);
+    const internationalCheckbox = screen.getByLabelText(
+      /International provider/i,
+    ) as HTMLInputElement;
 
     expect(internationalCheckbox.checked).toBe(false);
 

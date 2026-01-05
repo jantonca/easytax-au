@@ -7,7 +7,7 @@ import { usePreviewCsvImport } from './hooks/use-csv-preview';
 import { useImportCsv } from './hooks/use-csv-import';
 import { Loader2 } from 'lucide-react';
 
-type ImportSource = 'commbank' | 'amex' | 'custom' | 'nab' | 'westpac' | 'anz';
+type ImportSource = 'commbank' | 'amex' | 'custom' | 'nab' | 'westpac' | 'anz' | 'manual';
 
 interface SourceOption {
   value: ImportSource;

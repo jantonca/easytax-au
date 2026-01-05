@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { JSX } from 'react';
 import { Plus } from 'lucide-react';
 import { useRecurringExpenses } from './hooks/use-recurring';
 import { useDeleteRecurring } from './hooks/use-recurring-mutations';
@@ -10,7 +11,7 @@ import { useToast } from '@/lib/toast-context';
 import type { RecurringExpenseResponseDto } from '@/lib/api-client';
 import { formatCents } from '@/lib/currency';
 
-export function RecurringPage() {
+export function RecurringPage(): JSX.Element {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingRecurring, setEditingRecurring] = useState<RecurringExpenseResponseDto | null>(
     null,

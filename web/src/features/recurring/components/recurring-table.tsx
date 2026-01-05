@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import type { JSX } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
 import { formatCents } from '@/lib/currency';
 import type { RecurringExpenseResponseDto } from '@/lib/api-client';
@@ -12,7 +13,11 @@ interface RecurringTableProps {
   onDelete: (recurring: RecurringExpenseResponseDto) => void;
 }
 
-export function RecurringTable({ recurringExpenses, onEdit, onDelete }: RecurringTableProps) {
+export function RecurringTable({
+  recurringExpenses,
+  onEdit,
+  onDelete,
+}: RecurringTableProps): JSX.Element {
   const [sortField, setSortField] = useState<SortField>('nextDueDate');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
@@ -262,9 +267,10 @@ export function RecurringTable({ recurringExpenses, onEdit, onDelete }: Recurrin
                   </td>
                   <td className="py-2 pr-3 text-slate-400">
                     {recurring.lastGeneratedDate &&
-                    typeof recurring.lastGeneratedDate === 'string' &&
-                    recurring.lastGeneratedDate.length > 0
-                      ? new Date(recurring.lastGeneratedDate).toLocaleDateString()
+                    (recurring.lastGeneratedDate as unknown as string)
+                      ? new Date(
+                          recurring.lastGeneratedDate as unknown as string,
+                        ).toLocaleDateString()
                       : 'Never'}
                   </td>
                   <td className="py-2 pr-3">

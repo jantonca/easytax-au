@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { JSX } from 'react';
 import { Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useGenerateRecurring } from '../hooks/use-recurring-mutations';
@@ -10,7 +11,7 @@ interface GenerateButtonProps {
   onSuccess?: (result: GenerateExpensesResultDto) => void;
 }
 
-export function GenerateButton({ onSuccess }: GenerateButtonProps) {
+export function GenerateButton({ onSuccess }: GenerateButtonProps): JSX.Element {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [lastResult, setLastResult] = useState<GenerateExpensesResultDto | null>(null);

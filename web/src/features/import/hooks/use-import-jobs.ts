@@ -15,11 +15,12 @@ interface ImportJob {
 }
 
 async function fetchImportJobs(): Promise<ImportJob[]> {
-  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-  const response = await fetch(`${baseUrl}/import/jobs`);
+  const baseUrl = (import.meta.env.VITE_API_URL as string | undefined) || 'http://localhost:3000';
+  const response: Response = await fetch(`${baseUrl}/import/jobs`);
 
   if (!response.ok) {
-    const error = (await response.json()) as { message?: string };
+    const errorData = (await response.json()) as unknown;
+    const error = errorData as { message?: string };
     throw new Error(error.message || 'Failed to fetch import jobs');
   }
 
