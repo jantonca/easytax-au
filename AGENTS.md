@@ -147,7 +147,13 @@ export class MyDto {
 }
 ```
 
-**Real-World Example**: CSV Import module uses separate endpoints (`/import/expenses/preview` and `/import/expenses`) to avoid boolean conversion issues entirely. See `src/modules/csv-import/csv-import.controller.ts` lines 43 and 201.
+**Real-World Example**: CSV Import module uses separate endpoints with hardcoded `dryRun` values:
+- Expense import: `/import/expenses` (line ~137: `dryRun: false`) and `/import/expenses/preview` (line ~229: `dryRun: true`)
+- Income import: `/import/incomes` (line ~380: `dryRun: false`) and `/import/incomes/preview` (line ~TBD: `dryRun: true`)
+
+This pattern is **established and tested** across both expense and income imports. Always hardcode boolean values in the controller, never trust FormData parameters.
+
+See `src/modules/csv-import/csv-import.controller.ts` for implementation.
 
 ---
 
