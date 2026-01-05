@@ -10,6 +10,7 @@ interface ImportProgressProps {
   error: Error | null;
   onViewExpenses?: () => void;
   onImportMore?: () => void;
+  buttonLabel?: string;
 }
 
 function formatCurrency(cents: number): string {
@@ -30,11 +31,12 @@ export function ImportProgress({
   error,
   onViewExpenses,
   onImportMore,
+  buttonLabel = 'View Expenses',
 }: ImportProgressProps): ReactElement {
   // Loading state
   if (isLoading) {
     return (
-      <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-slate-800 bg-slate-900/40 p-12">
+      <div className="flex min-h-100 flex-col items-center justify-center rounded-lg border border-slate-800 bg-slate-900/40 p-12">
         <Loader2 className="mb-4 h-12 w-12 animate-spin text-emerald-500" />
         <h2 className="mb-2 text-xl font-semibold text-slate-200">Importing</h2>
         <p className="text-slate-400">Please wait while we process your CSV file...</p>
@@ -135,7 +137,7 @@ export function ImportProgress({
               onClick={onViewExpenses}
               className="rounded-lg bg-emerald-600 px-6 py-3 font-medium text-white transition-colors hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-900"
             >
-              View Expenses
+              {buttonLabel}
             </button>
           )}
           {onImportMore && (

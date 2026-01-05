@@ -274,12 +274,14 @@ export interface IncomeCsvImportOptions {
  * Predefined column mappings for income CSV sources.
  */
 export const INCOME_CSV_COLUMN_MAPPINGS: Record<string, IncomeCsvColumnMapping> = {
-  /** Custom spreadsheet format (Client, Invoice #, Subtotal, GST, Total) */
+  /** Custom spreadsheet format (Client, Invoice #, Subtotal, GST, Total, Date, Description) */
   custom: {
     client: 'Client',
     invoiceNum: 'Invoice #',
     subtotal: 'Subtotal',
     gst: 'GST',
     total: 'Total',
+    date: 'Date',
+    description: 'Description',
   },
 };

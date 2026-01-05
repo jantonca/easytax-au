@@ -278,12 +278,15 @@ export class IncomeCsvImportRequestDto {
     description: 'Skip duplicate incomes',
     default: true,
   })
-  @Transform(({ value }) => {
-    if (typeof value === 'string') {
-      return value === 'true' || value === '1';
-    }
-    return Boolean(value);
-  })
+  @Transform(
+    ({ value }) => {
+      if (typeof value === 'string') {
+        return value === 'true' || value === '1';
+      }
+      return Boolean(value);
+    },
+    { toClassOnly: true },
+  )
   @IsBoolean()
   @IsOptional()
   skipDuplicates?: boolean;
@@ -292,12 +295,17 @@ export class IncomeCsvImportRequestDto {
     description: 'Preview mode - do not create incomes',
     default: false,
   })
-  @Transform(({ value }) => {
-    if (typeof value === 'string') {
-      return value === 'true' || value === '1';
-    }
-    return Boolean(value);
-  })
+  @Transform(
+    ({ value }) => {
+      if (typeof value === 'string') {
+        // Explicitly handle 'false' and '0' as false
+        if (value === 'false' || value === '0' || value === '') return false;
+        return value === 'true' || value === '1';
+      }
+      return Boolean(value);
+    },
+    { toClassOnly: true },
+  )
   @IsBoolean()
   @IsOptional()
   dryRun?: boolean;
@@ -306,12 +314,15 @@ export class IncomeCsvImportRequestDto {
     description: 'Mark all imported incomes as paid',
     default: false,
   })
-  @Transform(({ value }) => {
-    if (typeof value === 'string') {
-      return value === 'true' || value === '1';
-    }
-    return Boolean(value);
-  })
+  @Transform(
+    ({ value }) => {
+      if (typeof value === 'string') {
+        return value === 'true' || value === '1';
+      }
+      return Boolean(value);
+    },
+    { toClassOnly: true },
+  )
   @IsBoolean()
   @IsOptional()
   markAsPaid?: boolean;
@@ -344,6 +355,12 @@ export class IncomeCsvRowResultDto {
 
   @ApiPropertyOptional({ description: 'Invoice number' })
   invoiceNum?: string;
+
+  @ApiPropertyOptional({ description: 'Invoice date (ISO 8601)' })
+  date?: string;
+
+  @ApiPropertyOptional({ description: 'Income description' })
+  description?: string;
 
   @ApiPropertyOptional({ description: 'Subtotal in cents' })
   subtotalCents?: number;

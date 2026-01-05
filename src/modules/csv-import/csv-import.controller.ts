@@ -7,6 +7,7 @@ import {
   BadRequestException,
   ParseFilePipe,
   MaxFileSizeValidator,
+  Logger,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse, ApiConsumes, ApiBody } from '@nestjs/swagger';
@@ -32,6 +33,8 @@ import {
 @ApiTags('CSV Import')
 @Controller('import')
 export class CsvImportController {
+  private readonly logger = new Logger(CsvImportController.name);
+
   constructor(
     private readonly csvImportService: CsvImportService,
     private readonly incomeCsvImportService: IncomeCsvImportService,
@@ -370,7 +373,13 @@ Incomes with same invoice number OR same date+amount+client are considered dupli
       throw new BadRequestException('CSV file is required');
     }
 
-    const options = this.buildIncomeOptions(dto);
+    // Fix: Force dryRun to false since Transform decorator converts "false" string incorrectly
+    const normalizedDto = {
+      ...dto,
+      dryRun: false, // Always false for actual imports (preview uses different endpoint)
+    };
+
+    const options = this.buildIncomeOptions(normalizedDto);
     const result = await this.incomeCsvImportService.importFromBuffer(file.buffer, options);
 
     return this.mapIncomeToResponse(result);
@@ -458,25 +467,14 @@ Incomes with same invoice number OR same date+amount+client are considered dupli
    * Build income import options from DTO.
    */
   private buildIncomeOptions(dto: IncomeCsvImportRequestDto): IncomeCsvImportOptions {
-    // Ensure boolean conversion for form-data (strings like "true"/"false")
-    const dryRun =
-      dto.dryRun === true || (dto.dryRun as unknown) === 'true' || (dto.dryRun as unknown) === '1';
-    const skipDuplicates =
-      dto.skipDuplicates !== false &&
-      (dto.skipDuplicates as unknown) !== 'false' &&
-      (dto.skipDuplicates as unknown) !== '0';
-    const markAsPaid =
-      dto.markAsPaid === true ||
-      (dto.markAsPaid as unknown) === 'true' ||
-      (dto.markAsPaid as unknown) === '1';
-
+    // DTO Transform decorators have already converted the values
     return {
       source: dto.source,
       mapping: dto.mapping,
       matchThreshold: dto.matchThreshold ?? 0.6,
-      skipDuplicates,
-      dryRun,
-      markAsPaid,
+      skipDuplicates: dto.skipDuplicates ?? true,
+      dryRun: dto.dryRun ?? false,
+      markAsPaid: dto.markAsPaid ?? false,
     };
   }
 
@@ -504,6 +502,8 @@ Incomes with same invoice number OR same date+amount+client are considered dupli
         clientName: r.clientMatch?.clientName,
         matchScore: r.clientMatch?.score,
         invoiceNum: r.incomeData?.invoiceNum ?? undefined,
+        date: r.incomeData?.date?.toISOString() ?? undefined,
+        description: r.incomeData?.description ?? undefined,
         subtotalCents: r.incomeData?.subtotalCents,
         gstCents: r.incomeData?.gstCents,
         totalCents: r.incomeData?.totalCents,

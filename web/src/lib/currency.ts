@@ -24,3 +24,16 @@ export function parseCurrency(input: string): Currency {
 
   return { cents: Math.round(value * 100) };
 }
+
+/**
+ * Format date in Australian format (DD/MM/YYYY)
+ */
+export function formatDate(date: string | Date): string {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+
+  const day = String(dateObj.getDate()).padStart(2, '0');
+  const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const year = dateObj.getFullYear();
+
+  return `${day}/${month}/${year}`;
+}

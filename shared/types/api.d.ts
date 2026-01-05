@@ -934,6 +934,10 @@ export interface components {
             matchScore?: number;
             /** @description Invoice number */
             invoiceNum?: string;
+            /** @description Invoice date (ISO 8601) */
+            date?: string;
+            /** @description Income description */
+            description?: string;
             /** @description Subtotal in cents */
             subtotalCents?: number;
             /** @description GST in cents */

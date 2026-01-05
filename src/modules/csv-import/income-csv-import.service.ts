@@ -100,7 +100,7 @@ export class IncomeCsvImportService {
     mapping: IncomeCsvColumnMapping,
     defaultDate?: Date,
   ): ParsedIncomeCsvRow[] {
-    const records = parse(content, {
+    const records: Record<string, string>[] = parse(content, {
       columns: true,
       skip_empty_lines: true,
       trim: true,
@@ -261,6 +261,7 @@ export class IncomeCsvImportService {
       try {
         await this.bulkCreateIncomes(incomesToCreate);
       } catch (error) {
+        this.logger.error(`Failed to save incomes:`, error);
         await this.updateImportJobStatus(
           importJob.id,
           ImportStatus.FAILED,
@@ -268,6 +269,8 @@ export class IncomeCsvImportService {
         );
         throw error;
       }
+    } else if (!options.dryRun) {
+      this.logger.warn('No incomes to create (all failed validation or duplicates)');
     }
 
     // Calculate totals

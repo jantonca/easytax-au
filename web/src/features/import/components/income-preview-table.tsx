@@ -1,6 +1,7 @@
 import type { ReactElement } from 'react';
 import type { components } from '@shared/types';
 import { CheckCircle2, AlertCircle, AlertTriangle } from 'lucide-react';
+import { formatDate } from '@/lib/currency';
 
 type BaseCsvRowResultDto = components['schemas']['CsvRowResultDto'];
 
@@ -9,7 +10,9 @@ type CsvRowResultDto = BaseCsvRowResultDto & {
   clientName?: string;
   subtotalCents?: number;
   totalCents?: number;
-  invoiceNumber?: string;
+  invoiceNum?: string;
+  date?: string;
+  description?: string;
   isPaid?: boolean;
 };
 
@@ -111,11 +114,11 @@ export function IncomePreviewTable({
       )}
 
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm table-fixed">
           <thead className="border-b border-slate-800 bg-slate-900/60">
             <tr>
               {selectable && (
-                <th className="px-4 py-3 text-left font-medium text-slate-300">
+                <th className="w-12 px-4 py-3 text-left font-medium text-slate-300">
                   <input
                     type="checkbox"
                     checked={allSelectableSelected}
@@ -125,13 +128,15 @@ export function IncomePreviewTable({
                   />
                 </th>
               )}
-              <th className="px-4 py-3 text-left font-medium text-slate-300">Row</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-300">Status</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-300">Client</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-300">Invoice #</th>
-              <th className="px-4 py-3 text-right font-medium text-slate-300">Subtotal</th>
-              <th className="px-4 py-3 text-right font-medium text-slate-300">GST</th>
-              <th className="px-4 py-3 text-right font-medium text-slate-300">Total</th>
+              <th className="w-12 px-4 py-3 text-left font-medium text-slate-300">Row</th>
+              <th className="w-20 px-4 py-3 text-left font-medium text-slate-300">Status</th>
+              <th className="w-32 px-4 py-3 text-left font-medium text-slate-300">Client</th>
+              <th className="w-24 px-4 py-3 text-left font-medium text-slate-300">Invoice #</th>
+              <th className="w-24 px-4 py-3 text-left font-medium text-slate-300">Date</th>
+              <th className="w-40 px-4 py-3 text-left font-medium text-slate-300">Description</th>
+              <th className="w-24 px-4 py-3 text-right font-medium text-slate-300">Subtotal</th>
+              <th className="w-24 px-4 py-3 text-right font-medium text-slate-300">GST</th>
+              <th className="w-24 px-4 py-3 text-right font-medium text-slate-300">Total</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800">
@@ -198,8 +203,26 @@ export function IncomePreviewTable({
 
                   {/* Invoice Number */}
                   <td className="px-4 py-3">
-                    {row.invoiceNumber ? (
-                      <span className="text-slate-200">{row.invoiceNumber}</span>
+                    {row.invoiceNum ? (
+                      <span className="text-slate-200">{row.invoiceNum}</span>
+                    ) : (
+                      <span className="text-slate-500">-</span>
+                    )}
+                  </td>
+
+                  {/* Date */}
+                  <td className="px-4 py-3">
+                    {row.date ? (
+                      <span className="text-slate-200">{formatDate(row.date)}</span>
+                    ) : (
+                      <span className="text-slate-500">-</span>
+                    )}
+                  </td>
+
+                  {/* Description */}
+                  <td className="px-4 py-3 truncate" title={row.description}>
+                    {row.description ? (
+                      <span className="text-slate-200">{row.description}</span>
                     ) : (
                       <span className="text-slate-500">-</span>
                     )}

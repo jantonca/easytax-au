@@ -35,7 +35,8 @@ async function importIncomeCsv(params: ImportIncomeCsvParams): Promise<CsvImport
     throw new Error(error.message || 'Failed to import income CSV');
   }
 
-  return (await response.json()) as CsvImportResponseDto;
+  const result = (await response.json()) as CsvImportResponseDto;
+  return result;
 }
 /* eslint-enable @typescript-eslint/no-unsafe-assignment */
 

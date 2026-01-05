@@ -2,7 +2,7 @@ import type { ReactElement } from 'react';
 import { useMemo, useState } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
 import type { IncomeResponseDto } from '@/lib/api-client';
-import { formatCents } from '@/lib/currency';
+import { formatCents, formatDate } from '@/lib/currency';
 import { cn } from '@/lib/utils';
 
 interface IncomesTableProps {
@@ -217,7 +217,7 @@ export function IncomesTable({
           </thead>
           <tbody>
             {sorted.map((income) => {
-              const dateLabel = String(income.date).slice(0, 10);
+              const dateLabel = formatDate(String(income.date));
 
               const description = (() => {
                 const raw = (income as unknown as { description?: unknown }).description;

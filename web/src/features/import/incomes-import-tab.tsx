@@ -63,6 +63,11 @@ export function IncomesImportTab(): ReactElement {
 
   const handleFileSelect = (file: File): void => {
     setSelectedFile(file);
+    // Reset state when new file is selected
+    setStep('upload');
+    setSelectedRows(new Set());
+    previewMutation.reset();
+    importMutation.reset();
   };
 
   const handleSourceChange = (newSource: ImportSource): void => {
@@ -94,7 +99,14 @@ export function IncomesImportTab(): ReactElement {
   };
 
   const handleImport = (): void => {
-    if (!selectedFile || selectedRows.size === 0) return;
+    if (!selectedFile) {
+      console.error('[Import] No file selected');
+      return;
+    }
+    if (selectedRows.size === 0) {
+      console.error('[Import] No rows selected');
+      return;
+    }
 
     // Use 'custom' if 'manual' is selected (they're equivalent)
     const apiSource = source === 'manual' ? 'custom' : source;
@@ -111,6 +123,10 @@ export function IncomesImportTab(): ReactElement {
           // Invalidate incomes query to refresh the list
           void queryClient.invalidateQueries({ queryKey: ['incomes'] });
           setStep('progress');
+        },
+        onError: (error) => {
+          console.error('[Import] Error:', error);
+          // Don't move to progress on error - stay on preview to show error
         },
       },
     );
@@ -243,6 +259,7 @@ export function IncomesImportTab(): ReactElement {
             error={importMutation.error}
             onViewExpenses={handleViewIncomes}
             onImportMore={handleStartOver}
+            buttonLabel="View Incomes"
           />
         </div>
       )}
