@@ -47,32 +47,32 @@ export function GenerateButton({ onSuccess }: GenerateButtonProps) {
       {showConfirmation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div
-            className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
+            className="w-full max-w-md rounded-lg bg-slate-900 p-6 shadow-xl border border-slate-800"
             role="alertdialog"
             aria-modal="true"
             aria-labelledby="generate-dialog-title"
           >
-            <h2 id="generate-dialog-title" className="mb-4 text-lg font-semibold">
+            <h2 id="generate-dialog-title" className="mb-4 text-lg font-semibold text-slate-100">
               Generate Recurring Expenses?
             </h2>
 
             {dueExpenses.length === 0 ? (
-              <p className="mb-6 text-sm text-gray-700">
+              <p className="mb-6 text-sm text-slate-300">
                 No recurring expenses are due for generation at this time.
               </p>
             ) : (
               <>
-                <p className="mb-4 text-sm text-gray-700">
+                <p className="mb-4 text-sm text-slate-300">
                   Generate {dueExpenses.length} expense{dueExpenses.length === 1 ? '' : 's'}{' '}
                   totaling ${formatCents(totalDueAmount)}?
                 </p>
 
-                <div className="mb-6 max-h-48 overflow-y-auto rounded border border-gray-200 bg-gray-50 p-3">
+                <div className="mb-6 max-h-48 overflow-y-auto rounded border border-slate-800 bg-slate-950 p-3">
                   <ul className="space-y-2 text-sm">
                     {dueExpenses.map((expense) => (
                       <li key={expense.id} className="flex justify-between">
-                        <span className="font-medium">{expense.name}</span>
-                        <span className="text-gray-600">${formatCents(expense.amountCents)}</span>
+                        <span className="font-medium text-slate-100">{expense.name}</span>
+                        <span className="text-slate-400">${formatCents(expense.amountCents)}</span>
                       </li>
                     ))}
                   </ul>
@@ -103,33 +103,33 @@ export function GenerateButton({ onSuccess }: GenerateButtonProps) {
       {showResults && lastResult && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div
-            className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
+            className="w-full max-w-md rounded-lg bg-slate-900 p-6 shadow-xl border border-slate-800"
             role="dialog"
             aria-modal="true"
             aria-labelledby="results-dialog-title"
           >
-            <h2 id="results-dialog-title" className="mb-4 text-lg font-semibold">
+            <h2 id="results-dialog-title" className="mb-4 text-lg font-semibold text-slate-100">
               Generation Complete
             </h2>
 
             <div className="mb-6 space-y-3">
-              <div className="flex justify-between rounded bg-green-50 p-3">
-                <span className="font-medium text-green-900">Generated:</span>
-                <span className="text-green-700">{lastResult.generated} expense(s)</span>
+              <div className="flex justify-between rounded bg-emerald-500/20 p-3">
+                <span className="font-medium text-emerald-300">Generated:</span>
+                <span className="text-emerald-400">{lastResult.generated} expense(s)</span>
               </div>
 
               {lastResult.skipped > 0 && (
-                <div className="flex justify-between rounded bg-amber-50 p-3">
-                  <span className="font-medium text-amber-900">Skipped:</span>
-                  <span className="text-amber-700">{lastResult.skipped} (already generated)</span>
+                <div className="flex justify-between rounded bg-amber-500/20 p-3">
+                  <span className="font-medium text-amber-300">Skipped:</span>
+                  <span className="text-amber-400">{lastResult.skipped} (already generated)</span>
                 </div>
               )}
 
               {lastResult.details && lastResult.details.length > 0 && (
                 <div className="mt-4">
-                  <h3 className="mb-2 text-sm font-medium text-gray-700">Details:</h3>
-                  <div className="max-h-32 overflow-y-auto rounded border border-gray-200 bg-gray-50 p-2">
-                    <ul className="space-y-1 text-xs text-gray-600">
+                  <h3 className="mb-2 text-sm font-medium text-slate-300">Details:</h3>
+                  <div className="max-h-32 overflow-y-auto rounded border border-slate-800 bg-slate-950 p-2">
+                    <ul className="space-y-1 text-xs text-slate-400">
                       {lastResult.details.map((detail, index) => (
                         <li key={index}>{JSON.stringify(detail)}</li>
                       ))}
