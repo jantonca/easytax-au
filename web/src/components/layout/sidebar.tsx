@@ -11,7 +11,7 @@ export function Sidebar({ className }: SidebarProps): ReactElement {
   return (
     <aside
       className={cn(
-        'w-56 shrink-0 border-r border-slate-200 bg-slate-50/80 px-3 py-4 backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/80',
+        'flex-col w-56 shrink-0 border-r border-slate-200 bg-slate-50/80 px-3 py-4 backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/80',
         className,
       )}
     >
