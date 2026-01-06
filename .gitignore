@@ -23,3 +23,7 @@ logs/
 /pgdata/
 # Test coverage
 coverage/
+
+# Playwright artifacts
+/web/playwright-report/
+/web/test-results/
