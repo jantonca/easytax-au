@@ -52,8 +52,10 @@ export function ProvidersPage(): ReactElement {
       <SettingsTabs />
       <header className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-50">Providers</h1>
-          <p className="text-sm text-slate-400">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+            Providers
+          </h1>
+          <p className="text-sm text-slate-600 dark:text-slate-400">
             Manage expense vendors with GST rules and default categories.
           </p>
         </div>
@@ -97,15 +99,15 @@ export function ProvidersPage(): ReactElement {
               aria-label="Add provider"
               className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
             >
-              <div className="w-full max-w-lg rounded-lg border border-slate-800 bg-slate-950 p-4 shadow-xl">
+              <div className="w-full max-w-lg rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950 p-4 shadow-xl">
                 <div className="mb-3 flex items-center justify-between">
-                  <h2 className="text-sm font-semibold tracking-tight text-slate-50">
+                  <h2 className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-50">
                     Add provider
                   </h2>
                   <button
                     type="button"
                     onClick={() => setIsCreateOpen(false)}
-                    className="text-xs text-slate-400 hover:text-slate-200"
+                    className="text-xs text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
                   >
                     Close
                   </button>
@@ -122,15 +124,15 @@ export function ProvidersPage(): ReactElement {
               aria-label="Edit provider"
               className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
             >
-              <div className="w-full max-w-lg rounded-lg border border-slate-800 bg-slate-950 p-4 shadow-xl">
+              <div className="w-full max-w-lg rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950 p-4 shadow-xl">
                 <div className="mb-3 flex items-center justify-between">
-                  <h2 className="text-sm font-semibold tracking-tight text-slate-50">
+                  <h2 className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-50">
                     Edit provider
                   </h2>
                   <button
                     type="button"
                     onClick={() => setProviderToEdit(null)}
-                    className="text-xs text-slate-400 hover:text-slate-200"
+                    className="text-xs text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
                   >
                     Close
                   </button>

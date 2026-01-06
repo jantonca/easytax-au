@@ -902,7 +902,7 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 | F3.4.6 | Add loading skeletons for all data fetches          | ✅     |
 | F3.4.7 | Add empty states for all lists                      | ✅     |
 | F3.4.8 | Add success/error toasts for all mutations          | ✅     |
-| F3.4.9 | Implement dark mode toggle (stored in localStorage) | ⬜     |
+| F3.4.9 | Implement dark mode toggle (stored in localStorage) | ✅     |
 
 **F3.4.6 Implementation Details (Loading Skeletons):**
 
@@ -1006,12 +1006,44 @@ Files updated:
 
 All other color combinations (primary text, error text, success text, button text) already meet or exceed WCAG AA requirements.
 
-**Files to Create (dark mode):**
+**F3.4.9 Implementation Details (Dark Mode Toggle):**
 
-- `web/src/hooks/use-theme.ts`
-- Update `web/src/components/layout/header.tsx` with toggle
+Created comprehensive dark mode system with theme persistence and system preference detection:
 
-**Definition of Done:**
+- **Theme Hook** (`web/src/hooks/use-theme.tsx`)
+  - React Context for theme state (`'light' | 'dark' | 'system'`)
+  - localStorage persistence with fallback for private mode
+  - System preference detection via `window.matchMedia('(prefers-color-scheme: dark)')`
+  - Auto-updates when system preference changes (only when theme is 'system')
+  - 12 unit tests covering all scenarios including edge cases
+
+- **Header Component** (`web/src/components/layout/header.tsx`)
+  - Theme toggle button with Sun/Moon icons (Lucide React)
+  - Cycles through: Light → Dark → Auto → Light
+  - Shows current theme label on desktop ("Light", "Dark", "Auto")
+  - Accessible with proper aria-label indicating current theme
+  - Keyboard navigable
+
+- **CSS Variables** (`web/src/index.css`)
+  - Light mode defaults with semantic color variables
+  - Dark mode overrides using `.dark` class on document root
+  - Supports Tailwind's `dark:` variant system-wide
+
+- **E2E Tests** (`web/e2e/theme.spec.ts`)
+  - 12 Playwright tests for theme persistence, cycling, and accessibility
+  - Tests localStorage persistence across page reloads
+  - Verifies keyboard accessibility and ARIA labels
+
+- **AppShell Integration** (`web/src/AppShell.tsx`)
+  - ThemeProvider wrapped as outermost provider
+  - Available to all components via `useTheme()` hook
+
+- **Test Infrastructure Updates:**
+  - Added `window.matchMedia` mock to `web/src/test/setup.ts`
+  - Updated `web/src/components/layout/layout.test.tsx` to wrap in ThemeProvider
+  - Configured vitest to exclude e2e directory
+
+**Definition of Done (F3.4):**
 
 - [x] All interactive elements keyboard accessible (F3.4.1 complete)
 - [x] Global focus-visible styles applied (F3.4.2 complete)
@@ -1021,33 +1053,61 @@ All other color combinations (primary text, error text, success text, button tex
 - [x] Loading states for all async operations (F3.4.6 complete)
 - [x] Empty states guide user action (F3.4.7 complete)
 - [x] Success/error toasts for all mutations (F3.4.8 complete)
+- [x] Dark mode toggle implemented (F3.4.9 complete)
 
 ---
 
 ### F3.5 E2E Testing
 
+**Status:** ✅ Completed
+
 | #      | Task                       | Status |
 | ------ | -------------------------- | ------ |
-| F3.5.1 | Set up Playwright          | ⬜     |
-| F3.5.2 | Test: Add expense flow     | ⬜     |
-| F3.5.3 | Test: Add income flow      | ⬜     |
-| F3.5.4 | Test: CSV import flow      | ⬜     |
-| F3.5.5 | Test: View BAS report flow | ⬜     |
-| F3.5.6 | Test: Download PDF flow    | ⬜     |
+| F3.5.1 | Set up Playwright          | ✅     |
+| F3.5.2 | Test: Add expense flow     | ✅     |
+| F3.5.3 | Test: Add income flow      | ✅     |
+| F3.5.4 | Test: CSV import flow      | ✅     |
+| F3.5.5 | Test: View BAS report flow | ✅     |
+| F3.5.6 | Test: Download PDF flow    | ✅     |
 
-**Files to Create:**
+**Implementation Summary (F3.5):**
 
-- `web/e2e/expense.spec.ts`
-- `web/e2e/income.spec.ts`
-- `web/e2e/import.spec.ts`
-- `web/e2e/reports.spec.ts`
-- `web/playwright.config.ts`
+Comprehensive E2E test suite implemented using Playwright covering all critical user flows:
 
-**Definition of Done:**
+- **Configuration** (`web/playwright.config.ts`)
+  - Playwright Test configured for Chromium, Firefox, and WebKit
+  - Base URL configured for local dev server
+  - Screenshots on failure, trace on first retry
 
-- [ ] Critical flows covered
-- [ ] Tests run in CI
-- [ ] No flaky tests
+- **Test Suites Created:**
+  - `web/e2e/expense.spec.ts` - 10 tests for expense CRUD flow
+  - `web/e2e/income.spec.ts` - Tests for income CRUD flow
+  - `web/e2e/import.spec.ts` - 8 tests for CSV import workflow
+  - `web/e2e/reports.spec.ts` - Tests for BAS/FY report views
+  - `web/e2e/download.spec.ts` - 10 tests for PDF downloads (BAS + FY reports)
+  - `web/e2e/theme.spec.ts` - 12 tests for dark mode persistence (added in F3.4.9)
+
+- **Coverage:**
+  - ✅ Expense creation with GST auto-calculation
+  - ✅ International provider GST handling
+  - ✅ Business percentage claimable GST
+  - ✅ Form validation and error handling
+  - ✅ Edit and delete with confirmation
+  - ✅ CSV file upload and preview
+  - ✅ Row selection and validation errors
+  - ✅ Import statistics and success feedback
+  - ✅ PDF downloads for BAS and FY reports
+  - ✅ Theme persistence and accessibility
+
+**Scripts:**
+- `pnpm --filter web test:e2e` - Run E2E tests headless
+- `pnpm --filter web test:e2e:ui` - Run E2E tests with UI
+
+**Definition of Done (F3.5):**
+
+- [x] Critical flows covered (40+ E2E tests)
+- [ ] Tests run in CI (configured locally, CI integration TBD)
+- [x] No flaky tests (reliable with proper waits)
 
 ---
 
@@ -1057,36 +1117,52 @@ All other color combinations (primary text, error text, success text, button tex
 
 ### F4.1 Build & Deployment
 
+**Status:** ✅ Completed
+
 | #      | Task                                         | Status |
 | ------ | -------------------------------------------- | ------ |
-| F4.1.1 | Configure production build                   | ⬜     |
-| F4.1.2 | Add to Docker Compose (nginx serving static) | ⬜     |
-| F4.1.3 | Configure API proxy in nginx                 | ⬜     |
-| F4.1.4 | Configure nginx gzip + SPA fallback          | ⬜     |
-| F4.1.5 | Add frontend health check                    | ⬜     |
+| F4.1.1 | Configure production build                   | ✅     |
+| F4.1.2 | Add to Docker Compose (nginx serving static) | ✅     |
+| F4.1.3 | Configure API proxy in nginx                 | ✅     |
+| F4.1.4 | Configure nginx gzip + SPA fallback          | ✅     |
+| F4.1.5 | Add frontend health check                    | ✅     |
 
-**Files to Create:**
+**Implementation Summary (F4.1):**
 
-- `web/Dockerfile`
-- `web/nginx.conf` (with gzip, `try_files $uri /index.html`)
-- Update `docker-compose.yml`
+Production-ready Docker deployment with Traefik support implemented:
 
-**nginx.conf essentials:**
+- **Dockerfile** (`web/Dockerfile`)
+  - Multi-stage build for optimized image size
+  - nginx:alpine base image for serving static files
+  - Vite production build with optimizations
+  - Build arg for `VITE_API_URL` configuration
 
-```nginx
-gzip on;
-gzip_types text/css application/javascript application/json;
-location / {
-    try_files $uri $uri/ /index.html;  # SPA fallback
-}
-```
-````
+- **nginx Configuration** (`web/nginx.conf`)
+  - Gzip compression enabled for text/css/js/json
+  - SPA fallback: `try_files $uri $uri/ /index.html`
+  - Security headers configured
+  - API proxy to backend via `/api` location
 
-**Definition of Done:**
+- **Docker Compose Integration** (`docker-compose.yml`)
+  - `easytax-au-web` service added
+  - Port 80 exposed (configurable via `WEB_PORT`)
+  - Depends on `easytax-au-api` backend service
+  - Traefik labels for HTTPS (optional via `TRAEFIK_ENABLED`)
+  - Connected to `easytax-au-network` bridge network
 
-- [ ] `docker compose up` serves frontend on port 80
-- [ ] API proxied through `/api`
-- [ ] Production build optimized
+**Environment Variables:**
+- `VITE_API_URL` - API base URL (default: `/api` for production)
+- `WEB_PORT` - Exposed port (default: `80`)
+- `TRAEFIK_ENABLED` - Enable Traefik routing (default: `false`)
+
+**Definition of Done (F4.1):**
+
+- [x] `docker compose up` serves frontend on port 80
+- [x] API proxied through `/api` in nginx
+- [x] Production build optimized (Vite minification, tree-shaking)
+- [x] Gzip compression enabled
+- [x] SPA routing works (fallback to index.html)
+- [x] Traefik integration available for HTTPS
 
 ---
 
@@ -1113,11 +1189,17 @@ location / {
 | -------------------- | ----- | ---- | -------- |
 | F1. Scaffold         | 22    | 22   | 100%     |
 | F2. Core Features    | 44    | 37   | 84%      |
-| F3. Reports & Polish | 26    | 22   | 85%      |
-| F4. Production       | 9     | 0    | 0%       |
-| **Total**            | **101** | **81** | **80%**  |
+| F3. Reports & Polish | 26    | 24   | 92%      |
+| F4. Production       | 9     | 5    | 56%      |
+| **Total**            | **101** | **88** | **87%**  |
 
-> Note: Frontend F2 progress currently counts completed tasks from F2.1 (Dashboard - 5 tasks), F2.2 (Expenses - 7 tasks including GST auto-calc and slider), F2.3 (Incomes - 10 tasks), F2.4 (CSV Import - 10 tasks), F2.5 (Providers & Categories - 6 tasks), and F2.6 (Clients - 3 tasks). F3 progress includes F3.1 (BAS Reports - 5 tasks), F3.2 (FY Reports - 6 tasks), F3.3 (Recurring Expenses - 5 tasks), and F3.4 (Polish & Accessibility - 7 tasks: F3.4.1 Forms Audit, F3.4.2 Focus Styles, F3.4.4 Skip Links, F3.4.5 Color Contrast, F3.4.6 Loading Skeletons, F3.4.7 Empty States, and F3.4.8 Toast Notifications). Remaining F2.x tasks include optional enhancements like pagination, searchable dropdowns, and inline editing. F3 remaining tasks: F3.4.3 Screen Reader Testing, F3.4.9 Dark Mode, and F3.5 E2E Testing (6 tasks).
+> **Note:** Frontend is 87% complete with all major features implemented.
+>
+> **Phase F3 (92%):** Completed F3.1 BAS Reports (5 tasks), F3.2 FY Reports (6 tasks), F3.3 Recurring Expenses (5 tasks), F3.4 Polish & Accessibility (8/9 tasks - F3.4.9 Dark Mode ✅ added), and F3.5 E2E Testing (6/6 tasks ✅). Only F3.4.3 Screen Reader Testing remains (requires manual testing).
+>
+> **Phase F4 (56%):** Completed F4.1 Build & Deployment (5/5 tasks ✅). Remaining: F4.2 Documentation (4 tasks - README updates, env var docs, screenshots, keyboard shortcuts).
+>
+> **Phase F2 (84%):** Remaining tasks are optional enhancements: pagination (F2.2.4), searchable dropdowns (F2.2.6, F2.2.7), and inline editing (F2.2.11 - explicitly deferred).
 
 ---
 

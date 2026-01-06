@@ -2,13 +2,16 @@ import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { Layout } from './layout';
+import { ThemeProvider } from '@/hooks/use-theme';
 
 describe('Layout', () => {
   it('renders skip link with correct href and accessible text', () => {
     render(
-      <BrowserRouter>
-        <Layout />
-      </BrowserRouter>,
+      <ThemeProvider>
+        <BrowserRouter>
+          <Layout />
+        </BrowserRouter>
+      </ThemeProvider>,
     );
 
     const skipLink = screen.getByText('Skip to main content');
@@ -19,9 +22,11 @@ describe('Layout', () => {
 
   it('has main content region with matching ID', () => {
     render(
-      <BrowserRouter>
-        <Layout />
-      </BrowserRouter>,
+      <ThemeProvider>
+        <BrowserRouter>
+          <Layout />
+        </BrowserRouter>
+      </ThemeProvider>,
     );
 
     const mainContent = document.getElementById('main-content');
@@ -31,9 +36,11 @@ describe('Layout', () => {
 
   it('skip link is visually hidden by default (sr-only class)', () => {
     render(
-      <BrowserRouter>
-        <Layout />
-      </BrowserRouter>,
+      <ThemeProvider>
+        <BrowserRouter>
+          <Layout />
+        </BrowserRouter>
+      </ThemeProvider>,
     );
 
     const skipLink = screen.getByText('Skip to main content');

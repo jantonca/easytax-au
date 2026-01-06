@@ -31,16 +31,16 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   render(): ReactNode {
     if (this.state.hasError) {
       return (
-        <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 text-slate-50">
+        <div className="flex min-h-screen items-center justify-center bg-white px-4 text-slate-900 dark:bg-slate-950 dark:text-slate-50">
           <div className="max-w-md space-y-3 text-center">
             <h1 className="text-xl font-semibold">Something went wrong</h1>
-            <p className="text-sm text-slate-300">
+            <p className="text-sm text-slate-600 dark:text-slate-300">
               An unexpected error occurred. Try again, or refresh the page if the problem persists.
             </p>
             <button
               type="button"
               onClick={this.handleRetry}
-              className="mt-2 rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-slate-50 hover:bg-sky-500"
+              className="mt-2 rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500"
             >
               Try again
             </button>

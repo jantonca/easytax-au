@@ -113,7 +113,7 @@ export function IncomesTable({
 
   if (sorted.length === 0) {
     return (
-      <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-400">
+      <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-4 text-sm text-slate-600 dark:text-slate-400">
         <p>No incomes recorded yet.</p>
       </div>
     );
@@ -122,18 +122,20 @@ export function IncomesTable({
   return (
     <section
       aria-label="Incomes"
-      className="rounded-lg border border-slate-800 bg-slate-900/60 p-4"
+      className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-4"
     >
       <div className="mb-3 flex items-baseline justify-between gap-2">
-        <h2 className="text-sm font-semibold tracking-tight text-slate-50">Incomes</h2>
+        <h2 className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+          Incomes
+        </h2>
         <p className="text-[11px] text-slate-500">
           Sorted by {sortBy === 'date' ? 'date (newest first)' : sortBy}
         </p>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-225 border-collapse text-left text-xs text-slate-300">
+        <table className="w-full min-w-[900px] border-collapse text-left text-xs text-slate-700 dark:text-slate-300">
           <thead>
-            <tr className="border-b border-slate-800 text-[11px] uppercase tracking-[0.18em] text-slate-500">
+            <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] uppercase tracking-[0.18em] text-slate-500">
               <th
                 scope="col"
                 className="py-2 pr-3"
@@ -142,7 +144,7 @@ export function IncomesTable({
                 <button
                   type="button"
                   onClick={() => handleSort('date')}
-                  className="inline-flex items-center gap-1 text-left hover:text-slate-300"
+                  className="inline-flex items-center gap-1 text-left hover:text-slate-600 dark:hover:text-slate-300"
                 >
                   <span>Date</span>
                   <span aria-hidden="true" className="text-[9px]">
@@ -161,7 +163,7 @@ export function IncomesTable({
                 <button
                   type="button"
                   onClick={() => handleSort('client')}
-                  className="inline-flex items-center gap-1 text-left hover:text-slate-300"
+                  className="inline-flex items-center gap-1 text-left hover:text-slate-600 dark:hover:text-slate-300"
                 >
                   <span>Client</span>
                   <span aria-hidden="true" className="text-[9px]">
@@ -186,7 +188,7 @@ export function IncomesTable({
                 <button
                   type="button"
                   onClick={() => handleSort('total')}
-                  className="inline-flex w-full items-center justify-end gap-1 text-right hover:text-slate-300"
+                  className="inline-flex w-full items-center justify-end gap-1 text-right hover:text-slate-600 dark:hover:text-slate-300"
                 >
                   <span>Total</span>
                   <span aria-hidden="true" className="text-[9px]">
@@ -202,7 +204,7 @@ export function IncomesTable({
                 <button
                   type="button"
                   onClick={() => handleSort('paid')}
-                  className="inline-flex items-center gap-1 hover:text-slate-300"
+                  className="inline-flex items-center gap-1 hover:text-slate-600 dark:hover:text-slate-300"
                 >
                   <span>Paid</span>
                   <span aria-hidden="true" className="text-[9px]">
@@ -228,24 +230,29 @@ export function IncomesTable({
               const clientName = income.client.name;
 
               return (
-                <tr key={income.id} className="border-b border-slate-900 last:border-b-0">
-                  <td className="py-2 pr-3 align-middle text-[11px] text-slate-200">{dateLabel}</td>
-                  <td className="py-2 pr-3 align-middle text-[11px] text-slate-300">
+                <tr
+                  key={income.id}
+                  className="border-b border-slate-200 dark:border-slate-900 last:border-b-0"
+                >
+                  <td className="py-2 pr-3 align-middle text-[11px] text-slate-700 dark:text-slate-200">
+                    {dateLabel}
+                  </td>
+                  <td className="py-2 pr-3 align-middle text-[11px] text-slate-600 dark:text-slate-300">
                     {invoiceNum}
                   </td>
-                  <td className="py-2 pr-3 align-middle text-[11px] text-slate-200">
+                  <td className="py-2 pr-3 align-middle text-[11px] text-slate-700 dark:text-slate-200">
                     {clientName}
                   </td>
-                  <td className="py-2 pr-3 align-middle text-[11px] text-slate-100">
+                  <td className="py-2 pr-3 align-middle text-[11px] text-slate-900 dark:text-slate-100">
                     {description}
                   </td>
-                  <td className="py-2 pr-3 align-middle text-right text-[11px] text-slate-200">
+                  <td className="py-2 pr-3 align-middle text-right text-[11px] text-slate-700 dark:text-slate-200">
                     {formatCents(income.subtotalCents)}
                   </td>
-                  <td className="py-2 pr-3 align-middle text-right text-[11px] text-slate-200">
+                  <td className="py-2 pr-3 align-middle text-right text-[11px] text-slate-700 dark:text-slate-200">
                     {formatCents(income.gstCents)}
                   </td>
-                  <td className="py-2 pr-3 align-middle text-right text-[11px] font-semibold text-slate-100">
+                  <td className="py-2 pr-3 align-middle text-right text-[11px] font-semibold text-slate-900 dark:text-slate-100">
                     {formatCents(income.totalCents)}
                   </td>
                   <td className="py-2 pr-3 align-middle text-center">
@@ -256,8 +263,8 @@ export function IncomesTable({
                         className={cn(
                           'inline-flex h-6 items-center rounded px-2 text-[10px] font-medium',
                           income.isPaid
-                            ? 'bg-emerald-900/40 text-emerald-300'
-                            : 'bg-amber-900/40 text-amber-300',
+                            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+                            : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
                         )}
                         title={income.isPaid ? 'Mark as unpaid' : 'Mark as paid'}
                       >
@@ -268,8 +275,8 @@ export function IncomesTable({
                         className={cn(
                           'inline-flex h-6 items-center rounded px-2 text-[10px] font-medium',
                           income.isPaid
-                            ? 'bg-emerald-900/40 text-emerald-300'
-                            : 'bg-amber-900/40 text-amber-300',
+                            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+                            : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
                         )}
                       >
                         {income.isPaid ? 'Paid' : 'Unpaid'}
@@ -282,7 +289,7 @@ export function IncomesTable({
                         <button
                           type="button"
                           onClick={() => onEdit(income)}
-                          className="inline-flex h-6 w-6 items-center justify-center rounded text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+                          className="inline-flex h-6 w-6 items-center justify-center rounded text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200"
                           aria-label={`Edit income: ${description}`}
                           title="Edit income"
                         >
@@ -293,7 +300,7 @@ export function IncomesTable({
                         <button
                           type="button"
                           onClick={() => onDelete(income)}
-                          className="inline-flex h-6 w-6 items-center justify-center rounded text-slate-400 hover:bg-red-900/40 hover:text-red-400"
+                          className="inline-flex h-6 w-6 items-center justify-center rounded text-slate-500 dark:text-slate-400 hover:bg-red-100 dark:hover:bg-red-900/40 hover:text-red-600 dark:hover:text-red-400"
                           aria-label={`Delete income: ${description}`}
                           title="Delete income"
                         >

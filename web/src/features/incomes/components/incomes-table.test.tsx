@@ -215,7 +215,7 @@ describe('IncomesTable', () => {
 
     const rows = screen.getAllByRole('row').slice(1);
     const paidBadge = within(rows[0]).getByText('Paid');
-    expect(paidBadge).toHaveClass('bg-emerald-900/40', 'text-emerald-300');
+    expect(paidBadge).toHaveClass('bg-emerald-100', 'text-emerald-700');
   });
 
   it('displays unpaid badge in amber for unpaid incomes', () => {
@@ -225,7 +225,7 @@ describe('IncomesTable', () => {
 
     const rows = screen.getAllByRole('row').slice(1);
     const unpaidBadge = within(rows[0]).getByText('Unpaid');
-    expect(unpaidBadge).toHaveClass('bg-amber-900/40', 'text-amber-300');
+    expect(unpaidBadge).toHaveClass('bg-amber-100', 'text-amber-700');
   });
 
   it('shows non-clickable badge when onTogglePaid is not provided', () => {

@@ -51,20 +51,20 @@ describe('SummaryStats', () => {
     const duplicatesCard = screen.getByText('Duplicates').closest('div');
 
     // Total Rows - slate colors
-    expect(totalCard).toHaveClass('border-slate-800');
-    expect(totalCard).toHaveClass('bg-slate-900/40');
+    expect(totalCard).toHaveClass('dark:border-slate-800');
+    expect(totalCard).toHaveClass('dark:bg-slate-900/40');
 
     // Valid - emerald colors
-    expect(validCard).toHaveClass('border-emerald-800');
-    expect(validCard).toHaveClass('bg-emerald-950/40');
+    expect(validCard).toHaveClass('dark:border-emerald-800');
+    expect(validCard).toHaveClass('dark:bg-emerald-950/40');
 
     // Errors - red colors
-    expect(errorsCard).toHaveClass('border-red-800');
-    expect(errorsCard).toHaveClass('bg-red-950/40');
+    expect(errorsCard).toHaveClass('dark:border-red-800');
+    expect(errorsCard).toHaveClass('dark:bg-red-950/40');
 
     // Duplicates - amber colors
-    expect(duplicatesCard).toHaveClass('border-amber-800');
-    expect(duplicatesCard).toHaveClass('bg-amber-950/40');
+    expect(duplicatesCard).toHaveClass('dark:border-amber-800');
+    expect(duplicatesCard).toHaveClass('dark:bg-amber-950/40');
   });
 
   it('handles zero counts gracefully', () => {
@@ -95,8 +95,8 @@ describe('SummaryStats', () => {
     const errorsValue = screen.getByText('10');
     const duplicatesValue = screen.getByText('5');
 
-    expect(validValue).toHaveClass('text-emerald-400');
-    expect(errorsValue).toHaveClass('text-red-400');
-    expect(duplicatesValue).toHaveClass('text-amber-400');
+    expect(validValue).toHaveClass('dark:text-emerald-400');
+    expect(errorsValue).toHaveClass('dark:text-red-400');
+    expect(duplicatesValue).toHaveClass('dark:text-amber-400');
   });
 });

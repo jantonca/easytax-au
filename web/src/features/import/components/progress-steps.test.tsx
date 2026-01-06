@@ -19,8 +19,8 @@ describe('ProgressSteps', () => {
     const importStep = screen.getByText('Import').closest('div');
 
     expect(uploadStep).toHaveClass('text-emerald-400');
-    expect(previewStep).toHaveClass('text-slate-500');
-    expect(importStep).toHaveClass('text-slate-500');
+    expect(previewStep).toHaveClass('dark:text-slate-500');
+    expect(importStep).toHaveClass('dark:text-slate-500');
   });
 
   it('highlights preview step when current step is preview', () => {
@@ -30,9 +30,9 @@ describe('ProgressSteps', () => {
     const previewStep = screen.getByText('Preview').closest('div');
     const importStep = screen.getByText('Import').closest('div');
 
-    expect(uploadStep).toHaveClass('text-slate-500');
+    expect(uploadStep).toHaveClass('dark:text-slate-500');
     expect(previewStep).toHaveClass('text-emerald-400');
-    expect(importStep).toHaveClass('text-slate-500');
+    expect(importStep).toHaveClass('dark:text-slate-500');
   });
 
   it('highlights import step when current step is progress', () => {
@@ -42,8 +42,8 @@ describe('ProgressSteps', () => {
     const previewStep = screen.getByText('Preview').closest('div');
     const importStep = screen.getByText('Import').closest('div');
 
-    expect(uploadStep).toHaveClass('text-slate-500');
-    expect(previewStep).toHaveClass('text-slate-500');
+    expect(uploadStep).toHaveClass('dark:text-slate-500');
+    expect(previewStep).toHaveClass('dark:text-slate-500');
     expect(importStep).toHaveClass('text-emerald-400');
   });
 

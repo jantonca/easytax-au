@@ -112,7 +112,7 @@ export function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTableProps
 
   if (sorted.length === 0) {
     return (
-      <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-400">
+      <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-4 text-sm text-slate-600 dark:text-slate-400">
         <p>No expenses recorded yet.</p>
       </div>
     );
@@ -121,18 +121,20 @@ export function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTableProps
   return (
     <section
       aria-label="Expenses"
-      className="rounded-lg border border-slate-800 bg-slate-900/60 p-4"
+      className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-4"
     >
       <div className="mb-3 flex items-baseline justify-between gap-2">
-        <h2 className="text-sm font-semibold tracking-tight text-slate-50">Expenses</h2>
+        <h2 className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+          Expenses
+        </h2>
         <p className="text-[11px] text-slate-500">
           Sorted by {sortBy === 'date' ? 'date (newest first)' : sortBy}
         </p>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-190 border-collapse text-left text-xs text-slate-300">
+        <table className="w-full min-w-190 border-collapse text-left text-xs text-slate-700 dark:text-slate-300">
           <thead>
-            <tr className="border-b border-slate-800 text-[11px] uppercase tracking-[0.18em] text-slate-500">
+            <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] uppercase tracking-[0.18em] text-slate-500">
               <th
                 scope="col"
                 className="py-2 pr-3"
@@ -141,7 +143,7 @@ export function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTableProps
                 <button
                   type="button"
                   onClick={() => handleSort('date')}
-                  className="inline-flex items-center gap-1 text-left hover:text-slate-300"
+                  className="inline-flex items-center gap-1 text-left hover:text-slate-600 dark:hover:text-slate-300"
                 >
                   <span>Date</span>
                   <span aria-hidden="true" className="text-[9px]">
@@ -166,7 +168,7 @@ export function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTableProps
                 <button
                   type="button"
                   onClick={() => handleSort('amount')}
-                  className="inline-flex w-full items-center justify-end gap-1 text-right hover:text-slate-300"
+                  className="inline-flex w-full items-center justify-end gap-1 text-right hover:text-slate-600 dark:hover:text-slate-300"
                 >
                   <span>Amount</span>
                   <span aria-hidden="true" className="text-[9px]">
@@ -203,27 +205,32 @@ export function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTableProps
               const periodLabel = `${expense.quarter} ${expense.fyLabel}`;
 
               return (
-                <tr key={expense.id} className="border-b border-slate-900 last:border-b-0">
-                  <td className="py-2 pr-3 align-middle text-[11px] text-slate-200">{dateLabel}</td>
-                  <td className="py-2 pr-3 align-middle text-[11px] text-slate-100">
+                <tr
+                  key={expense.id}
+                  className="border-b border-slate-200 dark:border-slate-900 last:border-b-0"
+                >
+                  <td className="py-2 pr-3 align-middle text-[11px] text-slate-700 dark:text-slate-200">
+                    {dateLabel}
+                  </td>
+                  <td className="py-2 pr-3 align-middle text-[11px] text-slate-900 dark:text-slate-100">
                     {description}
                   </td>
-                  <td className="py-2 pr-3 align-middle text-[11px] text-slate-200">
+                  <td className="py-2 pr-3 align-middle text-[11px] text-slate-700 dark:text-slate-200">
                     {providerName}
                   </td>
-                  <td className="py-2 pr-3 align-middle text-[11px] text-slate-200">
+                  <td className="py-2 pr-3 align-middle text-[11px] text-slate-700 dark:text-slate-200">
                     {categoryName}
                   </td>
-                  <td className="py-2 pr-3 align-middle text-right text-[11px] font-semibold text-slate-100">
+                  <td className="py-2 pr-3 align-middle text-right text-[11px] font-semibold text-slate-900 dark:text-slate-100">
                     {formatCents(expense.amountCents)}
                   </td>
-                  <td className="py-2 pr-3 align-middle text-right text-[11px] text-slate-200">
+                  <td className="py-2 pr-3 align-middle text-right text-[11px] text-slate-700 dark:text-slate-200">
                     {formatCents(expense.gstCents)}
                   </td>
-                  <td className="py-2 pr-3 align-middle text-right text-[11px] text-slate-200">
+                  <td className="py-2 pr-3 align-middle text-right text-[11px] text-slate-700 dark:text-slate-200">
                     {expense.bizPercent}%
                   </td>
-                  <td className="py-2 pr-3 align-middle text-right text-[11px] text-slate-300">
+                  <td className="py-2 pr-3 align-middle text-right text-[11px] text-slate-600 dark:text-slate-300">
                     {periodLabel}
                   </td>
                   <td className="py-2 pr-0 align-middle text-right">
@@ -232,7 +239,7 @@ export function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTableProps
                         <button
                           type="button"
                           onClick={() => onEdit(expense)}
-                          className="inline-flex h-6 w-6 items-center justify-center rounded text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+                          className="inline-flex h-6 w-6 items-center justify-center rounded text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200"
                           aria-label={`Edit expense: ${description}`}
                           title="Edit expense"
                         >
@@ -243,7 +250,7 @@ export function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTableProps
                         <button
                           type="button"
                           onClick={() => onDelete(expense)}
-                          className="inline-flex h-6 w-6 items-center justify-center rounded text-slate-400 hover:bg-red-900/40 hover:text-red-400"
+                          className="inline-flex h-6 w-6 items-center justify-center rounded text-slate-500 dark:text-slate-400 hover:bg-red-100 dark:hover:bg-red-900/40 hover:text-red-600 dark:hover:text-red-400"
                           aria-label={`Delete expense: ${description}`}
                           title="Delete expense"
                         >

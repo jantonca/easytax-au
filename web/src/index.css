@@ -1,8 +1,14 @@
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
 
+/* Configure dark mode variant (class-based) */
+@variant dark (&:where(.dark, .dark *));
+
+/* Body: Light by default, dark mode override */
 body {
-  @apply bg-slate-950 text-slate-50 min-h-screen antialiased;
+  @apply min-h-screen antialiased;
+  @apply bg-white text-slate-900;
+  @apply dark:bg-slate-950 dark:text-slate-50;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
 }
 

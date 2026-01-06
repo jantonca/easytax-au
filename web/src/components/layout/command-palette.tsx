@@ -42,23 +42,26 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps): Rea
         role="dialog"
         aria-modal="true"
         aria-labelledby="command-palette-title"
-        className="w-full max-w-lg rounded-lg border border-slate-800 bg-slate-950/95 shadow-xl backdrop-blur-md"
+        className="w-full max-w-lg rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/95 shadow-xl backdrop-blur-md"
       >
-        <div className="flex items-center justify-between border-b border-slate-800 px-4 py-2">
-          <h2 id="command-palette-title" className="text-sm font-semibold text-slate-100">
+        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-4 py-2">
+          <h2
+            id="command-palette-title"
+            className="text-sm font-semibold text-slate-900 dark:text-slate-100"
+          >
             Command palette
           </h2>
           <button
             ref={closeButtonRef}
             type="button"
             onClick={() => onOpenChange(false)}
-            className="text-xs text-slate-400 hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
+            className="text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
           >
             Esc
           </button>
         </div>
-        <div className="space-y-2 px-4 py-3 text-sm text-slate-300">
-          <p className="text-xs text-slate-400">
+        <div className="space-y-2 px-4 py-3 text-sm text-slate-700 dark:text-slate-300">
+          <p className="text-xs text-slate-600 dark:text-slate-400">
             Command palette wiring is in place (⌘K / Ctrl+K). Detailed commands will be added in a
             later phase.
           </p>

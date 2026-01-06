@@ -85,7 +85,7 @@ export function RecurringPage(): JSX.Element {
   if (error) {
     return (
       <section className="mx-auto flex max-w-5xl flex-col gap-3">
-        <div className="rounded-lg border border-red-900/60 bg-red-950/60 p-4 text-sm text-red-200">
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800 dark:border-red-900/60 dark:bg-red-950/60 dark:text-red-200">
           Error loading recurring expenses: {String(error)}
         </div>
       </section>
@@ -97,10 +97,10 @@ export function RecurringPage(): JSX.Element {
       {/* Header */}
       <header className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-50">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
             Recurring Expenses
           </h1>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-slate-600 dark:text-slate-400">
             Automate repetitive expense entries with recurring templates
           </p>
         </div>
@@ -140,15 +140,15 @@ export function RecurringPage(): JSX.Element {
           aria-label="Create recurring expense"
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
         >
-          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-lg border border-slate-800 bg-slate-950 p-4 shadow-xl">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg border border-slate-200 bg-white p-4 shadow-xl dark:border-slate-800 dark:bg-slate-950">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold tracking-tight text-slate-50">
+              <h2 className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-50">
                 Create Recurring Expense
               </h2>
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="text-xs text-slate-400 hover:text-slate-200"
+                className="text-xs text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
               >
                 Close
               </button>
@@ -169,15 +169,15 @@ export function RecurringPage(): JSX.Element {
           aria-label="Edit recurring expense"
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
         >
-          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-lg border border-slate-800 bg-slate-950 p-4 shadow-xl">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg border border-slate-200 bg-white p-4 shadow-xl dark:border-slate-800 dark:bg-slate-950">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold tracking-tight text-slate-50">
+              <h2 className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-50">
                 Edit Recurring Expense
               </h2>
               <button
                 type="button"
                 onClick={() => setEditingRecurring(null)}
-                className="text-xs text-slate-400 hover:text-slate-200"
+                className="text-xs text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
               >
                 Close
               </button>
@@ -203,18 +203,20 @@ export function RecurringPage(): JSX.Element {
           description={
             <>
               <p className="mb-2">Are you sure you want to delete this recurring expense?</p>
-              <div className="rounded bg-slate-800 p-3 text-sm">
-                <p className="font-medium text-slate-50">{deletingRecurring.name}</p>
-                <p className="text-slate-300">
+              <div className="rounded bg-slate-100 p-3 text-sm dark:bg-slate-800">
+                <p className="font-medium text-slate-900 dark:text-slate-50">
+                  {deletingRecurring.name}
+                </p>
+                <p className="text-slate-700 dark:text-slate-300">
                   Amount: ${formatCents(deletingRecurring.amountCents)}
                 </p>
-                <p className="text-slate-300">
+                <p className="text-slate-700 dark:text-slate-300">
                   Schedule:{' '}
                   {deletingRecurring.schedule.charAt(0).toUpperCase() +
                     deletingRecurring.schedule.slice(1)}
                 </p>
               </div>
-              <p className="mt-3 text-amber-400">
+              <p className="mt-3 text-amber-600 dark:text-amber-400">
                 Note: This will only delete the template. Previously generated expenses will remain.
               </p>
             </>

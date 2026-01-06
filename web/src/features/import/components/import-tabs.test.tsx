@@ -28,7 +28,7 @@ describe('ImportTabs', () => {
     expect(expensesLink).toHaveClass('border-emerald-500');
     expect(expensesLink).toHaveClass('text-emerald-400');
     expect(incomesLink).toHaveClass('border-transparent');
-    expect(incomesLink).toHaveClass('text-slate-400');
+    expect(incomesLink).toHaveClass('dark:text-slate-400');
   });
 
   it('highlights incomes tab when on incomes route', () => {
@@ -44,7 +44,7 @@ describe('ImportTabs', () => {
     expect(incomesLink).toHaveClass('border-emerald-500');
     expect(incomesLink).toHaveClass('text-emerald-400');
     expect(expensesLink).toHaveClass('border-transparent');
-    expect(expensesLink).toHaveClass('text-slate-400');
+    expect(expensesLink).toHaveClass('dark:text-slate-400');
   });
 
   it('renders navigation with correct accessibility attributes', () => {

@@ -100,7 +100,7 @@ export function RecurringTable({
 
   if (sortedExpenses.length === 0) {
     return (
-      <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-400">
+      <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-4 text-sm text-slate-600 dark:text-slate-400">
         <p>No recurring expenses yet.</p>
       </div>
     );
@@ -109,18 +109,20 @@ export function RecurringTable({
   return (
     <section
       aria-label="Recurring Expenses"
-      className="rounded-lg border border-slate-800 bg-slate-900/60 p-4"
+      className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-4"
     >
       <div className="mb-3 flex items-baseline justify-between gap-2">
-        <h2 className="text-sm font-semibold tracking-tight text-slate-50">Recurring Expenses</h2>
+        <h2 className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+          Recurring Expenses
+        </h2>
         <p className="text-[11px] text-slate-500">
           Sorted by {sortField === 'nextDueDate' ? 'next due date' : sortField}
         </p>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-220 border-collapse text-left text-xs text-slate-300">
+        <table className="w-full min-w-220 border-collapse text-left text-xs text-slate-700 dark:text-slate-300">
           <thead>
-            <tr className="border-b border-slate-800 text-[11px] uppercase tracking-[0.18em] text-slate-500">
+            <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] uppercase tracking-[0.18em] text-slate-500">
               <th
                 scope="col"
                 className="py-2 pr-3"
@@ -135,7 +137,7 @@ export function RecurringTable({
                 <button
                   type="button"
                   onClick={() => handleSort('name')}
-                  className="inline-flex items-center gap-1 text-left hover:text-slate-300"
+                  className="inline-flex items-center gap-1 text-left hover:text-slate-600 dark:hover:text-slate-300"
                 >
                   <span>Name</span>
                   <span aria-hidden="true" className="text-[9px]">
@@ -163,7 +165,7 @@ export function RecurringTable({
                 <button
                   type="button"
                   onClick={() => handleSort('amount')}
-                  className="inline-flex w-full items-center justify-end gap-1 text-right hover:text-slate-300"
+                  className="inline-flex w-full items-center justify-end gap-1 text-right hover:text-slate-600 dark:hover:text-slate-300"
                 >
                   <span>Amount</span>
                   <span aria-hidden="true" className="text-[9px]">
@@ -185,7 +187,7 @@ export function RecurringTable({
                 <button
                   type="button"
                   onClick={() => handleSort('schedule')}
-                  className="inline-flex items-center gap-1 text-left hover:text-slate-300"
+                  className="inline-flex items-center gap-1 text-left hover:text-slate-600 dark:hover:text-slate-300"
                 >
                   <span>Schedule</span>
                   <span aria-hidden="true" className="text-[9px]">
@@ -207,7 +209,7 @@ export function RecurringTable({
                 <button
                   type="button"
                   onClick={() => handleSort('nextDueDate')}
-                  className="inline-flex items-center gap-1 text-left hover:text-slate-300"
+                  className="inline-flex items-center gap-1 text-left hover:text-slate-600 dark:hover:text-slate-300"
                 >
                   <span>Next Due</span>
                   <span aria-hidden="true" className="text-[9px]">
@@ -232,7 +234,7 @@ export function RecurringTable({
                 <button
                   type="button"
                   onClick={() => handleSort('isActive')}
-                  className="inline-flex items-center gap-1 text-left hover:text-slate-300"
+                  className="inline-flex items-center gap-1 text-left hover:text-slate-600 dark:hover:text-slate-300"
                 >
                   <span>Status</span>
                   <span aria-hidden="true" className="text-[9px]">
@@ -250,10 +252,19 @@ export function RecurringTable({
               const dueDateStatus = getDueDateStatus(recurring.nextDueDate);
 
               return (
-                <tr key={recurring.id} className="border-b border-slate-800 hover:bg-slate-900/50">
-                  <td className="py-2 pr-3 font-medium text-slate-50">{recurring.name}</td>
-                  <td className="py-2 pr-3 text-slate-400">{recurring.providerName ?? '—'}</td>
-                  <td className="py-2 pr-3 text-slate-400">{recurring.categoryName ?? '—'}</td>
+                <tr
+                  key={recurring.id}
+                  className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-900/50"
+                >
+                  <td className="py-2 pr-3 font-medium text-slate-900 dark:text-slate-50">
+                    {recurring.name}
+                  </td>
+                  <td className="py-2 pr-3 text-slate-600 dark:text-slate-400">
+                    {recurring.providerName ?? '—'}
+                  </td>
+                  <td className="py-2 pr-3 text-slate-600 dark:text-slate-400">
+                    {recurring.categoryName ?? '—'}
+                  </td>
                   <td className="py-2 pr-3 text-right tabular-nums">
                     {formatCents(recurring.amountCents)}
                   </td>
@@ -265,7 +276,7 @@ export function RecurringTable({
                     {dueDateStatus === 'overdue' && ' (overdue)'}
                     {dueDateStatus === 'due-soon' && ' (due soon)'}
                   </td>
-                  <td className="py-2 pr-3 text-slate-400">
+                  <td className="py-2 pr-3 text-slate-600 dark:text-slate-400">
                     {recurring.lastGeneratedDate &&
                     (recurring.lastGeneratedDate as unknown as string)
                       ? new Date(
@@ -288,7 +299,7 @@ export function RecurringTable({
                     <div className="flex justify-end gap-2">
                       <button
                         onClick={() => onEdit(recurring)}
-                        className="text-blue-400 hover:text-blue-300"
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
                         aria-label={`Edit ${recurring.name}`}
                         title="Edit"
                       >
@@ -296,7 +307,7 @@ export function RecurringTable({
                       </button>
                       <button
                         onClick={() => onDelete(recurring)}
-                        className="text-red-400 hover:text-red-300"
+                        className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
                         aria-label={`Delete ${recurring.name}`}
                         title="Delete"
                       >

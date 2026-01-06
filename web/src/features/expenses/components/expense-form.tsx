@@ -184,34 +184,40 @@ export function ExpenseForm({
       className="space-y-3"
     >
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        <div className="flex flex-col gap-1 text-xs text-slate-200">
-          <label htmlFor="expense-date" className="text-[11px] font-medium text-slate-300">
+        <div className="flex flex-col gap-1 text-xs text-slate-700 dark:text-slate-200">
+          <label
+            htmlFor="expense-date"
+            className="text-[11px] font-medium text-slate-600 dark:text-slate-300"
+          >
             Date
           </label>
           <input
             id="expense-date"
             type="date"
-            className="h-8 rounded-md border border-slate-800 bg-slate-950 px-2 text-xs text-slate-100"
+            className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
             {...register('date')}
           />
           {errors.date && <p className="text-[11px] text-red-400">{errors.date.message}</p>}
         </div>
 
-        <div className="flex flex-col gap-1 text-xs text-slate-200">
-          <label htmlFor="expense-amount" className="text-[11px] font-medium text-slate-300">
+        <div className="flex flex-col gap-1 text-xs text-slate-700 dark:text-slate-200">
+          <label
+            htmlFor="expense-amount"
+            className="text-[11px] font-medium text-slate-600 dark:text-slate-300"
+          >
             Amount (AUD)
           </label>
           <input
             id="expense-amount"
             type="text"
             inputMode="decimal"
-            className="h-8 rounded-md border border-slate-800 bg-slate-950 px-2 text-xs text-slate-100"
+            className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
             placeholder="$0.00"
             {...register('amount')}
           />
           {errors.amount && <p className="text-[11px] text-red-400">{errors.amount.message}</p>}
           {calculatedGst && (
-            <p className="text-[10px] text-emerald-400">
+            <p className="text-[10px] text-emerald-600 dark:text-emerald-400">
               {calculatedGst.isInternational
                 ? 'GST: $0.00 (international provider)'
                 : `Calculated GST: ${formatCents(calculatedGst.cents)}`}
@@ -221,30 +227,38 @@ export function ExpenseForm({
       </div>
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-        <div className="flex flex-col gap-1 text-xs text-slate-200">
-          <label htmlFor="expense-gst" className="text-[11px] font-medium text-slate-300">
+        <div className="flex flex-col gap-1 text-xs text-slate-700 dark:text-slate-200">
+          <label
+            htmlFor="expense-gst"
+            className="text-[11px] font-medium text-slate-600 dark:text-slate-300"
+          >
             GST (optional)
           </label>
           <input
             id="expense-gst"
             type="text"
             inputMode="decimal"
-            className="h-8 rounded-md border border-slate-800 bg-slate-950 px-2 text-xs text-slate-100"
+            className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
             placeholder="$0.00"
             {...register('gstAmount')}
           />
-          <p className="text-[10px] text-slate-400">
+          <p className="text-[10px] text-slate-600 dark:text-slate-400">
             Leave blank to auto-calculate GST from total for domestic providers; international
             providers always use $0 GST.
           </p>
         </div>
 
-        <div className="flex flex-col gap-2 text-xs text-slate-200">
+        <div className="flex flex-col gap-2 text-xs text-slate-700 dark:text-slate-200">
           <div className="flex items-center justify-between">
-            <label htmlFor="expense-biz" className="text-[11px] font-medium text-slate-300">
+            <label
+              htmlFor="expense-biz"
+              className="text-[11px] font-medium text-slate-600 dark:text-slate-300"
+            >
               Business use %
             </label>
-            <span className="text-sm font-semibold text-emerald-400">{bizPercent}%</span>
+            <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+              {bizPercent}%
+            </span>
           </div>
           <input
             id="expense-biz"
@@ -259,7 +273,7 @@ export function ExpenseForm({
             className="w-full accent-emerald-600"
             {...register('bizPercent', { valueAsNumber: true })}
           />
-          <div className="flex justify-between text-[10px] text-slate-400">
+          <div className="flex justify-between text-[10px] text-slate-600 dark:text-slate-400">
             <span>0%</span>
             <span>100%</span>
           </div>
@@ -267,7 +281,7 @@ export function ExpenseForm({
             <p className="text-[11px] text-red-400">{errors.bizPercent.message}</p>
           )}
           {claimableGst !== null && (
-            <p className="text-[10px] text-slate-400">
+            <p className="text-[10px] text-slate-600 dark:text-slate-400">
               Claimable GST: {formatCents(claimableGst)} ({bizPercent}% of{' '}
               {formatCents(
                 gstAmount ? parseCurrency(gstAmount)?.cents || 0 : calculatedGst?.cents || 0,
@@ -279,13 +293,16 @@ export function ExpenseForm({
       </div>
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        <div className="flex flex-col gap-1 text-xs text-slate-200">
-          <label htmlFor="expense-provider" className="text-[11px] font-medium text-slate-300">
+        <div className="flex flex-col gap-1 text-xs text-slate-700 dark:text-slate-200">
+          <label
+            htmlFor="expense-provider"
+            className="text-[11px] font-medium text-slate-600 dark:text-slate-300"
+          >
             Provider
           </label>
           <select
             id="expense-provider"
-            className="h-8 rounded-md border border-slate-800 bg-slate-950 px-2 text-xs text-slate-100"
+            className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
             {...register('providerId')}
           >
             <option value="">Select a provider…</option>
@@ -300,13 +317,16 @@ export function ExpenseForm({
           )}
         </div>
 
-        <div className="flex flex-col gap-1 text-xs text-slate-200">
-          <label htmlFor="expense-category" className="text-[11px] font-medium text-slate-300">
+        <div className="flex flex-col gap-1 text-xs text-slate-700 dark:text-slate-200">
+          <label
+            htmlFor="expense-category"
+            className="text-[11px] font-medium text-slate-600 dark:text-slate-300"
+          >
             Category
           </label>
           <select
             id="expense-category"
-            className="h-8 rounded-md border border-slate-800 bg-slate-950 px-2 text-xs text-slate-100"
+            className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
             {...register('categoryId')}
           >
             <option value="">Select a category…</option>
@@ -322,13 +342,16 @@ export function ExpenseForm({
         </div>
       </div>
 
-      <div className="flex flex-col gap-1 text-xs text-slate-200">
-        <label htmlFor="expense-description" className="text-[11px] font-medium text-slate-300">
+      <div className="flex flex-col gap-1 text-xs text-slate-700 dark:text-slate-200">
+        <label
+          htmlFor="expense-description"
+          className="text-[11px] font-medium text-slate-600 dark:text-slate-300"
+        >
           Description (optional)
         </label>
         <textarea
           id="expense-description"
-          className="min-h-18 rounded-md border border-slate-800 bg-slate-950 px-2 py-1 text-xs text-slate-100"
+          className="min-h-18 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 py-1 text-xs text-slate-900 dark:text-slate-100"
           {...register('description')}
         />
         {errors.description && (
@@ -336,14 +359,17 @@ export function ExpenseForm({
         )}
       </div>
 
-      <div className="flex flex-col gap-1 text-xs text-slate-200">
-        <label htmlFor="expense-fileRef" className="text-[11px] font-medium text-slate-300">
+      <div className="flex flex-col gap-1 text-xs text-slate-700 dark:text-slate-200">
+        <label
+          htmlFor="expense-fileRef"
+          className="text-[11px] font-medium text-slate-600 dark:text-slate-300"
+        >
           Receipt reference (optional)
         </label>
         <input
           id="expense-fileRef"
           type="text"
-          className="h-8 rounded-md border border-slate-800 bg-slate-950 px-2 text-xs text-slate-100"
+          className="h-8 rounded-md border border-slate-300 bg-white dark:border-slate-800 dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
           placeholder="receipt-github-2024-01.pdf"
           {...register('fileRef')}
         />

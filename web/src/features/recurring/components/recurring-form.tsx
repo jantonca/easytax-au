@@ -186,14 +186,17 @@ export function RecurringForm({
     >
       {/* Name */}
       <div>
-        <label htmlFor="name" className="text-[11px] font-medium text-slate-300">
+        <label
+          htmlFor="name"
+          className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+        >
           Name <span className="text-red-500">*</span>
         </label>
         <input
           id="name"
           type="text"
           {...register('name')}
-          className="mt-1 block w-full rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-100"
+          className="mt-1 block w-full rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100"
           placeholder="e.g., iinet Internet"
         />
         {errors.name && <p className="mt-1 text-[11px] text-red-400">{errors.name.message}</p>}
@@ -201,14 +204,17 @@ export function RecurringForm({
 
       {/* Description */}
       <div>
-        <label htmlFor="description" className="text-[11px] font-medium text-slate-300">
+        <label
+          htmlFor="description"
+          className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+        >
           Description (optional)
         </label>
         <input
           id="description"
           type="text"
           {...register('description')}
-          className="mt-1 block w-full rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-100"
+          className="mt-1 block w-full rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100"
           placeholder="e.g., Monthly internet service"
         />
         {errors.description && (
@@ -218,13 +224,16 @@ export function RecurringForm({
 
       {/* Provider */}
       <div>
-        <label htmlFor="providerId" className="text-[11px] font-medium text-slate-300">
+        <label
+          htmlFor="providerId"
+          className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+        >
           Provider <span className="text-red-500">*</span>
         </label>
         <select
           id="providerId"
           {...register('providerId')}
-          className="mt-1 block w-full rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-100"
+          className="mt-1 block w-full rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100"
         >
           {providers.length === 0 && <option value="">Loading providers...</option>}
           {providers.map((provider) => (
@@ -241,13 +250,16 @@ export function RecurringForm({
 
       {/* Category */}
       <div>
-        <label htmlFor="categoryId" className="text-[11px] font-medium text-slate-300">
+        <label
+          htmlFor="categoryId"
+          className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+        >
           Category <span className="text-red-500">*</span>
         </label>
         <select
           id="categoryId"
           {...register('categoryId')}
-          className="mt-1 block w-full rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-100"
+          className="mt-1 block w-full rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100"
         >
           {categories.length === 0 && <option value="">Loading categories...</option>}
           {categories.map((category) => (
@@ -264,14 +276,17 @@ export function RecurringForm({
       {/* Amount and GST */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="amount" className="text-[11px] font-medium text-slate-300">
+          <label
+            htmlFor="amount"
+            className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+          >
             Amount (inc GST) <span className="text-red-500">*</span>
           </label>
           <input
             id="amount"
             type="text"
             {...register('amount')}
-            className="mt-1 block w-full rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-100"
+            className="mt-1 block w-full rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100"
             placeholder="110.00"
           />
           {errors.amount && (
@@ -288,14 +303,17 @@ export function RecurringForm({
         </div>
 
         <div>
-          <label htmlFor="gstAmount" className="text-[11px] font-medium text-slate-300">
+          <label
+            htmlFor="gstAmount"
+            className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+          >
             GST (optional override)
           </label>
           <input
             id="gstAmount"
             type="text"
             {...register('gstAmount')}
-            className="mt-1 block w-full rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-100"
+            className="mt-1 block w-full rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100"
             placeholder={calculatedGst}
           />
           {errors.gstAmount && (
@@ -306,7 +324,10 @@ export function RecurringForm({
 
       {/* Business Use Percentage */}
       <div>
-        <label htmlFor="bizPercent" className="text-[11px] font-medium text-slate-300">
+        <label
+          htmlFor="bizPercent"
+          className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+        >
           Business Use: <span className="text-emerald-400 font-semibold">{bizPercent}%</span>
         </label>
         <input
@@ -322,7 +343,7 @@ export function RecurringForm({
           aria-valuemax={100}
           aria-valuenow={bizPercent}
         />
-        <p className="mt-1 text-[10px] text-slate-400">
+        <p className="mt-1 text-[10px] text-slate-600 dark:text-slate-400">
           Claimable GST: <span className="font-semibold">${claimableGst}</span> ({bizPercent}% of $
           {gstAmount && gstAmount.trim() !== '' ? gstAmount : calculatedGst})
         </p>
@@ -333,13 +354,16 @@ export function RecurringForm({
 
       {/* Schedule */}
       <div>
-        <label htmlFor="schedule" className="text-[11px] font-medium text-slate-300">
+        <label
+          htmlFor="schedule"
+          className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+        >
           Schedule <span className="text-red-500">*</span>
         </label>
         <select
           id="schedule"
           {...register('schedule')}
-          className="mt-1 block w-full rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-100"
+          className="mt-1 block w-full rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100"
         >
           <option value="monthly">Monthly</option>
           <option value="quarterly">Quarterly</option>
@@ -352,7 +376,10 @@ export function RecurringForm({
 
       {/* Day of Month */}
       <div>
-        <label htmlFor="dayOfMonth" className="text-[11px] font-medium text-slate-300">
+        <label
+          htmlFor="dayOfMonth"
+          className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+        >
           Day of Month (1-28) <span className="text-red-500">*</span>
         </label>
         <input
@@ -361,9 +388,11 @@ export function RecurringForm({
           min="1"
           max="28"
           {...register('dayOfMonth', { valueAsNumber: true })}
-          className="mt-1 block w-full rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-100"
+          className="mt-1 block w-full rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100"
         />
-        <p className="mt-1 text-[10px] text-slate-400">Use 1-28 to avoid month-end date issues</p>
+        <p className="mt-1 text-[10px] text-slate-600 dark:text-slate-400">
+          Use 1-28 to avoid month-end date issues
+        </p>
         {errors.dayOfMonth && (
           <p className="mt-1 text-[11px] text-red-400">{errors.dayOfMonth.message}</p>
         )}
@@ -372,14 +401,17 @@ export function RecurringForm({
       {/* Start and End Dates */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="startDate" className="text-[11px] font-medium text-slate-300">
+          <label
+            htmlFor="startDate"
+            className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+          >
             Start Date <span className="text-red-500">*</span>
           </label>
           <input
             id="startDate"
             type="date"
             {...register('startDate')}
-            className="mt-1 block w-full rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-100"
+            className="mt-1 block w-full rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100"
           />
           {errors.startDate && (
             <p className="mt-1 text-[11px] text-red-400">{errors.startDate.message}</p>
@@ -387,14 +419,17 @@ export function RecurringForm({
         </div>
 
         <div>
-          <label htmlFor="endDate" className="text-[11px] font-medium text-slate-300">
+          <label
+            htmlFor="endDate"
+            className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+          >
             End Date (optional)
           </label>
           <input
             id="endDate"
             type="date"
             {...register('endDate')}
-            className="mt-1 block w-full rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-100"
+            className="mt-1 block w-full rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100"
           />
           {errors.endDate && (
             <p className="mt-1 text-[11px] text-red-400">{errors.endDate.message}</p>
@@ -408,9 +443,12 @@ export function RecurringForm({
           id="isActive"
           type="checkbox"
           {...register('isActive')}
-          className="h-4 w-4 rounded border-slate-700 bg-slate-950 text-emerald-600 focus:ring-2 focus:ring-emerald-500"
+          className="h-4 w-4 rounded border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 text-emerald-600 focus:ring-2 focus:ring-emerald-500"
         />
-        <label htmlFor="isActive" className="text-[11px] font-medium text-slate-300">
+        <label
+          htmlFor="isActive"
+          className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+        >
           Active (uncheck to pause this recurring expense)
         </label>
         {errors.isActive && (

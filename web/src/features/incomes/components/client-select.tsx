@@ -10,13 +10,16 @@ interface ClientSelectProps {
 
 export function ClientSelect({ clients, value, onChange, error }: ClientSelectProps): ReactElement {
   return (
-    <div className="flex flex-col gap-1 text-xs text-slate-200">
-      <label htmlFor="income-client" className="text-[11px] font-medium text-slate-300">
+    <div className="flex flex-col gap-1 text-xs text-slate-700 dark:text-slate-200">
+      <label
+        htmlFor="income-client"
+        className="text-[11px] font-medium text-slate-600 dark:text-slate-300"
+      >
         Client
       </label>
       <select
         id="income-client"
-        className="h-8 rounded-md border border-slate-800 bg-slate-950 px-2 text-xs text-slate-100"
+        className="h-8 rounded-md border border-slate-300 bg-white dark:border-slate-800 dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >

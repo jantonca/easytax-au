@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { queryClient } from '@/lib/query-client';
 import { ToastProvider } from '@/components/ui/toast-provider';
 import { ToastViewport } from '@/components/ui/toast-viewport';
+import { ThemeProvider } from '@/hooks/use-theme';
 
 interface AppShellProps {
   children: ReactNode;
@@ -12,14 +13,16 @@ interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps): ReactElement {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <ToastProvider>
-          {children}
-          <ToastViewport />
-        </ToastProvider>
-      </BrowserRouter>
-      {import.meta.env.DEV ? <ReactQueryDevtools initialIsOpen={false} /> : null}
-    </QueryClientProvider>
+    <ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <ToastProvider>
+            {children}
+            <ToastViewport />
+          </ToastProvider>
+        </BrowserRouter>
+        {import.meta.env.DEV ? <ReactQueryDevtools initialIsOpen={false} /> : null}
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }

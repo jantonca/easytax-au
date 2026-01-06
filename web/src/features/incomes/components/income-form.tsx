@@ -182,27 +182,33 @@ export function IncomeForm({
       className="space-y-3"
     >
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        <div className="flex flex-col gap-1 text-xs text-slate-200">
-          <label htmlFor="income-date" className="text-[11px] font-medium text-slate-300">
+        <div className="flex flex-col gap-1 text-xs text-slate-700 dark:text-slate-200">
+          <label
+            htmlFor="income-date"
+            className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+          >
             Date
           </label>
           <input
             id="income-date"
             type="date"
-            className="h-8 rounded-md border border-slate-800 bg-slate-950 px-2 text-xs text-slate-100"
+            className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
             {...register('date')}
           />
           {errors.date && <p className="text-[11px] text-red-400">{errors.date.message}</p>}
         </div>
 
-        <div className="flex flex-col gap-1 text-xs text-slate-200">
-          <label htmlFor="income-invoiceNum" className="text-[11px] font-medium text-slate-300">
+        <div className="flex flex-col gap-1 text-xs text-slate-700 dark:text-slate-200">
+          <label
+            htmlFor="income-invoiceNum"
+            className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+          >
             Invoice number (optional)
           </label>
           <input
             id="income-invoiceNum"
             type="text"
-            className="h-8 rounded-md border border-slate-800 bg-slate-950 px-2 text-xs text-slate-100"
+            className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
             placeholder="INV-2024-001"
             {...register('invoiceNum')}
           />
@@ -220,48 +226,57 @@ export function IncomeForm({
       />
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        <div className="flex flex-col gap-1 text-xs text-slate-200">
-          <label htmlFor="income-subtotal" className="text-[11px] font-medium text-slate-300">
+        <div className="flex flex-col gap-1 text-xs text-slate-700 dark:text-slate-200">
+          <label
+            htmlFor="income-subtotal"
+            className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+          >
             Subtotal (AUD)
           </label>
           <input
             id="income-subtotal"
             type="text"
             inputMode="decimal"
-            className="h-8 rounded-md border border-slate-800 bg-slate-950 px-2 text-xs text-slate-100"
+            className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
             placeholder="$0.00"
             {...register('subtotal')}
           />
           {errors.subtotal && <p className="text-[11px] text-red-400">{errors.subtotal.message}</p>}
         </div>
 
-        <div className="flex flex-col gap-1 text-xs text-slate-200">
-          <label htmlFor="income-gst" className="text-[11px] font-medium text-slate-300">
+        <div className="flex flex-col gap-1 text-xs text-slate-700 dark:text-slate-200">
+          <label
+            htmlFor="income-gst"
+            className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+          >
             GST (AUD)
           </label>
           <input
             id="income-gst"
             type="text"
             inputMode="decimal"
-            className="h-8 rounded-md border border-slate-800 bg-slate-950 px-2 text-xs text-slate-100"
+            className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
             placeholder="$0.00"
             {...register('gst')}
             onFocus={handleGstFocus}
           />
           {errors.gst && <p className="text-[11px] text-red-400">{errors.gst.message}</p>}
-          <p className="text-[10px] text-slate-400">
+          <p className="text-[10px] text-slate-600 dark:text-slate-400">
             Auto-calculated as 10% of subtotal. Edit to override.
           </p>
         </div>
       </div>
 
-      <div className="flex flex-col gap-1 text-xs text-slate-200">
-        <label htmlFor="income-description" className="text-[11px] font-medium text-slate-300">
+      <div className="flex flex-col gap-1 text-xs text-slate-700 dark:text-slate-200">
+        <label
+          htmlFor="income-description"
+          className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+        >
           Description (optional)
         </label>
         <textarea
           id="income-description"
-          className="min-h-[72px] rounded-md border border-slate-800 bg-slate-950 px-2 py-1 text-xs text-slate-100"
+          className="min-h-[72px] rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 py-1 text-xs text-slate-900 dark:text-slate-100"
           {...register('description')}
         />
         {errors.description && (
@@ -273,10 +288,10 @@ export function IncomeForm({
         <input
           id="income-paid"
           type="checkbox"
-          className="h-4 w-4 rounded border-slate-800 bg-slate-950 text-emerald-600"
+          className="h-4 w-4 rounded border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 text-emerald-600"
           {...register('isPaid')}
         />
-        <label htmlFor="income-paid" className="text-xs text-slate-200">
+        <label htmlFor="income-paid" className="text-xs text-slate-700 dark:text-slate-200">
           Mark as paid
         </label>
       </div>

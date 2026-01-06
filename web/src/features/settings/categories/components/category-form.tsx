@@ -120,27 +120,33 @@ export function CategoryForm({
       })}
       className="space-y-3"
     >
-      <div className="flex flex-col gap-1 text-xs text-slate-200">
-        <label htmlFor="category-name" className="text-[11px] font-medium text-slate-300">
+      <div className="flex flex-col gap-1 text-xs">
+        <label
+          htmlFor="category-name"
+          className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+        >
           Category name
         </label>
         <input
           id="category-name"
           type="text"
-          className="h-8 rounded-md border border-slate-800 bg-slate-950 px-2 text-xs text-slate-100"
+          className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
           placeholder="Software, Hosting, Internet, etc."
           {...register('name')}
         />
         {errors.name && <p className="text-[11px] text-red-400">{errors.name.message}</p>}
       </div>
 
-      <div className="flex flex-col gap-1 text-xs text-slate-200">
-        <label htmlFor="category-bas-label" className="text-[11px] font-medium text-slate-300">
+      <div className="flex flex-col gap-1 text-xs">
+        <label
+          htmlFor="category-bas-label"
+          className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+        >
           BAS label
         </label>
         <select
           id="category-bas-label"
-          className="h-8 rounded-md border border-slate-800 bg-slate-950 px-2 text-xs text-slate-100"
+          className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
           {...register('basLabel')}
         >
           <option value="1B">1B - Purchases for making sales (most common)</option>
@@ -148,7 +154,7 @@ export function CategoryForm({
           <option value="G11">G11 - Non-capital purchases</option>
         </select>
         {errors.basLabel && <p className="text-[11px] text-red-400">{errors.basLabel.message}</p>}
-        <p className="text-[10px] text-slate-400">
+        <p className="text-[10px] text-slate-600 dark:text-slate-400">
           ATO BAS label for reporting. Most business expenses use 1B.
         </p>
       </div>
@@ -157,26 +163,32 @@ export function CategoryForm({
         <input
           id="category-deductible"
           type="checkbox"
-          className="mt-1 h-4 w-4 rounded border-slate-800 bg-slate-950 text-emerald-600 focus:ring-emerald-600"
+          className="mt-1 h-4 w-4 rounded border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 text-emerald-600 focus:ring-emerald-600"
           {...register('isDeductible')}
         />
         <div className="flex flex-col gap-1">
-          <label htmlFor="category-deductible" className="text-[11px] font-medium text-slate-300">
+          <label
+            htmlFor="category-deductible"
+            className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+          >
             Tax deductible
           </label>
-          <p className="text-[10px] text-slate-400">
+          <p className="text-[10px] text-slate-600 dark:text-slate-400">
             Uncheck if this expense type is not tax deductible.
           </p>
         </div>
       </div>
 
-      <div className="flex flex-col gap-1 text-xs text-slate-200">
-        <label htmlFor="category-description" className="text-[11px] font-medium text-slate-300">
+      <div className="flex flex-col gap-1 text-xs">
+        <label
+          htmlFor="category-description"
+          className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+        >
           Description (optional)
         </label>
         <textarea
           id="category-description"
-          className="min-h-[72px] rounded-md border border-slate-800 bg-slate-950 px-2 py-1 text-xs text-slate-100"
+          className="min-h-[72px] rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 py-1 text-xs text-slate-900 dark:text-slate-100"
           placeholder="Optional notes about this category..."
           {...register('description')}
         />

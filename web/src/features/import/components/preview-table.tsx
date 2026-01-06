@@ -57,8 +57,8 @@ export function PreviewTable({
 }: PreviewTableProps): ReactElement {
   if (rows.length === 0) {
     return (
-      <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-12 text-center">
-        <p className="text-slate-400">No rows to preview</p>
+      <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 p-12 text-center">
+        <p className="text-slate-600 dark:text-slate-400">No rows to preview</p>
       </div>
     );
   }
@@ -92,11 +92,11 @@ export function PreviewTable({
   };
 
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-800 bg-slate-900/40">
+    <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
       {/* Selection Count */}
       {selectable && (
-        <div className="border-b border-slate-800 bg-slate-900/60 px-4 py-2">
-          <p className="text-sm text-slate-400">
+        <div className="border-b border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/60 px-4 py-2">
+          <p className="text-sm text-slate-600 dark:text-slate-400">
             {selectedRows.size} of {rows.length} rows selected
           </p>
         </div>
@@ -104,30 +104,46 @@ export function PreviewTable({
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="border-b border-slate-800 bg-slate-900/60">
+          <thead className="border-b border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/60">
             <tr>
               {selectable && (
-                <th className="px-4 py-3 text-left font-medium text-slate-300">
+                <th className="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">
                   <input
                     type="checkbox"
                     checked={allSelectableSelected}
                     onChange={handleToggleAll}
-                    className="h-4 w-4 rounded border-slate-700 bg-slate-800 text-emerald-600 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+                    className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-emerald-600 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
                     aria-label="Select all rows"
                   />
                 </th>
               )}
-              <th className="px-4 py-3 text-left font-medium text-slate-300">Row</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-300">Status</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-300">Date</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-300">Provider</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-300">Category</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-300">Description</th>
-              <th className="px-4 py-3 text-right font-medium text-slate-300">Amount</th>
-              <th className="px-4 py-3 text-right font-medium text-slate-300">GST</th>
+              <th className="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">
+                Row
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">
+                Status
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">
+                Date
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">
+                Provider
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">
+                Category
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">
+                Description
+              </th>
+              <th className="px-4 py-3 text-right font-medium text-slate-700 dark:text-slate-300">
+                Amount
+              </th>
+              <th className="px-4 py-3 text-right font-medium text-slate-700 dark:text-slate-300">
+                GST
+              </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800">
+          <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
             {rows.map((row) => {
               const rowBgClass = !row.success
                 ? 'bg-red-950/30'
@@ -148,14 +164,14 @@ export function PreviewTable({
                         checked={isRowSelected}
                         disabled={isRowDisabled}
                         onChange={() => handleToggleRow(row.rowNumber)}
-                        className="h-4 w-4 rounded border-slate-700 bg-slate-800 text-emerald-600 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-emerald-600 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
                         aria-label={`Select row ${row.rowNumber}`}
                       />
                     </td>
                   )}
 
                   {/* Row Number */}
-                  <td className="px-4 py-3 text-slate-400">{row.rowNumber}</td>
+                  <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{row.rowNumber}</td>
 
                   {/* Status */}
                   <td className="px-4 py-3">
@@ -180,7 +196,7 @@ export function PreviewTable({
                   {/* Date */}
                   <td className="px-4 py-3">
                     {(row as { date?: string }).date ? (
-                      <span className="text-slate-200">
+                      <span className="text-slate-900 dark:text-slate-200">
                         {formatDate((row as { date?: string }).date!)}
                       </span>
                     ) : (
@@ -192,7 +208,9 @@ export function PreviewTable({
                   <td className="px-4 py-3">
                     {row.providerName ? (
                       <div className="flex items-center">
-                        <span className="text-slate-200">{row.providerName}</span>
+                        <span className="text-slate-900 dark:text-slate-200">
+                          {row.providerName}
+                        </span>
                         {getConfidenceBadge(row.matchScore)}
                       </div>
                     ) : (
@@ -203,7 +221,7 @@ export function PreviewTable({
                   {/* Category */}
                   <td className="px-4 py-3">
                     {row.categoryName ? (
-                      <span className="text-slate-200">{row.categoryName}</span>
+                      <span className="text-slate-900 dark:text-slate-200">{row.categoryName}</span>
                     ) : (
                       <span className="text-slate-500">-</span>
                     )}
@@ -212,7 +230,7 @@ export function PreviewTable({
                   {/* Description */}
                   <td className="px-4 py-3">
                     {(row as { description?: string }).description ? (
-                      <span className="text-slate-200 truncate max-w-xs block">
+                      <span className="text-slate-900 dark:text-slate-200 truncate max-w-xs block">
                         {(row as { description?: string }).description}
                       </span>
                     ) : (
@@ -223,7 +241,9 @@ export function PreviewTable({
                   {/* Amount */}
                   <td className="px-4 py-3 text-right tabular-nums">
                     {row.amountCents !== undefined ? (
-                      <span className="text-slate-200">{formatCurrency(row.amountCents)}</span>
+                      <span className="text-slate-900 dark:text-slate-200">
+                        {formatCurrency(row.amountCents)}
+                      </span>
                     ) : (
                       <span className="text-slate-500">-</span>
                     )}
@@ -232,7 +252,9 @@ export function PreviewTable({
                   {/* GST */}
                   <td className="px-4 py-3 text-right tabular-nums">
                     {row.gstCents !== undefined ? (
-                      <span className="text-slate-200">{formatCurrency(row.gstCents)}</span>
+                      <span className="text-slate-900 dark:text-slate-200">
+                        {formatCurrency(row.gstCents)}
+                      </span>
                     ) : (
                       <span className="text-slate-500">-</span>
                     )}
@@ -246,14 +268,16 @@ export function PreviewTable({
 
       {/* Error Messages */}
       {rows.some((row) => row.error) && (
-        <div className="border-t border-slate-800 bg-slate-950/40 p-4">
-          <h3 className="mb-2 text-sm font-medium text-red-400">Errors</h3>
+        <div className="border-t border-slate-200 dark:border-slate-800 bg-red-50 dark:bg-slate-950/40 p-4">
+          <h3 className="mb-2 text-sm font-medium text-red-600 dark:text-red-400">Errors</h3>
           <ul className="space-y-1 text-sm">
             {rows
               .filter((row) => row.error)
               .map((row) => (
-                <li key={row.rowNumber} className="text-slate-400">
-                  <span className="font-medium text-slate-300">Row {row.rowNumber}:</span>{' '}
+                <li key={row.rowNumber} className="text-slate-700 dark:text-slate-400">
+                  <span className="font-medium text-slate-900 dark:text-slate-300">
+                    Row {row.rowNumber}:
+                  </span>{' '}
                   {row.error}
                 </li>
               ))}

@@ -42,7 +42,7 @@ export function ImportHistory(): ReactElement {
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="text-center">
           <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-emerald-500" />
-          <p className="text-slate-400">Loading import history...</p>
+          <p className="text-slate-600 dark:text-slate-400">Loading import history...</p>
         </div>
       </div>
     );
@@ -51,12 +51,16 @@ export function ImportHistory(): ReactElement {
   // Error state
   if (isError) {
     return (
-      <div className="rounded-lg border border-red-800 bg-red-950/40 p-8">
+      <div className="rounded-lg border border-red-200 bg-red-50 p-8 dark:border-red-800 dark:bg-red-950/40">
         <div className="flex items-center gap-3">
-          <AlertCircle className="h-8 w-8 text-red-400" />
+          <AlertCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
           <div>
-            <h2 className="text-xl font-semibold text-red-400">Error Loading Import History</h2>
-            <p className="mt-1 text-slate-300">{error?.message || 'An error occurred'}</p>
+            <h2 className="text-xl font-semibold text-red-600 dark:text-red-400">
+              Error Loading Import History
+            </h2>
+            <p className="mt-1 text-slate-700 dark:text-slate-300">
+              {error?.message || 'An error occurred'}
+            </p>
           </div>
         </div>
       </div>
@@ -66,10 +70,12 @@ export function ImportHistory(): ReactElement {
   // Empty state
   if (!jobs || jobs.length === 0) {
     return (
-      <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-12 text-center">
-        <FileX className="mx-auto mb-4 h-16 w-16 text-slate-600" />
-        <h2 className="mb-2 text-xl font-semibold text-slate-300">No Import History</h2>
-        <p className="text-slate-400">
+      <div className="rounded-lg border border-slate-200 bg-white p-12 text-center dark:border-slate-800 dark:bg-slate-900/40">
+        <FileX className="mx-auto mb-4 h-16 w-16 text-slate-400 dark:text-slate-600" />
+        <h2 className="mb-2 text-xl font-semibold text-slate-900 dark:text-slate-300">
+          No Import History
+        </h2>
+        <p className="text-slate-600 dark:text-slate-400">
           You haven't imported any CSV files yet. Start importing to see your history here.
         </p>
       </div>
@@ -82,36 +88,58 @@ export function ImportHistory(): ReactElement {
   );
 
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-800 bg-slate-900/40">
+    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/40">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="border-b border-slate-800 bg-slate-900/60">
+          <thead className="border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-950/40">
             <tr>
-              <th className="px-4 py-3 text-left font-medium text-slate-300">Date</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-300">Source</th>
-              <th className="px-4 py-3 text-right font-medium text-slate-300">Total</th>
-              <th className="px-4 py-3 text-right font-medium text-slate-300">Success</th>
-              <th className="px-4 py-3 text-right font-medium text-slate-300">Failed</th>
-              <th className="px-4 py-3 text-right font-medium text-slate-300">Amount</th>
-              <th className="px-4 py-3 text-right font-medium text-slate-300">GST</th>
+              <th className="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">
+                Date
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">
+                Source
+              </th>
+              <th className="px-4 py-3 text-right font-medium text-slate-700 dark:text-slate-300">
+                Total
+              </th>
+              <th className="px-4 py-3 text-right font-medium text-slate-700 dark:text-slate-300">
+                Success
+              </th>
+              <th className="px-4 py-3 text-right font-medium text-slate-700 dark:text-slate-300">
+                Failed
+              </th>
+              <th className="px-4 py-3 text-right font-medium text-slate-700 dark:text-slate-300">
+                Amount
+              </th>
+              <th className="px-4 py-3 text-right font-medium text-slate-700 dark:text-slate-300">
+                GST
+              </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800">
+          <tbody className="divide-y divide-slate-200/50 dark:divide-slate-800/50">
             {sortedJobs.map((job) => (
-              <tr key={job.id} className="hover:bg-slate-800/50">
-                <td className="px-4 py-3 text-slate-300">{formatDate(job.createdAt)}</td>
-                <td className="px-4 py-3 text-slate-300">{formatSource(job.source)}</td>
-                <td className="px-4 py-3 text-right text-slate-300">{job.totalRows}</td>
-                <td className="px-4 py-3 text-right text-emerald-400">{job.successCount}</td>
+              <tr key={job.id} className="hover:bg-slate-100 dark:hover:bg-slate-800/30">
+                <td className="px-4 py-3 text-slate-700 dark:text-slate-300">
+                  {formatDate(job.createdAt)}
+                </td>
+                <td className="px-4 py-3 text-slate-700 dark:text-slate-300">
+                  {formatSource(job.source)}
+                </td>
+                <td className="px-4 py-3 text-right text-slate-700 dark:text-slate-300">
+                  {job.totalRows}
+                </td>
+                <td className="px-4 py-3 text-right text-emerald-600 dark:text-emerald-400">
+                  {job.successCount}
+                </td>
                 <td
-                  className={`px-4 py-3 text-right ${job.failedCount > 0 ? 'text-red-400' : 'text-slate-500'}`}
+                  className={`px-4 py-3 text-right ${job.failedCount > 0 ? 'text-red-600 dark:text-red-400' : 'text-slate-500'}`}
                 >
                   {job.failedCount}
                 </td>
-                <td className="px-4 py-3 text-right tabular-nums text-slate-300">
+                <td className="px-4 py-3 text-right tabular-nums text-slate-700 dark:text-slate-300">
                   {formatCurrency(job.totalAmountCents)}
                 </td>
-                <td className="px-4 py-3 text-right tabular-nums text-slate-300">
+                <td className="px-4 py-3 text-right tabular-nums text-slate-700 dark:text-slate-300">
                   {formatCurrency(job.totalGstCents)}
                 </td>
               </tr>

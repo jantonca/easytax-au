@@ -47,8 +47,8 @@ describe('TableSkeleton', () => {
     const { container } = render(<TableSkeleton columns={3} />);
     const section = container.querySelector('section');
 
-    expect(section).toHaveClass('border-slate-800');
-    expect(section).toHaveClass('bg-slate-900/60');
+    expect(section).toHaveClass('dark:border-slate-800');
+    expect(section).toHaveClass('dark:bg-slate-900/60');
   });
 
   it('has aria-label for accessibility', () => {

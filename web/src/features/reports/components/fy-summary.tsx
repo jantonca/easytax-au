@@ -16,16 +16,20 @@ export function FYSummary({ fy }: FYSummaryProps): ReactElement {
   return (
     <div className="flex flex-col gap-6">
       {/* Period Display */}
-      <div className="rounded-lg border border-slate-800 bg-slate-950/40 px-4 py-3">
-        <p className="text-xs font-medium text-slate-400">Financial Year Period</p>
-        <p className="mt-1 text-sm font-medium text-slate-200">
+      <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-950/40">
+        <p className="text-xs font-medium text-slate-600 dark:text-slate-400">
+          Financial Year Period
+        </p>
+        <p className="mt-1 text-sm font-medium text-slate-900 dark:text-slate-200">
           {format(periodStart, 'd MMM yyyy')} - {format(periodEnd, 'd MMM yyyy')}
         </p>
       </div>
 
       {/* Income Summary */}
       <section aria-label="Income Summary">
-        <h3 className="mb-3 text-sm font-semibold text-slate-300">Income Summary</h3>
+        <h3 className="mb-3 text-sm font-semibold text-slate-900 dark:text-slate-300">
+          Income Summary
+        </h3>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <GstSummaryCard
             label="Total Income"
@@ -57,7 +61,9 @@ export function FYSummary({ fy }: FYSummaryProps): ReactElement {
 
       {/* Expenses Summary */}
       <section aria-label="Expenses Summary">
-        <h3 className="mb-3 text-sm font-semibold text-slate-300">Expenses Summary</h3>
+        <h3 className="mb-3 text-sm font-semibold text-slate-900 dark:text-slate-300">
+          Expenses Summary
+        </h3>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <GstSummaryCard
             label="Total Expenses"
@@ -81,7 +87,9 @@ export function FYSummary({ fy }: FYSummaryProps): ReactElement {
 
       {/* Net Position */}
       <section aria-label="Net Position Summary">
-        <h3 className="mb-3 text-sm font-semibold text-slate-300">Net Position</h3>
+        <h3 className="mb-3 text-sm font-semibold text-slate-900 dark:text-slate-300">
+          Net Position
+        </h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <GstSummaryCard
             label={isProfit ? 'Net Profit' : 'Net Loss'}

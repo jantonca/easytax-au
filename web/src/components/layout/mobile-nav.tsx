@@ -12,11 +12,11 @@ interface MobileNavProps {
 export function MobileNav({ isOpen, onOpenChange }: MobileNavProps): ReactElement {
   return (
     <>
-      <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/90 px-4 py-3 backdrop-blur-md md:hidden">
+      <div className="flex items-center justify-between border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/90 md:hidden">
         <button
           type="button"
           onClick={() => onOpenChange((open) => !open)}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-700 text-slate-200 hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-300 text-slate-700 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
           aria-label={isOpen ? 'Close navigation' : 'Open navigation'}
           aria-expanded={isOpen}
           aria-controls="mobile-nav-panel"
@@ -27,7 +27,7 @@ export function MobileNav({ isOpen, onOpenChange }: MobileNavProps): ReactElemen
             <Menu className="h-4 w-4" aria-hidden="true" />
           )}
         </button>
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-600 dark:text-slate-500">
           EasyTax-AU
         </p>
       </div>
@@ -35,7 +35,7 @@ export function MobileNav({ isOpen, onOpenChange }: MobileNavProps): ReactElemen
       <div
         id="mobile-nav-panel"
         className={cn(
-          'fixed inset-y-0 left-0 z-40 w-64 transform border-r border-slate-800 bg-slate-950/95 px-4 py-4 shadow-lg transition-transform duration-200 ease-out md:hidden',
+          'fixed inset-y-0 left-0 z-40 w-64 transform border-r border-slate-200 bg-white/95 px-4 py-4 shadow-lg transition-transform duration-200 ease-out dark:border-slate-800 dark:bg-slate-950/95 md:hidden',
           isOpen ? 'translate-x-0' : '-translate-x-full',
         )}
         role="dialog"
@@ -51,9 +51,10 @@ export function MobileNav({ isOpen, onOpenChange }: MobileNavProps): ReactElemen
                   onClick={() => onOpenChange(false)}
                   className={({ isActive }) =>
                     cn(
-                      'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-200 transition-colors',
-                      'hover:bg-slate-800/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500',
-                      isActive && 'bg-slate-800 text-slate-50',
+                      'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition-colors dark:text-slate-200',
+                      'hover:bg-slate-100/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 dark:hover:bg-slate-800/80',
+                      isActive &&
+                        'bg-slate-200 text-slate-900 dark:bg-slate-800 dark:text-slate-50',
                     )
                   }
                   aria-label={item.ariaLabel ?? item.label}

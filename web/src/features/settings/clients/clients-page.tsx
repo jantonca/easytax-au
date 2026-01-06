@@ -52,8 +52,10 @@ export function ClientsPage(): ReactElement {
       <SettingsTabs />
       <header className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-50">Clients</h1>
-          <p className="text-sm text-slate-400">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+            Clients
+          </h1>
+          <p className="text-sm text-slate-600 dark:text-slate-400">
             Manage income clients. Names and ABNs are encrypted at rest for privacy.
           </p>
         </div>
@@ -98,13 +100,15 @@ export function ClientsPage(): ReactElement {
               aria-label="Add client"
               className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
             >
-              <div className="w-full max-w-lg rounded-lg border border-slate-800 bg-slate-950 p-4 shadow-xl">
+              <div className="w-full max-w-lg rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950 p-4 shadow-xl">
                 <div className="mb-3 flex items-center justify-between">
-                  <h2 className="text-sm font-semibold tracking-tight text-slate-50">Add client</h2>
+                  <h2 className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+                    Add client
+                  </h2>
                   <button
                     type="button"
                     onClick={() => setIsCreateOpen(false)}
-                    className="text-xs text-slate-400 hover:text-slate-200"
+                    className="text-xs text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
                   >
                     Close
                   </button>
@@ -121,15 +125,15 @@ export function ClientsPage(): ReactElement {
               aria-label="Edit client"
               className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
             >
-              <div className="w-full max-w-lg rounded-lg border border-slate-800 bg-slate-950 p-4 shadow-xl">
+              <div className="w-full max-w-lg rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950 p-4 shadow-xl">
                 <div className="mb-3 flex items-center justify-between">
-                  <h2 className="text-sm font-semibold tracking-tight text-slate-50">
+                  <h2 className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-50">
                     Edit client
                   </h2>
                   <button
                     type="button"
                     onClick={() => setClientToEdit(null)}
-                    className="text-xs text-slate-400 hover:text-slate-200"
+                    className="text-xs text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
                   >
                     Close
                   </button>

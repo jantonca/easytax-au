@@ -3,7 +3,10 @@ import { NavLink } from 'react-router-dom';
 
 export function ImportTabs(): ReactElement {
   return (
-    <nav className="mb-4 border-b border-slate-800" aria-label="Import navigation">
+    <nav
+      className="mb-4 border-b border-slate-200 dark:border-slate-800"
+      aria-label="Import navigation"
+    >
       <ul className="flex gap-1">
         <li>
           <NavLink
@@ -12,7 +15,7 @@ export function ImportTabs(): ReactElement {
               `inline-flex items-center border-b-2 px-3 py-2 text-xs font-medium transition-colors ${
                 isActive
                   ? 'border-emerald-500 text-emerald-400'
-                  : 'border-transparent text-slate-400 hover:border-slate-700 hover:text-slate-300'
+                  : 'border-transparent text-slate-600 hover:border-slate-300 hover:text-slate-900 dark:text-slate-400 dark:hover:border-slate-700 dark:hover:text-slate-300'
               }`
             }
           >
@@ -26,7 +29,7 @@ export function ImportTabs(): ReactElement {
               `inline-flex items-center border-b-2 px-3 py-2 text-xs font-medium transition-colors ${
                 isActive
                   ? 'border-emerald-500 text-emerald-400'
-                  : 'border-transparent text-slate-400 hover:border-slate-700 hover:text-slate-300'
+                  : 'border-transparent text-slate-600 hover:border-slate-300 hover:text-slate-900 dark:text-slate-400 dark:hover:border-slate-700 dark:hover:text-slate-300'
               }`
             }
           >

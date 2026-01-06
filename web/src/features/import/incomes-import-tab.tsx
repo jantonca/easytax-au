@@ -155,8 +155,10 @@ export function IncomesImportTab(): ReactElement {
       {step === 'upload' && (
         <div className="flex flex-col gap-6">
           {/* Source Selection */}
-          <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-6">
-            <h2 className="mb-4 text-lg font-medium text-slate-200">1. Select Source Format</h2>
+          <div className="rounded-lg border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/40">
+            <h2 className="mb-4 text-lg font-medium text-slate-900 dark:text-slate-200">
+              1. Select Source Format
+            </h2>
             <div className="grid gap-3 sm:grid-cols-2">
               {SOURCE_OPTIONS.map((option) => (
                 <label
@@ -164,7 +166,7 @@ export function IncomesImportTab(): ReactElement {
                   className={`flex cursor-pointer items-start gap-3 rounded-lg border-2 p-4 transition-colors ${
                     source === option.value
                       ? 'border-emerald-500 bg-emerald-500/5'
-                      : 'border-slate-800 bg-slate-900/40 hover:border-slate-700'
+                      : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900/40 dark:hover:border-slate-700'
                   }`}
                 >
                   <input
@@ -173,11 +175,15 @@ export function IncomesImportTab(): ReactElement {
                     value={option.value}
                     checked={source === option.value}
                     onChange={(e) => handleSourceChange(e.target.value as ImportSource)}
-                    className="mt-0.5 h-4 w-4 border-slate-700 bg-slate-800 text-emerald-600 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+                    className="mt-0.5 h-4 w-4 border-slate-300 bg-white text-emerald-600 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-white dark:border-slate-700 dark:bg-slate-800 dark:focus:ring-offset-slate-900"
                   />
                   <div className="flex-1">
-                    <div className="text-sm font-medium text-slate-200">{option.label}</div>
-                    <div className="text-xs text-slate-500">{option.description}</div>
+                    <div className="text-sm font-medium text-slate-900 dark:text-slate-200">
+                      {option.label}
+                    </div>
+                    <div className="text-xs text-slate-600 dark:text-slate-500">
+                      {option.description}
+                    </div>
                   </div>
                 </label>
               ))}
@@ -185,8 +191,10 @@ export function IncomesImportTab(): ReactElement {
           </div>
 
           {/* File Upload */}
-          <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-6">
-            <h2 className="mb-4 text-lg font-medium text-slate-200">2. Upload CSV File</h2>
+          <div className="rounded-lg border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/40">
+            <h2 className="mb-4 text-lg font-medium text-slate-900 dark:text-slate-200">
+              2. Upload CSV File
+            </h2>
             <FileDropzone onFileSelect={handleFileSelect} />
           </div>
 
@@ -196,7 +204,7 @@ export function IncomesImportTab(): ReactElement {
               type="button"
               onClick={handlePreview}
               disabled={!selectedFile || previewMutation.isPending}
-              className="flex items-center gap-2 rounded-md bg-emerald-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-600"
+              className="flex items-center gap-2 rounded-md bg-emerald-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-600 dark:focus:ring-offset-slate-900"
             >
               {previewMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
               {previewMutation.isPending ? 'Loading Preview...' : 'Preview Import'}
@@ -205,8 +213,8 @@ export function IncomesImportTab(): ReactElement {
 
           {/* Preview Error */}
           {previewMutation.isError && (
-            <div className="rounded-lg border border-red-800 bg-red-950/40 p-4">
-              <p className="text-sm text-red-400">
+            <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/40">
+              <p className="text-sm text-red-600 dark:text-red-400">
                 {previewMutation.error?.message || 'Failed to preview CSV file'}
               </p>
             </div>
@@ -232,7 +240,7 @@ export function IncomesImportTab(): ReactElement {
             <button
               type="button"
               onClick={handleStartOver}
-              className="rounded-md border border-slate-700 bg-slate-800 px-6 py-2.5 text-sm font-medium text-slate-200 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+              className="rounded-md border border-slate-300 bg-white px-6 py-2.5 text-sm font-medium text-slate-900 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-white dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 dark:focus:ring-offset-slate-900"
             >
               Start Over
             </button>
@@ -240,7 +248,7 @@ export function IncomesImportTab(): ReactElement {
               type="button"
               onClick={handleImport}
               disabled={selectedRows.size === 0 || importMutation.isPending}
-              className="flex items-center gap-2 rounded-md bg-emerald-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-600"
+              className="flex items-center gap-2 rounded-md bg-emerald-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-emerald-600 dark:focus:ring-offset-slate-900"
             >
               {importMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
               {importMutation.isPending

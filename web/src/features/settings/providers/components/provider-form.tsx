@@ -137,14 +137,17 @@ export function ProviderForm({
       })}
       className="space-y-3"
     >
-      <div className="flex flex-col gap-1 text-xs text-slate-200">
-        <label htmlFor="provider-name" className="text-[11px] font-medium text-slate-300">
+      <div className="flex flex-col gap-1 text-xs">
+        <label
+          htmlFor="provider-name"
+          className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+        >
           Provider name
         </label>
         <input
           id="provider-name"
           type="text"
-          className="h-8 rounded-md border border-slate-800 bg-slate-950 px-2 text-xs text-slate-100"
+          className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
           placeholder="GitHub, VentraIP, etc."
           {...register('name')}
         />
@@ -155,30 +158,33 @@ export function ProviderForm({
         <input
           id="provider-international"
           type="checkbox"
-          className="mt-1 h-4 w-4 rounded border-slate-800 bg-slate-950 text-emerald-600 focus:ring-emerald-600"
+          className="mt-1 h-4 w-4 rounded border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 text-emerald-600 focus:ring-emerald-600"
           {...register('isInternational')}
         />
         <div className="flex flex-col gap-1">
           <label
             htmlFor="provider-international"
-            className="text-[11px] font-medium text-slate-300"
+            className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
           >
             International provider (GST-free)
           </label>
-          <p className="text-[10px] text-slate-400">
+          <p className="text-[10px] text-slate-600 dark:text-slate-400">
             International providers (GitHub, AWS, etc.) don't charge GST to Australian customers.
             Expenses from international providers will have GST set to $0.
           </p>
         </div>
       </div>
 
-      <div className="flex flex-col gap-1 text-xs text-slate-200">
-        <label htmlFor="provider-category" className="text-[11px] font-medium text-slate-300">
+      <div className="flex flex-col gap-1 text-xs">
+        <label
+          htmlFor="provider-category"
+          className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+        >
           Default category (optional)
         </label>
         <select
           id="provider-category"
-          className="h-8 rounded-md border border-slate-800 bg-slate-950 px-2 text-xs text-slate-100"
+          className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
           {...register('defaultCategoryId')}
         >
           <option value="">No default category</option>
@@ -193,20 +199,23 @@ export function ProviderForm({
         )}
       </div>
 
-      <div className="flex flex-col gap-1 text-xs text-slate-200">
-        <label htmlFor="provider-abn" className="text-[11px] font-medium text-slate-300">
+      <div className="flex flex-col gap-1 text-xs">
+        <label
+          htmlFor="provider-abn"
+          className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+        >
           ABN / ARN (optional)
         </label>
         <input
           id="provider-abn"
           type="text"
           inputMode="numeric"
-          className="h-8 rounded-md border border-slate-800 bg-slate-950 px-2 text-xs text-slate-100"
+          className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
           placeholder="51824753556 (ABN) or 123456789 (ARN)"
           {...register('abnArn')}
         />
         {errors.abnArn && <p className="text-[11px] text-red-400">{errors.abnArn.message}</p>}
-        <p className="text-[10px] text-slate-400">
+        <p className="text-[10px] text-slate-600 dark:text-slate-400">
           ABN (11 digits) or ARN (9 digits) for reference only.
         </p>
       </div>

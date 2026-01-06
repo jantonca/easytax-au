@@ -204,8 +204,8 @@ describe('ImportHistory', () => {
     const { container } = render(<ImportHistory />, { wrapper: createWrapper() });
 
     expect(screen.getByText('2')).toBeInTheDocument();
-    // Check for red styling on failed count
-    const failedCell = container.querySelector('.text-red-400');
+    // Check for red styling on failed count (uses dark: prefix)
+    const failedCell = container.querySelector('.dark\\:text-red-400');
     expect(failedCell).toBeInTheDocument();
   });
 

@@ -67,23 +67,29 @@ export function DashboardPage(): ReactElement {
         <div className="flex flex-col gap-3">
           <QuickActions />
           <section
-            className="rounded-lg border border-slate-800 bg-slate-900/60 p-4"
+            className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900/60"
             aria-label="Upcoming recurring expenses"
           >
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-600 dark:text-slate-400">
               Upcoming recurring expenses
             </p>
             {dueRecurringLoading ? (
-              <p className="mt-2 text-xs text-slate-500">Loading upcoming recurring expenses…</p>
+              <p className="mt-2 text-xs text-slate-500 dark:text-slate-500">
+                Loading upcoming recurring expenses…
+              </p>
             ) : !dueRecurring || dueRecurring.length === 0 ? (
-              <p className="mt-2 text-xs text-slate-500">No recurring expenses due soon.</p>
+              <p className="mt-2 text-xs text-slate-500 dark:text-slate-500">
+                No recurring expenses due soon.
+              </p>
             ) : (
-              <ul className="mt-2 space-y-1 text-xs text-slate-300">
+              <ul className="mt-2 space-y-1 text-xs text-slate-700 dark:text-slate-300">
                 {dueRecurring.map((item) => (
                   <li key={item.id} className="flex items-center justify-between gap-2">
                     <div className="flex flex-col">
-                      <span className="font-medium text-slate-50">{item.name}</span>
-                      <span className="text-[10px] text-slate-500">
+                      <span className="font-medium text-slate-900 dark:text-slate-50">
+                        {item.name}
+                      </span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-500">
                         Next due: {item.nextDueDate}
                       </span>
                     </div>

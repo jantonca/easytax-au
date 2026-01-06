@@ -15,9 +15,9 @@ export function BasSummary({ bas }: BasSummaryProps): ReactElement {
   return (
     <div className="flex flex-col gap-4">
       {/* Period Display */}
-      <div className="rounded-lg border border-slate-800 bg-slate-950/40 px-4 py-3">
-        <p className="text-xs font-medium text-slate-400">Period</p>
-        <p className="mt-1 text-sm font-medium text-slate-200">
+      <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-950/40">
+        <p className="text-xs font-medium text-slate-600 dark:text-slate-400">Period</p>
+        <p className="mt-1 text-sm font-medium text-slate-900 dark:text-slate-200">
           {format(periodStart, 'd MMM yyyy')} - {format(periodEnd, 'd MMM yyyy')}
         </p>
       </div>
@@ -54,14 +54,18 @@ export function BasSummary({ bas }: BasSummaryProps): ReactElement {
 
       {/* Record Counts */}
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-4">
-          <p className="text-xs font-medium text-slate-400">Income Records</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-200">{bas.incomeCount}</p>
+        <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900/40">
+          <p className="text-xs font-medium text-slate-600 dark:text-slate-400">Income Records</p>
+          <p className="mt-1 text-2xl font-semibold text-slate-900 dark:text-slate-200">
+            {bas.incomeCount}
+          </p>
         </div>
 
-        <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-4">
-          <p className="text-xs font-medium text-slate-400">Expense Records</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-200">{bas.expenseCount}</p>
+        <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900/40">
+          <p className="text-xs font-medium text-slate-600 dark:text-slate-400">Expense Records</p>
+          <p className="mt-1 text-2xl font-semibold text-slate-900 dark:text-slate-200">
+            {bas.expenseCount}
+          </p>
         </div>
       </div>
     </div>

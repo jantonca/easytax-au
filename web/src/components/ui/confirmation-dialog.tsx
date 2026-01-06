@@ -64,14 +64,17 @@ export function ConfirmationDialog({
       aria-describedby="confirmation-dialog-description"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
     >
-      <div className="w-full max-w-md rounded-lg border border-slate-800 bg-slate-950 p-6 shadow-xl">
+      <div className="w-full max-w-md rounded-lg border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 p-6 shadow-xl">
         <h2
           id="confirmation-dialog-title"
-          className="mb-2 text-lg font-semibold tracking-tight text-slate-50"
+          className="mb-2 text-lg font-semibold tracking-tight text-slate-900 dark:text-slate-50"
         >
           {title}
         </h2>
-        <div id="confirmation-dialog-description" className="mb-6 text-sm text-slate-300">
+        <div
+          id="confirmation-dialog-description"
+          className="mb-6 text-sm text-slate-700 dark:text-slate-300"
+        >
           {description}
         </div>
         <div className="flex justify-end gap-2">
@@ -79,7 +82,7 @@ export function ConfirmationDialog({
             type="button"
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
-            className="inline-flex h-8 items-center rounded-md border border-slate-700 bg-slate-900 px-3 text-xs font-medium text-slate-300 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex h-8 items-center rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {cancelLabel}
           </button>

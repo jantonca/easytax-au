@@ -59,8 +59,10 @@ export function BasLabelBreakdown({ categories }: BasLabelBreakdownProps): React
 
   if (categories.length === 0) {
     return (
-      <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-8 text-center">
-        <p className="text-sm text-slate-400">No expense data found for this period.</p>
+      <div className="rounded-lg border border-slate-200 bg-white p-8 text-center dark:border-slate-800 dark:bg-slate-900/40">
+        <p className="text-sm text-slate-600 dark:text-slate-400">
+          No expense data found for this period.
+        </p>
       </div>
     );
   }
@@ -70,20 +72,24 @@ export function BasLabelBreakdown({ categories }: BasLabelBreakdownProps): React
       {basLabelGroups.map((group) => (
         <div
           key={group.label}
-          className="overflow-hidden rounded-lg border border-slate-800 bg-slate-900/40"
+          className="overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/40"
         >
           {/* BAS Label Header */}
-          <div className="border-b border-slate-800 bg-slate-950/60 px-4 py-3">
+          <div className="border-b border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-950/60">
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-semibold text-slate-200">BAS Label {group.label}</h4>
-                <p className="mt-0.5 text-xs text-slate-400">{group.description}</p>
+                <h4 className="font-semibold text-slate-900 dark:text-slate-200">
+                  BAS Label {group.label}
+                </h4>
+                <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-400">
+                  {group.description}
+                </p>
               </div>
               <div className="text-right">
-                <p className="text-sm font-medium text-slate-300">
+                <p className="text-sm font-medium text-slate-900 dark:text-slate-300">
                   {formatCents(group.totalCents)}
                 </p>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-600 dark:text-slate-400">
                   {group.count} expense{group.count === 1 ? '' : 's'}
                 </p>
               </div>
@@ -94,25 +100,28 @@ export function BasLabelBreakdown({ categories }: BasLabelBreakdownProps): React
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-800/50 bg-slate-900/20">
-                  <th scope="col" className="px-4 py-2 text-xs font-medium text-slate-400">
+                <tr className="border-b border-slate-200/50 bg-slate-50/50 dark:border-slate-800/50 dark:bg-slate-900/20">
+                  <th
+                    scope="col"
+                    className="px-4 py-2 text-xs font-medium text-slate-700 dark:text-slate-400"
+                  >
                     Category
                   </th>
                   <th
                     scope="col"
-                    className="px-4 py-2 text-right text-xs font-medium text-slate-400"
+                    className="px-4 py-2 text-right text-xs font-medium text-slate-700 dark:text-slate-400"
                   >
                     Total
                   </th>
                   <th
                     scope="col"
-                    className="px-4 py-2 text-right text-xs font-medium text-slate-400"
+                    className="px-4 py-2 text-right text-xs font-medium text-slate-700 dark:text-slate-400"
                   >
                     GST Paid
                   </th>
                   <th
                     scope="col"
-                    className="px-4 py-2 text-right text-xs font-medium text-slate-400"
+                    className="px-4 py-2 text-right text-xs font-medium text-slate-700 dark:text-slate-400"
                   >
                     Count
                   </th>
@@ -124,31 +133,33 @@ export function BasLabelBreakdown({ categories }: BasLabelBreakdownProps): React
                   .map((category) => (
                     <tr
                       key={category.categoryId}
-                      className="border-b border-slate-800/30 last:border-b-0 hover:bg-slate-800/20"
+                      className="border-b border-slate-200/30 last:border-b-0 hover:bg-slate-100/50 dark:border-slate-800/30 dark:hover:bg-slate-800/20"
                     >
-                      <td className="px-4 py-2.5 text-slate-200">{category.name}</td>
-                      <td className="px-4 py-2.5 text-right tabular-nums text-slate-100">
+                      <td className="px-4 py-2.5 text-slate-900 dark:text-slate-200">
+                        {category.name}
+                      </td>
+                      <td className="px-4 py-2.5 text-right tabular-nums text-slate-900 dark:text-slate-100">
                         {formatCents(category.totalCents)}
                       </td>
-                      <td className="px-4 py-2.5 text-right tabular-nums text-slate-100">
+                      <td className="px-4 py-2.5 text-right tabular-nums text-slate-900 dark:text-slate-100">
                         {formatCents(category.gstCents)}
                       </td>
-                      <td className="px-4 py-2.5 text-right tabular-nums text-slate-300">
+                      <td className="px-4 py-2.5 text-right tabular-nums text-slate-700 dark:text-slate-300">
                         {category.count}
                       </td>
                     </tr>
                   ))}
                 {/* Subtotal for this BAS label */}
                 {group.categories.length > 1 && (
-                  <tr className="border-t border-slate-700 bg-slate-800/30 font-medium">
-                    <td className="px-4 py-2.5 text-slate-100">Subtotal</td>
-                    <td className="px-4 py-2.5 text-right tabular-nums text-slate-100">
+                  <tr className="border-t border-slate-300 bg-slate-100/50 font-medium dark:border-slate-700 dark:bg-slate-800/30">
+                    <td className="px-4 py-2.5 text-slate-900 dark:text-slate-100">Subtotal</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums text-slate-900 dark:text-slate-100">
                       {formatCents(group.totalCents)}
                     </td>
-                    <td className="px-4 py-2.5 text-right tabular-nums text-slate-100">
+                    <td className="px-4 py-2.5 text-right tabular-nums text-slate-900 dark:text-slate-100">
                       {formatCents(group.gstCents)}
                     </td>
-                    <td className="px-4 py-2.5 text-right tabular-nums text-slate-100">
+                    <td className="px-4 py-2.5 text-right tabular-nums text-slate-900 dark:text-slate-100">
                       {group.count}
                     </td>
                   </tr>

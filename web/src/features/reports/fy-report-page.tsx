@@ -77,17 +77,19 @@ export function FyReportPage(): ReactElement {
 
       {/* Loading State */}
       {isLoading && (
-        <div className="flex items-center justify-center gap-3 rounded-lg border border-slate-800 bg-slate-900/40 p-12">
-          <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
-          <p className="text-sm text-slate-400">Loading FY report...</p>
+        <div className="flex items-center justify-center gap-3 rounded-lg border border-slate-200 bg-white p-12 dark:border-slate-800 dark:bg-slate-900/40">
+          <Loader2 className="h-5 w-5 animate-spin text-slate-600 dark:text-slate-400" />
+          <p className="text-sm text-slate-600 dark:text-slate-400">Loading FY report...</p>
         </div>
       )}
 
       {/* Error State */}
       {error && !isLoading && (
-        <div className="rounded-lg border border-red-800 bg-red-950/40 p-4">
-          <p className="text-sm font-medium text-red-400">Failed to load FY report</p>
-          <p className="mt-1 text-sm text-red-300">
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/40">
+          <p className="text-sm font-medium text-red-800 dark:text-red-400">
+            Failed to load FY report
+          </p>
+          <p className="mt-1 text-sm text-red-700 dark:text-red-300">
             {error instanceof Error ? error.message : 'An unknown error occurred'}
           </p>
         </div>
@@ -101,7 +103,7 @@ export function FyReportPage(): ReactElement {
 
           {/* Expense Breakdown by Category */}
           <section>
-            <h2 className="mb-4 text-lg font-semibold text-slate-200">
+            <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-200">
               Expense Breakdown by Category
             </h2>
             <CategoryBreakdown categories={fyReport.expenses.byCategory} />
@@ -109,7 +111,7 @@ export function FyReportPage(): ReactElement {
 
           {/* Expense Breakdown by BAS Label */}
           <section>
-            <h2 className="mb-4 text-lg font-semibold text-slate-200">
+            <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-200">
               Expense Breakdown by BAS Label
             </h2>
             <BasLabelBreakdown categories={fyReport.expenses.byCategory} />
@@ -119,11 +121,11 @@ export function FyReportPage(): ReactElement {
 
       {/* Empty State */}
       {!fyReport && !isLoading && !error && (
-        <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-12 text-center">
-          <p className="text-sm font-medium text-slate-300">
+        <div className="rounded-lg border border-slate-200 bg-white p-12 text-center dark:border-slate-800 dark:bg-slate-900/40">
+          <p className="text-sm font-medium text-slate-900 dark:text-slate-300">
             No data available for FY{financialYear}
           </p>
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
             Add expenses and incomes to generate a financial year report
           </p>
         </div>

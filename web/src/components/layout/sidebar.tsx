@@ -11,12 +11,12 @@ export function Sidebar({ className }: SidebarProps): ReactElement {
   return (
     <aside
       className={cn(
-        'w-56 shrink-0 border-r border-slate-800 bg-slate-950/80 px-3 py-4 backdrop-blur-md',
+        'w-56 shrink-0 border-r border-slate-200 bg-slate-50/80 px-3 py-4 backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/80',
         className,
       )}
     >
       <div className="mb-4 px-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-600 dark:text-slate-500">
           EasyTax-AU
         </p>
       </div>
@@ -28,9 +28,9 @@ export function Sidebar({ className }: SidebarProps): ReactElement {
                 to={item.path}
                 className={({ isActive }) =>
                   cn(
-                    'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-300 transition-colors',
-                    'hover:bg-slate-800/70 hover:text-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500',
-                    isActive && 'bg-slate-800 text-slate-50',
+                    'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition-colors dark:text-slate-300',
+                    'hover:bg-slate-200/70 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 dark:hover:bg-slate-800/70 dark:hover:text-slate-50',
+                    isActive && 'bg-slate-200 text-slate-900 dark:bg-slate-800 dark:text-slate-50',
                   )
                 }
                 aria-label={item.ariaLabel ?? item.label}
