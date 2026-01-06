@@ -340,6 +340,7 @@ test('creates expense when form is submitted', async () => {
 | `BACKUP.md`         | 3-2-1 backup strategy                           |
 | `TASKS.md`          | Backend development tasks                       |
 | `TASKS-FRONTEND.md` | Frontend development tasks                      |
+| `README.md`         |                                                 |
 
 ---
 

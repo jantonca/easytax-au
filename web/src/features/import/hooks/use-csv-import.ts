@@ -54,8 +54,9 @@ export function useImportCsv(): UseMutationResult<CsvImportResponseDto, Error, I
     mutationFn: importCsv,
     onSuccess: (data) => {
       void queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      const skipped = data.totalRows - data.successCount - data.failedCount;
       showToast({
-        title: `Expense import completed: ${data.imported} imported, ${data.skipped} skipped`,
+        title: `Expense import completed: ${data.successCount} imported, ${skipped} skipped`,
       });
     },
     onError: (error: Error) => {

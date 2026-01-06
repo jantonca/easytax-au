@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface TableSkeletonProps {
@@ -25,7 +26,7 @@ export function TableSkeleton({
   columns,
   rows = 5,
   ariaLabel = 'Loading data',
-}: TableSkeletonProps): JSX.Element {
+}: TableSkeletonProps): React.ReactElement {
   return (
     <section
       aria-label={ariaLabel}

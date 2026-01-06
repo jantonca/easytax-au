@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { cn } from '@/lib/utils';
 
 interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -8,7 +9,7 @@ interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
  * Skeleton component for loading states
  * Displays an animated placeholder while content is loading
  */
-export function Skeleton({ className, ...props }: SkeletonProps): JSX.Element {
+export function Skeleton({ className, ...props }: SkeletonProps): React.ReactElement {
   return (
     <div
       aria-hidden="true"

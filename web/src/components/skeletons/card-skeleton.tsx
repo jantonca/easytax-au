@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface CardSkeletonProps {
@@ -19,7 +20,7 @@ interface CardSkeletonProps {
 export function CardSkeleton({
   showDescription = false,
   ariaLabel = 'Loading',
-}: CardSkeletonProps): JSX.Element {
+}: CardSkeletonProps): React.ReactElement {
   return (
     <section
       aria-label={ariaLabel}

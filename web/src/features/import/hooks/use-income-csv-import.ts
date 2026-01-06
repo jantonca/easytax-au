@@ -59,8 +59,9 @@ export function useImportIncomeCsv(): UseMutationResult<
     mutationFn: importIncomeCsv,
     onSuccess: (data) => {
       void queryClient.invalidateQueries({ queryKey: ['incomes'] });
+      const skipped = data.totalRows - data.successCount - data.failedCount;
       showToast({
-        title: `Income import completed: ${data.imported} imported, ${data.skipped} skipped`,
+        title: `Income import completed: ${data.successCount} imported, ${skipped} skipped`,
       });
     },
     onError: (error: Error) => {

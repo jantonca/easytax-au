@@ -78,27 +78,83 @@ pnpm --filter web build
 
 ### Docker Deployment (Full Stack)
 
-For production deployment, both API and database run in containers:
+For production deployment, all services (database, API, and frontend) run in containers.
+
+#### Standard Deployment (HTTP)
 
 ```bash
-# Set required environment variables
-export DB_PASSWORD=your_secure_password
-export ENCRYPTION_KEY=your_32_char_hex_key
+# 1. Copy and configure environment variables
+cp .env.example .env
+# Edit .env and set: DB_PASSWORD, ENCRYPTION_KEY
 
-# Start full stack (DB + API)
-docker compose up -d
+# 2. Build and start all services (database, API, frontend)
+docker compose up -d --build
 
-# View logs
-docker compose logs -f easytax-au-api
+# 3. View logs
+docker compose logs -f easytax-au-web    # Frontend logs
+docker compose logs -f easytax-au-api    # API logs
 
-# Stop all services
+# 4. Stop all services
 docker compose down
 ```
 
 **Endpoints:**
+- **Frontend:** `http://localhost` (port 80)
+- **API:** `http://localhost:3000`
+- **Swagger Docs:** `http://localhost:3000/api/docs`
 
-- API: `http://localhost:3000`
-- Swagger Docs: `http://localhost:3000/api/docs`
+#### Traefik Deployment (HTTPS)
+
+For production with HTTPS via Traefik reverse proxy:
+
+```bash
+# 1. Configure .env for Traefik
+cp .env.example .env
+# Edit .env and set:
+TRAEFIK_ENABLED=true
+TRAEFIK_HOST=easytax.bobeliadesign.com
+DB_PASSWORD=your_secure_password
+ENCRYPTION_KEY=$(openssl rand -hex 32)
+
+# 2. Start services
+docker compose up -d --build
+
+# 3. Configure Traefik (if not already set up)
+# Ensure Traefik is on the same Docker network: easytax-au-network
+# Or add Traefik labels to connect to your existing Traefik network
+```
+
+**Traefik Configuration Notes:**
+- Frontend container has pre-configured Traefik labels
+- HTTPS redirect is automatic when `TRAEFIK_ENABLED=true`
+- Domain: `easytax.bobeliadesign.com`
+- TLS certificates managed by Traefik (Let's Encrypt recommended)
+- Access via: `https://easytax.bobeliadesign.com`
+
+#### Environment Variables
+
+| Variable           | Required | Default       | Description                                    |
+| ------------------ | -------- | ------------- | ---------------------------------------------- |
+| `DB_PASSWORD`      | ✅       | -             | PostgreSQL password                            |
+| `ENCRYPTION_KEY`   | ✅       | -             | 64-char hex key (generate: `openssl rand -hex 32`) |
+| `DB_HOST`          | ❌       | localhost     | Database host (auto-set in Docker)             |
+| `DB_PORT`          | ❌       | 5432          | PostgreSQL port                                |
+| `DB_NAME`          | ❌       | easytax-au    | Database name                                  |
+| `DB_USERNAME`      | ❌       | postgres      | Database user                                  |
+| `PORT`             | ❌       | 3000          | API server port                                |
+| `WEB_PORT`         | ❌       | 80            | Frontend port                                  |
+| `NODE_ENV`         | ❌       | development   | Environment mode                               |
+| `TRAEFIK_ENABLED`  | ❌       | false         | Enable Traefik integration                     |
+| `TRAEFIK_HOST`     | ❌       | easytax.bobeliadesign.com | Domain for Traefik routing          |
+
+#### Production Checklist
+
+- [ ] Set strong `DB_PASSWORD` (use password manager)
+- [ ] Generate unique `ENCRYPTION_KEY` (use `openssl rand -hex 32`)
+- [ ] Configure automatic backups for `./pgdata` directory
+- [ ] Set up Traefik with Let's Encrypt for HTTPS
+- [ ] Review firewall rules (only expose port 80/443 via Traefik)
+- [ ] Test backup restoration process
 
 ---
 
