@@ -297,12 +297,3 @@ Goal: Establish a modern React SPA with tooling, styling, and core infrastructur
 | Email/OCR import        | Manual CSV works fine           |
 
 ---
-
-## Timeline Estimate
-
-| Phase               | Effort       | Calendar Time |
-| ------------------- | ------------ | ------------- |
-| Phase 1-4 (Backend) | ~65 hours    | ✅ Complete   |
-| Phase 5 (Frontend)  | ~40-50 hours | 2-3 weeks     |
-
-**Goal:** Complete frontend before end of January 2026 for Q2 FY2026 BAS (Oct-Dec 2025).
