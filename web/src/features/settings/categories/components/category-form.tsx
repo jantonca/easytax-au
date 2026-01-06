@@ -148,7 +148,7 @@ export function CategoryForm({
           <option value="G11">G11 - Non-capital purchases</option>
         </select>
         {errors.basLabel && <p className="text-[11px] text-red-400">{errors.basLabel.message}</p>}
-        <p className="text-[10px] text-slate-500">
+        <p className="text-[10px] text-slate-400">
           ATO BAS label for reporting. Most business expenses use 1B.
         </p>
       </div>
@@ -164,7 +164,7 @@ export function CategoryForm({
           <label htmlFor="category-deductible" className="text-[11px] font-medium text-slate-300">
             Tax deductible
           </label>
-          <p className="text-[10px] text-slate-500">
+          <p className="text-[10px] text-slate-400">
             Uncheck if this expense type is not tax deductible.
           </p>
         </div>

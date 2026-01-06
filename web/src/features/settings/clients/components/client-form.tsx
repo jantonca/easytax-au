@@ -124,7 +124,7 @@ export function ClientForm({ initialValues, clientId, onSuccess }: ClientFormPro
           {...register('name')}
         />
         {errors.name && <p className="text-[11px] text-red-400">{errors.name.message}</p>}
-        <p className="text-[10px] text-slate-500">
+        <p className="text-[10px] text-slate-400">
           Client names are encrypted at rest for privacy.
         </p>
       </div>
@@ -142,7 +142,7 @@ export function ClientForm({ initialValues, clientId, onSuccess }: ClientFormPro
           {...register('abn')}
         />
         {errors.abn && <p className="text-[11px] text-red-400">{errors.abn.message}</p>}
-        <p className="text-[10px] text-slate-500">
+        <p className="text-[10px] text-slate-400">
           ABN must be 11 digits. Also encrypted at rest for privacy.
         </p>
       </div>
@@ -158,7 +158,7 @@ export function ClientForm({ initialValues, clientId, onSuccess }: ClientFormPro
           <label htmlFor="client-psi-eligible" className="text-[11px] font-medium text-slate-300">
             PSI (Personal Services Income) eligible
           </label>
-          <p className="text-[10px] text-slate-500">
+          <p className="text-[10px] text-slate-400">
             Check this if Personal Services Income rules may apply to this client. This affects how
             income is reported for tax purposes.
           </p>

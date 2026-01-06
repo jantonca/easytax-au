@@ -165,7 +165,7 @@ export function ProviderForm({
           >
             International provider (GST-free)
           </label>
-          <p className="text-[10px] text-slate-500">
+          <p className="text-[10px] text-slate-400">
             International providers (GitHub, AWS, etc.) don't charge GST to Australian customers.
             Expenses from international providers will have GST set to $0.
           </p>
@@ -206,7 +206,7 @@ export function ProviderForm({
           {...register('abnArn')}
         />
         {errors.abnArn && <p className="text-[11px] text-red-400">{errors.abnArn.message}</p>}
-        <p className="text-[10px] text-slate-500">
+        <p className="text-[10px] text-slate-400">
           ABN (11 digits) or ARN (9 digits) for reference only.
         </p>
       </div>

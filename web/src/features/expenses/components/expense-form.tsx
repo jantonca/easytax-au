@@ -233,7 +233,7 @@ export function ExpenseForm({
             placeholder="$0.00"
             {...register('gstAmount')}
           />
-          <p className="text-[10px] text-slate-500">
+          <p className="text-[10px] text-slate-400">
             Leave blank to auto-calculate GST from total for domestic providers; international
             providers always use $0 GST.
           </p>
@@ -259,7 +259,7 @@ export function ExpenseForm({
             className="w-full accent-emerald-600"
             {...register('bizPercent', { valueAsNumber: true })}
           />
-          <div className="flex justify-between text-[10px] text-slate-500">
+          <div className="flex justify-between text-[10px] text-slate-400">
             <span>0%</span>
             <span>100%</span>
           </div>

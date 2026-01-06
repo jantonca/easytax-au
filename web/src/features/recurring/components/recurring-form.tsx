@@ -363,7 +363,7 @@ export function RecurringForm({
           {...register('dayOfMonth', { valueAsNumber: true })}
           className="mt-1 block w-full rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-100"
         />
-        <p className="mt-1 text-[10px] text-slate-500">Use 1-28 to avoid month-end date issues</p>
+        <p className="mt-1 text-[10px] text-slate-400">Use 1-28 to avoid month-end date issues</p>
         {errors.dayOfMonth && (
           <p className="mt-1 text-[11px] text-red-400">{errors.dayOfMonth.message}</p>
         )}

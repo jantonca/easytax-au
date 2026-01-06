@@ -5,3 +5,27 @@ body {
   @apply bg-slate-950 text-slate-50 min-h-screen antialiased;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
 }
+
+/* Global focus-visible styles for keyboard navigation accessibility */
+*:focus-visible {
+  outline: 2px solid hsl(186 100% 50%); /* Sky blue (sky-500) */
+  outline-offset: 2px;
+}
+
+/* Enhanced focus styles for interactive elements */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid hsl(186 100% 50%);
+  outline-offset: 2px;
+}
+
+/* Form controls with ring instead of outline for better visual integration */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[role="combobox"]:focus-visible,
+[role="slider"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px hsl(186 100% 50%);
+}

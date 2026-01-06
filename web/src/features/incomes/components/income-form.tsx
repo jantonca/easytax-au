@@ -249,7 +249,7 @@ export function IncomeForm({
             onFocus={handleGstFocus}
           />
           {errors.gst && <p className="text-[11px] text-red-400">{errors.gst.message}</p>}
-          <p className="text-[10px] text-slate-500">
+          <p className="text-[10px] text-slate-400">
             Auto-calculated as 10% of subtotal. Edit to override.
           </p>
         </div>

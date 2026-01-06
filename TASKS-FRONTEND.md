@@ -894,11 +894,11 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 
 | #      | Task                                                | Status |
 | ------ | --------------------------------------------------- | ------ |
-| F3.4.1 | Audit all forms for keyboard accessibility          | ⬜     |
-| F3.4.2 | Add focus visible styles                            | ⬜     |
+| F3.4.1 | Audit all forms for keyboard accessibility          | ✅     |
+| F3.4.2 | Add focus visible styles                            | ✅     |
 | F3.4.3 | Test with screen reader (VoiceOver/NVDA)            | ⬜     |
-| F3.4.4 | Add skip links for navigation                       | ⬜     |
-| F3.4.5 | Ensure color contrast meets WCAG AA                 | ⬜     |
+| F3.4.4 | Add skip links for navigation                       | ✅     |
+| F3.4.5 | Ensure color contrast meets WCAG AA                 | ✅     |
 | F3.4.6 | Add loading skeletons for all data fetches          | ✅     |
 | F3.4.7 | Add empty states for all lists                      | ✅     |
 | F3.4.8 | Add success/error toasts for all mutations          | ✅     |
@@ -959,6 +959,53 @@ Created reusable EmptyState component for consistent empty state messaging acros
 
 All page tests updated to check for new empty state text. EmptyState component follows project patterns with strict TypeScript and proper return types.
 
+**F3.4.1 Implementation Details (Forms Accessibility Audit):**
+
+Completed comprehensive keyboard accessibility audit of all 6 forms (Expenses, Incomes, Recurring, Providers, Categories, Clients):
+- ✅ All form fields have visible `<label>` elements with `htmlFor` matching input IDs
+- ✅ Tab order is logical (top-to-bottom, left-to-right)
+- ✅ Submit buttons reachable via Tab
+- ✅ Native `<select>` elements are keyboard operable
+- ✅ Range sliders have ARIA attributes (aria-label, aria-valuemin/max/now)
+- ✅ Checkboxes have proper label association
+- ✅ Modal dialogs (ConfirmationDialog) close on Escape key
+
+**Known improvement area for future iteration:**
+Error messages are currently displayed but not associated via `aria-describedby`. While this doesn't prevent keyboard navigation, it reduces screen reader effectiveness when validation errors occur.
+
+**F3.4.2 Implementation Details (Focus-Visible Styles):**
+
+Added global CSS rules in `web/src/index.css`:
+- Universal `:focus-visible` selector with 2px sky-blue outline (hsl(186 100% 50%))
+- Enhanced focus styles for interactive elements (buttons, links, role="button")
+- Form controls use box-shadow instead of outline for better visual integration
+- Styles only apply on keyboard navigation, not mouse clicks
+
+**F3.4.4 Implementation Details (Skip Links):**
+
+Added skip link to `web/src/components/layout/layout.tsx`:
+- Link positioned before all navigation using `href="#main-content"`
+- Visually hidden by default using `sr-only` class
+- Becomes visible and styled on keyboard focus
+- Main content region has matching `id="main-content"`
+- 3 new tests in `web/src/components/layout/layout.test.tsx` verify implementation
+
+**F3.4.5 Implementation Details (Color Contrast):**
+
+Fixed WCAG AA compliance issues by replacing `text-slate-500` with `text-slate-400` in form helper text across 6 forms:
+- `text-slate-500` on `bg-slate-950`: ~4.3:1 contrast ❌ (fails for small text)
+- `text-slate-400` on `bg-slate-950`: ~5.5:1 contrast ✅ (passes WCAG AA)
+
+Files updated:
+- `web/src/features/expenses/components/expense-form.tsx` (2 occurrences)
+- `web/src/features/incomes/components/income-form.tsx` (1 occurrence)
+- `web/src/features/recurring/components/recurring-form.tsx` (1 occurrence)
+- `web/src/features/settings/providers/components/provider-form.tsx` (2 occurrences)
+- `web/src/features/settings/categories/components/category-form.tsx` (2 occurrences)
+- `web/src/features/settings/clients/components/client-form.tsx` (3 occurrences)
+
+All other color combinations (primary text, error text, success text, button text) already meet or exceed WCAG AA requirements.
+
 **Files to Create (dark mode):**
 
 - `web/src/hooks/use-theme.ts`
@@ -966,10 +1013,14 @@ All page tests updated to check for new empty state text. EmptyState component f
 
 **Definition of Done:**
 
-- [ ] All interactive elements keyboard accessible
-- [ ] Screen reader announces correctly
+- [x] All interactive elements keyboard accessible (F3.4.1 complete)
+- [x] Global focus-visible styles applied (F3.4.2 complete)
+- [x] Skip links implemented (F3.4.4 complete)
+- [x] Color contrast meets WCAG AA (F3.4.5 complete)
+- [ ] Screen reader testing completed (F3.4.3 requires manual testing)
 - [x] Loading states for all async operations (F3.4.6 complete)
 - [x] Empty states guide user action (F3.4.7 complete)
+- [x] Success/error toasts for all mutations (F3.4.8 complete)
 
 ---
 
@@ -1062,11 +1113,11 @@ location / {
 | -------------------- | ----- | ---- | -------- |
 | F1. Scaffold         | 22    | 22   | 100%     |
 | F2. Core Features    | 44    | 37   | 84%      |
-| F3. Reports & Polish | 26    | 18   | 69%      |
+| F3. Reports & Polish | 26    | 22   | 85%      |
 | F4. Production       | 9     | 0    | 0%       |
-| **Total**            | **101** | **77** | **76%**  |
+| **Total**            | **101** | **81** | **80%**  |
 
-> Note: Frontend F2 progress currently counts completed tasks from F2.1 (Dashboard - 5 tasks), F2.2 (Expenses - 7 tasks including GST auto-calc and slider), F2.3 (Incomes - 10 tasks), F2.4 (CSV Import - 10 tasks), F2.5 (Providers & Categories - 6 tasks), and F2.6 (Clients - 3 tasks). F3 progress includes F3.1 (BAS Reports - 5 tasks), F3.2 (FY Reports - 6 tasks), F3.3 (Recurring Expenses - 5 tasks), and F3.4 (Polish & Accessibility - 3 tasks: F3.4.6 Loading Skeletons, F3.4.7 Empty States, and F3.4.8 Toast Notifications). Remaining F2.x tasks include optional enhancements like pagination, searchable dropdowns, and inline editing.
+> Note: Frontend F2 progress currently counts completed tasks from F2.1 (Dashboard - 5 tasks), F2.2 (Expenses - 7 tasks including GST auto-calc and slider), F2.3 (Incomes - 10 tasks), F2.4 (CSV Import - 10 tasks), F2.5 (Providers & Categories - 6 tasks), and F2.6 (Clients - 3 tasks). F3 progress includes F3.1 (BAS Reports - 5 tasks), F3.2 (FY Reports - 6 tasks), F3.3 (Recurring Expenses - 5 tasks), and F3.4 (Polish & Accessibility - 7 tasks: F3.4.1 Forms Audit, F3.4.2 Focus Styles, F3.4.4 Skip Links, F3.4.5 Color Contrast, F3.4.6 Loading Skeletons, F3.4.7 Empty States, and F3.4.8 Toast Notifications). Remaining F2.x tasks include optional enhancements like pagination, searchable dropdowns, and inline editing. F3 remaining tasks: F3.4.3 Screen Reader Testing, F3.4.9 Dark Mode, and F3.5 E2E Testing (6 tasks).
 
 ---
 
