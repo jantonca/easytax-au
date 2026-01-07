@@ -10,7 +10,7 @@ services:
     ports:
       - '${DB_PORT:-5432}:5432'
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - easytax-au-pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${DB_USERNAME:-postgres} -d ${DB_NAME:-easytax-au}']
       interval: 10s
@@ -73,3 +73,7 @@ services:
 networks:
   easytax-au-network:
     driver: bridge
+
+volumes:
+  easytax-au-pgdata:
+    driver: local

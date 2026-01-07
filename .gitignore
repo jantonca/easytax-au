@@ -19,8 +19,6 @@ dist/
 *.gpg
 logs/
 
-# Docker Volumes
-/pgdata/
 # Test coverage
 coverage/
 
