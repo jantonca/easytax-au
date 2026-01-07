@@ -1,7 +1,8 @@
 import type { ReactElement } from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { FileDropzone } from './components/file-dropzone';
+import { SmartFileDropzone } from './components/smart-file-dropzone';
 import { IncomePreviewTable } from './components/income-preview-table';
 import { ImportProgress } from './components/import-progress';
 import { ProgressSteps } from './components/progress-steps';
@@ -52,7 +53,13 @@ const SOURCE_OPTIONS: SourceOption[] = [
 ];
 
 export function IncomesImportTab(): ReactElement {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const location = useLocation();
+
+  // Initialize state from router state (auto-detected file)
+  const routerState = location.state as { file?: File; autoDetected?: boolean } | null;
+  const initialFile = routerState?.file && routerState?.autoDetected ? routerState.file : null;
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(initialFile);
   const [source, setSource] = useState<ImportSource>('custom');
   const [step, setStep] = useState<'upload' | 'preview' | 'progress'>('upload');
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
@@ -60,6 +67,14 @@ export function IncomesImportTab(): ReactElement {
   const queryClient = useQueryClient();
   const previewMutation = usePreviewIncomeCsvImport();
   const importMutation = useImportIncomeCsv();
+
+  // Clear router state after reading it
+  useEffect(() => {
+    if (routerState?.autoDetected) {
+      window.history.replaceState({}, document.title);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   const handleFileSelect = (file: File): void => {
     setSelectedFile(file);
@@ -195,7 +210,7 @@ export function IncomesImportTab(): ReactElement {
             <h2 className="mb-4 text-lg font-medium text-slate-900 dark:text-slate-200">
               2. Upload CSV File
             </h2>
-            <FileDropzone onFileSelect={handleFileSelect} />
+            <SmartFileDropzone expectedType="income" onFileSelect={handleFileSelect} />
           </div>
 
           {/* Preview Button */}

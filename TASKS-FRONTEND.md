@@ -545,7 +545,7 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 | #       | Task                                          | Status |
 | ------- | --------------------------------------------- | ------ |
 | F2.4.1  | Create import page with file dropzone         | ✅     |
-| F2.4.2  | Add file type detection (expenses vs incomes) | 🟡     |
+| F2.4.2  | Add file type detection (expenses vs incomes) | ✅     |
 | F2.4.3  | Create preview table showing parsed rows      | ✅     |
 | F2.4.4  | Show validation errors per row                | ✅     |
 | F2.4.5  | Show duplicate warnings                       | ✅     |
@@ -564,6 +564,7 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 - `web/src/features/import/components/progress-steps.tsx` - Step indicator
 - `web/src/features/import/components/summary-stats.tsx` - Stats grid
 - `web/src/features/import/components/file-dropzone.tsx`
+- `web/src/features/import/components/smart-file-dropzone.tsx` - Auto-detecting dropzone wrapper (F2.4.2)
 - `web/src/features/import/components/preview-table.tsx`
 - `web/src/features/import/components/income-preview-table.tsx`
 - `web/src/features/import/components/import-progress.tsx`
@@ -571,12 +572,23 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 - `web/src/features/import/hooks/use-csv-import.ts`
 - `web/src/features/import/hooks/use-income-csv-preview.ts`
 - `web/src/features/import/hooks/use-income-csv-import.ts`
+- `web/src/features/import/utils/detect-csv-type.ts` - CSV type detection utility (F2.4.2)
+- `web/src/features/import/utils/detect-csv-type.test.ts` - 24 comprehensive tests (F2.4.2)
 
 **Implementation notes (F2.4):**
 
 - **Expense import:** ✅ Fully working in UI
 - **Income import:** ✅ Fully working in UI with unified tabbed interface
 - **Unified Import Page:** ✅ Route-based tabs (`/import/expenses` and `/import/incomes`)
+- **Auto-detection (F2.4.2):** ✅ Smart CSV type detection with auto-routing
+  - Created `detectCsvType()` utility that analyzes CSV headers to determine expense vs income
+  - Detection logic: Expenses require "amount" + ("description" OR "date"), Incomes require ("client" OR "invoice") + ("subtotal" OR "total")
+  - Supports CommBank, Amex, and custom CSV formats with case-insensitive matching
+  - `SmartFileDropzone` component wraps `FileDropzone` with detection logic
+  - When wrong file type is dropped, user sees an info toast and is auto-redirected to correct tab after 800ms
+  - Unknown CSV types show error toast but still allow manual import
+  - File state preserved during navigation via React Router state
+  - 24 comprehensive tests covering happy paths, edge cases, and error scenarios
 - Fixed multiple critical issues during implementation:
   1. **404 errors:** Removed hardcoded `/api` prefix from 3 frontend hooks (backend has no global prefix)
   2. **400 file validation errors:** Created custom `CsvFileValidator` checking `.csv` extension instead of unreliable MIME types
@@ -1220,18 +1232,18 @@ Production-ready Docker deployment with Traefik support implemented:
 | Phase                | Tasks | Done | Progress |
 | -------------------- | ----- | ---- | -------- |
 | F1. Scaffold         | 22    | 22   | 100%     |
-| F2. Core Features    | 44    | 37   | 84%      |
+| F2. Core Features    | 44    | 38   | 86%      |
 | F3. Reports & Polish | 26    | 24   | 92%      |
 | F4. Production       | 9     | 9    | 100%     |
-| **Total**            | **101** | **92** | **91%**  |
+| **Total**            | **101** | **93** | **92%**  |
 
-> **Note:** Frontend is 91% complete with all production-ready features implemented and documented.
+> **Note:** Frontend is 92% complete with all production-ready features implemented and documented.
 >
 > **Phase F4 (100%):** ✅ **COMPLETE** - Finished F4.1 Build & Deployment (5/5 tasks) and F4.2 Documentation (4/4 tasks). Application is production-ready with comprehensive documentation.
 >
 > **Phase F3 (92%):** Completed F3.1 BAS Reports (5 tasks), F3.2 FY Reports (6 tasks), F3.3 Recurring Expenses (5 tasks), F3.4 Polish & Accessibility (8/9 tasks), and F3.5 E2E Testing (6 tasks). Only F3.4.3 Screen Reader Testing remains (requires manual QA with assistive technology).
 >
-> **Phase F2 (84%):** Remaining tasks are optional enhancements: pagination (F2.2.4), searchable dropdowns (F2.2.6, F2.2.7), and inline editing (F2.2.11 - explicitly deferred). Core CRUD functionality is complete.
+> **Phase F2 (86%):** ✅ **CSV Import Complete** - F2.4.2 (File type detection) finished with smart auto-routing between expense/income tabs. Remaining tasks are optional enhancements: pagination (F2.2.4), searchable dropdowns (F2.2.6, F2.2.7), and inline editing (F2.2.11 - explicitly deferred). Core CRUD functionality is complete.
 
 ---
 
