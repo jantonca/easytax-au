@@ -13,7 +13,7 @@ export function ToastViewport(): ReactNode {
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className="rounded-md border border-slate-300 bg-white/95 px-4 py-3 text-sm text-slate-900 shadow-lg dark:border-slate-700 dark:bg-slate-900/95 dark:text-slate-50"
+          className="animate-slide-in rounded-md border border-slate-300 bg-white/95 px-4 py-3 text-sm text-slate-900 shadow-lg transition-all duration-300 ease-in-out dark:border-slate-700 dark:bg-slate-900/95 dark:text-slate-50"
           role="status"
           aria-live="polite"
         >

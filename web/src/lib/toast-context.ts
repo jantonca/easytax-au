@@ -7,6 +7,7 @@ export interface Toast {
   title: string;
   description?: string;
   variant?: ToastVariant;
+  duration?: number; // milliseconds; undefined = no auto-dismiss
 }
 
 export interface ToastContextValue {

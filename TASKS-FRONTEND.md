@@ -165,8 +165,9 @@ easytax-au/
   - `web/src/components/error-boundary.tsx` (app-level error boundary with friendly fallback UI)
 - Toasts:
   - `web/src/lib/toast-context.ts` (`ToastContext` + `useToast`)
-  - `web/src/components/ui/toast-provider.tsx` (toast state)
-  - `web/src/components/ui/toast-viewport.tsx` (visual placement, accessible markup)
+  - `web/src/components/ui/toast-provider.tsx` (toast state + auto-dismiss logic)
+  - `web/src/components/ui/toast-viewport.tsx` (visual placement, accessible markup, slide-in animations)
+  - **Auto-dismiss feature**: Toasts automatically dismiss based on variant (success: 4s, default: 5s, error: 8s) or custom duration. Supports manual dismiss override with `duration: undefined`.
 - Testing:
   - `web/vitest.config.ts` (jsdom + `@` alias)
   - `web/src/test/setup.ts` (`@testing-library/jest-dom`)
@@ -180,7 +181,7 @@ easytax-au/
 - `pnpm --filter web test` passes:
   - API client throws `ApiError` for non-2xx, `checkApiHealth()` returns `true` for `/health` OK and `false` on failures.
   - Error boundary renders fallback UI when a child throws.
-  - Toast system adds and removes toasts correctly.
+  - Toast system adds and removes toasts correctly, auto-dismisses based on variant/duration (10 comprehensive tests including timer cleanup).
 - `pnpm --filter web build` passes (no TypeScript or Vite errors).
 - Dev shell:
   - App runs under `AppShell` with React Query provider, BrowserRouter, Toasts, and Query devtools (dev only).
