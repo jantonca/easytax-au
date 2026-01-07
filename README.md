@@ -44,23 +44,51 @@ docker compose up -d easytax-au-db
 pnpm run start:dev
 ```
 
-### Frontend (web SPA)
+### Frontend Development (React SPA)
 
-The React SPA lives in `web/` and talks to the NestJS API.
+The frontend is a React 19 SPA located in `web/` that communicates with the NestJS API.
 
-```bash path=null start=null
-# Dev server
+#### Quick Start
+
+```bash
+# 1. Install dependencies (from project root)
+pnpm install
+
+# 2. Set up frontend environment variables
+cp web/.env.example web/.env
+# Edit web/.env if needed (defaults work for local development)
+
+# 3. Start the dev server
 pnpm --filter web dev    # http://localhost:5173
-
-# Lint
-pnpm --filter web lint
-
-# Tests
-pnpm --filter web test
-
-# Build
-pnpm --filter web build
 ```
+
+#### Frontend Scripts
+
+| Command | Description |
+|---------|-------------|
+| `pnpm --filter web dev` | Start Vite dev server with HMR (port 5173) |
+| `pnpm --filter web build` | Build for production (outputs to `web/dist`) |
+| `pnpm --filter web preview` | Preview production build locally |
+| `pnpm --filter web lint` | Run ESLint on frontend code |
+| `pnpm --filter web test` | Run Vitest unit tests in watch mode |
+| `pnpm --filter web test:e2e` | Run Playwright E2E tests (headless) |
+| `pnpm --filter web test:e2e:ui` | Run Playwright E2E tests with UI |
+
+#### Troubleshooting
+
+**Issue: "Failed to fetch" or CORS errors**
+- Ensure the backend API is running on `http://localhost:3000`
+- Check `web/.env` has correct `VITE_API_URL` (default: `http://localhost:3000`)
+- Verify backend CORS is configured (should allow `http://localhost:5173` in development)
+
+**Issue: "Cannot find module '@shared/types'"**
+- Run `pnpm run generate:types` to generate OpenAPI types from the backend
+- Ensure backend API is running (types are generated from `/api/docs-json`)
+
+**Issue: Frontend builds but shows blank screen**
+- Check browser console for errors
+- Verify `VITE_API_URL` is set correctly for your environment
+- For production builds, ensure API is accessible from the frontend's host
 
 ### Available Scripts
 
@@ -133,19 +161,38 @@ docker compose up -d --build
 
 #### Environment Variables
 
+**Backend Variables (root `.env`):**
+
 | Variable           | Required | Default       | Description                                    |
 | ------------------ | -------- | ------------- | ---------------------------------------------- |
 | `DB_PASSWORD`      | ✅       | -             | PostgreSQL password                            |
 | `ENCRYPTION_KEY`   | ✅       | -             | 64-char hex key (generate: `openssl rand -hex 32`) |
-| `DB_HOST`          | ❌       | localhost     | Database host (auto-set in Docker)             |
+| `DB_HOST`          | ❌       | localhost     | Database host (auto-set to `easytax-au-db` in Docker) |
 | `DB_PORT`          | ❌       | 5432          | PostgreSQL port                                |
 | `DB_NAME`          | ❌       | easytax-au    | Database name                                  |
 | `DB_USERNAME`      | ❌       | postgres      | Database user                                  |
 | `PORT`             | ❌       | 3000          | API server port                                |
-| `WEB_PORT`         | ❌       | 80            | Frontend port                                  |
-| `NODE_ENV`         | ❌       | development   | Environment mode                               |
-| `TRAEFIK_ENABLED`  | ❌       | false         | Enable Traefik integration                     |
-| `TRAEFIK_HOST`     | ❌       | easytax.bobeliadesign.com | Domain for Traefik routing          |
+| `NODE_ENV`         | ❌       | development   | Environment mode (development/production)      |
+
+**Frontend Variables (`web/.env`):**
+
+| Variable           | Required | Default       | Description                                    |
+| ------------------ | -------- | ------------- | ---------------------------------------------- |
+| `VITE_API_URL`     | ❌       | `http://localhost:3000` | Backend API base URL (use `/api` for production Docker) |
+
+**Docker-Only Variables (root `.env`):**
+
+| Variable           | Required | Default       | Description                                    |
+| ------------------ | -------- | ------------- | ---------------------------------------------- |
+| `WEB_PORT`         | ❌       | 80            | Frontend nginx port (Docker only)              |
+| `TRAEFIK_ENABLED`  | ❌       | false         | Enable Traefik reverse proxy integration       |
+| `TRAEFIK_HOST`     | ❌       | easytax.bobeliadesign.com | Domain for Traefik routing (when enabled) |
+
+**Security Notes:**
+- Never commit `.env` files to version control
+- Use `.env.example` as a template
+- Store `ENCRYPTION_KEY` securely (rotating it requires re-encrypting all client names/ABNs)
+- Generate strong `DB_PASSWORD` using a password manager
 
 #### Production Checklist
 
@@ -155,6 +202,132 @@ docker compose up -d --build
 - [ ] Set up Traefik with Let's Encrypt for HTTPS
 - [ ] Review firewall rules (only expose port 80/443 via Traefik)
 - [ ] Test backup restoration process
+
+---
+
+## Features
+
+### Dashboard
+- **Current BAS Period Summary**: G1 (Total Sales), 1A (GST Collected), 1B (GST Paid), Net GST Payable/Refund
+- **Recent Expenses**: Latest 10 expense entries sorted by date
+- **Upcoming Recurring Expenses**: Due recurring templates with color-coded status
+- **Quick Actions**: Fast access to add expenses and incomes
+
+![Dashboard](docs/screenshots/dashboard.png)
+
+### Expense Management
+- **Full CRUD Operations**: Create, read, update, and delete expenses
+- **Smart GST Calculation**: Automatic 1/11 calculation for domestic providers, $0 for international
+- **Business Use Slider**: Visual percentage slider (0-100%) with real-time claimable GST calculation
+- **Filtering & Sorting**: Filter by provider, category, date range; sort by date, amount, provider
+- **CSV Import**: Bulk import with preview, validation, and duplicate detection
+
+![Expenses List](docs/screenshots/expenses.png)
+
+### Income Tracking
+- **Invoice Management**: Track income with invoice numbers, subtotal, GST (auto-calculated at 10%), and totals
+- **Quick Paid Toggle**: One-click status updates from unpaid to paid
+- **Client Management**: Encrypted client storage with ABN validation and PSI eligibility tracking
+- **Filtering**: Filter by client, paid/unpaid status, and date range
+
+![Incomes List](docs/screenshots/incomes.png)
+
+### BAS Reporting
+- **Quarterly Summaries**: View BAS for any quarter with automatic period calculation
+- **PDF Export**: Download BAS reports with all required ATO fields (G1, 1A, 1B)
+- **Record Counts**: See how many income and expense records contribute to each BAS period
+
+![BAS Report](docs/screenshots/bas-report.png)
+
+### Financial Year Reports
+- **Annual Summaries**: Complete FY breakdown for tax return preparation
+- **Income Analysis**: Total income, paid/unpaid split, GST collected
+- **Expense Analysis**: Breakdown by category and BAS label (1B, G10, G11)
+- **Net Position**: Profit/Loss calculation and Net GST Payable/Refund
+- **PDF Export**: Downloadable FY reports with all details
+
+![FY Report](docs/screenshots/fy-report.png)
+
+### Recurring Expenses
+- **Automated Templates**: Set up monthly, quarterly, or yearly recurring expenses
+- **Smart Scheduling**: Configure day-of-month (1-28) to avoid month-end issues
+- **Due Date Tracking**: Color-coded status (overdue/due soon/future)
+- **Bulk Generation**: Generate all due expenses with confirmation dialog
+- **Pause/Resume**: Temporarily suspend templates without deletion
+
+![Recurring Expenses](docs/screenshots/recurring.png)
+
+### Settings & Configuration
+- **Providers**: Manage expense vendors with international flag and default categories
+- **Categories**: Organize expenses with BAS label mapping (1B/G10/G11)
+- **Clients**: Encrypted client storage with ABN and PSI tracking
+- **Related Records**: See counts of expenses/incomes linked to each provider/category/client
+
+![Settings](docs/screenshots/settings.png)
+
+### Dark Mode
+- **Theme Toggle**: Cycle between Light, Dark, and Auto (system preference)
+- **Persistent Settings**: Theme choice saved to localStorage
+- **Accessible**: Keyboard navigable with proper ARIA labels
+
+![Dark Mode](docs/screenshots/dark-mode.png)
+
+---
+
+## Keyboard Shortcuts
+
+EasyTax-AU is fully keyboard accessible. All features can be used without a mouse.
+
+### Global Shortcuts
+
+| Shortcut | Action | Context |
+|----------|--------|---------|
+| `⌘K` / `Ctrl+K` | Open command palette | Anywhere in the app |
+| `Escape` | Close modal/dialog | When a modal is open |
+| `Tab` | Navigate to next element | Form fields, buttons, links |
+| `Shift+Tab` | Navigate to previous element | Form fields, buttons, links |
+| `Enter` | Submit form or activate button | Forms, buttons |
+| `Space` | Toggle checkbox/switch | Checkboxes, toggles |
+
+### Navigation
+
+| Action | Method |
+|--------|--------|
+| Navigate between sections | Click sidebar links or use `Tab` to reach navigation |
+| Open/close mobile menu | Click hamburger icon (on mobile) or use `Tab` + `Enter` |
+| Skip to main content | Press `Tab` on page load to reveal skip link, then `Enter` |
+
+### Data Tables
+
+| Action | Method |
+|--------|--------|
+| Sort column | Click column header or use `Tab` + `Enter` |
+| Open row actions | `Tab` to Edit/Delete buttons, then `Enter` |
+| Navigate table | Use `Tab` to move between interactive elements |
+
+### Forms
+
+| Action | Method |
+|--------|--------|
+| Navigate fields | `Tab` / `Shift+Tab` |
+| Submit form | `Tab` to submit button, then `Enter` |
+| Cancel/close | `Escape` key or `Tab` to Cancel button |
+| Date picker | Type date in `YYYY-MM-DD` format or use native date picker |
+| Dropdown select | `Tab` to select, `Arrow Up/Down` to choose, `Enter` to confirm |
+
+### Theme Toggle
+
+| Action | Shortcut |
+|--------|----------|
+| Change theme | Click theme button in header to cycle: Light → Dark → Auto → Light |
+
+### Accessibility Features
+
+- **Focus Indicators**: All interactive elements show a visible sky-blue outline on keyboard focus
+- **Screen Reader Support**: Proper ARIA labels, semantic HTML, and live regions for dynamic content
+- **Skip Links**: Press `Tab` on any page to reveal "Skip to main content" link
+- **Form Validation**: Error messages displayed inline with accessible labels
+- **Loading States**: Screen readers announce loading and completion states
 
 ---
 
