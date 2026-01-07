@@ -1,14 +1,35 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ToastProvider } from '@/components/ui/toast-provider';
 import { PreviewTable } from './preview-table';
 import type { components } from '@shared/types';
 
+// Mock the CreateProviderModal component
+vi.mock('./create-provider-modal', () => ({
+  CreateProviderModal: () => null,
+}));
+
 type CsvRowResultDto = components['schemas']['CsvRowResultDto'];
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: false },
+  },
+});
+
+function renderWithProviders(ui: React.ReactElement) {
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <ToastProvider>{ui}</ToastProvider>
+    </QueryClientProvider>,
+  );
+}
 
 describe('PreviewTable', () => {
   it('renders empty state when no rows provided', () => {
-    render(<PreviewTable rows={[]} />);
+    renderWithProviders(<PreviewTable rows={[]} />);
 
     expect(screen.getByText(/no rows to preview/i)).toBeInTheDocument();
   });
@@ -25,7 +46,7 @@ describe('PreviewTable', () => {
       },
     ];
 
-    render(<PreviewTable rows={rows} />);
+    renderWithProviders(<PreviewTable rows={rows} />);
 
     expect(screen.getByText('Row')).toBeInTheDocument();
     expect(screen.getByText('Status')).toBeInTheDocument();
@@ -48,7 +69,7 @@ describe('PreviewTable', () => {
       },
     ];
 
-    render(<PreviewTable rows={rows} />);
+    renderWithProviders(<PreviewTable rows={rows} />);
 
     expect(screen.getByText('1')).toBeInTheDocument();
     expect(screen.getByText(/success/i)).toBeInTheDocument();
@@ -67,7 +88,7 @@ describe('PreviewTable', () => {
       },
     ];
 
-    render(<PreviewTable rows={rows} />);
+    renderWithProviders(<PreviewTable rows={rows} />);
 
     expect(screen.getByText('2')).toBeInTheDocument();
 
@@ -93,7 +114,7 @@ describe('PreviewTable', () => {
       },
     ];
 
-    render(<PreviewTable rows={rows} />);
+    renderWithProviders(<PreviewTable rows={rows} />);
 
     expect(screen.getByText('3')).toBeInTheDocument();
     expect(screen.getByText(/duplicate/i)).toBeInTheDocument();
@@ -125,7 +146,7 @@ describe('PreviewTable', () => {
       },
     ];
 
-    render(<PreviewTable rows={rows} />);
+    renderWithProviders(<PreviewTable rows={rows} />);
 
     // High confidence (>= 0.8)
     expect(screen.getByText(/95%/)).toBeInTheDocument();
@@ -147,7 +168,7 @@ describe('PreviewTable', () => {
       },
     ];
 
-    render(<PreviewTable rows={rows} />);
+    renderWithProviders(<PreviewTable rows={rows} />);
 
     expect(screen.getByText('1')).toBeInTheDocument();
     expect(screen.getByText('$100.00')).toBeInTheDocument();
@@ -167,7 +188,7 @@ describe('PreviewTable', () => {
       },
     ];
 
-    render(<PreviewTable rows={rows} />);
+    renderWithProviders(<PreviewTable rows={rows} />);
 
     expect(screen.getAllByText('$0.00')).toHaveLength(2); // Amount and GST
   });
@@ -194,7 +215,7 @@ describe('PreviewTable', () => {
       },
     ];
 
-    render(<PreviewTable rows={rows} />);
+    renderWithProviders(<PreviewTable rows={rows} />);
 
     expect(screen.getByText('1')).toBeInTheDocument();
     expect(screen.getByText('2')).toBeInTheDocument();
@@ -221,7 +242,7 @@ describe('PreviewTable', () => {
       },
     ];
 
-    const { container } = render(<PreviewTable rows={rows} />);
+    const { container } = renderWithProviders(<PreviewTable rows={rows} />);
 
     const tableRows = container.querySelectorAll('tbody tr');
 
@@ -244,7 +265,7 @@ describe('PreviewTable', () => {
         { rowNumber: 2, success: true, amountCents: 2000 },
       ];
 
-      render(<PreviewTable rows={rows} selectable onSelectionChange={vi.fn()} />);
+      renderWithProviders(<PreviewTable rows={rows} selectable onSelectionChange={vi.fn()} />);
 
       const checkboxes = screen.getAllByRole('checkbox');
       // Should have 2 row checkboxes + 1 "select all" checkbox
@@ -260,7 +281,7 @@ describe('PreviewTable', () => {
         { rowNumber: 2, success: true, amountCents: 2000 },
       ];
 
-      const { rerender } = render(
+      const { rerender } = renderWithProviders(
         <PreviewTable
           rows={rows}
           selectable
@@ -330,7 +351,7 @@ describe('PreviewTable', () => {
         { rowNumber: 3, success: true, amountCents: 3000 },
       ];
 
-      render(<PreviewTable rows={rows} selectable onSelectionChange={onSelectionChange} />);
+      renderWithProviders(<PreviewTable rows={rows} selectable onSelectionChange={onSelectionChange} />);
 
       const selectAllCheckbox = screen.getByRole('checkbox', { name: /select all/i });
 
@@ -410,7 +431,7 @@ describe('PreviewTable', () => {
         { rowNumber: 2, success: false, error: 'Invalid' },
       ];
 
-      render(<PreviewTable rows={rows} selectable onSelectionChange={vi.fn()} />);
+      renderWithProviders(<PreviewTable rows={rows} selectable onSelectionChange={vi.fn()} />);
 
       const checkboxes = screen.getAllByRole('checkbox', { name: /select row/i });
 
@@ -426,7 +447,7 @@ describe('PreviewTable', () => {
         { rowNumber: 1, success: true, isDuplicate: true, amountCents: 1000 },
       ];
 
-      render(<PreviewTable rows={rows} selectable onSelectionChange={onSelectionChange} />);
+      renderWithProviders(<PreviewTable rows={rows} selectable onSelectionChange={onSelectionChange} />);
 
       const checkbox = screen.getByRole('checkbox', { name: /select row 1/i });
 

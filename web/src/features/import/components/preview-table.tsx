@@ -1,15 +1,19 @@
 import type { ReactElement } from 'react';
+import { useState } from 'react';
 import type { components } from '@shared/types';
-import { CheckCircle2, AlertCircle, AlertTriangle } from 'lucide-react';
+import { CheckCircle2, AlertCircle, AlertTriangle, Plus } from 'lucide-react';
 import { formatDate } from '@/lib/currency';
+import { CreateProviderModal } from './create-provider-modal';
 
 type CsvRowResultDto = components['schemas']['CsvRowResultDto'];
+type Provider = components['schemas']['Provider'];
 
 interface PreviewTableProps {
   rows: CsvRowResultDto[];
   selectable?: boolean;
   selectedRows?: Set<number>;
   onSelectionChange?: (selected: Set<number>) => void;
+  onProviderCreated?: () => void;
 }
 
 function formatCurrency(cents?: number): string {
@@ -49,12 +53,36 @@ function getConfidenceBadge(score?: number): ReactElement | null {
   );
 }
 
+/**
+ * Extract provider name from error message like 'No matching provider found for "GitHub"'
+ */
+function extractProviderName(error: string): string | null {
+  const match = error.match(/No matching provider found for "([^"]+)"/i);
+  return match ? match[1] : null;
+}
+
 export function PreviewTable({
   rows,
   selectable = false,
   selectedRows = new Set(),
   onSelectionChange,
+  onProviderCreated,
 }: PreviewTableProps): ReactElement {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [providerToCreate, setProviderToCreate] = useState<string>('');
+
+  const handleCreateProvider = (providerName: string): void => {
+    setProviderToCreate(providerName);
+    setIsModalOpen(true);
+  };
+
+  const handleProviderCreated = (_provider: Provider): void => {
+    setIsModalOpen(false);
+    if (onProviderCreated) {
+      onProviderCreated();
+    }
+  };
+
   if (rows.length === 0) {
     return (
       <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 p-12 text-center">
@@ -270,20 +298,43 @@ export function PreviewTable({
       {rows.some((row) => row.error) && (
         <div className="border-t border-slate-200 dark:border-slate-800 bg-red-50 dark:bg-slate-950/40 p-4">
           <h3 className="mb-2 text-sm font-medium text-red-600 dark:text-red-400">Errors</h3>
-          <ul className="space-y-1 text-sm">
+          <ul className="space-y-2 text-sm">
             {rows
               .filter((row) => row.error)
-              .map((row) => (
-                <li key={row.rowNumber} className="text-slate-700 dark:text-slate-400">
-                  <span className="font-medium text-slate-900 dark:text-slate-300">
-                    Row {row.rowNumber}:
-                  </span>{' '}
-                  {row.error}
-                </li>
-              ))}
+              .map((row) => {
+                const providerName = extractProviderName(row.error!);
+                return (
+                  <li key={row.rowNumber} className="flex items-center justify-between gap-4">
+                    <span className="text-slate-700 dark:text-slate-400">
+                      <span className="font-medium text-slate-900 dark:text-slate-300">
+                        Row {row.rowNumber}:
+                      </span>{' '}
+                      {row.error}
+                    </span>
+                    {providerName && (
+                      <button
+                        type="button"
+                        onClick={() => handleCreateProvider(providerName)}
+                        className="flex items-center gap-1.5 rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-red-50 dark:focus:ring-offset-slate-950 whitespace-nowrap"
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                        Create Provider
+                      </button>
+                    )}
+                  </li>
+                );
+              })}
           </ul>
         </div>
       )}
+
+      {/* Create Provider Modal */}
+      <CreateProviderModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={handleProviderCreated}
+        suggestedName={providerToCreate}
+      />
     </div>
   );
 }

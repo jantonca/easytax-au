@@ -228,6 +228,17 @@ export function ExpensesImportTab(): ReactElement {
             selectable
             selectedRows={selectedRows}
             onSelectionChange={setSelectedRows}
+            onProviderCreated={() => {
+              // Re-run preview after provider is created
+              if (selectedFile) {
+                previewMutation.mutate({
+                  file: selectedFile,
+                  source,
+                  matchThreshold: 0.6,
+                  skipDuplicates: true,
+                });
+              }
+            }}
           />
 
           {/* Action Buttons */}

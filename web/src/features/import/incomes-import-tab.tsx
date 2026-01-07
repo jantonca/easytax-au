@@ -248,6 +248,17 @@ export function IncomesImportTab(): ReactElement {
             selectable
             selectedRows={selectedRows}
             onSelectionChange={setSelectedRows}
+            onClientCreated={() => {
+              // Re-run preview after client is created
+              if (selectedFile) {
+                previewMutation.mutate({
+                  file: selectedFile,
+                  source,
+                  matchThreshold: 0.6,
+                  skipDuplicates: true,
+                });
+              }
+            }}
           />
 
           {/* Action Buttons */}

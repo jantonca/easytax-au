@@ -574,6 +574,10 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 - `web/src/features/import/hooks/use-income-csv-import.ts`
 - `web/src/features/import/utils/detect-csv-type.ts` - CSV type detection utility (F2.4.2)
 - `web/src/features/import/utils/detect-csv-type.test.ts` - 24 comprehensive tests (F2.4.2)
+- `web/src/features/import/components/create-provider-modal.tsx` - Inline provider creation modal
+- `web/src/features/import/components/create-client-modal.tsx` - Inline client creation modal
+- `web/src/features/import/components/preview-table-create-provider.test.tsx` - 8 tests for provider creation
+- `web/src/features/import/components/income-preview-table-create-client.test.tsx` - 8 tests for client creation
 
 **Implementation notes (F2.4):**
 
@@ -589,6 +593,15 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
   - Unknown CSV types show error toast but still allow manual import
   - File state preserved during navigation via React Router state
   - 24 comprehensive tests covering happy paths, edge cases, and error scenarios
+- **Inline provider/client creation:** ✅ Create missing providers/clients during import without leaving workflow
+  - Preview tables detect "No matching provider/client found for" errors and extract entity names using regex
+  - "Create Provider" and "Create Client" buttons appear next to relevant error messages
+  - Modal dialogs pre-fill entity names from CSV data, allowing users to edit before saving
+  - CreateProviderModal fetches categories and sets safe defaults (isInternational: false for 10% GST)
+  - CreateClientModal sets safe defaults (isPsiEligible: false)
+  - After successful creation, preview automatically re-runs to reflect new matches
+  - User stays in import workflow - no context switching required
+  - 16 comprehensive tests covering name extraction, button rendering, and modal functionality
 - Fixed multiple critical issues during implementation:
   1. **404 errors:** Removed hardcoded `/api` prefix from 3 frontend hooks (backend has no global prefix)
   2. **400 file validation errors:** Created custom `CsvFileValidator` checking `.csv` extension instead of unreliable MIME types

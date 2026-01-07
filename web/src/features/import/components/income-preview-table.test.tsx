@@ -1,8 +1,15 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ToastProvider } from '@/components/ui/toast-provider';
 import { IncomePreviewTable } from './income-preview-table';
 import type { components } from '@shared/types';
+
+// Mock the CreateClientModal component
+vi.mock('./create-client-modal', () => ({
+  CreateClientModal: () => null,
+}));
 
 type BaseCsvRowResultDto = components['schemas']['CsvRowResultDto'];
 
@@ -15,9 +22,23 @@ type CsvRowResultDto = BaseCsvRowResultDto & {
   isPaid?: boolean;
 };
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: false },
+  },
+});
+
+function renderWithProviders(ui: React.ReactElement) {
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <ToastProvider>{ui}</ToastProvider>
+    </QueryClientProvider>,
+  );
+}
+
 describe('IncomePreviewTable', () => {
   it('renders empty state when no rows provided', () => {
-    render(<IncomePreviewTable rows={[]} />);
+    renderWithProviders(<IncomePreviewTable rows={[]} />);
 
     expect(screen.getByText(/no rows to preview/i)).toBeInTheDocument();
   });
@@ -35,7 +56,7 @@ describe('IncomePreviewTable', () => {
       },
     ];
 
-    render(<IncomePreviewTable rows={rows} />);
+    renderWithProviders(<IncomePreviewTable rows={rows} />);
 
     expect(screen.getByText('Row')).toBeInTheDocument();
     expect(screen.getByText('Status')).toBeInTheDocument();
@@ -61,7 +82,7 @@ describe('IncomePreviewTable', () => {
       },
     ];
 
-    render(<IncomePreviewTable rows={rows} />);
+    renderWithProviders(<IncomePreviewTable rows={rows} />);
 
     expect(screen.getByText('1')).toBeInTheDocument();
     expect(screen.getByText(/success/i)).toBeInTheDocument();
@@ -81,7 +102,7 @@ describe('IncomePreviewTable', () => {
       },
     ];
 
-    render(<IncomePreviewTable rows={rows} />);
+    renderWithProviders(<IncomePreviewTable rows={rows} />);
 
     expect(screen.getByText('2')).toBeInTheDocument();
 
@@ -108,7 +129,7 @@ describe('IncomePreviewTable', () => {
       },
     ];
 
-    render(<IncomePreviewTable rows={rows} />);
+    renderWithProviders(<IncomePreviewTable rows={rows} />);
 
     expect(screen.getByText('3')).toBeInTheDocument();
     expect(screen.getByText(/duplicate/i)).toBeInTheDocument();
@@ -128,7 +149,7 @@ describe('IncomePreviewTable', () => {
       },
     ];
 
-    render(<IncomePreviewTable rows={rows} />);
+    renderWithProviders(<IncomePreviewTable rows={rows} />);
 
     // High confidence (>= 80%) shows in emerald/green
     const badge = screen.getByText('100%');
@@ -149,7 +170,7 @@ describe('IncomePreviewTable', () => {
       },
     ];
 
-    render(<IncomePreviewTable rows={rows} />);
+    renderWithProviders(<IncomePreviewTable rows={rows} />);
 
     // Medium confidence (50-79%) shows in amber/yellow
     const badge = screen.getByText('65%');
@@ -170,7 +191,7 @@ describe('IncomePreviewTable', () => {
       },
     ];
 
-    render(<IncomePreviewTable rows={rows} />);
+    renderWithProviders(<IncomePreviewTable rows={rows} />);
 
     // Low confidence (< 50%) shows in red
     const badge = screen.getByText('30%');
@@ -191,7 +212,7 @@ describe('IncomePreviewTable', () => {
       },
     ];
 
-    render(<IncomePreviewTable rows={rows} />);
+    renderWithProviders(<IncomePreviewTable rows={rows} />);
 
     expect(screen.getByText('Minimal Data Corp')).toBeInTheDocument();
     // Should show dashes for missing fields
@@ -211,7 +232,7 @@ describe('IncomePreviewTable', () => {
         },
       ];
 
-      render(<IncomePreviewTable rows={rows} selectable={true} />);
+      renderWithProviders(<IncomePreviewTable rows={rows} selectable={true} />);
 
       const checkboxes = screen.getAllByRole('checkbox');
       expect(checkboxes.length).toBeGreaterThan(0);
@@ -255,7 +276,7 @@ describe('IncomePreviewTable', () => {
         },
       ];
 
-      render(<IncomePreviewTable rows={rows} selectable={true} />);
+      renderWithProviders(<IncomePreviewTable rows={rows} selectable={true} />);
 
       const checkbox = screen.getByLabelText('Select row 1');
       expect(checkbox).toBeDisabled();
@@ -324,7 +345,7 @@ describe('IncomePreviewTable', () => {
         },
       ];
 
-      render(<IncomePreviewTable rows={rows} selectable={true} selectedRows={new Set([1, 2])} />);
+      renderWithProviders(<IncomePreviewTable rows={rows} selectable={true} selectedRows={new Set([1, 2])} />);
 
       expect(screen.getByText('2 of 2 rows selected')).toBeInTheDocument();
     });
@@ -356,7 +377,7 @@ describe('IncomePreviewTable', () => {
       },
     ];
 
-    const { container } = render(<IncomePreviewTable rows={rows} />);
+    const { container } = renderWithProviders(<IncomePreviewTable rows={rows} />);
 
     const tableRows = container.querySelectorAll('tbody tr');
     expect(tableRows[0]).not.toHaveClass('bg-red-950/30', 'bg-amber-950/30'); // Success - no bg
