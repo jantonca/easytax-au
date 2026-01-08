@@ -237,4 +237,153 @@ describe('IncomesTable', () => {
     const badge = within(rows[0]).getByText('Unpaid');
     expect(badge.tagName).toBe('SPAN'); // Not a button
   });
+
+  describe('Pagination', () => {
+    it('shows pagination controls when incomes exceed 25', () => {
+      const incomes: IncomeResponseDto[] = Array.from({ length: 30 }, (_, i) =>
+        createIncome({ id: `income-${i}`, date: `2025-08-${String(i + 1).padStart(2, '0')}T00:00:00Z`, totalCents: (i + 1) * 1000 }),
+      );
+
+      render(<IncomesTable incomes={incomes} />);
+
+      expect(screen.getByRole('button', { name: /previous page/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /next page/i })).toBeInTheDocument();
+      expect(screen.getByText(/showing 1-25 of 30/i)).toBeInTheDocument();
+    });
+
+    it('hides pagination controls when incomes are 25 or fewer', () => {
+      const incomes: IncomeResponseDto[] = Array.from({ length: 25 }, (_, i) =>
+        createIncome({ id: `income-${i}`, date: `2025-08-${String(i + 1).padStart(2, '0')}T00:00:00Z`, totalCents: (i + 1) * 1000 }),
+      );
+
+      render(<IncomesTable incomes={incomes} />);
+
+      expect(screen.queryByRole('button', { name: /previous page/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /next page/i })).not.toBeInTheDocument();
+      expect(screen.queryByText(/showing/i)).not.toBeInTheDocument();
+    });
+
+    it('navigates to next page when Next button is clicked', async () => {
+      const user = userEvent.setup();
+      const incomes: IncomeResponseDto[] = Array.from({ length: 30 }, (_, i) =>
+        createIncome({ id: `income-${i}`, date: `2025-08-${String(i + 1).padStart(2, '0')}T00:00:00Z`, totalCents: (i + 1) * 1000 }),
+      );
+
+      render(<IncomesTable incomes={incomes} />);
+
+      const nextButton = screen.getByRole('button', { name: /next page/i });
+      await user.click(nextButton);
+
+      expect(screen.getByText(/showing 26-30 of 30/i)).toBeInTheDocument();
+    });
+
+    it('navigates to previous page when Previous button is clicked', async () => {
+      const user = userEvent.setup();
+      const incomes: IncomeResponseDto[] = Array.from({ length: 30 }, (_, i) =>
+        createIncome({ id: `income-${i}`, date: `2025-08-${String(i + 1).padStart(2, '0')}T00:00:00Z`, totalCents: (i + 1) * 1000 }),
+      );
+
+      render(<IncomesTable incomes={incomes} />);
+
+      const nextButton = screen.getByRole('button', { name: /next page/i });
+      await user.click(nextButton);
+
+      const prevButton = screen.getByRole('button', { name: /previous page/i });
+      await user.click(prevButton);
+
+      expect(screen.getByText(/showing 1-25 of 30/i)).toBeInTheDocument();
+    });
+
+    it('disables Previous button on first page', () => {
+      const incomes: IncomeResponseDto[] = Array.from({ length: 30 }, (_, i) =>
+        createIncome({ id: `income-${i}`, date: `2025-08-${String(i + 1).padStart(2, '0')}T00:00:00Z`, totalCents: (i + 1) * 1000 }),
+      );
+
+      render(<IncomesTable incomes={incomes} />);
+
+      const prevButton = screen.getByRole('button', { name: /previous page/i });
+      expect(prevButton).toBeDisabled();
+    });
+
+    it('disables Next button on last page', async () => {
+      const user = userEvent.setup();
+      const incomes: IncomeResponseDto[] = Array.from({ length: 30 }, (_, i) =>
+        createIncome({ id: `income-${i}`, date: `2025-08-${String(i + 1).padStart(2, '0')}T00:00:00Z`, totalCents: (i + 1) * 1000 }),
+      );
+
+      render(<IncomesTable incomes={incomes} />);
+
+      const nextButton = screen.getByRole('button', { name: /next page/i });
+      await user.click(nextButton);
+
+      expect(nextButton).toBeDisabled();
+    });
+
+    it('shows correct page indicator for multiple pages', () => {
+      const incomes: IncomeResponseDto[] = Array.from({ length: 100 }, (_, i) =>
+        createIncome({ id: `income-${i}`, date: `2025-01-01T00:00:00Z`, totalCents: (i + 1) * 1000 }),
+      );
+
+      render(<IncomesTable incomes={incomes} />);
+
+      expect(screen.getByText(/page 1 of 4/i)).toBeInTheDocument();
+    });
+
+    it('displays only current page rows (25 per page)', () => {
+      const incomes: IncomeResponseDto[] = Array.from({ length: 30 }, (_, i) =>
+        createIncome({ id: `income-${i}`, date: `2025-08-${String(i + 1).padStart(2, '0')}T00:00:00Z`, totalCents: (i + 1) * 1000 }),
+      );
+
+      render(<IncomesTable incomes={incomes} />);
+
+      const rows = screen.getAllByRole('row').slice(1); // skip header
+      expect(rows).toHaveLength(25);
+    });
+
+    it('handles zero amount incomes correctly in pagination', () => {
+      const incomes: IncomeResponseDto[] = [
+        createIncome({ id: '1', totalCents: 0, subtotalCents: 0, gstCents: 0 }),
+        ...Array.from({ length: 29 }, (_, i) =>
+          createIncome({ id: `income-${i + 2}`, totalCents: (i + 1) * 1000 }),
+        ),
+      ];
+
+      render(<IncomesTable incomes={incomes} />);
+
+      expect(screen.getAllByText('$0.00').length).toBeGreaterThan(0);
+      expect(screen.getByText(/showing 1-25 of 30/i)).toBeInTheDocument();
+    });
+
+    it('preserves sorting when navigating between pages', async () => {
+      const user = userEvent.setup();
+      const incomes: IncomeResponseDto[] = Array.from({ length: 30 }, (_, i) =>
+        createIncome({ id: `income-${i}`, date: `2025-08-${String(i + 1).padStart(2, '0')}T00:00:00Z`, totalCents: (i + 1) * 1000 }),
+      );
+
+      render(<IncomesTable incomes={incomes} />);
+
+      // Sort by total ascending
+      const totalHeaderButton = screen.getByRole('button', { name: /total/i });
+      await user.click(totalHeaderButton);
+
+      // Navigate to page 2
+      const nextButton = screen.getByRole('button', { name: /next page/i });
+      await user.click(nextButton);
+
+      // Verify page 2 still shows sorted data (totals 26-30)
+      const rows = screen.getAllByRole('row').slice(1);
+      expect(within(rows[0]).getByText(/\$260\.00/)).toBeInTheDocument();
+    });
+
+    it('has proper ARIA labels on pagination controls', () => {
+      const incomes: IncomeResponseDto[] = Array.from({ length: 30 }, (_, i) =>
+        createIncome({ id: `income-${i}`, date: `2025-08-${String(i + 1).padStart(2, '0')}T00:00:00Z`, totalCents: (i + 1) * 1000 }),
+      );
+
+      render(<IncomesTable incomes={incomes} />);
+
+      expect(screen.getByRole('button', { name: /previous page/i })).toHaveAttribute('aria-label');
+      expect(screen.getByRole('button', { name: /next page/i })).toHaveAttribute('aria-label');
+    });
+  });
 });

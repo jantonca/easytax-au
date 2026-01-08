@@ -52,6 +52,9 @@ function getAriaSort(
 export function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTableProps): ReactElement {
   const [sortBy, setSortBy] = useState<SortColumn>('date');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const ITEMS_PER_PAGE = 25;
 
   const sorted = useMemo(() => {
     if (expenses.length === 0) {
@@ -98,6 +101,12 @@ export function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTableProps
     return items;
   }, [expenses, sortBy, sortDirection]);
 
+  const totalPages = Math.ceil(sorted.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedExpenses = sorted.slice(startIndex, endIndex);
+  const showPagination = sorted.length > ITEMS_PER_PAGE;
+
   function handleSort(column: SortColumn): void {
     setSortBy((current) => {
       if (current === column) {
@@ -106,8 +115,17 @@ export function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTableProps
       }
 
       setSortDirection('asc');
+      setCurrentPage(1); // Reset to page 1 when sorting changes
       return column;
     });
+  }
+
+  function handlePreviousPage(): void {
+    setCurrentPage((prev) => Math.max(1, prev - 1));
+  }
+
+  function handleNextPage(): void {
+    setCurrentPage((prev) => Math.min(totalPages, prev + 1));
   }
 
   if (sorted.length === 0) {
@@ -191,7 +209,7 @@ export function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTableProps
             </tr>
           </thead>
           <tbody>
-            {sorted.map((expense) => {
+            {paginatedExpenses.map((expense) => {
               const dateLabel = String(expense.date).slice(0, 10);
 
               const description = (() => {
@@ -265,6 +283,40 @@ export function ExpensesTable({ expenses, onEdit, onDelete }: ExpensesTableProps
           </tbody>
         </table>
       </div>
+
+      {showPagination && (
+        <div className="mt-4 flex items-center justify-between gap-3 border-t border-slate-200 dark:border-slate-800 pt-3">
+          <div className="text-[11px] text-slate-600 dark:text-slate-400">
+            Showing {startIndex + 1}-{Math.min(endIndex, sorted.length)} of {sorted.length}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="text-[11px] text-slate-500">
+              Page {currentPage} of {totalPages}
+            </div>
+            <div className="flex gap-1">
+              <button
+                type="button"
+                onClick={handlePreviousPage}
+                disabled={currentPage === 1}
+                aria-label="Previous page"
+                className="inline-flex h-7 items-center rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 text-[11px] font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white dark:disabled:hover:bg-slate-900"
+              >
+                Previous
+              </button>
+              <button
+                type="button"
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                aria-label="Next page"
+                className="inline-flex h-7 items-center rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 text-[11px] font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white dark:disabled:hover:bg-slate-900"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

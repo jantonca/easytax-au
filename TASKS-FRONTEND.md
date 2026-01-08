@@ -378,7 +378,7 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 || F2.2.1 | Create expenses list page with data table | ✅ |
 || F2.2.2 | Add sorting (date, amount, provider) | ✅ |
 || F2.2.3 | Add filtering (category, provider, date range) | ✅ |
-|| F2.2.4 | Add pagination | ⬜ |
+|| F2.2.4 | Add pagination | ✅ |
 || F2.2.5 | Create expense form (add/edit) with validation | ✅ |
 || F2.2.6 | Implement provider dropdown with search | ⬜ |
 || F2.2.7 | Implement category dropdown | ⬜ |
@@ -397,6 +397,7 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 - Expense create form implemented as `ExpenseForm` using React Hook Form + Zod (`expenseFormSchema` / `ExpenseFormValues`) and a typed `useCreateExpense` mutation that posts `CreateExpenseDto` and invalidates the `['expenses']` query on success.
 - The Expenses page wires an "Add expense" button to open an accessible modal dialog containing `ExpenseForm`; on successful submit, the modal closes and a success toast is shown; failures surface a generic error toast.
 - The form handles cents conversion via `parseCurrency`, enforces `providerId`/`categoryId` UUIDs and `bizPercent` range, and preselects the first available provider/category when lists are non-empty.
+- **F2.2.4 (Pagination):** Implemented client-side pagination with 25 expenses per page. Pagination controls appear only when expenses exceed 25, showing "Showing X-Y of Z" count and "Page X of Y" indicator. Previous/Next buttons are disabled appropriately on first/last pages. ARIA labels ensure accessibility. Sorting is preserved across page navigation. 11 comprehensive tests cover all pagination scenarios including edge cases (zero amounts, last page, disabled states).
 - **F2.2.10 (Delete):** Implemented delete with confirmation via `useDeleteExpense` mutation hook and reusable `ConfirmationDialog` component. Expenses table includes Actions column with Edit/Delete icon buttons. Delete confirmation shows expense details (amount, description, date) and handles loading/error states with toast notifications.
 - **F2.2.5 (Edit):** Implemented edit via modal reusing `ExpenseForm` with `useUpdateExpense` mutation hook. Form supports both create and edit modes via `initialValues` and `expenseId` props, automatically populating fields and switching button text/toast messages based on mode. Edit flow wired in `ExpensesPage` with separate state management for create vs edit modals.
 - **F2.2.8 (GST auto-calculation display):** Implemented real-time GST calculation in expense form using React Hook Form's `watch()` and `useMemo` for performance. For domestic providers, GST is automatically calculated as 1/11 of the total amount (e.g., $110.00 → $10.00 GST). For international providers, GST is always $0.00. The calculated GST is displayed below the amount field in emerald text with clear labeling. The calculation is reactive - updates immediately when amount or provider selection changes.
@@ -455,7 +456,7 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 | F2.3.1  | Create incomes list page with data table        | ✅     |
 | F2.3.2  | Add sorting (date, amount, client)              | ✅     |
 | F2.3.3  | Add filtering (client, paid/unpaid, date range) | ✅     |
-| F2.3.4  | Add pagination                                  | ⬜     |
+| F2.3.4  | Add pagination                                  | ✅     |
 | F2.3.5  | Create income form (add/edit) with validation   | ✅     |
 | F2.3.6  | Implement client dropdown with search + add new | ✅     |
 | F2.3.7  | Add GST (10%) auto-calculation                  | ✅     |
@@ -471,6 +472,7 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 - Form validation using React Hook Form + Zod (`income.schema.ts`)
 - Client-side filtering by client, paid/unpaid status, and date range
 - Client-side sorting by date (default descending), total, client name, and paid status
+- **F2.3.4 (Pagination):** Implemented client-side pagination with 25 incomes per page, matching expense pagination pattern. Pagination controls show/hide based on data count, with proper disabled states and ARIA labels. Sorting preserved across pages. 11 comprehensive tests ensure consistent behavior.
 - Responsive table with columns: Date, Invoice #, Client, Description, Subtotal, GST, Total, Paid Status, Actions
 - Paid/unpaid badge is clickable toggle when `onTogglePaid` callback is provided
 - GST auto-calculated as 10% of subtotal (Australian standard)
@@ -478,7 +480,7 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 - Client select dropdown with pre-population of first client when available
 - Modal-based create/edit forms with proper success/error toast notifications
 - Delete confirmation using reusable `ConfirmationDialog` component
-- Comprehensive tests: 26 tests passing (7 page, 13 table, 6 form)
+- Comprehensive tests: 48 tests passing (7 page, 24 table including 11 pagination, 6 form, 11 mutations)
 
 **Files created:**
 
@@ -555,6 +557,7 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 | F2.4.8  | Add "Import Selected" confirmation            | ✅     |
 | F2.4.9  | Show import progress and results              | ✅     |
 | F2.4.10 | Link to ImportJob for rollback option         | ✅     |
+| F2.4.11 | Add pagination to import jobs history         | ✅     |
 
 **Files Created:**
 
@@ -612,6 +615,7 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
   4. **NaN database error:** Fixed CSV test data with comma in amount (`$1,250.00` → `$1250.00`)
   5. **Preview saving to database:** Fixed frontend hook to call correct `/import/expenses/preview` endpoint
 - **Critical lesson:** NestJS boolean parameter conversion fails for multipart uploads. Always use separate endpoints or explicit controller-level normalization (see `AGENTS.md` section "Multipart/Form-Data and Boolean Parameters")
+- **F2.4.11 (Import Jobs Pagination):** Implemented client-side pagination for import history table with 25 jobs per page, following same UX pattern as expenses/incomes. Shows job metadata (date, source, success/failed counts, amounts) with proper formatting. 8 comprehensive tests ensure pagination works correctly across navigation, disabled states, and ARIA accessibility.
 - Backend endpoints: `/import/expenses`, `/import/expenses/preview`, `/import/incomes`, `/import/incomes/preview`
 - Frontend hooks: `use-csv-preview.ts`, `use-csv-import.ts`, `use-import-jobs.ts`
 - All hooks use `VITE_API_URL` environment variable (never hardcoded URLs)

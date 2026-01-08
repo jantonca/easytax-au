@@ -1,4 +1,5 @@
 import type { ReactElement } from 'react';
+import { useState } from 'react';
 import { Loader2, AlertCircle, FileX } from 'lucide-react';
 import { useImportJobs } from './hooks/use-import-jobs';
 
@@ -35,6 +36,9 @@ function formatSource(source: string): string {
 
 export function ImportHistory(): ReactElement {
   const { data: jobs, isLoading, isError, error } = useImportJobs();
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const ITEMS_PER_PAGE = 25;
 
   // Loading state
   if (isLoading) {
@@ -87,6 +91,21 @@ export function ImportHistory(): ReactElement {
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
 
+  // Pagination calculations
+  const totalPages = Math.ceil(sortedJobs.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedJobs = sortedJobs.slice(startIndex, endIndex);
+  const showPagination = sortedJobs.length > ITEMS_PER_PAGE;
+
+  function handlePreviousPage(): void {
+    setCurrentPage((prev) => Math.max(1, prev - 1));
+  }
+
+  function handleNextPage(): void {
+    setCurrentPage((prev) => Math.min(totalPages, prev + 1));
+  }
+
   return (
     <div className="overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/40">
       <div className="overflow-x-auto">
@@ -117,7 +136,7 @@ export function ImportHistory(): ReactElement {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200/50 dark:divide-slate-800/50">
-            {sortedJobs.map((job) => (
+            {paginatedJobs.map((job) => (
               <tr key={job.id} className="hover:bg-slate-100 dark:hover:bg-slate-800/30">
                 <td className="px-4 py-3 text-slate-700 dark:text-slate-300">
                   {formatDate(job.createdAt)}
@@ -147,6 +166,40 @@ export function ImportHistory(): ReactElement {
           </tbody>
         </table>
       </div>
+
+      {showPagination && (
+        <div className="flex items-center justify-between gap-3 border-t border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-950/40">
+          <div className="text-[11px] text-slate-600 dark:text-slate-400">
+            Showing {startIndex + 1}-{Math.min(endIndex, sortedJobs.length)} of {sortedJobs.length}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="text-[11px] text-slate-500">
+              Page {currentPage} of {totalPages}
+            </div>
+            <div className="flex gap-1">
+              <button
+                type="button"
+                onClick={handlePreviousPage}
+                disabled={currentPage === 1}
+                aria-label="Previous page"
+                className="inline-flex h-7 items-center rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 text-[11px] font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white dark:disabled:hover:bg-slate-900"
+              >
+                Previous
+              </button>
+              <button
+                type="button"
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                aria-label="Next page"
+                className="inline-flex h-7 items-center rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 text-[11px] font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white dark:disabled:hover:bg-slate-900"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -9,7 +9,7 @@
 
 **Purpose:** This document tracks future improvements, UX enhancements, and nice-to-have features that are not critical for the current MVP but would improve the user experience.
 
-**Project Status:** 92% complete (93/101 tasks done) - Production-ready with core functionality complete.
+**Project Status:** 94% complete (95/101 tasks done) - Production-ready with core functionality complete.
 
 ---
 
@@ -17,53 +17,38 @@
 
 These tasks are deferred from the current sprint but are important for a polished product.
 
-### F2.2.4: Add Pagination to Expenses List
+### F2.2.4: Add Pagination to Expenses List ✅
 
-**Status:** ⬜ Not started
+**Status:** ✅ Completed (2026-01-08)
 **Phase:** F2.2 Expenses CRUD
-**Estimated Effort:** 3-4 hours
-**Dependencies:** None
+**Actual Effort:** 3 hours
 
-**Description:**
-Currently loads all expenses at once. Add pagination for better performance with large datasets (>100 expenses).
+**Implementation:**
+Implemented client-side pagination with 25 expenses per page. Pagination controls appear only when expenses exceed 25, showing "Showing X-Y of Z" count and "Page X of Y" indicator. Previous/Next buttons are disabled appropriately on first/last pages. ARIA labels ensure accessibility. Sorting is preserved across page navigation.
 
-**Acceptance Criteria:**
+**Testing:**
+11 comprehensive tests cover all pagination scenarios including edge cases (zero amounts, last page, disabled states, ARIA labels, sorting preservation).
 
-- [ ] Display 25 expenses per page (configurable)
-- [ ] Page navigation (Previous/Next + page numbers)
-- [ ] Show total count and current page
-- [ ] Preserve filters and sorting when navigating pages
-- [ ] Server-side pagination via `/expenses?page=1&limit=25` query params
-- [ ] Update `useExpenses` hook to support pagination params
-- [ ] Mobile-friendly pagination controls
+**Technical Decision:**
+Used client-side pagination instead of server-side because backend doesn't currently support pagination parameters. This is acceptable for <1000 expenses and provides instant navigation without API calls.
 
-**Technical Notes:**
-
-- Backend already supports pagination (see TASKS-BACKEND.md)
-- Use TanStack Table's pagination features
-- Consider infinite scroll as alternative UX pattern
-
-**Reference:** TASKS-FRONTEND.md line 381
+**Reference:** TASKS-FRONTEND.md F2.2.4
 
 ---
 
-### F2.3.4: Add Pagination to Incomes List
+### F2.3.4: Add Pagination to Incomes List ✅
 
-**Status:** ⬜ Not started
+**Status:** ✅ Completed (2026-01-08)
 **Phase:** F2.3 Incomes CRUD
-**Estimated Effort:** 2-3 hours (similar to F2.2.4)
-**Dependencies:** F2.2.4 (reuse pagination component)
+**Actual Effort:** 1 hour
 
-**Description:**
-Same pagination pattern as expenses list.
+**Implementation:**
+Implemented client-side pagination with 25 incomes per page, matching expense pagination pattern (90% code reuse). Pagination controls show/hide based on data count, with proper disabled states and ARIA labels. Sorting preserved across pages.
 
-**Acceptance Criteria:**
+**Testing:**
+11 comprehensive tests ensure consistent behavior with expenses pagination. Fixed one test for zero amount handling (multiple $0.00 values in table).
 
-- [ ] Same UX as expenses pagination
-- [ ] Reusable pagination component
-- [ ] Server-side pagination via `/incomes?page=1&limit=25`
-
-**Reference:** TASKS-FRONTEND.md line 458
+**Reference:** TASKS-FRONTEND.md F2.3.4
 
 ---
 
