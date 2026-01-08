@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import type { CategoryDto, ProviderDto } from '@/lib/api-client';
@@ -17,6 +17,32 @@ vi.mock('@/lib/toast-context', () => ({
 
 const mockedUseCreateExpense = vi.mocked(useCreateExpense);
 const mockedUseUpdateExpense = vi.mocked(useUpdateExpense);
+
+// Helper function to select a provider using the combobox
+async function selectProvider(
+  user: ReturnType<typeof userEvent.setup>,
+  providerName: string,
+): Promise<void> {
+  const providerButton = screen.getByRole('button', { name: /select provider/i });
+  await user.click(providerButton);
+
+  const listbox = screen.getByRole('listbox', { name: /provider options/i });
+  const option = within(listbox).getByRole('option', { name: new RegExp(providerName, 'i') });
+  await user.click(option);
+}
+
+// Helper function to select a category using the combobox
+async function selectCategory(
+  user: ReturnType<typeof userEvent.setup>,
+  categoryName: string,
+): Promise<void> {
+  const categoryButton = screen.getByRole('button', { name: /select category/i });
+  await user.click(categoryButton);
+
+  const listbox = screen.getByRole('listbox', { name: /category options/i });
+  const option = within(listbox).getByRole('option', { name: new RegExp(categoryName, 'i') });
+  await user.click(option);
+}
 
 const mockProviders: ProviderDto[] = [
   {
@@ -71,14 +97,12 @@ describe('ExpenseForm', () => {
 
     const dateInput = screen.getByLabelText('Date');
     const amountInput = screen.getByLabelText('Amount (AUD)');
-    const providerSelect = screen.getByLabelText('Provider');
-    const categorySelect = screen.getByLabelText('Category');
 
     await user.type(dateInput, '2025-08-15');
     await user.type(amountInput, '110');
 
-    await user.selectOptions(providerSelect, '550e8400-e29b-41d4-a716-446655440000');
-    await user.selectOptions(categorySelect, '660e8400-e29b-41d4-a716-446655440000');
+    await selectProvider(user, 'VentraIP');
+    await selectCategory(user, 'Software');
 
     const submitButton = screen.getByRole('button', { name: 'Save expense' });
     await user.click(submitButton);
@@ -102,10 +126,9 @@ describe('ExpenseForm', () => {
     render(<ExpenseForm providers={mockProviders} categories={mockCategories} />);
 
     const amountInput = screen.getByLabelText('Amount (AUD)');
-    const providerSelect = screen.getByLabelText('Provider');
 
     // Select domestic provider
-    await user.selectOptions(providerSelect, '550e8400-e29b-41d4-a716-446655440000');
+    await selectProvider(user, 'VentraIP');
 
     // Enter amount: $110.00 should result in $10.00 GST (1/11)
     await user.type(amountInput, '110');
@@ -130,10 +153,9 @@ describe('ExpenseForm', () => {
     render(<ExpenseForm providers={mockProviders} categories={mockCategories} />);
 
     const amountInput = screen.getByLabelText('Amount (AUD)');
-    const providerSelect = screen.getByLabelText('Provider');
 
     // Select international provider (GitHub)
-    await user.selectOptions(providerSelect, '660e8400-e29b-41d4-a716-446655440001');
+    await selectProvider(user, 'GitHub');
 
     // Enter amount
     await user.type(amountInput, '100');
@@ -158,10 +180,9 @@ describe('ExpenseForm', () => {
     render(<ExpenseForm providers={mockProviders} categories={mockCategories} />);
 
     const amountInput = screen.getByLabelText('Amount (AUD)');
-    const providerSelect = screen.getByLabelText('Provider');
 
     // Select domestic provider
-    await user.selectOptions(providerSelect, '550e8400-e29b-41d4-a716-446655440000');
+    await selectProvider(user, 'VentraIP');
 
     // Enter amount: $110.00 = $10.00 GST
     await user.type(amountInput, '110');
