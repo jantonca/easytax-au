@@ -10,6 +10,8 @@ import {
   useCreateExpense,
   useUpdateExpense,
 } from '@/features/expenses/hooks/use-expense-mutations';
+import { ProviderSelect } from './provider-select';
+import { CategorySelect } from './category-select';
 
 interface ExpenseFormProps {
   providers: ProviderDto[];
@@ -34,6 +36,7 @@ export function ExpenseForm({
     formState: { errors, isSubmitting },
     reset,
     watch,
+    setValue,
   } = useForm<ExpenseFormValues>({
     resolver: zodResolver(expenseFormSchema),
     defaultValues: initialValues
@@ -73,6 +76,7 @@ export function ExpenseForm({
   // Watch form values for real-time calculations
   const amount = watch('amount');
   const providerId = watch('providerId');
+  const categoryId = watch('categoryId');
   const bizPercent = watch('bizPercent');
   const gstAmount = watch('gstAmount');
 
@@ -300,21 +304,13 @@ export function ExpenseForm({
           >
             Provider
           </label>
-          <select
-            id="expense-provider"
-            className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
-            {...register('providerId')}
-          >
-            <option value="">Select a provider…</option>
-            {providers.map(({ id, name }) => (
-              <option key={id} value={id}>
-                {name}
-              </option>
-            ))}
-          </select>
-          {errors.providerId && (
-            <p className="text-[11px] text-red-400">{errors.providerId.message}</p>
-          )}
+          <ProviderSelect
+            providers={providers}
+            value={providerId}
+            onChange={(id) => setValue('providerId', id, { shouldValidate: true })}
+            error={errors.providerId?.message}
+            disabled={submitting}
+          />
         </div>
 
         <div className="flex flex-col gap-1 text-xs text-slate-700 dark:text-slate-200">
@@ -324,21 +320,13 @@ export function ExpenseForm({
           >
             Category
           </label>
-          <select
-            id="expense-category"
-            className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
-            {...register('categoryId')}
-          >
-            <option value="">Select a category…</option>
-            {categories.map(({ id, name }) => (
-              <option key={id} value={id}>
-                {name}
-              </option>
-            ))}
-          </select>
-          {errors.categoryId && (
-            <p className="text-[11px] text-red-400">{errors.categoryId.message}</p>
-          )}
+          <CategorySelect
+            categories={categories}
+            value={categoryId}
+            onChange={(id) => setValue('categoryId', id, { shouldValidate: true })}
+            error={errors.categoryId?.message}
+            disabled={submitting}
+          />
         </div>
       </div>
 
