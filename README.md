@@ -207,6 +207,8 @@ docker compose up -d --build
 
 ## Features
 
+> All screenshots below showcase the application in dark mode. EasyTax-AU supports Light, Dark, and Auto (system preference) themes.
+
 ### Dashboard
 - **Current BAS Period Summary**: G1 (Total Sales), 1A (GST Collected), 1B (GST Paid), Net GST Payable/Refund
 - **Recent Expenses**: Latest 10 expense entries sorted by date
@@ -265,12 +267,14 @@ docker compose up -d --build
 
 ![Settings](docs/screenshots/settings.png)
 
-### Dark Mode
+### Theme Support
 - **Theme Toggle**: Cycle between Light, Dark, and Auto (system preference)
 - **Persistent Settings**: Theme choice saved to localStorage
 - **Accessible**: Keyboard navigable with proper ARIA labels
 
-![Dark Mode](docs/screenshots/dark-mode.png)
+*Light mode example (all screenshots above show dark mode):*
+
+![Light Mode](docs/screenshots/light-mode.png)
 
 ---
 

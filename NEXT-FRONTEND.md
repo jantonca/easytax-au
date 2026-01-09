@@ -1,12 +1,12 @@
 # NEXT: Frontend Remaining Work
 
-**Status:** 94% Complete (95/101 tasks)
+**Status:** 95% Complete (96/101 tasks)
 
-**Purpose:** Track the final 6 tasks to reach 100% frontend completion.
+**Purpose:** Track the final 5 tasks to reach 100% frontend completion.
 
 ---
 
-## Remaining Tasks (6)
+## Remaining Tasks (5)
 
 ### Optional Enhancements (Deferred)
 
@@ -57,11 +57,11 @@ These tasks are explicitly deferred to [FUTURE-ENHANCEMENTS.md](FUTURE-ENHANCEME
 - API proxy configuration
 - Traefik integration for HTTPS
 
-### ✅ Documentation (89%)
+### ✅ Documentation (100%)
 - README with setup instructions
 - Environment variables documented
 - Keyboard shortcuts documented
-- Screenshot placeholders created (actual screenshots pending)
+- Screenshots captured (8 screenshots: 7 dark mode, 1 light mode)
 
 ---
 
@@ -69,18 +69,13 @@ These tasks are explicitly deferred to [FUTURE-ENHANCEMENTS.md](FUTURE-ENHANCEME
 
 If you want to reach 100%:
 
-1. **Take Screenshots** (F4.2.3)
-   - Follow guide in `docs/screenshots/README.md`
-   - Capture 8 screenshots: dashboard, expenses, incomes, BAS report, FY report, recurring, settings, dark mode
-   - Place in `docs/screenshots/` directory
-
-2. **Screen Reader Testing** (F3.4.3)
+1. **Screen Reader Testing** (F3.4.3)
    - Test with VoiceOver (macOS) or NVDA (Windows)
    - Verify all ARIA labels are meaningful
    - Ensure form validation errors are announced
    - Document any issues in GitHub issues
 
-3. **Inline Editing** (F2.2.11)
+2. **Inline Editing** (F2.2.11)
    - Implement double-click to edit in expenses/incomes tables
    - Add inline validation
    - Optimistic UI updates
@@ -119,8 +114,8 @@ The frontend is **production ready** when:
 
 **Current Status:** ✅ **PRODUCTION READY**
 
-The remaining 6 tasks are nice-to-have polish items that do not block daily use.
+The remaining 5 tasks are nice-to-have polish items that do not block daily use.
 
 ---
 
-**Last Updated:** 2026-01-09
+**Last Updated:** 2026-01-09 (F4.2.3 Screenshots completed)
