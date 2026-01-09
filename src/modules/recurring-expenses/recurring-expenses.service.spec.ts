@@ -603,6 +603,44 @@ describe('RecurringExpensesService', () => {
     });
   });
 
+  // ==================== FIND ALL ACTIVE TESTS ====================
+  describe('findAllActive', () => {
+    it('should return all active recurring expenses sorted by nextDueDate', async () => {
+      const mockExpense1 = {
+        ...mockRecurringExpense,
+        id: 'id-1',
+        nextDueDate: new Date('2025-08-01'),
+      };
+      const mockExpense2 = {
+        ...mockRecurringExpense,
+        id: 'id-2',
+        nextDueDate: new Date('2025-07-15'),
+      };
+
+      recurringExpenseRepository.find.mockResolvedValue([
+        mockExpense1 as RecurringExpense,
+        mockExpense2 as RecurringExpense,
+      ]);
+
+      const result = await service.findAllActive();
+
+      expect(result).toHaveLength(2);
+      expect(recurringExpenseRepository.find).toHaveBeenCalledWith({
+        where: { isActive: true },
+        relations: ['provider', 'category'],
+        order: { nextDueDate: 'ASC' },
+      });
+    });
+
+    it('should return empty array if no active recurring expenses', async () => {
+      recurringExpenseRepository.find.mockResolvedValue([]);
+
+      const result = await service.findAllActive();
+
+      expect(result).toHaveLength(0);
+    });
+  });
+
   // ==================== TO RESPONSE DTO TESTS ====================
   describe('toResponseDto', () => {
     it('should convert entity to response DTO', () => {

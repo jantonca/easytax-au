@@ -327,6 +327,22 @@ export class RecurringExpensesService {
   }
 
   /**
+   * Finds all active recurring expenses, sorted by next due date.
+   *
+   * Used by dashboard to display upcoming recurring expenses,
+   * regardless of whether they are due for generation.
+   *
+   * @returns Array of active recurring expenses ordered by nextDueDate
+   */
+  async findAllActive(): Promise<RecurringExpense[]> {
+    return this.recurringExpenseRepository.find({
+      where: { isActive: true },
+      relations: ['provider', 'category'],
+      order: { nextDueDate: 'ASC' },
+    });
+  }
+
+  /**
    * Calculates the next due date based on schedule.
    *
    * @param startDate - When the recurring expense starts

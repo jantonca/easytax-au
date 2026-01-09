@@ -81,4 +81,92 @@ describe('DashboardPage', () => {
     expect(addExpenseLink).toHaveAttribute('href', '/expenses');
     expect(addIncomeLink).toHaveAttribute('href', '/incomes');
   });
+
+  it('displays upcoming recurring expenses sorted by nextDueDate', () => {
+    const upcomingRecurring: RecurringExpenseResponseDto[] = [
+      {
+        id: 'recurring-1',
+        name: 'iinet Internet',
+        amountCents: 8999,
+        gstCents: 818,
+        bizPercent: 100,
+        currency: 'AUD',
+        schedule: 'monthly',
+        dayOfMonth: 15,
+        startDate: '2025-07-01',
+        endDate: null,
+        isActive: true,
+        lastGeneratedDate: null,
+        nextDueDate: '2026-01-15',
+        providerId: 'provider-1',
+        providerName: 'iinet',
+        categoryId: 'category-1',
+        categoryName: 'Internet',
+      },
+      {
+        id: 'recurring-2',
+        name: 'GitHub Pro',
+        amountCents: 9900,
+        gstCents: 0,
+        bizPercent: 100,
+        currency: 'AUD',
+        schedule: 'yearly',
+        dayOfMonth: 1,
+        startDate: '2025-07-01',
+        endDate: null,
+        isActive: true,
+        lastGeneratedDate: null,
+        nextDueDate: '2026-02-01',
+        providerId: 'provider-2',
+        providerName: 'GitHub',
+        categoryId: 'category-2',
+        categoryName: 'Software',
+      },
+    ];
+
+    mockedUseDashboardData.mockReturnValue({
+      bas: undefined,
+      basLoading: false,
+      basError: null,
+      recentExpenses: [],
+      recentExpensesLoading: false,
+      recentExpensesError: null,
+      dueRecurring: upcomingRecurring,
+      dueRecurringLoading: false,
+      dueRecurringError: null,
+    });
+
+    render(
+      <MemoryRouter>
+        <DashboardPage />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText('iinet Internet')).toBeInTheDocument();
+    expect(screen.getByText('GitHub Pro')).toBeInTheDocument();
+    expect(screen.getByText('Next due: 2026-01-15')).toBeInTheDocument();
+    expect(screen.getByText('Next due: 2026-02-01')).toBeInTheDocument();
+  });
+
+  it('shows message when no recurring expenses are active', () => {
+    mockedUseDashboardData.mockReturnValue({
+      bas: undefined,
+      basLoading: false,
+      basError: null,
+      recentExpenses: [],
+      recentExpensesLoading: false,
+      recentExpensesError: null,
+      dueRecurring: [],
+      dueRecurringLoading: false,
+      dueRecurringError: null,
+    });
+
+    render(
+      <MemoryRouter>
+        <DashboardPage />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText('No recurring expenses due soon.')).toBeInTheDocument();
+  });
 });

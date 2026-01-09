@@ -139,11 +139,12 @@ The web dashboard in `web/src/features/dashboard` provides a high-level BAS over
   - Uses `getFYInfo(new Date())` to determine the active BAS quarter and financial year.
   - Fetches the BAS summary (`BasSummaryDto`) for that period.
   - Loads recent expenses (`ExpenseResponseDto[]`), sorted newest-first and limited to the latest 10.
-  - Loads due recurring expenses (`RecurringExpenseResponseDto[]`) as of “today”.
+  - Loads active recurring expenses (`RecurringExpenseResponseDto[]`) sorted by `nextDueDate`.
 - Typed API helpers in `web/src/lib/api-client.ts` wrap the shared OpenAPI types:
   - `getBasSummary(quarter, year)`
   - `getRecentExpenses()`
-  - `getDueRecurringExpenses(asOfDate?)`
+  - `getActiveRecurringExpenses()` – Returns all active recurring expenses sorted by next due date
+  - `getDueRecurringExpenses(asOfDate?)` – Returns only expenses due for auto-generation
 - `DashboardPage` composes:
   - GST summary cards for G1, 1A, 1B and Net GST.
   - A “Recent expenses” list with loading/empty/data states.
@@ -381,6 +382,7 @@ features/recurring/
   - Modal-based create/edit forms
   - Delete confirmation with warning about income references
 - **Module structure:** All three settings modules follow the established feature pattern:
+
   ```
   features/settings/providers/
   ├── providers-page.tsx          # Main CRUD page with modals
@@ -415,6 +417,7 @@ features/recurring/
   features/settings/components/
   └── settings-tabs.tsx           # Shared tab navigation
   ```
+
 - **Shared query hooks:** All three modules reuse existing shared hooks from `web/src/hooks/` for data fetching (`useProviders`, `useCategories`, `useClients`) rather than duplicating them
 - **Type safety:** All DTOs imported from `@shared/types` OpenAPI schema. Update mutations use `Partial<CreateDto>` pattern since backend Update DTOs are defined as `Record<string, never>` in the OpenAPI schema
 
@@ -995,15 +998,16 @@ The Recurring Expenses feature automates repetitive expense entries.
 
 ### API Endpoints
 
-| Method | Endpoint                       | Description                          |
-| ------ | ------------------------------ | ------------------------------------ |
-| POST   | `/recurring-expenses`          | Create recurring expense template    |
-| GET    | `/recurring-expenses`          | List all templates                   |
-| GET    | `/recurring-expenses/due`      | List templates due for generation    |
-| GET    | `/recurring-expenses/:id`      | Get single template                  |
-| PATCH  | `/recurring-expenses/:id`      | Update template                      |
-| DELETE | `/recurring-expenses/:id`      | Delete template                      |
-| POST   | `/recurring-expenses/generate` | Generate expenses from due templates |
+| Method | Endpoint                       | Description                           |
+| ------ | ------------------------------ | ------------------------------------- |
+| POST   | `/recurring-expenses`          | Create recurring expense template     |
+| GET    | `/recurring-expenses`          | List all templates                    |
+| GET    | `/recurring-expenses/active`   | List active templates (for dashboard) |
+| GET    | `/recurring-expenses/due`      | List templates due for generation     |
+| GET    | `/recurring-expenses/:id`      | Get single template                   |
+| PATCH  | `/recurring-expenses/:id`      | Update template                       |
+| DELETE | `/recurring-expenses/:id`      | Delete template                       |
+| POST   | `/recurring-expenses/generate` | Generate expenses from due templates  |
 
 ### Schedule Types
 

@@ -182,6 +182,10 @@ export async function getRecentExpenses(): Promise<ExpenseResponseDto[]> {
   return [...expenses].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 10);
 }
 
+export async function getActiveRecurringExpenses(): Promise<RecurringExpenseResponseDto[]> {
+  return apiClient.get<RecurringExpenseResponseDto[]>('/recurring-expenses/active');
+}
+
 export async function getDueRecurringExpenses(
   asOfDate?: string,
 ): Promise<RecurringExpenseResponseDto[]> {

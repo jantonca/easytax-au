@@ -73,6 +73,22 @@ export class RecurringExpensesController {
   }
 
   /**
+   * Retrieves all active recurring expenses, sorted by next due date.
+   * Used by dashboard to display upcoming recurring expenses.
+   */
+  @Get('active')
+  @ApiOperation({ summary: 'Get all active recurring expenses for dashboard' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of active recurring expenses sorted by next due date',
+    type: [RecurringExpenseResponseDto],
+  })
+  async findAllActive(): Promise<RecurringExpenseResponseDto[]> {
+    const entities = await this.recurringExpensesService.findAllActive();
+    return entities.map((e) => this.recurringExpensesService.toResponseDto(e));
+  }
+
+  /**
    * Retrieves recurring expense templates that are due for generation.
    */
   @Get('due')

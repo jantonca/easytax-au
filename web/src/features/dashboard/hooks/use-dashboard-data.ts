@@ -4,7 +4,7 @@ import type {
   ExpenseResponseDto,
   RecurringExpenseResponseDto,
 } from '@/lib/api-client';
-import { getBasSummary, getDueRecurringExpenses, getRecentExpenses } from '@/lib/api-client';
+import { getBasSummary, getActiveRecurringExpenses, getRecentExpenses } from '@/lib/api-client';
 import { getFYInfo } from '@/lib/fy';
 
 export interface DashboardData {
@@ -52,8 +52,8 @@ export function useDashboardData(date: Date = new Date()): DashboardData {
     isLoading: dueRecurringLoading,
     error: dueRecurringError,
   } = useQuery<RecurringExpenseResponseDto[]>({
-    queryKey: ['dashboard', 'due-recurring-expenses'],
-    queryFn: () => getDueRecurringExpenses(),
+    queryKey: ['dashboard', 'active-recurring-expenses'],
+    queryFn: () => getActiveRecurringExpenses(),
   });
 
   return {

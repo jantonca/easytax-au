@@ -62,6 +62,7 @@ describe('RecurringExpensesController', () => {
       remove: jest.fn(),
       generateExpenses: jest.fn(),
       findDue: jest.fn(),
+      findAllActive: jest.fn(),
       toResponseDto: jest.fn(),
     };
 
@@ -145,6 +146,28 @@ describe('RecurringExpensesController', () => {
       await controller.findDue('2025-07-20');
 
       expect(service.findDue).toHaveBeenCalledWith(new Date('2025-07-20'));
+    });
+  });
+
+  // ==================== FIND ALL ACTIVE TESTS ====================
+  describe('findAllActive', () => {
+    it('should return all active recurring expenses', async () => {
+      service.findAllActive.mockResolvedValue([mockRecurringExpense as RecurringExpense]);
+      service.toResponseDto.mockReturnValue(mockResponseDto);
+
+      const result = await controller.findAllActive();
+
+      expect(result).toHaveLength(1);
+      expect(service.findAllActive).toHaveBeenCalled();
+      expect(service.toResponseDto).toHaveBeenCalledWith(mockRecurringExpense);
+    });
+
+    it('should return empty array if no active recurring expenses', async () => {
+      service.findAllActive.mockResolvedValue([]);
+
+      const result = await controller.findAllActive();
+
+      expect(result).toHaveLength(0);
     });
   });
 
