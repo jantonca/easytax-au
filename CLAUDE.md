@@ -41,17 +41,20 @@ Use these via the `Bash` tool. Preferred aliases:
 ## 📚 Documentation Structure (Tiered for AI Efficiency)
 
 **⭐ PRIORITY FILES (Read First):**
+
 - `NEXT-FRONTEND.md`: Final 6% of frontend work (active backlog)
 - `docs/core/ATO-LOGIC.md`: **CRITICAL** - Australian tax rules (prevents US tax hallucinations)
 - `.github/copilot-instructions.md`: Detailed UI/UX and Collaboration protocol
 
 **🏗 CORE DOCUMENTATION (Reference as Needed):**
+
 - `docs/core/ARCHITECTURE.md`: System design and tech stack
 - `docs/core/SCHEMA.md`: Database structure and entity relationships
 - `docs/core/SECURITY.md`: Encryption, key management, security protocols
 - `docs/core/BACKUP.md`: Infrastructure and backup procedures
 
 **📦 ARCHIVE (Historical - Ignore Unless Explicitly Asked):**
+
 - `docs/archive/TASKS-DONE.md`: Completed backend tasks (95% done)
 - `docs/archive/TASKS-FRONTEND.md`: Completed frontend tasks (94% done)
 - `docs/archive/ROADMAP-DONE.md`: Historical progress tracking
@@ -60,7 +63,22 @@ Use these via the `Bash` tool. Preferred aliases:
 - `docs/archive/CHANGELOG-*.md`: Historical change logs
 
 **⚠️ IMPORTANT RULES:**
+
 1. **Always check `docs/core/ATO-LOGIC.md`** before implementing tax/GST/BAS calculations
 2. **Never use US tax terminology** (IRS, sales tax, W-2, Form 1040, April 15)
 3. **Never assume calendar year** - Australian FY is July 1 - June 30
 4. **Focus on `NEXT-FRONTEND.md`** - ignore completed tasks in `docs/archive/`
+
+## 🎯 Common Prompts
+
+### For Discovery
+
+"Review NEXT-FRONTEND.md. Recommend the next task and justify the priority."
+
+### For Complex Features
+
+"I need to implement [X]. Use EnterPlanMode to propose an approach that considers SCHEMA.md and ATO-LOGIC.md."
+
+### For Debugging
+
+"Investigate why [X] fails. Check SCHEMA.md for data assumptions before proposing a fix."

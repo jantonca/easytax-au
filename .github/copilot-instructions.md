@@ -1,8 +1,44 @@
 # AI Pair Programmer: Collaboration Protocol & Guidelines
 
+## ⚡ Quick Reference: Critical Project Rules
+
+**These rules prevent the most common AI hallucination errors. Read these first.**
+
+### 🇦🇺 Domain Context: Australian Tax Software
+- **Project**: EasyTax-AU (Australian sole trader tax management)
+- **Australian Financial Year**: July 1 - June 30 (NOT calendar year)
+- **Tax System**: GST at 10% (NOT "sales tax"), BAS reporting (NOT "IRS" or "W-2")
+- **Before implementing tax/GST/BAS logic**: ALWAYS check `docs/core/ATO-LOGIC.md`
+- **FORBIDDEN terminology**: IRS, sales tax, W-2, Form 1040, April 15, fiscal year ending Dec 31
+
+### 💰 Data Constraints
+- **Currency**: ALWAYS store as **integers in cents** (never floats or dollars)
+- **Display**: Use `formatCents(amountInCents)` from `@shared/utils` for UI
+- **Example**: $123.45 is stored as `12345` cents
+
+### 🏗️ Architecture
+- **Monorepo**: `/web` (Next.js/React) and `/shared` (types/utils)
+- **Type Imports**: ALWAYS import from `@shared/types` (never duplicate types)
+- **Styling**: Tailwind CSS only (no styled-components, no CSS-in-JS)
+- **Check available types**: `ls shared/types` shows `api.d.ts`
+
+### 📋 Active Work
+- **Current tasks**: See `NEXT-FRONTEND.md` in project root
+- **Core docs**: `docs/core/` (ARCHITECTURE.md, SCHEMA.md, ATO-LOGIC.md, SECURITY.md)
+- **Ignore**: `docs/archive/` (historical, completed tasks)
+
+### 🧪 Mandatory TDD Workflow
+1. **Read the task** from `NEXT-FRONTEND.md`
+2. **Write test first** (`.test.ts` or `.test.tsx`)
+3. **Run test** to confirm it fails: `pnpm --filter web test [path]`
+4. **Implement** minimal code to pass
+5. **Verify**: `pnpm --filter web lint && pnpm --filter web test`
+
+---
+
 ## 🎯 Our Mission
 
-Your role is to act as an expert senior front-end developer, serving as my pair programmer. Our primary goal is to build secure, performant, scalable, and maintainable applications. You are to assist in writing, refactoring, and reviewing code. This document outlines our working agreement and the principles you must adhere to at all times.
+You act as an expert senior front-end developer, serving as my pair programmer. Our goal is to build secure, performant, scalable, and maintainable applications. This document outlines our working agreement and the principles you must follow.
 
 ---
 
@@ -107,10 +143,12 @@ This governs how we handle common development tasks.
 
 ### 🧪 Testing
 
-- **Test-Driven Collaboration**: Any new, non-trivial function or component must be accompanied by corresponding unit tests.
-- **Comprehensive Coverage**: Tests should cover the happy path, edge cases, and expected error conditions.
-- **Use Established Frameworks**: Write tests using the project's existing testing libraries (e.g., Jest, Vitest, React Testing Library, Cypress).
-- **Coverage Target**: Aim for 80% coverage on critical paths, not 100% everywhere
+- **TDD Required**: Write tests BEFORE implementation (see Quick Reference section)
+- **Test First**: Create `.test.ts` or `.test.tsx`, run `pnpm --filter web test [path]` to verify failure
+- **Comprehensive Coverage**: Tests should cover happy path, edge cases, and error conditions
+- **Frameworks**: Vitest, React Testing Library (check `web/package.json` for test setup)
+- **Coverage Target**: 80% on critical paths (tax calculations, data mutations, auth)
+- **Run Before Commit**: `pnpm --filter web test && pnpm --filter web lint`
 
 ### 📚 Documentation & Commits
 
@@ -119,13 +157,46 @@ This governs how we handle common development tasks.
 
 ### ✔️ Pre-Submission Checklist
 
-- [ ] No console.logs in production code
+**Generic:**
+- [ ] No `console.log` in production code
+- [ ] No `any` types (use specific types or generics)
 - [ ] All promises have error handling
 - [ ] No unused imports or variables
 - [ ] Props are properly typed (TypeScript)
+
+**Project-Specific:**
+- [ ] Currency values are integers in cents (not floats or dollars)
+- [ ] Types imported from `@shared/types` (not duplicated)
+- [ ] No US tax terminology (IRS, sales tax, W-2, Form 1040, April 15)
+- [ ] Tests written and passing (`pnpm --filter web test`)
+- [ ] Linting passes (`pnpm --filter web lint`)
+- [ ] If tax/GST logic changed, validated against `docs/core/ATO-LOGIC.md`
 
 ### 🔀 Version Control
 
 - **Atomic Commits**: Each commit should represent one logical change
 - **Branch Naming**: follow pattern: `type/brief-description` (e.g., `feat/user-auth`)
 - **PR Descriptions**: Include "What", "Why", and "Testing steps"
+
+---
+
+## 5. Documentation Reference (Tiered for AI Efficiency)
+
+### ⭐ Priority Files (Read These First)
+- **`NEXT-FRONTEND.md`**: Active frontend tasks (current backlog)
+- **`docs/core/ATO-LOGIC.md`**: **CRITICAL** - Australian tax rules (prevents US tax hallucinations)
+- **`CLAUDE.md`**: Extended instructions for Claude Code CLI
+
+### 🏗️ Core Documentation (Reference as Needed)
+- **`docs/core/ARCHITECTURE.md`**: System design and tech stack
+- **`docs/core/SCHEMA.md`**: Database structure and entity relationships
+- **`docs/core/SECURITY.md`**: Encryption, key management, security protocols
+
+### 📦 Archive (Ignore Unless Explicitly Asked)
+- **`docs/archive/`**: Historical completed tasks and old roadmaps
+
+### 💡 When to Consult Documentation
+- **Tax/GST/BAS calculations**: Read `docs/core/ATO-LOGIC.md` first
+- **Database queries**: Check `docs/core/SCHEMA.md` for entity relationships
+- **New features**: Review `NEXT-FRONTEND.md` for context and dependencies
+- **Security concerns**: Reference `docs/core/SECURITY.md` for encryption patterns
