@@ -333,12 +333,32 @@ EasyTax-AU is fully keyboard accessible. All features can be used without a mous
 
 ## Documentation
 
-| Document                           | Purpose                              |
-| ---------------------------------- | ------------------------------------ |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Tech stack, module design, ATO logic |
-| [SCHEMA.md](SCHEMA.md)             | Database entities & relationships    |
-| [ROADMAP.md](ROADMAP.md)           | MVP scope & development phases       |
-| [TASKS.md](TASKS.md)               | Development checklist                |
-| [SECURITY.md](SECURITY.md)         | Encryption & data sovereignty        |
-| [BACKUP.md](BACKUP.md)             | 3-2-1 backup strategy                |
-| [AGENTS.md](AGENTS.md)             | AI coding guidelines                 |
+Documentation is organized into three tiers for AI efficiency and human clarity.
+
+### ⭐ Active Development
+| Document | Purpose |
+|----------|---------|
+| [NEXT-FRONTEND.md](NEXT-FRONTEND.md) | Final 6% of frontend work (6 tasks remaining) |
+| [CLAUDE.md](CLAUDE.md) | AI agent directives and workflow |
+| [AGENTS.md](AGENTS.md) | AI coding guidelines and best practices |
+
+### 🏗 Core Documentation (Technical Reference)
+| Document | Purpose |
+|----------|---------|
+| [docs/core/ATO-LOGIC.md](docs/core/ATO-LOGIC.md) | **CRITICAL** - Australian tax rules, GST calculations, BAS labels |
+| [docs/core/ARCHITECTURE.md](docs/core/ARCHITECTURE.md) | Tech stack, module design, frontend/backend structure |
+| [docs/core/SCHEMA.md](docs/core/SCHEMA.md) | Database entities, relationships, and encryption |
+| [docs/core/SECURITY.md](docs/core/SECURITY.md) | AES-256-GCM encryption, key management, data sovereignty |
+| [docs/core/BACKUP.md](docs/core/BACKUP.md) | 3-2-1 backup strategy and recovery procedures |
+
+### 📦 Archive (Historical - Completed Work)
+| Document | Purpose |
+|----------|---------|
+| [docs/archive/TASKS-DONE.md](docs/archive/TASKS-DONE.md) | Backend development checklist (95% complete) |
+| [docs/archive/TASKS-FRONTEND.md](docs/archive/TASKS-FRONTEND.md) | Frontend development checklist (94% complete) |
+| [docs/archive/ROADMAP-DONE.md](docs/archive/ROADMAP-DONE.md) | Historical MVP scope and development phases |
+| [docs/archive/BACKLOG.md](docs/archive/BACKLOG.md) | Old feature ideas and brainstorming |
+| [docs/archive/FUTURE-ENHANCEMENTS.md](docs/archive/FUTURE-ENHANCEMENTS.md) | Deferred features (inline editing, screen reader testing) |
+| [docs/archive/CHANGELOG-*.md](docs/archive/) | Historical change logs |
+
+**Note:** The tiered structure reduces AI context bloat by ~80%, focusing agents on active work in `NEXT-FRONTEND.md` and critical tax logic in `docs/core/ATO-LOGIC.md`.

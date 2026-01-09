@@ -13,7 +13,7 @@ You act as an expert senior front-end developer. You must follow the **Collabora
 
 ## 🛠 Mandatory Workflow (TDD)
 
-1. **Planning (Opus):** Analyze `TASKS-FRONTEND.md` and `.github/copilot-instructions.md` to define the sub-task.
+1. **Planning (Opus):** Analyze `NEXT-FRONTEND.md` and `.github/copilot-instructions.md` to define the sub-task.
 2. **Test First (Sonnet):** Create/update `.test.ts/tsx` before implementation.
    - Run `pnpm --filter web test [path]` to verify failure.
 3. **Implementation:** Write minimal code to pass tests. Follow **Security First** and **A11y** principles.
@@ -38,8 +38,29 @@ Use these via the `Bash` tool. Preferred aliases:
 - **Accessibility:** Mandatory ARIA labels and semantic HTML.
 - **Security:** Sanitize all inputs; no hardcoded secrets.
 
-## 📚 Key Context Files
+## 📚 Documentation Structure (Tiered for AI Efficiency)
 
-- `.github/copilot-instructions.md`: Detailed UI/UX and Collaboration protocol.
-- `ARCHITECTURE.md`: High-level design.
-- `TASKS-FRONTEND.md`: Current backlog.
+**⭐ PRIORITY FILES (Read First):**
+- `NEXT-FRONTEND.md`: Final 6% of frontend work (active backlog)
+- `docs/core/ATO-LOGIC.md`: **CRITICAL** - Australian tax rules (prevents US tax hallucinations)
+- `.github/copilot-instructions.md`: Detailed UI/UX and Collaboration protocol
+
+**🏗 CORE DOCUMENTATION (Reference as Needed):**
+- `docs/core/ARCHITECTURE.md`: System design and tech stack
+- `docs/core/SCHEMA.md`: Database structure and entity relationships
+- `docs/core/SECURITY.md`: Encryption, key management, security protocols
+- `docs/core/BACKUP.md`: Infrastructure and backup procedures
+
+**📦 ARCHIVE (Historical - Ignore Unless Explicitly Asked):**
+- `docs/archive/TASKS-DONE.md`: Completed backend tasks (95% done)
+- `docs/archive/TASKS-FRONTEND.md`: Completed frontend tasks (94% done)
+- `docs/archive/ROADMAP-DONE.md`: Historical progress tracking
+- `docs/archive/BACKLOG.md`: Old feature ideas
+- `docs/archive/FUTURE-ENHANCEMENTS.md`: Deferred features
+- `docs/archive/CHANGELOG-*.md`: Historical change logs
+
+**⚠️ IMPORTANT RULES:**
+1. **Always check `docs/core/ATO-LOGIC.md`** before implementing tax/GST/BAS calculations
+2. **Never use US tax terminology** (IRS, sales tax, W-2, Form 1040, April 15)
+3. **Never assume calendar year** - Australian FY is July 1 - June 30
+4. **Focus on `NEXT-FRONTEND.md`** - ignore completed tasks in `docs/archive/`
