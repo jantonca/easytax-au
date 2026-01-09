@@ -40,6 +40,7 @@
 **Context:** Auto-dismiss implemented in commit `ca6324b`
 
 **Features:**
+
 - [ ] **Progress bar** showing time until auto-dismiss
   - Thin bar at bottom of toast that drains over duration
   - Visual indicator of remaining time
@@ -51,15 +52,13 @@
 - [ ] **Toast stacking limit** (max 5 visible)
   - Auto-dismiss oldest when limit exceeded
   - Prevent UI clutter during bulk operations
-- [ ] **Sound effects** for accessibility (optional)
-  - Optional audio cue for toast appearance
-  - Configurable in settings
 - [ ] **Undo action** for destructive toasts
   - "Expense deleted. [Undo]" button
   - 8-second window to restore
   - Keep deleted item in memory for duration, then commit
 
 **Technical Notes:**
+
 - Current implementation: `web/src/components/ui/toast-provider.tsx`
 - Auto-dismiss durations: success (4s), default (5s), error (8s)
 
@@ -72,11 +71,13 @@
 **Context:** Base skeletons implemented in F3.4.6
 
 **Current State:**
+
 - ✅ TableSkeleton with configurable columns/rows
 - ✅ CardSkeleton for dashboard summaries
 - ✅ Integrated across all data-fetching pages
 
 **Future Improvements:**
+
 - [ ] Content-aware skeletons that match actual content layout more closely
 - [ ] Shimmer effect instead of pulse animation (more modern)
 - [ ] Skeleton variants for forms and modals
@@ -93,6 +94,7 @@
 Add keyboard shortcuts beyond basic navigation for power users.
 
 **Proposed Shortcuts:**
+
 - [ ] `Cmd/Ctrl + N` - New expense
 - [ ] `Cmd/Ctrl + Shift + N` - New income
 - [ ] `Cmd/Ctrl + I` - Import CSV
@@ -103,12 +105,14 @@ Add keyboard shortcuts beyond basic navigation for power users.
 - [ ] `Cmd/Ctrl + S` - Save form (in modals)
 
 **Technical Notes:**
+
 - Use `mousetrap` or native `keydown` event listeners
 - Show shortcuts in tooltips
 - Add shortcuts overlay (triggered by `Cmd/Ctrl + /`)
 - Respect OS conventions (Cmd on Mac, Ctrl on Windows/Linux)
 
 **Implementation:**
+
 - Current: `web/src/hooks/use-keyboard-shortcuts.ts` (⌘K only)
 - Expand to global shortcut registry
 
@@ -120,6 +124,7 @@ Add keyboard shortcuts beyond basic navigation for power users.
 **Estimated Effort:** 4-6 hours
 
 **Enhancements:**
+
 - [ ] **Hover states** for table rows (subtle background change)
 - [ ] **Success animations** (checkmark, confetti on major actions)
 - [ ] **Form field focus animations** (smooth transitions)
@@ -129,6 +134,7 @@ Add keyboard shortcuts beyond basic navigation for power users.
 - [ ] **Smooth scroll** to validation errors in forms
 
 **Technical Notes:**
+
 - Use Framer Motion or CSS animations
 - Keep animations subtle (< 300ms)
 - Respect `prefers-reduced-motion` for accessibility
@@ -148,12 +154,14 @@ Edit expense/income fields directly in the table without opening modal.
 
 **Rationale for Deferral:**
 Modal-based editing provides full CRUD functionality with simpler implementation. Inline editing requires:
+
 - Field-level validation
 - Conflict resolution (if data changed by another operation)
 - Complex UX patterns (click to edit, save/cancel controls)
 - Not essential for MVP (current modal workflow is functional)
 
 **If Implemented:**
+
 - [ ] Click cell to edit (text fields, dropdowns)
 - [ ] Tab navigation between fields
 - [ ] Auto-save on blur or Enter
@@ -162,6 +170,7 @@ Modal-based editing provides full CRUD functionality with simpler implementation
 - [ ] Optimistic updates with rollback
 
 **Files to Modify:**
+
 - `web/src/features/expenses/components/expenses-table.tsx`
 - `web/src/features/incomes/components/incomes-table.tsx`
 
@@ -176,6 +185,7 @@ Modal-based editing provides full CRUD functionality with simpler implementation
 Allow selecting multiple rows for batch operations.
 
 **Features:**
+
 - [ ] Multi-select checkboxes in expense/income tables
 - [ ] Bulk delete with confirmation
   - "Delete 5 selected expenses?"
@@ -185,6 +195,7 @@ Allow selecting multiple rows for batch operations.
 - [ ] "Select all" / "Select none" / "Invert selection"
 
 **Technical Notes:**
+
 - TanStack Table supports row selection out of the box
 - Use Shift+Click for range selection
 - Show selected count in toolbar
@@ -201,6 +212,7 @@ Allow selecting multiple rows for batch operations.
 Provide downloadable CSV templates with example data.
 
 **Templates:**
+
 - [ ] Expense import template (CommBank format)
 - [ ] Expense import template (Generic format)
 - [ ] Income import template
@@ -208,6 +220,7 @@ Provide downloadable CSV templates with example data.
 - [ ] Client bulk import template
 
 **Technical Notes:**
+
 - Generate client-side (no backend needed)
 - Use `js-file-download` or Blob API
 - Include header row + 2-3 example rows
@@ -228,6 +241,7 @@ Provide downloadable CSV templates with example data.
 Manual testing with assistive technology to ensure full accessibility compliance.
 
 **Testing Checklist:**
+
 - [ ] Test with NVDA (Windows) or JAWS
 - [ ] Test with VoiceOver (macOS)
 - [ ] All forms navigable and understandable
@@ -238,6 +252,7 @@ Manual testing with assistive technology to ensure full accessibility compliance
 - [ ] Document findings and fix issues
 
 **Current Accessibility Status:**
+
 - ✅ Keyboard navigation implemented (F3.4.1)
 - ✅ Focus-visible styles (F3.4.2)
 - ✅ Skip links (F3.4.4)
@@ -246,11 +261,13 @@ Manual testing with assistive technology to ensure full accessibility compliance
 - ✅ Semantic HTML throughout
 
 **Known Issues to Validate:**
+
 - Error messages may need `aria-describedby` association
 - Custom combobox pattern (provider/category dropdowns) needs validation
 - Table pagination ARIA may need refinement
 
 **When to Implement:**
+
 - Before public release or multi-user deployment
 - If application will be used by visually impaired users
 - For compliance with accessibility regulations (WCAG 2.1 AA)
@@ -266,6 +283,7 @@ Manual testing with assistive technology to ensure full accessibility compliance
 Error messages are displayed visually but not associated via `aria-describedby` (noted in TASKS-FRONTEND.md line 1009).
 
 **Enhancement:**
+
 ```typescript
 // Add to all forms
 <input
@@ -281,6 +299,7 @@ Error messages are displayed visually but not associated via `aria-describedby` 
 ```
 
 **Files to Update:**
+
 - `web/src/features/expenses/components/expense-form.tsx`
 - `web/src/features/incomes/components/income-form.tsx`
 - `web/src/features/recurring/components/recurring-form.tsx`
@@ -299,6 +318,7 @@ Error messages are displayed visually but not associated via `aria-describedby` 
 Enhanced dashboard with charts and insights beyond current GST summary.
 
 **Features:**
+
 - [ ] **Expense trends chart** (line chart, last 6 months)
 - [ ] **Category breakdown** (pie chart)
 - [ ] **Top 5 providers** by spend
@@ -308,6 +328,7 @@ Enhanced dashboard with charts and insights beyond current GST summary.
 - [ ] **Year-over-year comparison**
 
 **Technical Notes:**
+
 - Use lightweight charting library (Recharts ~15KB or Chart.js ~60KB)
 - Calculate insights client-side from existing data
 - Consider backend aggregation endpoints for performance
@@ -326,6 +347,7 @@ Enhanced dashboard with charts and insights beyond current GST summary.
 Attach receipt/invoice images to expenses and incomes.
 
 **Features:**
+
 - [ ] Upload button in expense/income forms
 - [ ] Image preview in form
 - [ ] Drag-and-drop upload
@@ -336,12 +358,14 @@ Attach receipt/invoice images to expenses and incomes.
 - [ ] Thumbnail gallery for multiple images
 
 **Technical Notes:**
+
 - Requires backend storage (S3, local filesystem, or database)
 - Image optimization (compress/resize before upload)
 - Security: Validate file types server-side
 - Privacy: Consider encryption for sensitive documents
 
 **Dependencies:**
+
 - Backend API for file uploads
 - Storage solution decision
 
@@ -356,10 +380,12 @@ Attach receipt/invoice images to expenses and incomes.
 More sophisticated filtering beyond current date range and dropdowns.
 
 **Current State:**
+
 - ✅ Client-side filtering by provider, category, date range (expenses)
 - ✅ Client-side filtering by client, paid status, date range (incomes)
 
 **Features:**
+
 - [ ] **Saved filters** (name and persist common filter combinations)
 - [ ] **Multi-select filters** (multiple providers, categories)
 - [ ] **Amount range filter** (min/max)
@@ -368,6 +394,7 @@ More sophisticated filtering beyond current date range and dropdowns.
 - [ ] **Filter builder UI** (add/remove conditions)
 
 **Technical Notes:**
+
 - Store saved filters in localStorage or backend
 - Generate SQL WHERE clauses for server-side filtering
 - Debounce filter inputs to reduce API calls
@@ -384,6 +411,7 @@ More sophisticated filtering beyond current date range and dropdowns.
 Support expenses/incomes in foreign currencies with exchange rate tracking.
 
 **Scope:**
+
 - [ ] Currency field in expense/income forms
 - [ ] Exchange rate lookup (manual or API integration)
 - [ ] Convert to AUD for GST calculations
@@ -392,12 +420,14 @@ Support expenses/incomes in foreign currencies with exchange rate tracking.
 - [ ] Multi-currency BAS/FY reports
 
 **Technical Notes:**
+
 - Requires database schema changes
 - Exchange rate API (free tier: exchangerate-api.com)
 - Store both original and converted amounts
 - Complex GST rules for international transactions
 
 **Dependencies:**
+
 - Backend schema migration
 - Exchange rate data source
 
@@ -412,12 +442,14 @@ Support expenses/incomes in foreign currencies with exchange rate tracking.
 Export data to popular accounting formats (Xero, MYOB, QuickBooks).
 
 **Scope:**
+
 - [ ] Export to Xero format (CSV or API)
 - [ ] Export to MYOB format
 - [ ] Export to QuickBooks format
 - [ ] Custom CSV export with field mapping
 
 **Technical Notes:**
+
 - Research each platform's import requirements
 - Field mapping UI for custom exports
 - OAuth integration for API-based exports (complex)
@@ -433,10 +465,12 @@ Export data to popular accounting formats (Xero, MYOB, QuickBooks).
 **Context:** E2E tests configured locally (F3.5)
 
 **Current State:**
+
 - ✅ 40+ Playwright tests covering critical flows
 - ✅ Local execution with `pnpm --filter web test:e2e`
 
 **Tasks:**
+
 - [ ] Add Playwright to GitHub Actions workflow
 - [ ] Run E2E tests on PR creation
 - [ ] Upload test results and screenshots as artifacts
@@ -454,6 +488,7 @@ Export data to popular accounting formats (Xero, MYOB, QuickBooks).
 **Context:** Currently on React Router v6
 
 **Tasks:**
+
 - [ ] Upgrade to React Router v7
 - [ ] Migrate to new data loading patterns (if applicable)
 - [ ] Update tests
@@ -471,6 +506,7 @@ Wait for React Router v7 stable release and migration guide.
 **Estimated Effort:** Ongoing
 
 **Opportunities:**
+
 - [ ] **Code splitting** by route (partially done with lazy routes)
 - [ ] **Lazy load** heavy components
 - [ ] **Virtual scrolling** for long tables (100+ rows using TanStack Virtual)
@@ -479,6 +515,7 @@ Wait for React Router v7 stable release and migration guide.
 - [ ] **Lighthouse audit** and fixes
 
 **Current State:**
+
 - Frontend bundle: ~100KB gzipped (excellent)
 - React 19 with automatic memoization
 - Vite production build with tree-shaking
@@ -493,12 +530,14 @@ Wait for React Router v7 stable release and migration guide.
 **Estimated Effort:** 2-3 hours per component
 
 **Components to enhance:**
+
 - [ ] **Button variants** (ghost, link, icon-only)
 - [ ] **Badge variants** (outline, subtle)
 - [ ] **Alert variants** (warning, info, tip)
 - [ ] **Card variants** (elevated, bordered, interactive)
 
 **Current State:**
+
 - Basic shadcn/ui components implemented
 - Button has primary/secondary variants
 - File: `web/src/components/ui/button.tsx`
@@ -511,12 +550,14 @@ Wait for React Router v7 stable release and migration guide.
 **Estimated Effort:** 2-3 hours
 
 **Tasks:**
+
 - [ ] Audit all icon usage
 - [ ] Standardize icon sizes (16px, 20px, 24px)
 - [ ] Create icon component wrapper
 - [ ] Document icon conventions
 
 **Current State:**
+
 - Using Lucide React icons
 - Icons imported individually (good for tree-shaking)
 - Sizes vary between components
@@ -531,6 +572,7 @@ Wait for React Router v7 stable release and migration guide.
 **Estimated Effort:** 6-8 hours
 
 **Content:**
+
 - [ ] Getting started guide
 - [ ] CSV import guide with examples
 - [ ] BAS/FY reporting explained
@@ -540,6 +582,7 @@ Wait for React Router v7 stable release and migration guide.
 - [ ] Video tutorials (optional)
 
 **Current State:**
+
 - README has comprehensive setup and feature documentation
 - Screenshots guide created in `docs/screenshots/README.md`
 
@@ -551,6 +594,7 @@ Wait for React Router v7 stable release and migration guide.
 **Estimated Effort:** 3-4 hours
 
 **Content:**
+
 - [ ] Contributing guide (CONTRIBUTING.md)
 - [ ] Code style guide (covered in CLAUDE.md and copilot-instructions.md)
 - [ ] Component architecture patterns (covered in ARCHITECTURE.md)
@@ -568,6 +612,7 @@ Wait for React Router v7 stable release and migration guide.
 **Estimated Effort:** 4-6 hours
 
 **Tasks:**
+
 - [ ] Content Security Policy (CSP) headers
 - [ ] Subresource Integrity (SRI) for CDN assets
 - [ ] Security headers audit (X-Frame-Options, X-Content-Type-Options)
@@ -576,6 +621,7 @@ Wait for React Router v7 stable release and migration guide.
 - [ ] Rate limiting on API calls
 
 **Current State:**
+
 - ✅ AES-256-GCM encryption for sensitive fields
 - ✅ No hardcoded secrets
 - ✅ Input validation with class-validator
@@ -589,12 +635,14 @@ Wait for React Router v7 stable release and migration guide.
 **Estimated Effort:** 3-4 hours
 
 **Tools:**
+
 - [ ] Sentry integration for frontend errors
 - [ ] Error boundary with reporting
 - [ ] Source map upload for production
 - [ ] User context in error reports
 
 **Current State:**
+
 - ✅ App-level error boundary in place
 - ❌ No external error tracking
 
@@ -606,6 +654,7 @@ Wait for React Router v7 stable release and migration guide.
 **Estimated Effort:** 2-3 hours
 
 **Scope:**
+
 - [ ] Self-hosted analytics (Plausible, Umami)
 - [ ] Page view tracking
 - [ ] Feature usage metrics
@@ -621,6 +670,7 @@ Wait for React Router v7 stable release and migration guide.
 **Review Cadence:** Quarterly or based on user feedback
 
 **Process:**
+
 1. Review enhancements quarterly
 2. Promote high-priority items to TASKS-FRONTEND.md when ready to implement
 3. Archive completed items
