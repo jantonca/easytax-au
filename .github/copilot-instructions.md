@@ -15,15 +15,15 @@
 ### 💰 Data Constraints
 
 - **Currency**: ALWAYS store as **integers in cents** (never floats or dollars)
-- **Display**: Use `formatCents(amountInCents)` from `@shared/utils` for UI
+- **Display**: Use `formatCents(amountInCents)` from `@/lib/currency` for UI
 - **Example**: $123.45 is stored as `12345` cents
 
 ### 🏗️ Architecture
 
-- **Monorepo**: `/web` (Next.js/React) and `/shared` (types/utils)
+- **Monorepo**: `/web` (Vite + React) and `/shared` (types only)
 - **Type Imports**: ALWAYS import from `@shared/types` (never duplicate types)
 - **Styling**: Tailwind CSS only (no styled-components, no CSS-in-JS)
-- **Check available types**: `ls shared/types` shows `api.d.ts`
+- **Type imports**: `import type { components } from '@shared/types';` (auto-generated from OpenAPI)
 
 ### 📋 Active Work
 
