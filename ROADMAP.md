@@ -215,13 +215,15 @@ All MVP requirements have been completed as of January 1, 2026.
 
 ---
 
-## Phase 5: Web UI (91% Complete)
+## Phase 5: Web UI (94% Complete)
 
 **Goal:** Build a modern, accessible React frontend for daily use.
 
 **Status:** ✅ **Production Ready** - All core features implemented, Docker deployed, and fully documented.
 
-**See:** [TASKS-FRONTEND.md](./TASKS-FRONTEND.md) for detailed task breakdown.
+**See:**
+- [TASKS-FRONTEND.md](./TASKS-FRONTEND.md) for detailed task breakdown and implementation reference
+- [FUTURE-ENHANCEMENTS.md](./FUTURE-ENHANCEMENTS.md) for optional features and improvements
 
 ### Tech Stack
 
@@ -274,7 +276,7 @@ Goal: Establish a modern React SPA with tooling, styling, and core infrastructur
 ### Completed Frontend Phases
 
 - ✅ **F1 – Project Scaffold (100%):** Vite + React 19 + TypeScript, TanStack Query, React Router, Tailwind CSS 4, Testing infrastructure
-- ✅ **F2 – Core Features (84%):** Dashboard, Expenses CRUD, Incomes CRUD, CSV Import, Settings (Providers/Categories/Clients management)
+- ✅ **F2 – Core Features (91%):** Dashboard, Expenses CRUD, Incomes CRUD, CSV Import, Settings, Searchable Dropdowns
 - ✅ **F3 – Reports & Polish (92%):** BAS Reports, FY Reports, Recurring Expenses, Accessibility (keyboard nav, dark mode, E2E tests)
 - ✅ **F4 – Production Ready (100%):** Docker deployment, comprehensive documentation with screenshots guide and keyboard shortcuts
 
@@ -291,11 +293,13 @@ Goal: Establish a modern React SPA with tooling, styling, and core infrastructur
 - **Accessibility**: Full keyboard navigation, ARIA labels, screen reader support
 - **Testing**: 272+ unit tests, 40+ E2E tests with Playwright
 
-### Remaining Optional Enhancements
+### Optional Future Enhancements
 
-- Pagination for large datasets (F2.2.4)
-- Searchable dropdown filters (F2.2.6, F2.2.7)
-- Screen reader manual QA (F3.4.3)
+See [FUTURE-ENHANCEMENTS.md](./FUTURE-ENHANCEMENTS.md) for:
+- Deferred features (inline editing, screen reader testing)
+- UX polish (toast enhancements, keyboard shortcuts, micro-interactions)
+- Advanced features (multi-currency, bulk operations, receipt uploads)
+- Technical improvements (CI/CD for E2E tests, React Router v7 migration)
 
 ---
 

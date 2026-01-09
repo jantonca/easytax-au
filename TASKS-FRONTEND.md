@@ -11,6 +11,13 @@
 
 **Target User:** Single freelancer (the project owner) managing Australian GST and tax.
 
+> **🚀 Future Enhancements:** See [FUTURE-ENHANCEMENTS.md](FUTURE-ENHANCEMENTS.md) for:
+>
+> - Deferred features (F2.2.11 Inline Editing, F3.4.3 Screen Reader Testing)
+> - Nice-to-have UX polish (toast enhancements, keyboard shortcuts, micro-interactions)
+> - Advanced features (multi-currency, bulk operations, receipt uploads)
+> - Technical debt and infrastructure improvements
+
 ---
 
 ## Architecture Decisions (Confirmed)
@@ -385,7 +392,7 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 || F2.2.8 | Add GST auto-calculation display | ✅ |
 || F2.2.9 | Add biz_percent slider (0-100) | ✅ |
 || F2.2.10 | Implement delete with confirmation | ✅ |
-|| F2.2.11 | Add inline editing for quick updates | ⬜ |
+|| F2.2.11 | Add inline editing for quick updates | ⬜ Deferred → [FUTURE-ENHANCEMENTS.md](FUTURE-ENHANCEMENTS.md#f2211-inline-editing-for-quick-updates) |
 
 - Initial read-only expenses list implemented via `useExpenses` and `ExpensesTable` with default date-desc sorting, loading/error/empty states, and columns for date, description, amount, GST, biz%, and FY/quarter.
 - Expenses table supports client-side sorting on date (default), amount, and provider name, via clickable column headers and `aria-sort` for accessibility.
@@ -405,7 +412,7 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 - **F2.2.6 (Provider dropdown with search):** ✅ Implemented searchable, accessible provider dropdown using ARIA combobox pattern. Features: (1) Client-side case-insensitive filtering by provider name, (2) Alphabetical sorting (A-Z), (3) Search term highlighting with `<mark>` tag, (4) Empty states ("No providers available" and "No provider found"), (5) Full keyboard navigation (Arrow Up/Down, Enter to select, Escape to close, Tab), (6) ARIA labels and roles for screen readers, (7) Outside click to close, (8) Auto-focus search input on open, (9) Mobile-optimized with touch-friendly targets, (10) Dark mode support. Component uses React Hook Form's `setValue()` for integration. 22 comprehensive tests cover basic rendering, dropdown interaction, search functionality, keyboard navigation, edge cases, accessibility, and validation states. Implementation follows established patterns with 0 new lint errors.
 - **F2.2.7 (Category dropdown with search):** ✅ Implemented searchable, accessible category dropdown with 95% code reuse from ProviderSelect (F2.2.6). Identical features: client-side filtering, alphabetical sorting, search highlighting, empty states, keyboard navigation, ARIA combobox pattern, outside click close, auto-focus, mobile optimization, and dark mode. Component handles `CategoryDto` instead of `ProviderDto` with all labels updated accordingly. 22 comprehensive tests ensure feature parity with provider dropdown. Component integrated with React Hook Form in `ExpenseForm` via `setValue()`. Implementation time: ~10 minutes. Zero new lint errors introduced.
 
-> **Deferred:** F2.2.11 (inline editing) is explicitly deferred to a future iteration. The current modal-based edit flow provides full CRUD functionality while keeping the implementation simpler and more consistent with the create flow. Inline editing would require additional complexity for field-level validation, conflict resolution, and UX patterns that are not essential for MVP.
+> **Deferred:** F2.2.11 (inline editing) is explicitly deferred. See [FUTURE-ENHANCEMENTS.md](FUTURE-ENHANCEMENTS.md#deferred-features) for details. The current modal-based edit flow provides full CRUD functionality while keeping implementation simpler.
 
 **Files to Create:**
 
@@ -928,7 +935,7 @@ Under the **Frontend Architecture** or equivalent section, add a short bullet li
 | ------ | --------------------------------------------------- | ------ |
 | F3.4.1 | Audit all forms for keyboard accessibility          | ✅     |
 | F3.4.2 | Add focus visible styles                            | ✅     |
-| F3.4.3 | Test with screen reader (VoiceOver/NVDA)            | ⬜     |
+| F3.4.3 | Test with screen reader (VoiceOver/NVDA)            | ⬜ Deferred → [FUTURE-ENHANCEMENTS.md](FUTURE-ENHANCEMENTS.md#f343-screen-reader-testing)     |
 | F3.4.4 | Add skip links for navigation                       | ✅     |
 | F3.4.5 | Ensure color contrast meets WCAG AA                 | ✅     |
 | F3.4.6 | Add loading skeletons for all data fetches          | ✅     |
@@ -1088,11 +1095,12 @@ Created comprehensive dark mode system with theme persistence and system prefere
 - [x] Global focus-visible styles applied (F3.4.2 complete)
 - [x] Skip links implemented (F3.4.4 complete)
 - [x] Color contrast meets WCAG AA (F3.4.5 complete)
-- [ ] Screen reader testing completed (F3.4.3 requires manual testing)
 - [x] Loading states for all async operations (F3.4.6 complete)
 - [x] Empty states guide user action (F3.4.7 complete)
 - [x] Success/error toasts for all mutations (F3.4.8 complete)
 - [x] Dark mode toggle implemented (F3.4.9 complete)
+
+**Note:** F3.4.3 Screen Reader Testing is deferred to [FUTURE-ENHANCEMENTS.md](FUTURE-ENHANCEMENTS.md#f343-screen-reader-testing). All programmatic accessibility is implemented (ARIA labels, semantic HTML, keyboard navigation), but manual testing with assistive technology is pending.
 
 ---
 
@@ -1268,13 +1276,13 @@ Production-ready Docker deployment with Traefik support implemented:
 | F4. Production       | 9       | 9      | 100%     |
 | **Total**            | **101** | **95** | **94%**  |
 
-> **Note:** Frontend is 94% complete with all production-ready features implemented and documented.
+> **Note:** Frontend is 94% complete (95/101 tasks). Core functionality is production-ready. Remaining 6 tasks are optional enhancements deferred to [FUTURE-ENHANCEMENTS.md](FUTURE-ENHANCEMENTS.md).
 >
-> **Phase F4 (100%):** ✅ **COMPLETE** - Finished F4.1 Build & Deployment (5/5 tasks) and F4.2 Documentation (4/4 tasks). Application is production-ready with comprehensive documentation.
+> **Phase F4 (100%):** ✅ **COMPLETE** - Build & Deployment + Documentation
 >
-> **Phase F3 (92%):** Completed F3.1 BAS Reports (5 tasks), F3.2 FY Reports (6 tasks), F3.3 Recurring Expenses (5 tasks), F3.4 Polish & Accessibility (8/9 tasks), and F3.5 E2E Testing (6 tasks). Only F3.4.3 Screen Reader Testing remains (requires manual QA with assistive technology).
+> **Phase F3 (92%):** ✅ **Production-Ready** - All essential polish complete. F3.4.3 Screen Reader Testing deferred (manual QA with assistive technology). All programmatic accessibility implemented.
 >
-> **Phase F2 (91%):** ✅ **Searchable Dropdowns Complete** - F2.2.6 (Provider dropdown) and F2.2.7 (Category dropdown) finished with full ARIA combobox pattern, keyboard navigation, search highlighting, and 22+ comprehensive tests each. Remaining tasks: F2.2.11 (inline editing - explicitly deferred). Core CRUD with enhanced UX is complete.
+> **Phase F2 (91%):** ✅ **Core CRUD Complete** - Full Expenses, Incomes, Settings, CSV Import. F2.2.11 Inline Editing deferred (modal-based editing is functional).
 
 ---
 
