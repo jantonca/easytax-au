@@ -28,6 +28,7 @@ services:
     env_file: .env
     environment:
       DB_HOST: easytax-au-db
+      IS_DOCKER: "true"
     volumes:
       - ./data:/app/data:ro
     depends_on:

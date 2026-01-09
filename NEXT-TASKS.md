@@ -1,6 +1,6 @@
 # NEXT: Upcoming Tasks
 
-**Status:** App is 98% complete (99/101 frontend tasks done). Production-ready.
+**Status:** App is 99% complete (100/101 frontend tasks done). Production-ready.
 
 **Purpose:** Track upcoming tasks for the next release (v1.1.0).
 
@@ -13,13 +13,13 @@
 | Task | Effort | Priority | Status |
 |------|--------|----------|--------|
 | **Version Display** - Show app version in UI footer and Settings | 3-4 hours | 🔥 HIGH | ✅ Done |
-| **Database Export** - Download backup from Settings page | 7-8 hours | 🔥 HIGH | Planned |
+| **Database Export** - Download backup from Settings page | 7-8 hours | 🔥 HIGH | ✅ Done |
 | **Update Notification** - Check GitHub for updates (optional) | 4-6 hours | 🟡 MEDIUM | Deferred |
 
 **Implementation Notes:**
-- Version: Add `/api/version` endpoint + footer component
-- DB Export: Add `/api/backup/export` endpoint with rate limiting + Settings UI
-- See `docs/archive/FUTURE-ENHANCEMENTS.md` for detailed requirements
+- Version: ✅ `/api/version` endpoint + footer component + Settings page display
+- DB Export: ✅ `/api/backup/export` endpoint with rate limiting (3 per 5 min) + Settings UI with countdown timer
+- Update Notification: See `docs/archive/FUTURE-ENHANCEMENTS.md` for detailed requirements
 
 ---
 
@@ -111,4 +111,4 @@ The remaining 5 tasks are nice-to-have polish items that do not block daily use.
 
 ---
 
-**Last Updated:** 2026-01-09 (Version Display feature completed)
+**Last Updated:** 2026-01-10 (Database Export feature completed)

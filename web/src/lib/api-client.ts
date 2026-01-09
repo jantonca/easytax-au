@@ -247,6 +247,47 @@ export async function downloadFYReportPdf(year: number): Promise<void> {
   window.URL.revokeObjectURL(downloadUrl);
 }
 
+/**
+ * Download database backup as SQL file.
+ * Rate limited to 3 requests per 5 minutes.
+ */
+export async function downloadDatabaseBackup(): Promise<void> {
+  const envBaseUrl = import.meta.env.VITE_API_URL as unknown;
+  const baseUrl =
+    typeof envBaseUrl === 'string' && envBaseUrl.length > 0 ? envBaseUrl : 'http://localhost:3000';
+  const url = new URL('/backup/export', baseUrl).toString();
+
+  const response = await fetch(url, {
+    credentials: 'omit',
+  });
+
+  if (!response.ok) {
+    if (response.status === 429) {
+      throw new ApiError(
+        'Rate limit exceeded. Please wait a few minutes before exporting again.',
+        429,
+      );
+    }
+    throw new ApiError(`Failed to download backup: ${response.status}`, response.status);
+  }
+
+  const blob = await response.blob();
+  const downloadUrl = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = downloadUrl;
+
+  // Extract filename from Content-Disposition header or use default
+  const contentDisposition = response.headers.get('Content-Disposition');
+  const filenameMatch = contentDisposition?.match(/filename="(.+)"/);
+  const filename = filenameMatch
+    ? filenameMatch[1]
+    : `backup-${new Date().toISOString().split('T')[0]}.sql`;
+
+  a.download = filename;
+  a.click();
+  window.URL.revokeObjectURL(downloadUrl);
+}
+
 // Recurring Expenses API helpers
 export async function getRecurringExpenses(): Promise<RecurringExpenseResponseDto[]> {
   return apiClient.get<RecurringExpenseResponseDto[]>('/recurring-expenses');

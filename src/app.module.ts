@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CommonModule } from './common';
@@ -15,6 +17,7 @@ import { IncomesModule } from './modules/incomes';
 import { ProvidersModule } from './modules/providers';
 import { RecurringExpensesModule } from './modules/recurring-expenses';
 import { ReportsModule } from './modules/reports';
+import { BackupModule } from './modules/backup';
 
 @Module({
   imports: [
@@ -23,6 +26,13 @@ import { ReportsModule } from './modules/reports';
       isGlobal: true,
       load: [databaseConfig],
     }),
+    // Rate limiting
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000, // 1 minute default
+        limit: 100, // 100 requests per minute default
+      },
+    ]),
     // Configure TypeORM with async factory
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
@@ -47,8 +57,15 @@ import { ReportsModule } from './modules/reports';
     ProvidersModule,
     RecurringExpensesModule,
     ReportsModule,
+    BackupModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}

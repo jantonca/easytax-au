@@ -169,7 +169,8 @@ easytax-au/
 │   │   ├── reports/
 │   │   ├── csv-import/
 │   │   ├── import-jobs/
-│   │   └── recurring-expenses/
+│   │   ├── recurring-expenses/
+│   │   └── backup/
 │   ├── app.module.ts
 │   └── main.ts
 │
@@ -631,6 +632,11 @@ npm install -g pnpm
 │  ┌─────────────────────────────────────────────────┐   │
 │  │               bas module (read-only)            │   │
 │  │  (injects: ExpenseRepository, IncomeRepository) │   │
+│  └─────────────────────────────────────────────────┘   │
+│                                                        │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │             backup module (utility)             │   │
+│  │  (system management, pg_dump wrapper)           │   │
 │  └─────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────┘
 ```

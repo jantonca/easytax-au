@@ -186,6 +186,7 @@ docker compose up -d --build
 | `DB_USERNAME`      | ❌       | postgres      | Database user                                  |
 | `PORT`             | ❌       | 3000          | API server port                                |
 | `NODE_ENV`         | ❌       | development   | Environment mode (development/production)      |
+| `IS_DOCKER`        | ❌       | false         | Set to `true` when database is in Docker (for backup export) |
 
 **Frontend Variables (`web/.env`):**
 
@@ -277,6 +278,11 @@ docker compose up -d --build
 - **Categories**: Organize expenses with BAS label mapping (1B/G10/G11)
 - **Clients**: Encrypted client storage with ABN and PSI tracking
 - **About**: View application version and system information
+- **Database Backup**: Export complete SQL backup from Settings → About page
+  - Rate limited to 3 exports per 5 minutes
+  - Live countdown timer shows when you can export again
+  - Supports both Docker and bare-metal deployments
+  - SQL file can be restored using `psql`
 - **Related Records**: See counts of expenses/incomes linked to each provider/category/client
 
 ![Settings](docs/screenshots/settings.png)
