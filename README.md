@@ -376,7 +376,7 @@ Documentation is organized into three tiers for AI efficiency and human clarity.
 | [docs/archive/TASKS-DONE.md](docs/archive/TASKS-DONE.md) | Backend development checklist (95% complete) |
 | [docs/archive/TASKS-FRONTEND.md](docs/archive/TASKS-FRONTEND.md) | Frontend development checklist (94% complete) |
 | [docs/archive/ROADMAP-DONE.md](docs/archive/ROADMAP-DONE.md) | Historical MVP scope and development phases |
-| [docs/archive/BACKLOG.md](docs/archive/BACKLOG.md) | Old feature ideas and brainstorming |
+| [docs/archive/COMPLETED-ENHANCEMENTS.md](docs/archive/COMPLETED-ENHANCEMENTS.md) | Completed features beyond MVP requirements |
 | [docs/archive/FUTURE-ENHANCEMENTS.md](docs/archive/FUTURE-ENHANCEMENTS.md) | Deferred features (inline editing, screen reader testing) |
 | [docs/archive/CHANGELOG-*.md](docs/archive/) | Historical change logs |
 

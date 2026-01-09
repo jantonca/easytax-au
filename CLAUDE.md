@@ -58,7 +58,7 @@ Use these via the `Bash` tool. Preferred aliases:
 - `docs/archive/TASKS-DONE.md`: Completed backend tasks (95% done)
 - `docs/archive/TASKS-FRONTEND.md`: Completed frontend tasks (94% done)
 - `docs/archive/ROADMAP-DONE.md`: Historical progress tracking
-- `docs/archive/BACKLOG.md`: Old feature ideas
+- `docs/archive/COMPLETED-ENHANCEMENTS.md`: Completed features beyond MVP
 - `docs/archive/FUTURE-ENHANCEMENTS.md`: Deferred features
 - `docs/archive/CHANGELOG-*.md`: Historical change logs
 
