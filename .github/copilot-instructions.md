@@ -5,6 +5,7 @@
 **These rules prevent the most common AI hallucination errors. Read these first.**
 
 ### 🇦🇺 Domain Context: Australian Tax Software
+
 - **Project**: EasyTax-AU (Australian sole trader tax management)
 - **Australian Financial Year**: July 1 - June 30 (NOT calendar year)
 - **Tax System**: GST at 10% (NOT "sales tax"), BAS reporting (NOT "IRS" or "W-2")
@@ -12,23 +13,27 @@
 - **FORBIDDEN terminology**: IRS, sales tax, W-2, Form 1040, April 15, fiscal year ending Dec 31
 
 ### 💰 Data Constraints
+
 - **Currency**: ALWAYS store as **integers in cents** (never floats or dollars)
 - **Display**: Use `formatCents(amountInCents)` from `@shared/utils` for UI
 - **Example**: $123.45 is stored as `12345` cents
 
 ### 🏗️ Architecture
+
 - **Monorepo**: `/web` (Next.js/React) and `/shared` (types/utils)
 - **Type Imports**: ALWAYS import from `@shared/types` (never duplicate types)
 - **Styling**: Tailwind CSS only (no styled-components, no CSS-in-JS)
 - **Check available types**: `ls shared/types` shows `api.d.ts`
 
 ### 📋 Active Work
-- **Current tasks**: See `NEXT-FRONTEND.md` in project root
+
+- **Current tasks**: See `NEXT-TASKS.md` in project root
 - **Core docs**: `docs/core/` (ARCHITECTURE.md, SCHEMA.md, ATO-LOGIC.md, SECURITY.md)
 - **Ignore**: `docs/archive/` (historical, completed tasks)
 
 ### 🧪 Mandatory TDD Workflow
-1. **Read the task** from `NEXT-FRONTEND.md`
+
+1. **Read the task** from `NEXT-TASKS.md`
 2. **Write test first** (`.test.ts` or `.test.tsx`)
 3. **Run test** to confirm it fails: `pnpm --filter web test [path]`
 4. **Implement** minimal code to pass
@@ -158,6 +163,7 @@ This governs how we handle common development tasks.
 ### ✔️ Pre-Submission Checklist
 
 **Generic:**
+
 - [ ] No `console.log` in production code
 - [ ] No `any` types (use specific types or generics)
 - [ ] All promises have error handling
@@ -165,6 +171,7 @@ This governs how we handle common development tasks.
 - [ ] Props are properly typed (TypeScript)
 
 **Project-Specific:**
+
 - [ ] Currency values are integers in cents (not floats or dollars)
 - [ ] Types imported from `@shared/types` (not duplicated)
 - [ ] No US tax terminology (IRS, sales tax, W-2, Form 1040, April 15)
@@ -183,20 +190,24 @@ This governs how we handle common development tasks.
 ## 5. Documentation Reference (Tiered for AI Efficiency)
 
 ### ⭐ Priority Files (Read These First)
-- **`NEXT-FRONTEND.md`**: Active frontend tasks (current backlog)
+
+- **`NEXT-TASKS.md`**: Active frontend tasks (current backlog)
 - **`docs/core/ATO-LOGIC.md`**: **CRITICAL** - Australian tax rules (prevents US tax hallucinations)
 - **`CLAUDE.md`**: Extended instructions for Claude Code CLI
 
 ### 🏗️ Core Documentation (Reference as Needed)
+
 - **`docs/core/ARCHITECTURE.md`**: System design and tech stack
 - **`docs/core/SCHEMA.md`**: Database structure and entity relationships
 - **`docs/core/SECURITY.md`**: Encryption, key management, security protocols
 
 ### 📦 Archive (Ignore Unless Explicitly Asked)
+
 - **`docs/archive/`**: Historical completed tasks and old roadmaps
 
 ### 💡 When to Consult Documentation
+
 - **Tax/GST/BAS calculations**: Read `docs/core/ATO-LOGIC.md` first
 - **Database queries**: Check `docs/core/SCHEMA.md` for entity relationships
-- **New features**: Review `NEXT-FRONTEND.md` for context and dependencies
+- **New features**: Review `NEXT-TASKS.md` for context and dependencies
 - **Security concerns**: Reference `docs/core/SECURITY.md` for encryption patterns
