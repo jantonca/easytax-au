@@ -104,9 +104,22 @@ pnpm --filter web dev    # http://localhost:5173
 || `pnpm run format` | Run Prettier on backend source |
 || `pnpm run generate:types` | Generate shared API types to `shared/types/api.d.ts` |
 
+### Production Deployment
+
+**Two deployment options available:**
+
+| Method | Best For | Efficiency | Guide |
+|--------|----------|------------|-------|
+| **Multi-LXC (Native)** ⭐ | Proxmox users | Most efficient (~1.5GB RAM) | **[docs/DEPLOYMENT-PROXMOX-LXC.md](docs/DEPLOYMENT-PROXMOX-LXC.md)** |
+| **Docker Compose** | Portability, non-Proxmox hosts | Good (~3GB RAM) | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) |
+
+**Recommended:** Use Multi-LXC deployment if running on Proxmox for better performance and resource usage.
+
+---
+
 ### Docker Deployment (Full Stack)
 
-For production deployment, all services (database, API, and frontend) run in containers.
+For Docker-based deployment (VMs, cloud servers, or non-Proxmox environments):
 
 #### Standard Deployment (HTTP)
 
@@ -342,13 +355,15 @@ Documentation is organized into three tiers for AI efficiency and human clarity.
 ### ⭐ Active Development
 | Document | Purpose |
 |----------|---------|
-| [NEXT-FRONTEND.md](NEXT-FRONTEND.md) | Final 6% of frontend work (6 tasks remaining) |
+| [NEXT-TASKS.md](NEXT-TASKS.md) | Upcoming tasks for next release (v1.1.0) |
 | [CLAUDE.md](CLAUDE.md) | AI agent directives and workflow |
 | [AGENTS.md](AGENTS.md) | AI coding guidelines and best practices |
 
 ### 🏗 Core Documentation (Technical Reference)
 | Document | Purpose |
 |----------|---------|
+| [docs/DEPLOYMENT-PROXMOX-LXC.md](docs/DEPLOYMENT-PROXMOX-LXC.md) | **Proxmox deployment** - Multi-LXC setup (most efficient, ~1.5GB RAM) |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | **Docker deployment** - Docker Compose for VMs/cloud (~3GB RAM) |
 | [docs/core/ATO-LOGIC.md](docs/core/ATO-LOGIC.md) | **CRITICAL** - Australian tax rules, GST calculations, BAS labels |
 | [docs/core/ARCHITECTURE.md](docs/core/ARCHITECTURE.md) | Tech stack, module design, frontend/backend structure |
 | [docs/core/SCHEMA.md](docs/core/SCHEMA.md) | Database entities, relationships, and encryption |
@@ -365,4 +380,4 @@ Documentation is organized into three tiers for AI efficiency and human clarity.
 | [docs/archive/FUTURE-ENHANCEMENTS.md](docs/archive/FUTURE-ENHANCEMENTS.md) | Deferred features (inline editing, screen reader testing) |
 | [docs/archive/CHANGELOG-*.md](docs/archive/) | Historical change logs |
 
-**Note:** The tiered structure reduces AI context bloat by ~80%, focusing agents on active work in `NEXT-FRONTEND.md` and critical tax logic in `docs/core/ATO-LOGIC.md`.
+**Note:** The tiered structure reduces AI context bloat by ~80%, focusing agents on active work in `NEXT-TASKS.md` and critical tax logic in `docs/core/ATO-LOGIC.md`.

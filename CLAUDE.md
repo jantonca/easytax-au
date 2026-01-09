@@ -13,7 +13,7 @@ You act as an expert senior front-end developer. You must follow the **Collabora
 
 ## 🛠 Mandatory Workflow (TDD)
 
-1. **Planning (Opus):** Analyze `NEXT-FRONTEND.md` and `.github/copilot-instructions.md` to define the sub-task.
+1. **Planning (Opus):** Analyze `NEXT-TASKS.md` and `.github/copilot-instructions.md` to define the sub-task.
 2. **Test First (Sonnet):** Create/update `.test.ts/tsx` before implementation.
    - Run `pnpm --filter web test [path]` to verify failure.
 3. **Implementation:** Write minimal code to pass tests. Follow **Security First** and **A11y** principles.
@@ -42,7 +42,7 @@ Use these via the `Bash` tool. Preferred aliases:
 
 **⭐ PRIORITY FILES (Read First):**
 
-- `NEXT-FRONTEND.md`: Final 6% of frontend work (active backlog)
+- `NEXT-TASKS.md`: Upcoming tasks for next release (active backlog)
 - `docs/core/ATO-LOGIC.md`: **CRITICAL** - Australian tax rules (prevents US tax hallucinations)
 - `.github/copilot-instructions.md`: Detailed UI/UX and Collaboration protocol
 
@@ -67,13 +67,13 @@ Use these via the `Bash` tool. Preferred aliases:
 1. **Always check `docs/core/ATO-LOGIC.md`** before implementing tax/GST/BAS calculations
 2. **Never use US tax terminology** (IRS, sales tax, W-2, Form 1040, April 15)
 3. **Never assume calendar year** - Australian FY is July 1 - June 30
-4. **Focus on `NEXT-FRONTEND.md`** - ignore completed tasks in `docs/archive/`
+4. **Focus on `NEXT-TASKS.md`** - ignore completed tasks in `docs/archive/`
 
 ## 🎯 Common Prompts
 
 ### For Discovery
 
-"Review NEXT-FRONTEND.md. Recommend the next task and justify the priority."
+"Review NEXT-TASKS.md. Recommend the next task and justify the priority."
 
 ### For Complex Features
 

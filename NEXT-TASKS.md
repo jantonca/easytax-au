@@ -1,21 +1,31 @@
-# NEXT: Frontend Remaining Work
+# NEXT: Upcoming Tasks
 
-**Status:** 95% Complete (96/101 tasks)
+**Status:** App is 98% complete (99/101 frontend tasks done). Production-ready.
 
-**Purpose:** Track the final 5 tasks to reach 100% frontend completion.
+**Purpose:** Track upcoming tasks for the next release (v1.1.0).
 
 ---
 
-## Remaining Tasks (5)
+## System Management Features (v1.1.0) - NEW
 
-### Optional Enhancements (Deferred)
+**Priority:** HIGH | **Target:** Next minor release
 
-These tasks are explicitly deferred to [FUTURE-ENHANCEMENTS.md](FUTURE-ENHANCEMENTS.md) and are **not blockers** for production use:
+| Task | Effort | Priority | Status |
+|------|--------|----------|--------|
+| **Version Display** - Show app version in UI footer and Settings | 3-4 hours | 🔥 HIGH | Planned |
+| **Database Export** - Download backup from Settings page | 7-8 hours | 🔥 HIGH | Planned |
+| **Update Notification** - Check GitHub for updates (optional) | 4-6 hours | 🟡 MEDIUM | Deferred |
 
-| Task                        | Phase  | Status  | Reason Deferred                                                                 |
-| --------------------------- | ------ | ------- | ------------------------------------------------------------------------------- |
-| F2.2.11 Inline Editing      | F2     | Deferred| Modal-based editing is functional; inline editing adds complexity for marginal UX gain |
-| F3.4.3 Screen Reader Testing| F3     | Deferred| All programmatic accessibility implemented; manual testing with assistive tech pending |
+**Implementation Notes:**
+- Version: Add `/api/version` endpoint + footer component
+- DB Export: Add `/api/backup/export` endpoint with rate limiting + Settings UI
+- See `docs/archive/FUTURE-ENHANCEMENTS.md` for detailed requirements
+
+---
+
+## Frontend Optional Enhancements (Deferred)
+
+See [FUTURE-ENHANCEMENTS.md](docs/archive/FUTURE-ENHANCEMENTS.md) for additional nice-to-have features (inline editing, toast enhancements, keyboard shortcuts, etc.).
 
 ---
 
@@ -35,7 +45,7 @@ These tasks are explicitly deferred to [FUTURE-ENHANCEMENTS.md](FUTURE-ENHANCEME
 - Toast notifications
 - Error boundaries
 
-### ✅ Polish (92%)
+### ✅ Polish (96%)
 - Loading skeletons for all data fetches
 - Empty states for all lists
 - Success/error toasts for all mutations
@@ -44,6 +54,7 @@ These tasks are explicitly deferred to [FUTURE-ENHANCEMENTS.md](FUTURE-ENHANCEME
 - Focus-visible styles
 - Skip links
 - Color contrast WCAG AA compliant
+- *Deferred: Screen reader testing (manual QA)*
 
 ### ✅ Testing (100%)
 - 272 Vitest unit/integration tests passing
@@ -62,24 +73,6 @@ These tasks are explicitly deferred to [FUTURE-ENHANCEMENTS.md](FUTURE-ENHANCEME
 - Environment variables documented
 - Keyboard shortcuts documented
 - Screenshots captured (8 screenshots: 7 dark mode, 1 light mode)
-
----
-
-## Next Steps (Optional)
-
-If you want to reach 100%:
-
-1. **Screen Reader Testing** (F3.4.3)
-   - Test with VoiceOver (macOS) or NVDA (Windows)
-   - Verify all ARIA labels are meaningful
-   - Ensure form validation errors are announced
-   - Document any issues in GitHub issues
-
-2. **Inline Editing** (F2.2.11)
-   - Implement double-click to edit in expenses/incomes tables
-   - Add inline validation
-   - Optimistic UI updates
-   - See [FUTURE-ENHANCEMENTS.md](FUTURE-ENHANCEMENTS.md#f2211-inline-editing-for-quick-updates) for full spec
 
 ---
 

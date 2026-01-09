@@ -198,69 +198,6 @@ easytax-au/
 
 ---
 
-## 2. `ARCHITECTURE.md` – frontend section tweaks
-
-Under the **Frontend Architecture** or equivalent section, add a short bullet list describing the actual infra. For example:
-
-```md path=null start=null
-### Frontend infrastructure (current)
-
-- **API client:** `web/src/lib/api-client.ts`
-  - Thin wrapper around `fetch` using `VITE_API_URL` as base.
-  - Central `ApiError` type and `checkApiHealth()` helper hitting `/health`.
-- **Data fetching:** TanStack Query v5
-  - Shared `QueryClient` in `web/src/lib/query-client.ts`.
-  - Wired via `AppShell` (`QueryClientProvider` + `ReactQueryDevtools` in dev).
-- **Routing shell:** React Router
-  - `BrowserRouter` wrapped in `AppShell` (routes will be expanded in later phases).
-- **Toasts:** custom toast context + provider
-  - `web/src/lib/toast-context.ts`, `web/src/components/ui/toast-provider.tsx`, `toast-viewport.tsx`.
-  - Accessible UI with Tailwind, no third-party toast dependency.
-- **Error handling:**
-  - App-level error boundary in `web/src/components/error-boundary.tsx` with a minimal friendly fallback screen.
-- **Testing:** Vitest + React Testing Library
-  - `web/vitest.config.ts` + `web/src/test/setup.ts`.
-  - Coverage today: infra tests for API client, error boundary, and toast provider.
-
-| #      | Task                                                                    | Status |
-| ------ | ----------------------------------------------------------------------- | ------ |
-| F1.2.1 | Create API client using fetch wrapper + centralized errors (`ApiError`) | ✅     |
-| F1.2.2 | Set up TanStack Query provider + devtools                               | ⬜     |
-| F1.2.3 | Create React Router with lazy loading                                   | ⬜     |
-| F1.2.4 | Create error boundary component (app-level)                             | ⬜     |
-| F1.2.5 | Create toast notification system (custom, Tailwind-based)               | ✅     |
-
-> **Note (F1.2.4):** Start with a single app-level error boundary. Add route-level error boundaries only if crashes in one feature affect unrelated features during testing.
-> | F1.2.6 | Create currency transformer (dollars ↔ cents) | ⬜ |
-> | F1.2.7 | Set up Vitest + Testing Library | ⬜ |
-
-**Files to Create:**
-
-- `web/src/lib/currency.ts` (toCents, toDollars, formatCurrency)
-- `web/src/lib/api-client.ts`
-- `web/src/lib/query-client.ts`
-- `web/src/lib/router.tsx`
-- `web/src/components/error-boundary.tsx`
-- `web/src/components/ui/` (shadcn components)
-- `web/vitest.config.ts`
-- `web/src/test/setup.ts`
-
-**Tests Required:**
-
-- [ ] API client handles 401/403/500 errors gracefully
-- [ ] Error boundary catches and displays errors
-- [ ] Toast notifications appear and dismiss
-- [ ] Vitest runs and passes sample test
-
-**Definition of Done:**
-
-- [ ] API client can call `/health` endpoint
-- [ ] React Query caches responses
-- [ ] Routes lazy load correctly
-- [ ] Error boundary shows fallback UI on error
-
----
-
 ### F1.3 Shared Types (Auto-Generated)
 
 | #      | Task                                                      | Status |
@@ -1271,18 +1208,18 @@ Production-ready Docker deployment with Traefik support implemented:
 | Phase                | Tasks   | Done   | Progress |
 | -------------------- | ------- | ------ | -------- |
 | F1. Scaffold         | 22      | 22     | 100%     |
-| F2. Core Features    | 44      | 40     | 91%      |
-| F3. Reports & Polish | 26      | 24     | 92%      |
+| F2. Core Features    | 44      | 43     | 98%      |
+| F3. Reports & Polish | 26      | 25     | 96%      |
 | F4. Production       | 9       | 9      | 100%     |
-| **Total**            | **101** | **95** | **94%**  |
+| **Total**            | **101** | **99** | **98%**  |
 
-> **Note:** Frontend is 94% complete (95/101 tasks). Core functionality is production-ready. Remaining 6 tasks are optional enhancements deferred to [FUTURE-ENHANCEMENTS.md](FUTURE-ENHANCEMENTS.md).
+> **Note:** Frontend is 98% complete (99/101 tasks). Core functionality is production-ready. Remaining 2 tasks are optional enhancements deferred to [FUTURE-ENHANCEMENTS.md](FUTURE-ENHANCEMENTS.md).
 >
 > **Phase F4 (100%):** ✅ **COMPLETE** - Build & Deployment + Documentation
 >
-> **Phase F3 (92%):** ✅ **Production-Ready** - All essential polish complete. F3.4.3 Screen Reader Testing deferred (manual QA with assistive technology). All programmatic accessibility implemented.
+> **Phase F3 (96%):** ✅ **Production-Ready** - All essential polish complete. F3.4.3 Screen Reader Testing deferred (manual QA with assistive technology). All programmatic accessibility implemented.
 >
-> **Phase F2 (91%):** ✅ **Core CRUD Complete** - Full Expenses, Incomes, Settings, CSV Import. F2.2.11 Inline Editing deferred (modal-based editing is functional).
+> **Phase F2 (98%):** ✅ **Core CRUD Complete** - Full Expenses, Incomes, Settings, CSV Import. F2.2.11 Inline Editing deferred (modal-based editing is functional).
 
 ---
 
