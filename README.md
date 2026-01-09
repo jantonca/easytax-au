@@ -276,6 +276,7 @@ docker compose up -d --build
 - **Providers**: Manage expense vendors with international flag and default categories
 - **Categories**: Organize expenses with BAS label mapping (1B/G10/G11)
 - **Clients**: Encrypted client storage with ABN and PSI tracking
+- **About**: View application version and system information
 - **Related Records**: See counts of expenses/incomes linked to each provider/category/client
 
 ![Settings](docs/screenshots/settings.png)

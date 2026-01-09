@@ -12,7 +12,7 @@
 
 | Task | Effort | Priority | Status |
 |------|--------|----------|--------|
-| **Version Display** - Show app version in UI footer and Settings | 3-4 hours | 🔥 HIGH | Planned |
+| **Version Display** - Show app version in UI footer and Settings | 3-4 hours | 🔥 HIGH | ✅ Done |
 | **Database Export** - Download backup from Settings page | 7-8 hours | 🔥 HIGH | Planned |
 | **Update Notification** - Check GitHub for updates (optional) | 4-6 hours | 🟡 MEDIUM | Deferred |
 
@@ -57,7 +57,7 @@ See [FUTURE-ENHANCEMENTS.md](docs/archive/FUTURE-ENHANCEMENTS.md) for additional
 - *Deferred: Screen reader testing (manual QA)*
 
 ### ✅ Testing (100%)
-- 272 Vitest unit/integration tests passing
+- 461 Vitest unit/integration tests passing
 - 40+ Playwright E2E tests covering critical flows
 - Test coverage on critical paths
 
@@ -111,4 +111,4 @@ The remaining 5 tasks are nice-to-have polish items that do not block daily use.
 
 ---
 
-**Last Updated:** 2026-01-09 (F4.2.3 Screenshots completed)
+**Last Updated:** 2026-01-09 (Version Display feature completed)

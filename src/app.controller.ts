@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AppService } from './app.service';
-import type { HealthResponse } from './app.service';
+import type { HealthResponse, VersionResponse } from './app.service';
 
 @ApiTags('System')
 @Controller()
@@ -33,5 +33,31 @@ export class AppController {
   })
   getHealth(): HealthResponse {
     return this.appService.getHealth();
+  }
+
+  /**
+   * Version information endpoint for system monitoring and UI display.
+   * @returns Application version and environment metadata.
+   */
+  @Get('version')
+  @ApiOperation({ summary: 'Application version information' })
+  @ApiResponse({
+    status: 200,
+    description: 'Application version metadata',
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', example: 'easytax-au' },
+        version: { type: 'string', example: '0.0.1' },
+        nodeVersion: { type: 'string', example: 'v22.10.7' },
+        environment: {
+          type: 'string',
+          enum: ['development', 'production', 'test'],
+        },
+      },
+    },
+  })
+  getVersion(): VersionResponse {
+    return this.appService.getVersion();
   }
 }

@@ -12,6 +12,7 @@ import { FyReportPage } from '@/features/reports/fy-report-page';
 import { ProvidersPage } from '@/features/settings/providers/providers-page';
 import { CategoriesPage } from '@/features/settings/categories/categories-page';
 import { ClientsPage } from '@/features/settings/clients/clients-page';
+import { AboutPage } from '@/features/settings/about/about-page';
 import { RecurringPage } from '@/features/recurring/recurring-page';
 
 function App(): ReactElement {
@@ -34,6 +35,7 @@ function App(): ReactElement {
           <Route path="providers" element={<ProvidersPage />} />
           <Route path="categories" element={<CategoriesPage />} />
           <Route path="clients" element={<ClientsPage />} />
+          <Route path="about" element={<AboutPage />} />
         </Route>
       </Route>
     </Routes>

@@ -57,4 +57,33 @@ describe('AppController', () => {
       expect(date.toISOString()).toBe(result.timestamp);
     });
   });
+
+  describe('version', () => {
+    it('should return version information', () => {
+      const result = appController.getVersion();
+
+      expect(result.version).toBeDefined();
+      expect(result.name).toBe('easytax-au');
+      expect(result.environment).toBeDefined();
+      expect(result.nodeVersion).toBeDefined();
+    });
+
+    it('should return version matching semantic versioning format', () => {
+      const result = appController.getVersion();
+
+      expect(result.version).toMatch(/^\d+\.\d+\.\d+$/);
+    });
+
+    it('should return node version with v prefix', () => {
+      const result = appController.getVersion();
+
+      expect(result.nodeVersion).toMatch(/^v\d+/);
+    });
+
+    it('should return environment from NODE_ENV or default to development', () => {
+      const result = appController.getVersion();
+
+      expect(['development', 'production', 'test']).toContain(result.environment);
+    });
+  });
 });

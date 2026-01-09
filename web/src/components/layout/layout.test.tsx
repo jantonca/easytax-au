@@ -1,8 +1,21 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { Layout } from './layout';
 import { ThemeProvider } from '@/hooks/use-theme';
+
+vi.mock('@/hooks/use-version', () => ({
+  useVersion: () => ({
+    data: {
+      name: 'easytax-au',
+      version: '0.0.1',
+      nodeVersion: 'v22.10.7',
+      environment: 'test',
+    },
+    isLoading: false,
+    isError: false,
+  }),
+}));
 
 describe('Layout', () => {
   it('renders skip link with correct href and accessible text', () => {
@@ -45,5 +58,17 @@ describe('Layout', () => {
 
     const skipLink = screen.getByText('Skip to main content');
     expect(skipLink).toHaveClass('sr-only');
+  });
+
+  it('renders footer component', () => {
+    render(
+      <ThemeProvider>
+        <BrowserRouter>
+          <Layout />
+        </BrowserRouter>
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByRole('contentinfo')).toBeInTheDocument();
   });
 });

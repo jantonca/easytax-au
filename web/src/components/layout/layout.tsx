@@ -8,6 +8,7 @@ import { Header } from '@/components/layout/header';
 import { MobileNav } from '@/components/layout/mobile-nav';
 import { Sidebar } from '@/components/layout/sidebar';
 import { CommandPalette } from '@/components/layout/command-palette';
+import { Footer } from '@/components/layout/footer';
 
 export function Layout(): ReactElement {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
@@ -42,6 +43,8 @@ export function Layout(): ReactElement {
         <main id="main-content" className={cn('flex-1 px-4 py-4 lg:px-6')}>
           <Outlet />
         </main>
+
+        <Footer />
       </div>
 
       <CommandPalette open={isCommandPaletteOpen} onOpenChange={setIsCommandPaletteOpen} />

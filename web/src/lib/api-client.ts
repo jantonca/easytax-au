@@ -86,6 +86,10 @@ export async function checkApiHealth(): Promise<boolean> {
   }
 }
 
+export async function getVersion(): Promise<VersionResponse> {
+  return apiClient.get<VersionResponse>('/version');
+}
+
 export type BasSummaryDto = components['schemas']['BasSummaryDto'];
 export type ExpenseResponseDto = components['schemas']['ExpenseResponseDto'];
 export type RecurringExpenseResponseDto = components['schemas']['RecurringExpenseResponseDto'];
@@ -153,6 +157,13 @@ export interface QuarterDateRange {
   quarter: string;
   start: string;
   end: string;
+}
+
+export interface VersionResponse {
+  name: string;
+  version: string;
+  nodeVersion: string;
+  environment: string;
 }
 
 export async function getBasSummary(quarter: string, year: number): Promise<BasSummaryDto> {

@@ -47,6 +47,20 @@ export function SettingsTabs(): ReactElement {
             Clients
           </NavLink>
         </li>
+        <li>
+          <NavLink
+            to="/settings/about"
+            className={({ isActive }) =>
+              `inline-flex items-center border-b-2 px-3 py-2 text-xs font-medium transition-colors ${
+                isActive
+                  ? 'border-emerald-500 text-emerald-400'
+                  : 'border-transparent text-slate-400 hover:border-slate-700 hover:text-slate-300'
+              }`
+            }
+          >
+            About
+          </NavLink>
+        </li>
       </ul>
     </nav>
   );
