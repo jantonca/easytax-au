@@ -1,8 +1,9 @@
 import type { ReactElement } from 'react';
 import { useState, useEffect } from 'react';
-import { Clock, Download, Info, Loader2 } from 'lucide-react';
+import { Clock, Download, Info, Loader2, RefreshCw } from 'lucide-react';
 import { SettingsTabs } from '@/features/settings/components/settings-tabs';
 import { useVersion } from '@/hooks/use-version';
+import { useUpdateCheck } from '@/hooks/use-update-check';
 import { downloadDatabaseBackup } from '@/lib/api-client';
 import { useToast } from '@/lib/toast-context';
 
@@ -11,6 +12,7 @@ const RATE_LIMIT_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 export function AboutPage(): ReactElement {
   const { data: version, isLoading, isError } = useVersion();
+  const { updateInfo, isChecking, checkError, checkNow } = useUpdateCheck();
   const { showToast } = useToast();
   const [isExporting, setIsExporting] = useState(false);
   const [rateLimitExpiry, setRateLimitExpiry] = useState<number | null>(null);
@@ -251,6 +253,80 @@ export function AboutPage(): ReactElement {
                 </p>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Update Check Card */}
+      {!isLoading && !isError && version && (
+        <div className="rounded-lg border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+          <div className="flex flex-col gap-4">
+            <div>
+              <h2 className="mb-1 text-lg font-semibold text-slate-900 dark:text-slate-50">
+                Software Updates
+              </h2>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Check for the latest version from GitHub.
+              </p>
+            </div>
+
+            {updateInfo?.hasUpdate && (
+              <div className="rounded-md border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900/50 dark:bg-emerald-900/20">
+                <div className="flex items-start gap-3">
+                  <div className="rounded-lg bg-emerald-100 p-2 dark:bg-emerald-900/30">
+                    <Info className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">
+                      Update Available
+                    </h3>
+                    <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">
+                      Version {updateInfo.latestVersion} is available. You are currently running
+                      version {updateInfo.currentVersion}.
+                    </p>
+                    <a
+                      href={updateInfo.releaseUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-emerald-700 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300"
+                    >
+                      View on GitHub →
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {updateInfo && !updateInfo.hasUpdate && (
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                You are running the latest version ({updateInfo.currentVersion}).
+              </p>
+            )}
+
+            {checkError && (
+              <p className="text-sm text-red-600 dark:text-red-400">
+                Unable to check for updates. Please check your internet connection.
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={checkNow}
+              disabled={isChecking}
+              className="flex w-full items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 dark:focus:ring-offset-slate-900 sm:w-auto"
+            >
+              {isChecking ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Checking...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="h-4 w-4" />
+                  Check for Updates
+                </>
+              )}
+            </button>
           </div>
         </div>
       )}

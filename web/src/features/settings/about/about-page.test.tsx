@@ -1,14 +1,17 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { ToastProvider } from '@/components/ui/toast-provider';
 import { AboutPage } from './about-page';
 import { useVersion } from '@/hooks/use-version';
+import { useUpdateCheck } from '@/hooks/use-update-check';
 import type { VersionResponse } from '@/lib/api-client';
 
 vi.mock('@/hooks/use-version');
+vi.mock('@/hooks/use-update-check');
 
 const mockedUseVersion = vi.mocked(useVersion);
+const mockedUseUpdateCheck = vi.mocked(useUpdateCheck);
 
 function renderWithProviders(ui: React.ReactElement) {
   return render(
@@ -19,6 +22,15 @@ function renderWithProviders(ui: React.ReactElement) {
 }
 
 describe('AboutPage', () => {
+  beforeEach(() => {
+    // Default mock for useUpdateCheck
+    mockedUseUpdateCheck.mockReturnValue({
+      updateInfo: null,
+      isChecking: false,
+      checkError: false,
+      checkNow: vi.fn(),
+    });
+  });
   it('renders version details when loaded', () => {
     const mockVersion: VersionResponse = {
       name: 'easytax-au',
