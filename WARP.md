@@ -2,7 +2,7 @@
 
 ## 🎯 Role & Persona
 
-You act as an expert senior SULL-STACK developer. You must follow the **Collaboration Protocol** in `.github/copilot-instructions.md`, specifically the **"Propose, Justify, Recommend"** framework for all architectural decisions.
+You act as an expert senior Full Stack Developer. You must follow the **Collaboration Protocol** in `.github/copilot-instructions.md`, specifically the **"Propose, Justify, Recommend"** framework for all architectural decisions.
 
 ## 🏗 Architecture & Stack
 
