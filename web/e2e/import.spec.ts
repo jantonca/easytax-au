@@ -47,11 +47,8 @@ test.describe('CSV Import Flow', () => {
     // Wait for preview to load (use .first() for strict mode)
     await expect(page.getByText(/preview/i).first()).toBeVisible();
 
-    // Wait for the preview table to actually load with data
-    await page.waitForTimeout(2000); // Give time for API call to complete
-
-    // Verify preview table shows the CSV data (use .first() for multiple matches)
-    await expect(page.getByText('Test Expense 1').first()).toBeVisible({ timeout: 10000 });
+    // Wait for the preview table to actually load with data by checking for first row
+    await expect(page.getByText('Test Expense 1').first()).toBeVisible({ timeout: 15000 });
     await expect(page.getByText('Test Expense 2').first()).toBeVisible();
     await expect(page.getByText('Test Expense 3').first()).toBeVisible();
   });
@@ -66,11 +63,8 @@ test.describe('CSV Import Flow', () => {
 
     await page.getByRole('button', { name: /preview/i }).click();
 
-    // Wait for preview to load (use .first() for strict mode)
-    await expect(page.getByText(/preview/i).first()).toBeVisible();
-    
-    // Wait for the preview table to load with data
-    await page.waitForTimeout(2000);
+    // Wait for preview to load by checking for first data row
+    await expect(page.getByText('Test Expense 1').first()).toBeVisible({ timeout: 15000 });
 
     // Find checkboxes for row selection
     const checkboxes = page.locator('input[type="checkbox"]');
@@ -98,11 +92,8 @@ test.describe('CSV Import Flow', () => {
 
     await page.getByRole('button', { name: /preview/i }).click();
 
-    // Wait for preview to load (use .first() for strict mode)
-    await expect(page.getByText(/preview/i).first()).toBeVisible();
-    
-    // Wait for the preview table to load with data  
-    await page.waitForTimeout(2000);
+    // Wait for preview data to load
+    await expect(page.getByText('Test Expense 1').first()).toBeVisible({ timeout: 15000 });
 
     // Click Import button
     const importButton = page.getByRole('button', { name: /import.*selected/i });
@@ -204,8 +195,8 @@ invalid-date,Bad Expense,100.00
     // Click Preview
     await page.getByRole('button', { name: /preview/i }).click();
 
-    // Wait for preview
-    await page.waitForTimeout(2000);
+    // Wait for preview data to appear
+    await expect(page.getByText('Good Expense').first()).toBeVisible({ timeout: 15000 });
 
     // Should show validation errors or mark rows as failed
     // The exact error handling depends on implementation
@@ -247,18 +238,14 @@ invalid-date,Bad Expense,100.00
 
     await page.getByRole('button', { name: /preview/i }).click();
 
-    // Wait for preview (use .first() for strict mode)
-    await expect(page.getByText(/preview/i).first()).toBeVisible();
-    
-    // Wait for the preview table to load with data
-    await page.waitForTimeout(2000);
+    // Wait for preview data to load
+    await expect(page.getByText('Test Expense 1').first()).toBeVisible({ timeout: 15000 });
 
     // Import
     const importButton = page.getByRole('button', { name: /import.*selected/i });
     await importButton.click();
 
-    // Wait for import to complete
-    await page.waitForTimeout(2000);
+    // Wait for import to complete by checking for success message or stats
 
     // Should show statistics (imported count, skipped count, etc.)
     const hasStats =

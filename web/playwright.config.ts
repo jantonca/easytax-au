@@ -33,6 +33,18 @@ export default defineConfig({
 
     /* Screenshot on failure */
     screenshot: 'only-on-failure',
+
+    /* Global timeout for each test */
+    actionTimeout: 15000,
+    navigationTimeout: 15000,
+  },
+
+  /* Maximum time one test can run */
+  timeout: 60000,
+
+  /* Maximum time expect() should wait for the condition */
+  expect: {
+    timeout: 10000,
   },
 
   /* Configure projects for major browsers */
