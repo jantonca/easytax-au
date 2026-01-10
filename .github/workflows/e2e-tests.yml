@@ -63,7 +63,11 @@ jobs:
           echo $! > backend.pid
         env:
           NODE_ENV: test
-          DATABASE_URL: postgresql://easytax:easytax_dev@localhost:5432/easytax_au
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USERNAME: easytax
+          DB_PASSWORD: easytax_dev
+          DB_NAME: easytax_au
           ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY || '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef' }}
 
       - name: Wait for backend to be ready
