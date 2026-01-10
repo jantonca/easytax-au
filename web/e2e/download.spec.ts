@@ -106,11 +106,9 @@ test.describe('PDF Download - BAS Reports', () => {
   });
 
   test('should handle download error gracefully', async ({ page }) => {
-    // This test checks error handling when download fails
-    // We can simulate this by intercepting the network request
 
     // Intercept PDF download request and return error
-    await page.route('**/reports/bas/**/*.pdf', (route) => {
+    await page.route('**/reports/bas/**/pdf', (route) => {
       route.abort('failed');
     });
 
@@ -201,8 +199,9 @@ test.describe('PDF Download - FY Reports', () => {
   });
 
   test('should handle network failure during FY PDF download', async ({ page }) => {
+
     // Intercept PDF download request and return error
-    await page.route('**/reports/fy/**/*.pdf', (route) => {
+    await page.route('**/reports/fy/**/pdf', (route) => {
       route.abort('failed');
     });
 
@@ -263,21 +262,30 @@ test.describe('PDF Download - General', () => {
 
     const downloadButton = page.getByRole('button', { name: /download.*pdf/i });
 
+    // Verify button is initially enabled
+    await expect(downloadButton).not.toBeDisabled();
+
+    // Delay the PDF response to make the loading state observable
+    await page.route('**/reports/bas/**/pdf', async (route) => {
+      // Wait 500ms before responding to create observable loading state
+      await page.waitForTimeout(500);
+      route.continue();
+    });
+
     // Set up download listener
     const downloadPromise = page.waitForEvent('download', { timeout: 10000 });
 
     // Click download button
     await downloadButton.click();
 
-    // Immediately try to click again
-    await downloadButton.click();
-
-    // Button should be disabled during download
-    const isDisabled = await downloadButton.isDisabled();
-    expect(isDisabled).toBe(true);
+    // Button should be disabled during download (with delayed response)
+    await expect(downloadButton).toBeDisabled();
 
     // Wait for download to complete
     await downloadPromise;
+
+    // Button should be enabled again after download completes
+    await expect(downloadButton).not.toBeDisabled();
   });
 
   test('should show success feedback after PDF download', async ({ page }) => {

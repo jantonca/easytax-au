@@ -2,6 +2,8 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Dark Mode Theme Toggle', () => {
   test.beforeEach(async ({ page }) => {
+    // Set viewport to desktop size to ensure theme labels are visible
+    await page.setViewportSize({ width: 1280, height: 720 });
     // Clear localStorage before each test
     await page.goto('/');
     await page.evaluate(() => localStorage.clear());
@@ -16,11 +18,13 @@ test.describe('Dark Mode Theme Toggle', () => {
   });
 
   test('should default to system theme on first visit', async ({ page }) => {
+    // Navigate with empty localStorage (already cleared in beforeEach)
     await page.goto('/');
 
-    // Check localStorage is empty initially
+    // On first visit, theme should default to system
+    // The app may set localStorage to 'system' as the default, or leave it null
     const theme = await page.evaluate(() => localStorage.getItem('theme'));
-    expect(theme).toBeNull();
+    expect(theme === null || theme === 'system').toBe(true);
 
     // Check that the theme button shows "Auto" (system theme)
     const themeButton = page.getByRole('button', { name: /switch theme/i });

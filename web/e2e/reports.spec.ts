@@ -26,11 +26,11 @@ test.describe('BAS Report Viewing', () => {
     await expect(page.getByText(/Q[1-4].*FY/i)).toBeVisible();
 
     // Should show BAS summary cards or placeholders
-    // Check for G1, 1A, 1B labels
-    await expect(page.getByText(/G1|total.*sales/i)).toBeVisible();
-    await expect(page.getByText(/1A|gst.*collected/i)).toBeVisible();
-    await expect(page.getByText(/1B|gst.*paid/i)).toBeVisible();
-    await expect(page.getByText(/net.*gst/i)).toBeVisible();
+    // Check for G1, 1A, 1B labels (use .first() for multiple matches)
+    await expect(page.getByText(/G1|total.*sales/i).first()).toBeVisible();
+    await expect(page.getByText(/1A|gst.*collected/i).first()).toBeVisible();
+    await expect(page.getByText(/1B|gst.*paid/i).first()).toBeVisible();
+    await expect(page.getByText(/net.*gst/i).first()).toBeVisible();
   });
 
   test('should switch between quarters', async ({ page }) => {
@@ -55,8 +55,8 @@ test.describe('BAS Report Viewing', () => {
         const newQuarter = await quarterSelect.inputValue();
         expect(newQuarter).not.toBe(initialQuarter);
 
-        // BAS summary should still be visible (even if empty)
-        await expect(page.getByText(/G1|1A|1B|net.*gst/i)).toBeVisible();
+        // BAS summary should still be visible (even if empty, use .first())
+        await expect(page.getByText(/G1|1A|1B|net.*gst/i).first()).toBeVisible();
       }
     }
   });
@@ -85,10 +85,10 @@ test.describe('BAS Report Viewing', () => {
   });
 
   test('should show period date range', async ({ page }) => {
-    // BAS report should show the period dates (e.g., "1 Jul 2025 - 30 Sep 2025")
-    await expect(
-      page.getByText(/\d{1,2}\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i),
-    ).toBeVisible();
+    // BAS report should show the period dates
+    // Look for visible text only, not hidden select options
+    const dateText = page.locator('p, div').filter({ hasText: /\d{1,2}\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i }).first();
+    await expect(dateText).toBeVisible();
   });
 
   test('should show record counts for income and expenses', async ({ page }) => {
@@ -137,12 +137,12 @@ test.describe('FY Report Viewing', () => {
     // Check page heading
     await expect(page.getByRole('heading', { name: /fy.*report|financial.*year/i })).toBeVisible();
 
-    // Should show year selector
-    await expect(page.getByText(/FY\s*20\d{2}/i)).toBeVisible();
+    // Should show year selector (use .first() for multiple matches)
+    await expect(page.getByText(/FY\s*20\d{2}/i).first()).toBeVisible();
 
-    // Should show FY summary sections
-    await expect(page.getByText(/income/i)).toBeVisible();
-    await expect(page.getByText(/expense/i)).toBeVisible();
+    // Should show FY summary sections (use role for more specific match)
+    await expect(page.getByRole('heading', { name: /income/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /expense/i }).first()).toBeVisible();
   });
 
   test('should switch between financial years', async ({ page }) => {
@@ -167,8 +167,8 @@ test.describe('FY Report Viewing', () => {
         const newYear = await yearSelect.inputValue();
         expect(newYear).not.toBe(initialYear);
 
-        // FY summary should still be visible
-        await expect(page.getByText(/income|expense/i)).toBeVisible();
+        // FY summary should still be visible (use .first() for multiple matches)
+        await expect(page.getByText(/income|expense/i).first()).toBeVisible();
       }
     }
   });
@@ -177,9 +177,9 @@ test.describe('FY Report Viewing', () => {
     // Wait for data to load
     await page.waitForTimeout(2000);
 
-    // Check for income summary fields
-    await expect(page.getByText(/total.*income/i)).toBeVisible();
-    await expect(page.getByText(/gst.*collected/i)).toBeVisible();
+    // Check for income summary fields (use .first() for multiple matches)
+    await expect(page.getByText(/total.*income/i).first()).toBeVisible();
+    await expect(page.getByText(/gst.*collected/i).first()).toBeVisible();
 
     // May also show paid/unpaid breakdown
     const hasPaidBreakdown = (await page.getByText(/paid.*income/i).count()) > 0;
@@ -193,9 +193,9 @@ test.describe('FY Report Viewing', () => {
     // Wait for data to load
     await page.waitForTimeout(2000);
 
-    // Check for expense summary fields
-    await expect(page.getByText(/total.*expense/i)).toBeVisible();
-    await expect(page.getByText(/gst.*paid/i)).toBeVisible();
+    // Check for expense summary fields (use .first() for multiple matches)
+    await expect(page.getByText(/total.*expense/i).first()).toBeVisible();
+    await expect(page.getByText(/gst.*paid/i).first()).toBeVisible();
   });
 
   test('should display category breakdown', async ({ page }) => {
@@ -207,7 +207,7 @@ test.describe('FY Report Viewing', () => {
       (await page.getByText(/by.*category|category.*breakdown/i).count()) > 0;
 
     if (hasCategorySection) {
-      await expect(page.getByText(/by.*category|category.*breakdown/i)).toBeVisible();
+      await expect(page.getByText(/by.*category|category.*breakdown/i).first()).toBeVisible();
     }
   });
 

@@ -142,10 +142,7 @@ export function IncomesTable({
       aria-label="Incomes"
       className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-4"
     >
-      <div className="mb-3 flex items-baseline justify-between gap-2">
-        <h2 className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-50">
-          Incomes
-        </h2>
+      <div className="mb-3 flex justify-end">
         <p className="text-[11px] text-slate-500">
           Sorted by {sortBy === 'date' ? 'date (newest first)' : sortBy}
         </p>

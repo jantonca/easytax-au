@@ -1,5 +1,9 @@
 import { test, expect } from '@playwright/test';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * E2E tests for CSV Import functionality
@@ -29,9 +33,8 @@ test.describe('CSV Import Flow', () => {
   });
 
   test('should upload CSV and show preview', async ({ page }) => {
-    // Select source type (Manual/Custom CSV)
-    const sourceSelect = page.locator('select').first();
-    await sourceSelect.selectOption('custom');
+    // Select source type (Manual/Custom CSV) using radio button
+    await page.getByRole('radio', { name: /manual csv/i }).click();
 
     // Upload CSV file
     const fileInput = page.locator('input[type="file"]');
@@ -41,19 +44,21 @@ test.describe('CSV Import Flow', () => {
     // Click Preview button
     await page.getByRole('button', { name: /preview/i }).click();
 
-    // Wait for preview to load
-    await expect(page.getByText(/preview/i)).toBeVisible();
+    // Wait for preview to load (use .first() for strict mode)
+    await expect(page.getByText(/preview/i).first()).toBeVisible();
 
-    // Verify preview table shows the CSV data
-    await expect(page.getByText('Test Expense 1')).toBeVisible();
-    await expect(page.getByText('Test Expense 2')).toBeVisible();
-    await expect(page.getByText('Test Expense 3')).toBeVisible();
+    // Wait for the preview table to actually load with data
+    await page.waitForTimeout(2000); // Give time for API call to complete
+
+    // Verify preview table shows the CSV data (use .first() for multiple matches)
+    await expect(page.getByText('Test Expense 1').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Test Expense 2').first()).toBeVisible();
+    await expect(page.getByText('Test Expense 3').first()).toBeVisible();
   });
 
   test('should allow selecting and deselecting rows', async ({ page }) => {
     // Upload and preview CSV
-    const sourceSelect = page.locator('select').first();
-    await sourceSelect.selectOption('custom');
+    await page.getByRole('radio', { name: /manual csv/i }).click();
 
     const fileInput = page.locator('input[type="file"]');
     const csvPath = path.join(__dirname, 'fixtures', 'test-expenses.csv');
@@ -61,8 +66,11 @@ test.describe('CSV Import Flow', () => {
 
     await page.getByRole('button', { name: /preview/i }).click();
 
-    // Wait for preview to load
-    await expect(page.getByText(/preview/i)).toBeVisible();
+    // Wait for preview to load (use .first() for strict mode)
+    await expect(page.getByText(/preview/i).first()).toBeVisible();
+    
+    // Wait for the preview table to load with data
+    await page.waitForTimeout(2000);
 
     // Find checkboxes for row selection
     const checkboxes = page.locator('input[type="checkbox"]');
@@ -82,8 +90,7 @@ test.describe('CSV Import Flow', () => {
 
   test('should import selected rows successfully', async ({ page }) => {
     // Upload and preview CSV
-    const sourceSelect = page.locator('select').first();
-    await sourceSelect.selectOption('custom');
+    await page.getByRole('radio', { name: /manual csv/i }).click();
 
     const fileInput = page.locator('input[type="file"]');
     const csvPath = path.join(__dirname, 'fixtures', 'test-expenses.csv');
@@ -91,8 +98,11 @@ test.describe('CSV Import Flow', () => {
 
     await page.getByRole('button', { name: /preview/i }).click();
 
-    // Wait for preview to load
-    await expect(page.getByText(/preview/i)).toBeVisible();
+    // Wait for preview to load (use .first() for strict mode)
+    await expect(page.getByText(/preview/i).first()).toBeVisible();
+    
+    // Wait for the preview table to load with data  
+    await page.waitForTimeout(2000);
 
     // Click Import button
     const importButton = page.getByRole('button', { name: /import.*selected/i });
@@ -106,25 +116,20 @@ test.describe('CSV Import Flow', () => {
   });
 
   test('should show error for invalid file type', async ({ page }) => {
-    // Try to upload a non-CSV file
     const fileInput = page.locator('input[type="file"]');
 
     // Create a temporary text file
-    const textContent = 'This is not a CSV file';
-    const blob = new Blob([textContent], { type: 'text/plain' });
-    const file = new File([blob], 'test.txt', { type: 'text/plain' });
-
-    // Use the DataTransfer API to set the file
-    const dataTransfer = await page.evaluateHandle((file) => {
-      const dt = new DataTransfer();
-      dt.items.add(file);
-      return dt;
-    }, file);
-
-    await fileInput.evaluate((input, dataTransfer) => {
-      input.files = dataTransfer.files;
-      input.dispatchEvent(new Event('change', { bubbles: true }));
-    }, dataTransfer);
+    // Create a temporary text file on disk
+    const fs = await import('fs/promises');
+    const tempPath = path.join(__dirname, 'fixtures', 'temp-invalid.txt');
+    await fs.writeFile(tempPath, 'This is not a CSV file');
+    
+    try {
+      await fileInput.setInputFiles(tempPath);
+    } finally {
+      // Clean up
+      await fs.unlink(tempPath).catch(() => {});
+    }
 
     // Should show error message about file type
     // Note: Exact error message depends on implementation
@@ -142,29 +147,24 @@ test.describe('CSV Import Flow', () => {
   });
 
   test('should handle empty CSV file', async ({ page }) => {
-    // Create an empty CSV file
     const emptyCSV = 'date,description,amount\n';
 
     // Upload via file input
     const fileInput = page.locator('input[type="file"]');
 
-    const blob = new Blob([emptyCSV], { type: 'text/csv' });
-    const file = new File([blob], 'empty.csv', { type: 'text/csv' });
-
-    const dataTransfer = await page.evaluateHandle((file) => {
-      const dt = new DataTransfer();
-      dt.items.add(file);
-      return dt;
-    }, file);
-
-    await fileInput.evaluate((input, dataTransfer) => {
-      input.files = dataTransfer.files;
-      input.dispatchEvent(new Event('change', { bubbles: true }));
-    }, dataTransfer);
+    // Create temporary empty CSV file
+    const fs = await import('fs/promises');
+    const tempPath = path.join(__dirname, 'fixtures', 'temp-empty.csv');
+    await fs.writeFile(tempPath, emptyCSV);
+    
+    try {
+      await fileInput.setInputFiles(tempPath);
+    } finally {
+      await fs.unlink(tempPath).catch(() => {});
+    }
 
     // Select source
-    const sourceSelect = page.locator('select').first();
-    await sourceSelect.selectOption('custom');
+    await page.getByRole('radio', { name: /manual csv/i }).click();
 
     // Click Preview
     await page.getByRole('button', { name: /preview/i }).click();
@@ -174,7 +174,6 @@ test.describe('CSV Import Flow', () => {
   });
 
   test('should show validation errors for invalid data', async ({ page }) => {
-    // Create a CSV with invalid data (e.g., invalid date)
     const invalidCSV = `date,description,amount
 invalid-date,Bad Expense,100.00
 2025-01-06,Good Expense,200.00`;
@@ -182,23 +181,19 @@ invalid-date,Bad Expense,100.00
     // Upload the CSV
     const fileInput = page.locator('input[type="file"]');
 
-    const blob = new Blob([invalidCSV], { type: 'text/csv' });
-    const file = new File([blob], 'invalid.csv', { type: 'text/csv' });
-
-    const dataTransfer = await page.evaluateHandle((file) => {
-      const dt = new DataTransfer();
-      dt.items.add(file);
-      return dt;
-    }, file);
-
-    await fileInput.evaluate((input, dataTransfer) => {
-      input.files = dataTransfer.files;
-      input.dispatchEvent(new Event('change', { bubbles: true }));
-    }, dataTransfer);
+    // Create temporary invalid CSV file
+    const fs = await import('fs/promises');
+    const tempPath = path.join(__dirname, 'fixtures', 'temp-invalid.csv');
+    await fs.writeFile(tempPath, invalidCSV);
+    
+    try {
+      await fileInput.setInputFiles(tempPath);
+    } finally {
+      await fs.unlink(tempPath).catch(() => {});
+    }
 
     // Select source
-    const sourceSelect = page.locator('select').first();
-    await sourceSelect.selectOption('custom');
+    await page.getByRole('radio', { name: /manual csv/i }).click();
 
     // Click Preview
     await page.getByRole('button', { name: /preview/i }).click();
@@ -222,9 +217,10 @@ invalid-date,Bad Expense,100.00
     await expect(page).toHaveURL(/\/import\/expenses/);
 
     // Navigate to incomes import tab (if it exists)
-    const incomesTab = page.getByRole('link', { name: /incomes/i });
+    // Use specific selector to avoid ambiguity (get the import tab, not navigation)
+    const incomesTab = page.getByRole('link', { name: 'Incomes', exact: true }).filter({ has: page.locator('[href="/import/incomes"]') });
 
-    if (await incomesTab.isVisible()) {
+    if (await incomesTab.count() > 0) {
       await incomesTab.click();
       await expect(page).toHaveURL(/\/import\/incomes/);
 
@@ -237,8 +233,7 @@ invalid-date,Bad Expense,100.00
 
   test('should show import statistics after successful import', async ({ page }) => {
     // Upload and preview CSV
-    const sourceSelect = page.locator('select').first();
-    await sourceSelect.selectOption('custom');
+    await page.getByRole('radio', { name: /manual csv/i }).click();
 
     const fileInput = page.locator('input[type="file"]');
     const csvPath = path.join(__dirname, 'fixtures', 'test-expenses.csv');
@@ -246,8 +241,11 @@ invalid-date,Bad Expense,100.00
 
     await page.getByRole('button', { name: /preview/i }).click();
 
-    // Wait for preview
-    await expect(page.getByText(/preview/i)).toBeVisible();
+    // Wait for preview (use .first() for strict mode)
+    await expect(page.getByText(/preview/i).first()).toBeVisible();
+    
+    // Wait for the preview table to load with data
+    await page.waitForTimeout(2000);
 
     // Import
     const importButton = page.getByRole('button', { name: /import.*selected/i });

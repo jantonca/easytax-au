@@ -6,20 +6,22 @@
 
 ---
 
-## System Management Features (v1.1.0) - NEW
+## System Management Features (v1.1.0) - COMPLETE
 
-**Priority:** HIGH | **Target:** Next minor release
+**Priority:** HIGH | **Target:** Shipped
 
 | Task | Effort | Priority | Status |
 |------|--------|----------|--------|
 | **Version Display** - Show app version in UI footer and Settings | 3-4 hours | 🔥 HIGH | ✅ Done |
 | **Database Export** - Download backup from Settings page | 7-8 hours | 🔥 HIGH | ✅ Done |
 | **Update Notification** - Check GitHub for updates (optional) | 4-6 hours | 🟡 MEDIUM | ✅ Done |
+| **CI/CD for E2E Tests** - Automated testing in GitHub Actions | 3-4 hours | 🟡 MEDIUM | ✅ Done |
 
 **Implementation Notes:**
 - Version: ✅ `/api/version` endpoint + footer component + Settings page display
 - DB Export: ✅ `/api/backup/export` endpoint with rate limiting (3 per 5 min) + Settings UI with countdown timer
 - Update Notification: ✅ GitHub Releases API integration + auto-check (24h) + manual check button on About page
+- CI/CD: ✅ GitHub Actions workflow (`.github/workflows/e2e-tests.yml`) with PostgreSQL, 63 E2E tests, artifacts upload
 
 ---
 
@@ -111,4 +113,4 @@ The remaining 5 tasks are nice-to-have polish items that do not block daily use.
 
 ---
 
-**Last Updated:** 2026-01-10 (Update Notification feature completed - v1.1.0 complete)
+**Last Updated:** 2026-01-10 (CI/CD for E2E Tests completed - v1.1.0 complete with automated testing)

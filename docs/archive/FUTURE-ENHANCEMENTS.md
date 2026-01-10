@@ -447,26 +447,32 @@ Export data to popular accounting formats (Xero, MYOB, QuickBooks).
 
 ## 🔧 Technical Debt & Infrastructure
 
-### CI/CD Integration for E2E Tests
+### CI/CD Integration for E2E Tests ✅ **COMPLETED**
 
 **Priority:** 🟡 Medium
 **Estimated Effort:** 3-4 hours
-**Context:** E2E tests configured locally (F3.5)
+**Completed:** 2026-01-10
+**Workflow:** `.github/workflows/e2e-tests.yml`
 
-**Current State:**
+**Implementation:**
 
-- ✅ 40+ Playwright tests covering critical flows
-- ✅ Local execution with `pnpm --filter web test:e2e`
+- ✅ 63 Playwright tests covering critical flows (93.7% passing)
+- ✅ GitHub Actions workflow with PostgreSQL service
+- ✅ Automatic browser dependency installation
+- ✅ Backend auto-start with health checks
+- ✅ Test artifacts upload (reports + screenshots on failure)
+- ✅ Configured test parallelization (1 worker on CI, 8 locally)
+- ✅ Test database auto-seeded on startup
 
-**Tasks:**
+**Test Coverage:**
+- Theme switching: 11/11 ✓
+- Expense CRUD: 9/9 ✓
+- Income CRUD: 10/10 ✓
+- Reports: 14/14 ✓
+- PDF Downloads: 10/10 ✓
+- CSV Import: 5/9 (4 require backend API)
 
-- [ ] Add Playwright to GitHub Actions workflow
-- [ ] Run E2E tests on PR creation
-- [ ] Upload test results and screenshots as artifacts
-- [ ] Configure test parallelization
-- [ ] Set up test database for CI
-
-**Reference:** TASKS-FRONTEND.md line 1135
+**Reference:** TASKS-FRONTEND.md line 1135, web/e2e/README.md
 
 ---
 

@@ -120,18 +120,42 @@ Tests assume the following seed data exists:
 
 ## CI/CD Integration
 
-The `playwright.config.ts` is configured for CI:
-- Retries failed tests 2 times
-- Uses single worker on CI
-- Runs in headless mode
-- Captures screenshots on failure
-- Generates HTML report
+### GitHub Actions Workflow
 
-Add to your CI pipeline:
-```yaml
-- name: Run E2E tests
-  run: pnpm --filter web test:e2e
-```
+E2E tests run automatically in CI via `.github/workflows/e2e-tests.yml`:
+- **Triggers**: On pull requests and pushes to main
+- **Environment**: Ubuntu Latest with Node 20, pnpm 8
+- **Database**: PostgreSQL 15 (via GitHub Actions service)
+- **Browser**: Chromium with system dependencies auto-installed
+- **Test execution**: All 63 E2E tests in parallel with retries
+- **Artifacts**: Test reports and screenshots uploaded on failure
+
+### Playwright Configuration
+
+The `playwright.config.ts` is CI-optimized:
+- **Retries**: 2 retries on CI (0 locally)
+- **Workers**: 1 worker on CI (parallel locally)
+- **Mode**: Headless (always)
+- **Screenshots**: Only on failure
+- **Reports**: HTML report generated
+
+### Running in CI
+
+The workflow automatically:
+1. Installs Playwright with system dependencies (`playwright install --with-deps chromium`)
+2. Starts PostgreSQL database
+3. Builds and starts the backend (with auto-seeding)
+4. Waits for health check (`/health` endpoint)
+5. Runs all E2E tests
+6. Uploads test artifacts (reports, screenshots)
+
+### Viewing Test Results
+
+After a CI run:
+1. Go to the Actions tab in GitHub
+2. Click on the workflow run
+3. Check the "Run E2E tests" step for test output
+4. Download artifacts for detailed reports and failure screenshots
 
 ## Writing New Tests
 
