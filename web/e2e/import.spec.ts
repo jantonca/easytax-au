@@ -48,9 +48,9 @@ test.describe('CSV Import Flow', () => {
     await expect(page.getByText(/preview/i).first()).toBeVisible();
 
     // Wait for the preview table to actually load with data by checking for first row
-    await expect(page.getByText('Test Expense 1').first()).toBeVisible({ timeout: 15000 });
-    await expect(page.getByText('Test Expense 2').first()).toBeVisible();
-    await expect(page.getByText('Test Expense 3').first()).toBeVisible();
+    await expect(page.getByText('GitHub').first()).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText('VentraIP').first()).toBeVisible();
+    await expect(page.getByText('NordVPN').first()).toBeVisible();
   });
 
   test('should allow selecting and deselecting rows', async ({ page }) => {
@@ -64,7 +64,7 @@ test.describe('CSV Import Flow', () => {
     await page.getByRole('button', { name: /preview/i }).click();
 
     // Wait for preview to load by checking for first data row
-    await expect(page.getByText('Test Expense 1').first()).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText('GitHub').first()).toBeVisible({ timeout: 15000 });
 
     // Find checkboxes for row selection
     const checkboxes = page.locator('input[type="checkbox"]');
@@ -93,7 +93,7 @@ test.describe('CSV Import Flow', () => {
     await page.getByRole('button', { name: /preview/i }).click();
 
     // Wait for preview data to load
-    await expect(page.getByText('Test Expense 1').first()).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText('GitHub').first()).toBeVisible({ timeout: 15000 });
 
     // Click Import button
     const importButton = page.getByRole('button', { name: /import.*selected/i });
@@ -140,7 +140,7 @@ test.describe('CSV Import Flow', () => {
   });
 
   test('should handle empty CSV file', async ({ page }) => {
-    const emptyCSV = 'date,description,amount\n';
+    const emptyCSV = 'Date,Item,Total\n';
 
     // Upload via file input
     const fileInput = page.locator('input[type="file"]');
@@ -169,9 +169,9 @@ test.describe('CSV Import Flow', () => {
   });
 
   test('should show validation errors for invalid data', async ({ page }) => {
-    const invalidCSV = `date,description,amount
-invalid-date,Bad Expense,100.00
-2025-01-06,Good Expense,200.00`;
+    const invalidCSV = `Date,Item,Total
+invalid-date,GitHub,100.00
+2025-01-06,VentraIP,200.00`;
 
     // Upload the CSV
     const fileInput = page.locator('input[type="file"]');
@@ -196,7 +196,7 @@ invalid-date,Bad Expense,100.00
     await page.getByRole('button', { name: /preview/i }).click();
 
     // Wait for preview data to appear
-    await expect(page.getByText('Good Expense').first()).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText('VentraIP').first()).toBeVisible({ timeout: 15000 });
 
     // Should show validation errors or mark rows as failed
     // The exact error handling depends on implementation
@@ -239,7 +239,7 @@ invalid-date,Bad Expense,100.00
     await page.getByRole('button', { name: /preview/i }).click();
 
     // Wait for preview data to load
-    await expect(page.getByText('Test Expense 1').first()).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText('GitHub').first()).toBeVisible({ timeout: 15000 });
 
     // Import
     const importButton = page.getByRole('button', { name: /import.*selected/i });
