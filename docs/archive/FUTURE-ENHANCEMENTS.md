@@ -232,7 +232,7 @@ Provide downloadable CSV templates with example data.
 
 ### F3.4.3: Screen Reader Testing
 
-**Priority:** 🔴 High (Deferred for now)
+**Priority:** 🔴 High (Deferred for now as we don't currently have access to screen reader software,)
 **Estimated Effort:** 4-6 hours (manual QA)
 **Original Task:** TASKS-FRONTEND.md line 1078
 **Dependencies:** Access to NVDA (Windows) or VoiceOver (macOS)
