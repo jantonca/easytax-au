@@ -1,0 +1,5 @@
+# Allow CSV test fixtures in this directory
+!*.csv
+
+# Ignore temp files created during tests
+temp-*
