@@ -59,8 +59,9 @@ jobs:
 
       - name: Start backend
         run: |
-          pnpm start:prod &
+          pnpm start:prod > backend.log 2>&1 &
           echo $! > backend.pid
+          echo "Backend started with PID $(cat backend.pid)"
         env:
           NODE_ENV: test
           DB_HOST: localhost
@@ -72,8 +73,22 @@ jobs:
 
       - name: Wait for backend to be ready
         run: |
-          timeout 60 bash -c 'until curl -f http://localhost:3000/health 2>/dev/null; do sleep 2; done' || true
-          sleep 5
+          echo "Waiting for backend to start..."
+          for i in {1..30}; do
+            if curl -f http://localhost:3000/health 2>/dev/null; then
+              echo "Backend is ready!"
+              curl http://localhost:3000/health
+              exit 0
+            fi
+            echo "Attempt $i/30: Backend not ready yet..."
+            sleep 2
+          done
+          echo "Backend failed to start within 60 seconds"
+          echo "=== Backend logs ==="
+          cat backend.log || echo "No logs available"
+          echo "=== Process status ==="
+          ps aux | grep node || echo "No node processes"
+          exit 1
 
       - name: Run E2E tests
         run: pnpm --filter web test:e2e
