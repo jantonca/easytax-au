@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { ToastProvider } from '@/components/ui/toast-provider';
 import { AboutPage } from './about-page';
 import { useVersion } from '@/hooks/use-version';
 import type { VersionResponse } from '@/lib/api-client';
@@ -8,6 +9,14 @@ import type { VersionResponse } from '@/lib/api-client';
 vi.mock('@/hooks/use-version');
 
 const mockedUseVersion = vi.mocked(useVersion);
+
+function renderWithProviders(ui: React.ReactElement) {
+  return render(
+    <ToastProvider>
+      <MemoryRouter>{ui}</MemoryRouter>
+    </ToastProvider>,
+  );
+}
 
 describe('AboutPage', () => {
   it('renders version details when loaded', () => {
@@ -24,11 +33,7 @@ describe('AboutPage', () => {
       isError: false,
     } as ReturnType<typeof useVersion>);
 
-    render(
-      <MemoryRouter>
-        <AboutPage />
-      </MemoryRouter>,
-    );
+    renderWithProviders(<AboutPage />);
 
     expect(screen.getByRole('heading', { level: 1, name: /about/i })).toBeInTheDocument();
     expect(screen.getByText('0.0.1')).toBeInTheDocument();
@@ -50,11 +55,7 @@ describe('AboutPage', () => {
       isError: false,
     } as ReturnType<typeof useVersion>);
 
-    render(
-      <MemoryRouter>
-        <AboutPage />
-      </MemoryRouter>,
-    );
+    renderWithProviders(<AboutPage />);
 
     expect(screen.getByRole('navigation', { name: 'Settings navigation' })).toBeInTheDocument();
   });
@@ -66,11 +67,7 @@ describe('AboutPage', () => {
       isError: false,
     } as ReturnType<typeof useVersion>);
 
-    render(
-      <MemoryRouter>
-        <AboutPage />
-      </MemoryRouter>,
-    );
+    renderWithProviders(<AboutPage />);
 
     expect(screen.getByRole('heading', { level: 1, name: /about/i })).toBeInTheDocument();
     expect(screen.getByText(/loading version information/i)).toBeInTheDocument();
@@ -83,11 +80,7 @@ describe('AboutPage', () => {
       isError: true,
     } as ReturnType<typeof useVersion>);
 
-    render(
-      <MemoryRouter>
-        <AboutPage />
-      </MemoryRouter>,
-    );
+    renderWithProviders(<AboutPage />);
 
     expect(screen.getByText(/couldn't load version information/i)).toBeInTheDocument();
   });
@@ -106,11 +99,7 @@ describe('AboutPage', () => {
       isError: false,
     } as ReturnType<typeof useVersion>);
 
-    render(
-      <MemoryRouter>
-        <AboutPage />
-      </MemoryRouter>,
-    );
+    renderWithProviders(<AboutPage />);
 
     expect(screen.getByText('EasyTax-AU')).toBeInTheDocument();
   });

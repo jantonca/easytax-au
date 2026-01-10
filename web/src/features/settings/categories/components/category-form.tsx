@@ -132,9 +132,14 @@ export function CategoryForm({
           type="text"
           className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
           placeholder="Software, Hosting, Internet, etc."
+          aria-describedby={errors.name ? 'category-name-error' : undefined}
           {...register('name')}
         />
-        {errors.name && <p className="text-[11px] text-red-400">{errors.name.message}</p>}
+        {errors.name && (
+          <p id="category-name-error" className="text-[11px] text-red-400">
+            {errors.name.message}
+          </p>
+        )}
       </div>
 
       <div className="flex flex-col gap-1 text-xs">
@@ -147,13 +152,18 @@ export function CategoryForm({
         <select
           id="category-bas-label"
           className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
+          aria-describedby={errors.basLabel ? 'category-bas-label-error' : undefined}
           {...register('basLabel')}
         >
           <option value="1B">1B - Purchases for making sales (most common)</option>
           <option value="G10">G10 - Capital purchases</option>
           <option value="G11">G11 - Non-capital purchases</option>
         </select>
-        {errors.basLabel && <p className="text-[11px] text-red-400">{errors.basLabel.message}</p>}
+        {errors.basLabel && (
+          <p id="category-bas-label-error" className="text-[11px] text-red-400">
+            {errors.basLabel.message}
+          </p>
+        )}
         <p className="text-[10px] text-slate-600 dark:text-slate-400">
           ATO BAS label for reporting. Most business expenses use 1B.
         </p>
@@ -190,10 +200,13 @@ export function CategoryForm({
           id="category-description"
           className="min-h-[72px] rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 py-1 text-xs text-slate-900 dark:text-slate-100"
           placeholder="Optional notes about this category..."
+          aria-describedby={errors.description ? 'category-description-error' : undefined}
           {...register('description')}
         />
         {errors.description && (
-          <p className="text-[11px] text-red-400">{errors.description.message}</p>
+          <p id="category-description-error" className="text-[11px] text-red-400">
+            {errors.description.message}
+          </p>
         )}
       </div>
 

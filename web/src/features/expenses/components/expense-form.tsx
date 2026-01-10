@@ -199,9 +199,14 @@ export function ExpenseForm({
             id="expense-date"
             type="date"
             className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
+            aria-describedby={errors.date ? 'expense-date-error' : undefined}
             {...register('date')}
           />
-          {errors.date && <p className="text-[11px] text-red-400">{errors.date.message}</p>}
+          {errors.date && (
+            <p id="expense-date-error" className="text-[11px] text-red-400">
+              {errors.date.message}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col gap-1 text-xs text-slate-700 dark:text-slate-200">
@@ -217,9 +222,14 @@ export function ExpenseForm({
             inputMode="decimal"
             className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
             placeholder="$0.00"
+            aria-describedby={errors.amount ? 'expense-amount-error' : undefined}
             {...register('amount')}
           />
-          {errors.amount && <p className="text-[11px] text-red-400">{errors.amount.message}</p>}
+          {errors.amount && (
+            <p id="expense-amount-error" className="text-[11px] text-red-400">
+              {errors.amount.message}
+            </p>
+          )}
           {calculatedGst && (
             <p className="text-[10px] text-emerald-600 dark:text-emerald-400">
               {calculatedGst.isInternational
@@ -274,6 +284,7 @@ export function ExpenseForm({
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={bizPercent}
+            aria-describedby={errors.bizPercent ? 'expense-biz-error' : undefined}
             className="w-full accent-emerald-600"
             {...register('bizPercent', { valueAsNumber: true })}
           />
@@ -282,7 +293,9 @@ export function ExpenseForm({
             <span>100%</span>
           </div>
           {errors.bizPercent && (
-            <p className="text-[11px] text-red-400">{errors.bizPercent.message}</p>
+            <p id="expense-biz-error" className="text-[11px] text-red-400">
+              {errors.bizPercent.message}
+            </p>
           )}
           {claimableGst !== null && (
             <p className="text-[10px] text-slate-600 dark:text-slate-400">
@@ -340,10 +353,13 @@ export function ExpenseForm({
         <textarea
           id="expense-description"
           className="min-h-18 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 py-1 text-xs text-slate-900 dark:text-slate-100"
+          aria-describedby={errors.description ? 'expense-description-error' : undefined}
           {...register('description')}
         />
         {errors.description && (
-          <p className="text-[11px] text-red-400">{errors.description.message}</p>
+          <p id="expense-description-error" className="text-[11px] text-red-400">
+            {errors.description.message}
+          </p>
         )}
       </div>
 
@@ -359,9 +375,14 @@ export function ExpenseForm({
           type="text"
           className="h-8 rounded-md border border-slate-300 bg-white dark:border-slate-800 dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
           placeholder="receipt-github-2024-01.pdf"
+          aria-describedby={errors.fileRef ? 'expense-fileRef-error' : undefined}
           {...register('fileRef')}
         />
-        {errors.fileRef && <p className="text-[11px] text-red-400">{errors.fileRef.message}</p>}
+        {errors.fileRef && (
+          <p id="expense-fileRef-error" className="text-[11px] text-red-400">
+            {errors.fileRef.message}
+          </p>
+        )}
       </div>
 
       <div className="mt-4 flex justify-end gap-2">

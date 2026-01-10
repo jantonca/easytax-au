@@ -149,9 +149,14 @@ export function ProviderForm({
           type="text"
           className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
           placeholder="GitHub, VentraIP, etc."
+          aria-describedby={errors.name ? 'provider-name-error' : undefined}
           {...register('name')}
         />
-        {errors.name && <p className="text-[11px] text-red-400">{errors.name.message}</p>}
+        {errors.name && (
+          <p id="provider-name-error" className="text-[11px] text-red-400">
+            {errors.name.message}
+          </p>
+        )}
       </div>
 
       <div className="flex items-start gap-2">
@@ -185,6 +190,7 @@ export function ProviderForm({
         <select
           id="provider-category"
           className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
+          aria-describedby={errors.defaultCategoryId ? 'provider-category-error' : undefined}
           {...register('defaultCategoryId')}
         >
           <option value="">No default category</option>
@@ -195,7 +201,9 @@ export function ProviderForm({
           ))}
         </select>
         {errors.defaultCategoryId && (
-          <p className="text-[11px] text-red-400">{errors.defaultCategoryId.message}</p>
+          <p id="provider-category-error" className="text-[11px] text-red-400">
+            {errors.defaultCategoryId.message}
+          </p>
         )}
       </div>
 
@@ -212,9 +220,14 @@ export function ProviderForm({
           inputMode="numeric"
           className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
           placeholder="51824753556 (ABN) or 123456789 (ARN)"
+          aria-describedby={errors.abnArn ? 'provider-abn-error' : undefined}
           {...register('abnArn')}
         />
-        {errors.abnArn && <p className="text-[11px] text-red-400">{errors.abnArn.message}</p>}
+        {errors.abnArn && (
+          <p id="provider-abn-error" className="text-[11px] text-red-400">
+            {errors.abnArn.message}
+          </p>
+        )}
         <p className="text-[10px] text-slate-600 dark:text-slate-400">
           ABN (11 digits) or ARN (9 digits) for reference only.
         </p>

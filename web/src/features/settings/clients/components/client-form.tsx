@@ -124,9 +124,14 @@ export function ClientForm({ initialValues, clientId, onSuccess }: ClientFormPro
           type="text"
           className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
           placeholder="Acme Corp, etc."
+          aria-describedby={errors.name ? 'client-name-error' : undefined}
           {...register('name')}
         />
-        {errors.name && <p className="text-[11px] text-red-400">{errors.name.message}</p>}
+        {errors.name && (
+          <p id="client-name-error" className="text-[11px] text-red-400">
+            {errors.name.message}
+          </p>
+        )}
         <p className="text-[10px] text-slate-600 dark:text-slate-400">
           Client names are encrypted at rest for privacy.
         </p>
@@ -145,9 +150,14 @@ export function ClientForm({ initialValues, clientId, onSuccess }: ClientFormPro
           inputMode="numeric"
           className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
           placeholder="12345678901 (11 digits)"
+          aria-describedby={errors.abn ? 'client-abn-error' : undefined}
           {...register('abn')}
         />
-        {errors.abn && <p className="text-[11px] text-red-400">{errors.abn.message}</p>}
+        {errors.abn && (
+          <p id="client-abn-error" className="text-[11px] text-red-400">
+            {errors.abn.message}
+          </p>
+        )}
         <p className="text-[10px] text-slate-600 dark:text-slate-400">
           ABN must be 11 digits. Also encrypted at rest for privacy.
         </p>

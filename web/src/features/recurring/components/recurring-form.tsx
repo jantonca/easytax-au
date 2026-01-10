@@ -198,8 +198,13 @@ export function RecurringForm({
           {...register('name')}
           className="mt-1 block w-full rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100"
           placeholder="e.g., iinet Internet"
+          aria-describedby={errors.name ? 'name-error' : undefined}
         />
-        {errors.name && <p className="mt-1 text-[11px] text-red-400">{errors.name.message}</p>}
+        {errors.name && (
+          <p id="name-error" className="mt-1 text-[11px] text-red-400">
+            {errors.name.message}
+          </p>
+        )}
       </div>
 
       {/* Description */}
@@ -216,9 +221,12 @@ export function RecurringForm({
           {...register('description')}
           className="mt-1 block w-full rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100"
           placeholder="e.g., Monthly internet service"
+          aria-describedby={errors.description ? 'description-error' : undefined}
         />
         {errors.description && (
-          <p className="mt-1 text-[11px] text-red-400">{errors.description.message}</p>
+          <p id="description-error" className="mt-1 text-[11px] text-red-400">
+            {errors.description.message}
+          </p>
         )}
       </div>
 
@@ -234,6 +242,7 @@ export function RecurringForm({
           id="providerId"
           {...register('providerId')}
           className="mt-1 block w-full rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100"
+          aria-describedby={errors.providerId ? 'providerId-error' : undefined}
         >
           {providers.length === 0 && <option value="">Loading providers...</option>}
           {providers.map((provider) => (
@@ -244,7 +253,9 @@ export function RecurringForm({
           ))}
         </select>
         {errors.providerId && (
-          <p className="mt-1 text-[11px] text-red-400">{errors.providerId.message}</p>
+          <p id="providerId-error" className="mt-1 text-[11px] text-red-400">
+            {errors.providerId.message}
+          </p>
         )}
       </div>
 
@@ -260,6 +271,7 @@ export function RecurringForm({
           id="categoryId"
           {...register('categoryId')}
           className="mt-1 block w-full rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100"
+          aria-describedby={errors.categoryId ? 'categoryId-error' : undefined}
         >
           {categories.length === 0 && <option value="">Loading categories...</option>}
           {categories.map((category) => (
@@ -269,7 +281,9 @@ export function RecurringForm({
           ))}
         </select>
         {errors.categoryId && (
-          <p className="mt-1 text-[11px] text-red-400">{errors.categoryId.message}</p>
+          <p id="categoryId-error" className="mt-1 text-[11px] text-red-400">
+            {errors.categoryId.message}
+          </p>
         )}
       </div>
 
@@ -288,9 +302,12 @@ export function RecurringForm({
             {...register('amount')}
             className="mt-1 block w-full rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100"
             placeholder="110.00"
+            aria-describedby={errors.amount ? 'amount-error' : undefined}
           />
           {errors.amount && (
-            <p className="mt-1 text-[11px] text-red-400">{errors.amount.message}</p>
+            <p id="amount-error" className="mt-1 text-[11px] text-red-400">
+              {errors.amount.message}
+            </p>
           )}
           {/* GST auto-calculation display */}
           {selectedProvider && (
@@ -315,9 +332,12 @@ export function RecurringForm({
             {...register('gstAmount')}
             className="mt-1 block w-full rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100"
             placeholder={calculatedGst}
+            aria-describedby={errors.gstAmount ? 'gstAmount-error' : undefined}
           />
           {errors.gstAmount && (
-            <p className="mt-1 text-[11px] text-red-400">{errors.gstAmount.message}</p>
+            <p id="gstAmount-error" className="mt-1 text-[11px] text-red-400">
+              {errors.gstAmount.message}
+            </p>
           )}
         </div>
       </div>
@@ -342,13 +362,16 @@ export function RecurringForm({
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={bizPercent}
+          aria-describedby={errors.bizPercent ? 'bizPercent-error' : undefined}
         />
         <p className="mt-1 text-[10px] text-slate-600 dark:text-slate-400">
           Claimable GST: <span className="font-semibold">${claimableGst}</span> ({bizPercent}% of $
           {gstAmount && gstAmount.trim() !== '' ? gstAmount : calculatedGst})
         </p>
         {errors.bizPercent && (
-          <p className="mt-1 text-[11px] text-red-400">{errors.bizPercent.message}</p>
+          <p id="bizPercent-error" className="mt-1 text-[11px] text-red-400">
+            {errors.bizPercent.message}
+          </p>
         )}
       </div>
 
@@ -364,13 +387,16 @@ export function RecurringForm({
           id="schedule"
           {...register('schedule')}
           className="mt-1 block w-full rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100"
+          aria-describedby={errors.schedule ? 'schedule-error' : undefined}
         >
           <option value="monthly">Monthly</option>
           <option value="quarterly">Quarterly</option>
           <option value="yearly">Yearly</option>
         </select>
         {errors.schedule && (
-          <p className="mt-1 text-[11px] text-red-400">{errors.schedule.message}</p>
+          <p id="schedule-error" className="mt-1 text-[11px] text-red-400">
+            {errors.schedule.message}
+          </p>
         )}
       </div>
 
@@ -389,12 +415,15 @@ export function RecurringForm({
           max="28"
           {...register('dayOfMonth', { valueAsNumber: true })}
           className="mt-1 block w-full rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100"
+          aria-describedby={errors.dayOfMonth ? 'dayOfMonth-error' : undefined}
         />
         <p className="mt-1 text-[10px] text-slate-600 dark:text-slate-400">
           Use 1-28 to avoid month-end date issues
         </p>
         {errors.dayOfMonth && (
-          <p className="mt-1 text-[11px] text-red-400">{errors.dayOfMonth.message}</p>
+          <p id="dayOfMonth-error" className="mt-1 text-[11px] text-red-400">
+            {errors.dayOfMonth.message}
+          </p>
         )}
       </div>
 
@@ -412,9 +441,12 @@ export function RecurringForm({
             type="date"
             {...register('startDate')}
             className="mt-1 block w-full rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100"
+            aria-describedby={errors.startDate ? 'startDate-error' : undefined}
           />
           {errors.startDate && (
-            <p className="mt-1 text-[11px] text-red-400">{errors.startDate.message}</p>
+            <p id="startDate-error" className="mt-1 text-[11px] text-red-400">
+              {errors.startDate.message}
+            </p>
           )}
         </div>
 
@@ -430,9 +462,12 @@ export function RecurringForm({
             type="date"
             {...register('endDate')}
             className="mt-1 block w-full rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100"
+            aria-describedby={errors.endDate ? 'endDate-error' : undefined}
           />
           {errors.endDate && (
-            <p className="mt-1 text-[11px] text-red-400">{errors.endDate.message}</p>
+            <p id="endDate-error" className="mt-1 text-[11px] text-red-400">
+              {errors.endDate.message}
+            </p>
           )}
         </div>
       </div>

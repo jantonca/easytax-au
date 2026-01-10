@@ -193,9 +193,14 @@ export function IncomeForm({
             id="income-date"
             type="date"
             className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
+            aria-describedby={errors.date ? 'income-date-error' : undefined}
             {...register('date')}
           />
-          {errors.date && <p className="text-[11px] text-red-400">{errors.date.message}</p>}
+          {errors.date && (
+            <p id="income-date-error" className="text-[11px] text-red-400">
+              {errors.date.message}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col gap-1 text-xs text-slate-700 dark:text-slate-200">
@@ -210,10 +215,13 @@ export function IncomeForm({
             type="text"
             className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
             placeholder="INV-2024-001"
+            aria-describedby={errors.invoiceNum ? 'income-invoiceNum-error' : undefined}
             {...register('invoiceNum')}
           />
           {errors.invoiceNum && (
-            <p className="text-[11px] text-red-400">{errors.invoiceNum.message}</p>
+            <p id="income-invoiceNum-error" className="text-[11px] text-red-400">
+              {errors.invoiceNum.message}
+            </p>
           )}
         </div>
       </div>
@@ -239,9 +247,14 @@ export function IncomeForm({
             inputMode="decimal"
             className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
             placeholder="$0.00"
+            aria-describedby={errors.subtotal ? 'income-subtotal-error' : undefined}
             {...register('subtotal')}
           />
-          {errors.subtotal && <p className="text-[11px] text-red-400">{errors.subtotal.message}</p>}
+          {errors.subtotal && (
+            <p id="income-subtotal-error" className="text-[11px] text-red-400">
+              {errors.subtotal.message}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col gap-1 text-xs text-slate-700 dark:text-slate-200">
@@ -257,10 +270,15 @@ export function IncomeForm({
             inputMode="decimal"
             className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
             placeholder="$0.00"
+            aria-describedby={errors.gst ? 'income-gst-error' : undefined}
             {...register('gst')}
             onFocus={handleGstFocus}
           />
-          {errors.gst && <p className="text-[11px] text-red-400">{errors.gst.message}</p>}
+          {errors.gst && (
+            <p id="income-gst-error" className="text-[11px] text-red-400">
+              {errors.gst.message}
+            </p>
+          )}
           <p className="text-[10px] text-slate-600 dark:text-slate-400">
             Auto-calculated as 10% of subtotal. Edit to override.
           </p>
@@ -277,10 +295,13 @@ export function IncomeForm({
         <textarea
           id="income-description"
           className="min-h-[72px] rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 py-1 text-xs text-slate-900 dark:text-slate-100"
+          aria-describedby={errors.description ? 'income-description-error' : undefined}
           {...register('description')}
         />
         {errors.description && (
-          <p className="text-[11px] text-red-400">{errors.description.message}</p>
+          <p id="income-description-error" className="text-[11px] text-red-400">
+            {errors.description.message}
+          </p>
         )}
       </div>
 
