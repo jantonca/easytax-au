@@ -57,6 +57,12 @@ jobs:
       - name: Build backend
         run: pnpm build
 
+      - name: Verify build output
+        run: |
+          echo "Checking build output..."
+          ls -la dist/ || echo "dist/ not found"
+          ls -la dist/main.js || echo "main.js not found"
+
       - name: Start backend
         run: |
           pnpm start:prod > backend.log 2>&1 &
