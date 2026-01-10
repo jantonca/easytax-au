@@ -4,7 +4,7 @@
 
 **Project Status:** Core functionality is production-ready (98% complete, 99/101 tasks done). These enhancements are optional improvements based on user feedback and evolving needs.
 
-**Last Updated:** 2026-01-09
+**Last Updated:** 2026-01-10
 
 ---
 
@@ -274,36 +274,25 @@ Manual testing with assistive technology to ensure full accessibility compliance
 
 ---
 
-### Error Message Improvements
+### Error Message Improvements ✅ **COMPLETED**
 
 **Priority:** 🟡 Medium
 **Estimated Effort:** 2-3 hours
+**Completed:** 2026-01-10
+**Commit:** `fa6d716`
 
-**Current State:**
-Error messages are displayed visually but not associated via `aria-describedby` (noted in TASKS-FRONTEND.md line 1009).
+**Implementation:**
+Added `aria-describedby` associations to 29 form fields across 6 forms to properly announce error messages to screen readers. Implementation follows WCAG 2.1 AA guidelines.
 
-**Enhancement:**
+**Files Updated:**
 
-```typescript
-// Add to all forms
-<input
-  id="amount"
-  aria-describedby={errors.amountCents ? "amount-error" : undefined}
-  {...field}
-/>
-{errors.amountCents && (
-  <span id="amount-error" className="text-red-500">
-    {errors.amountCents.message}
-  </span>
-)}
-```
-
-**Files to Update:**
-
-- `web/src/features/expenses/components/expense-form.tsx`
-- `web/src/features/incomes/components/income-form.tsx`
-- `web/src/features/recurring/components/recurring-form.tsx`
-- All settings forms (providers, categories, clients)
+- ✅ `web/src/features/expenses/components/expense-form.tsx` (5 fields)
+- ✅ `web/src/features/incomes/components/income-form.tsx` (5 fields)
+- ✅ `web/src/features/recurring/components/recurring-form.tsx` (11 fields)
+- ✅ `web/src/features/settings/providers/components/provider-form.tsx` (3 fields)
+- ✅ `web/src/features/settings/categories/components/category-form.tsx` (3 fields)
+- ✅ `web/src/features/settings/clients/components/client-form.tsx` (2 fields)
+- ✅ `web/src/features/settings/about/about-page.test.tsx` (test fix)
 
 ---
 

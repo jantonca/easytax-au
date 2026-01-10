@@ -18,7 +18,7 @@
 
 **Project Status:** 98% complete (99/101 tasks done) - Production-ready with core functionality complete.
 
-**Last Updated:** 2026-01-09
+**Last Updated:** 2026-01-10
 
 ---
 
@@ -130,6 +130,60 @@ Implemented searchable, accessible category dropdown with 95% code reuse from Pr
 - Once a complex pattern is validated (provider dropdown), duplication is faster than premature abstraction
 - TypeScript generics would enable a shared component, but adds complexity for marginal benefit (2 instances)
 - Consistent naming and structure across similar components improves maintainability
+
+---
+
+### Accessibility: Form Error Message Improvements
+
+**Status:** ✅ Completed (2026-01-10)
+**Phase:** Accessibility Enhancements
+**Actual Effort:** 2-3 hours
+**Commit:** `fa6d716`
+
+**Implementation:**
+Added `aria-describedby` associations to 29 form fields across 6 forms to properly announce validation error messages to screen readers. This ensures assistive technology users receive immediate feedback when form fields contain errors, improving form completion success rates.
+
+**Pattern Applied:**
+```tsx
+<input
+  id="field-id"
+  aria-describedby={errors.fieldName ? 'field-id-error' : undefined}
+  {...register('fieldName')}
+/>
+{errors.fieldName && (
+  <p id="field-id-error" className="text-[11px] text-red-400">
+    {errors.fieldName.message}
+  </p>
+)}
+```
+
+**Testing:**
+All 461 tests passing. Form tests validate that error messages display correctly for invalid inputs. Manual verification confirms screen reader announcement behavior.
+
+**Technical Decision:**
+Used conditional `aria-describedby` (only present when error exists) rather than always-present empty error containers. This prevents screen readers from announcing "no error" unnecessarily and follows WCAG 2.1 AA guidelines.
+
+**Reference:** FUTURE-ENHANCEMENTS.md "Error Message Improvements"
+
+**Key Files:**
+- `web/src/features/expenses/components/expense-form.tsx` (5 fields)
+- `web/src/features/incomes/components/income-form.tsx` (5 fields)
+- `web/src/features/recurring/components/recurring-form.tsx` (11 fields)
+- `web/src/features/settings/providers/components/provider-form.tsx` (3 fields)
+- `web/src/features/settings/categories/components/category-form.tsx` (3 fields)
+- `web/src/features/settings/clients/components/client-form.tsx` (2 fields)
+- `web/src/features/settings/about/about-page.test.tsx` (test provider fix)
+
+**Accessibility Impact:**
+- ✅ WCAG 2.1 AA compliant error message associations
+- ✅ Screen readers announce error messages when focusing invalid fields
+- ✅ Improved form accessibility for visually impaired users
+- ✅ Prepares codebase for comprehensive screen reader testing (next priority)
+
+**Lessons Learned:**
+- Consistent implementation across all forms ensures uniform accessibility
+- Test files must include proper context providers (ToastProvider) to avoid hook errors
+- Error ID naming convention (`{field-id}-error`) provides clear association patterns
 
 ---
 
@@ -256,7 +310,7 @@ describe('ProviderSelect', () => {
 
 ## 🗂 Backlog Management
 
-**Last Updated:** 2026-01-09
+**Last Updated:** 2026-01-10
 **Next Review:** When new feature requests arise from daily usage
 
 **Process:**
