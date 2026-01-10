@@ -232,9 +232,9 @@ invalid-date,GitHub,100.00
   });
 
   test('should show import statistics after successful import', async ({ page }) => {
-    // Upload CSV first
+    // Upload CSV first - use alternate CSV to avoid duplicates from previous tests
     const fileInput = page.locator('input[type="file"]');
-    const csvPath = path.join(__dirname, 'fixtures', 'test-expenses.csv');
+    const csvPath = path.join(__dirname, 'fixtures', 'test-expenses-alt.csv');
     await fileInput.setInputFiles(csvPath);
 
     // Select source type AFTER uploading file
@@ -243,8 +243,8 @@ invalid-date,GitHub,100.00
     // Click Preview
     await page.getByRole('button', { name: /preview/i }).click();
 
-    // Wait for preview data to load
-    await expect(page.getByText('GitHub').first()).toBeVisible({ timeout: 15000 });
+    // Wait for preview data to load (checking for JetBrains from alt CSV)
+    await expect(page.getByText('JetBrains').first()).toBeVisible({ timeout: 15000 });
 
     // Wait for checkboxes to be enabled (rows validated successfully)
     const firstCheckbox = page.locator('input[type="checkbox"]').nth(1);
