@@ -121,7 +121,9 @@ test.describe('CSV Import Flow', () => {
     // Create a temporary text file
     // Create a temporary text file on disk
     const fs = await import('fs/promises');
-    const tempPath = path.join(__dirname, 'fixtures', 'temp-invalid.txt');
+    const fixturesDir = path.join(__dirname, 'fixtures');
+    await fs.mkdir(fixturesDir, { recursive: true });
+    const tempPath = path.join(fixturesDir, 'temp-invalid.txt');
     await fs.writeFile(tempPath, 'This is not a CSV file');
     
     try {
@@ -154,7 +156,9 @@ test.describe('CSV Import Flow', () => {
 
     // Create temporary empty CSV file
     const fs = await import('fs/promises');
-    const tempPath = path.join(__dirname, 'fixtures', 'temp-empty.csv');
+    const fixturesDir = path.join(__dirname, 'fixtures');
+    await fs.mkdir(fixturesDir, { recursive: true });
+    const tempPath = path.join(fixturesDir, 'temp-empty.csv');
     await fs.writeFile(tempPath, emptyCSV);
     
     try {
@@ -183,7 +187,9 @@ invalid-date,Bad Expense,100.00
 
     // Create temporary invalid CSV file
     const fs = await import('fs/promises');
-    const tempPath = path.join(__dirname, 'fixtures', 'temp-invalid.csv');
+    const fixturesDir = path.join(__dirname, 'fixtures');
+    await fs.mkdir(fixturesDir, { recursive: true });
+    const tempPath = path.join(fixturesDir, 'temp-invalid.csv');
     await fs.writeFile(tempPath, invalidCSV);
     
     try {

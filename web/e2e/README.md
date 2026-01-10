@@ -111,6 +111,8 @@ pnpm exec playwright test expense.spec.ts --debug
 Test CSV files are located in `e2e/fixtures/`:
 - `test-expenses.csv` - Sample expense data for import tests
 
+**Note**: The `fixtures/` directory is tracked in git (with a local `.gitignore` to allow `.csv` files despite the root `.gitignore` excluding them). Tests automatically create this directory if it doesn't exist when generating temporary test files.
+
 ### Database Requirements
 
 Tests assume the following seed data exists:

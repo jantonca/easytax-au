@@ -20,7 +20,7 @@ test.describe('Income CRUD Flow', () => {
 
   test('should display incomes page with Add income button', async ({ page }) => {
     // Check page heading
-    await expect(page.getByRole('heading', { name: 'Incomes' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Incomes', exact: true })).toBeVisible();
 
     // Check Add income button is visible
     await expect(page.getByRole('button', { name: 'Add income' })).toBeVisible();

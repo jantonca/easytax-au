@@ -20,7 +20,7 @@ test.describe('Expense CRUD Flow', () => {
 
   test('should display expenses page with Add expense button', async ({ page }) => {
     // Check page heading
-    await expect(page.getByRole('heading', { name: 'Expenses' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Expenses', exact: true })).toBeVisible();
 
     // Check Add expense button is visible
     await expect(page.getByRole('button', { name: 'Add expense' })).toBeVisible();
