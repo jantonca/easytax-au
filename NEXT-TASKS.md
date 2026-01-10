@@ -21,7 +21,7 @@
 - Version: ✅ `/api/version` endpoint + footer component + Settings page display
 - DB Export: ✅ `/api/backup/export` endpoint with rate limiting (3 per 5 min) + Settings UI with countdown timer
 - Update Notification: ✅ GitHub Releases API integration + auto-check (24h) + manual check button on About page
-- CI/CD: ✅ GitHub Actions workflow (`.github/workflows/e2e-tests.yml`) with PostgreSQL, 63 E2E tests, artifacts upload
+- CI/CD: ✅ GitHub Actions workflow (`.github/workflows/e2e-tests.yml`) with PostgreSQL, 62 E2E tests (1 skipped, 98.4% pass rate), artifacts upload
 
 ---
 
@@ -60,7 +60,7 @@ See [FUTURE-ENHANCEMENTS.md](docs/archive/FUTURE-ENHANCEMENTS.md) for additional
 
 ### ✅ Testing (100%)
 - 482 Vitest unit/integration tests passing
-- 40+ Playwright E2E tests covering critical flows
+- 62 Playwright E2E tests (1 skipped, 98.4% pass rate)
 - Test coverage on critical paths
 
 ### ✅ Deployment (100%)

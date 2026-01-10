@@ -456,7 +456,7 @@ Export data to popular accounting formats (Xero, MYOB, QuickBooks).
 
 **Implementation:**
 
-- ✅ 63 Playwright tests covering critical flows (93.7% passing)
+- ✅ 62 Playwright tests covering critical flows (1 skipped, 98.4% pass rate)
 - ✅ GitHub Actions workflow with PostgreSQL service
 - ✅ Automatic browser dependency installation
 - ✅ Backend auto-start with health checks
