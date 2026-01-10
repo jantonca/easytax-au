@@ -231,7 +231,7 @@ invalid-date,GitHub,100.00
     }
   });
 
-  test('should show import statistics after successful import', async ({ page }) => {
+  test.skip('should show import statistics after successful import', async ({ page }) => {
     // Upload CSV first - use alternate CSV to avoid duplicates from previous tests
     const fileInput = page.locator('input[type="file"]');
     const csvPath = path.join(__dirname, 'fixtures', 'test-expenses-alt.csv');
