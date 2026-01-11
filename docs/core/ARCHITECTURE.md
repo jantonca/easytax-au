@@ -91,8 +91,15 @@
   - App-level error boundary with a simple fallback screen and dev-only logging (no PII).
 - **Toasts:**
   - `web/src/lib/toast-context.ts` (`ToastContext`, `useToast`)
-  - `web/src/components/ui/toast-provider.tsx` (state management)
+  - `web/src/components/ui/toast-provider.tsx` (state management with pause/resume, auto-dismiss, stacking)
   - `web/src/components/ui/toast-viewport.tsx` (Tailwind-styled, accessible UI, bottom-right)
+  - Features:
+    - **Auto-dismiss:** Variant-based durations (success: 4s, default: 5s, error: 8s, customizable)
+    - **Progress bar:** Visual countdown with CSS animation, pauses on hover
+    - **Pause on hover:** Timer pauses when hovering over toast, resumes on mouse leave
+    - **Stacking:** Maximum 5 toasts displayed, FIFO removal of oldest when limit exceeded
+    - **Undo actions:** Delete operations show undo button with 8-second window (expenses, incomes)
+    - **Accessibility:** ARIA live regions, keyboard navigation, prefers-reduced-motion support
 - **Loading States (Skeleton Components):**
   - `web/src/components/ui/skeleton.tsx` (base skeleton with animated pulse, dark mode support)
   - `web/src/components/skeletons/table-skeleton.tsx` (configurable table skeleton with N columns/rows, ARIA labels)

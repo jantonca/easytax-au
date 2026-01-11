@@ -64,9 +64,66 @@ export function useDeleteProvider(): UseMutationResult<void, unknown, string> {
 
   return useMutation<void, unknown, string>({
     mutationFn: async (id: string) => apiClient.delete<void>(`/providers/${id}`),
-    onSuccess: async () => {
+    onSuccess: async (_, deletedId) => {
+      // Get the deleted provider from cache before invalidation
+      const providers = queryClient.getQueryData<ProviderDto[]>(['providers']);
+      const deletedProvider = providers?.find((p) => p.id === deletedId);
+
       await queryClient.invalidateQueries({ queryKey: ['providers'] });
-      showToast({ title: 'Provider deleted successfully' });
+
+      if (!deletedProvider) {
+        showToast({ title: 'Provider deleted', variant: 'success' });
+        return;
+      }
+
+      // Show undo toast with 8-second window
+      showToast({
+        title: 'Provider deleted',
+        description: deletedProvider.name || undefined,
+        variant: 'success',
+        duration: 8000,
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            // Recreate the provider by calling the create API
+            const restoreData: {
+              name: string;
+              isInternational: boolean;
+              defaultCategoryId?: string;
+              abnArn?: string;
+            } = {
+              name: deletedProvider.name,
+              isInternational: deletedProvider.isInternational,
+            };
+
+            // Only include optional fields if they have values
+            if (deletedProvider.defaultCategoryId) {
+              restoreData.defaultCategoryId = deletedProvider.defaultCategoryId;
+            }
+            if (deletedProvider.abnArn) {
+              restoreData.abnArn = deletedProvider.abnArn;
+            }
+
+            apiClient
+              .post('/providers', restoreData)
+              .then(() => {
+                void queryClient.invalidateQueries({ queryKey: ['providers'] });
+                showToast({
+                  title: 'Provider restored',
+                  variant: 'success',
+                  duration: 3000,
+                });
+              })
+              .catch(() => {
+                showToast({
+                  title: 'Failed to restore provider',
+                  variant: 'error',
+                  duration: 5000,
+                });
+              });
+          },
+        },
+      });
     },
     onError: (error: unknown) => {
       const errorMessage = getErrorMessage(error, 'delete provider');

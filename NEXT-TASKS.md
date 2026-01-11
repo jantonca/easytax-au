@@ -1,33 +1,41 @@
 # NEXT: Upcoming Tasks
 
-**Status:** App is 100% complete. All v1.1.0 System Management features shipped. Production-ready.
+**Status:** v1.1.0 shipped. Planning v1.2.0 UX Enhancements.
 
-**Purpose:** Track upcoming tasks for the next release (v1.1.0).
+**Purpose:** Track upcoming tasks for the next release (v1.2.0).
 
 ---
 
-## System Management Features (v1.1.0) - COMPLETE
+## UX Enhancements (v1.2.0) - IN PROGRESS
 
-**Priority:** HIGH | **Target:** Shipped
+**Priority:** MEDIUM | **Target:** Q1 2026
 
 | Task | Effort | Priority | Status |
 |------|--------|----------|--------|
-| **Version Display** - Show app version in UI footer and Settings | 3-4 hours | 🔥 HIGH | ✅ Done |
-| **Database Export** - Download backup from Settings page | 7-8 hours | 🔥 HIGH | ✅ Done |
-| **Update Notification** - Check GitHub for updates (optional) | 4-6 hours | 🟡 MEDIUM | ✅ Done |
-| **CI/CD for E2E Tests** - Automated testing in GitHub Actions | 3-4 hours | 🟡 MEDIUM | ✅ Done |
+| **Toast Notification Enhancements** - Progress bar, pause on hover, stacking, undo | 3-4 hours | 🟡 MEDIUM | ⬜ Todo |
+| **Keyboard Shortcuts** - Power user shortcuts (⌘N, ⌘I, etc.) | 4-5 hours | 🟡 MEDIUM | ⬜ Todo |
+| **Bulk Operations** - Multi-select for batch delete/export/categorize | 5-6 hours | 🟡 MEDIUM | ⬜ Todo |
+| **CSV Template Downloads** - Downloadable templates with examples | 2-3 hours | 🟢 LOW | ⬜ Todo |
+| **Advanced Filtering** - Saved filters, multi-select, amount ranges | 6-8 hours | 🟡 MEDIUM | ⬜ Todo |
 
 **Implementation Notes:**
-- Version: ✅ `/api/version` endpoint + footer component + Settings page display
-- DB Export: ✅ `/api/backup/export` endpoint with rate limiting (3 per 5 min) + Settings UI with countdown timer
-- Update Notification: ✅ GitHub Releases API integration + auto-check (24h) + manual check button on About page
-- CI/CD: ✅ GitHub Actions workflow (`.github/workflows/e2e-tests.yml`) with PostgreSQL, 62 E2E tests (1 skipped, 98.4% pass rate), artifacts upload
+- Toast: Enhance `web/src/components/ui/toast-provider.tsx` with progress bar (CSS animation), pause on hover (setTimeout control), max 5 stack limit, undo action (8s window)
+- Keyboard: Extend `web/src/hooks/use-keyboard-shortcuts.ts` with ⌘N (new expense), ⌘⇧N (new income), ⌘I (import), ⌘/ (help overlay)
+- Bulk: TanStack Table row selection, bulk delete/export/recategorize, "Select all/none/invert" toolbar
+- Templates: Client-side CSV generation (Blob API), example rows for CommBank/Generic/Income formats
+- Filtering: localStorage for saved filters, multi-select dropdowns, amount min/max, quick filters (This month, Last quarter)
 
 ---
 
-## Frontend Optional Enhancements (Deferred)
+## Completed Releases
 
-See [FUTURE-ENHANCEMENTS.md](docs/archive/FUTURE-ENHANCEMENTS.md) for additional nice-to-have features (inline editing, toast enhancements, keyboard shortcuts, etc.).
+- **v1.1.0** (2026-01-10): System Management Features - See [ROADMAP-DONE.md Phase 6](docs/archive/ROADMAP-DONE.md#phase-6-system-management-features-v110---100-complete)
+
+---
+
+## Additional Future Enhancements
+
+See [FUTURE-ENHANCEMENTS.md](docs/archive/FUTURE-ENHANCEMENTS.md) for additional nice-to-have features (dashboard analytics, receipt uploads, multi-currency, screen reader testing, etc.).
 
 ---
 
@@ -113,4 +121,4 @@ The remaining 5 tasks are nice-to-have polish items that do not block daily use.
 
 ---
 
-**Last Updated:** 2026-01-10 (CI/CD for E2E Tests completed - v1.1.0 complete with automated testing)
+**Last Updated:** 2026-01-11 (v1.1.0 archived, v1.2.0 UX Enhancements planned - 5 tasks promoted from FUTURE-ENHANCEMENTS.md)

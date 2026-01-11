@@ -59,9 +59,58 @@ export function useDeleteIncome(): UseMutationResult<void, unknown, string> {
 
   return useMutation<void, unknown, string>({
     mutationFn: async (id: string) => apiClient.delete<void>(`/incomes/${id}`),
-    onSuccess: async () => {
+    onSuccess: async (_, deletedId) => {
+      // Get the deleted income from cache before invalidation
+      const incomes = queryClient.getQueryData<IncomeResponseDto[]>(['incomes']);
+      const deletedIncome = incomes?.find((i) => i.id === deletedId);
+
       await queryClient.invalidateQueries({ queryKey: ['incomes'] });
-      showToast({ title: 'Income deleted successfully' });
+
+      if (!deletedIncome) {
+        showToast({ title: 'Income deleted', variant: 'success' });
+        return;
+      }
+
+      // Show undo toast with 8-second window
+      showToast({
+        title: 'Income deleted',
+        description: deletedIncome.invoiceNum || deletedIncome.description || undefined,
+        variant: 'success',
+        duration: 8000,
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            // Recreate the income by calling the create API
+            const restoreData = {
+              date: deletedIncome.date,
+              clientId: deletedIncome.clientId,
+              subtotalCents: deletedIncome.subtotalCents,
+              gstCents: deletedIncome.gstCents,
+              isPaid: deletedIncome.isPaid,
+              ...(deletedIncome.invoiceNum && { invoiceNum: deletedIncome.invoiceNum }),
+              ...(deletedIncome.description && { description: deletedIncome.description }),
+            };
+
+            apiClient
+              .post('/incomes', restoreData)
+              .then(() => {
+                void queryClient.invalidateQueries({ queryKey: ['incomes'] });
+                showToast({
+                  title: 'Income restored',
+                  variant: 'success',
+                  duration: 3000,
+                });
+              })
+              .catch(() => {
+                showToast({
+                  title: 'Failed to restore income',
+                  variant: 'error',
+                  duration: 5000,
+                });
+              });
+          },
+        },
+      });
     },
     onError: (error: unknown) => {
       const errorMessage = getErrorMessage(error, 'delete income');

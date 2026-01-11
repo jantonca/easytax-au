@@ -303,6 +303,77 @@ See [FUTURE-ENHANCEMENTS.md](./FUTURE-ENHANCEMENTS.md) for:
 
 ---
 
+## Phase 6: System Management Features (v1.1.0) - 100% Complete
+
+**Goal:** Add version management, backup export, and update notifications.
+
+**Status:** ✅ **Shipped** - 2026-01-10
+
+| Task | Effort | Status | Implementation |
+|------|--------|--------|----------------|
+| **Version Display** | 3-4 hours | ✅ Done | `/api/version` endpoint + footer component + Settings page display |
+| **Database Export** | 7-8 hours | ✅ Done | `/api/backup/export` endpoint with rate limiting (3 per 5 min) + Settings UI with countdown timer |
+| **Update Notification** | 4-6 hours | ✅ Done | GitHub Releases API integration + auto-check (24h) + manual check button on About page |
+| **CI/CD for E2E Tests** | 3-4 hours | ✅ Done | GitHub Actions workflow (`.github/workflows/e2e-tests.yml`) with PostgreSQL, 62 E2E tests (1 skipped, 98.4% pass rate), artifacts upload |
+
+### Implementation Details
+
+**Version Display:**
+- Backend: `GET /api/version` returns `{ version: "1.1.0", buildDate: "..." }`
+- Frontend: Version shown in footer on all pages + Settings page with build info
+- Source of truth: `package.json` version field
+
+**Database Export:**
+- Backend: Rate-limited export endpoint (3 downloads per 5 minutes per session)
+- Frontend: Download button in Settings with countdown timer between downloads
+- File format: `easytax-backup-YYYY-MM-DD.sql` (PostgreSQL dump)
+- Security: Export includes encryption keys (user responsible for secure storage)
+
+**Update Notification:**
+- Backend: Fetch GitHub Releases API to check for newer versions
+- Frontend: Auto-check on app startup (cached for 24 hours)
+- Manual check button on About page
+- Toast notification if newer version available with link to releases page
+
+**CI/CD for E2E Tests:**
+- GitHub Actions workflow runs on push/PR to main branch
+- Automated setup: PostgreSQL service, backend startup, dependency installation
+- 62 Playwright tests covering: theme switching (11), expenses (9), incomes (10), reports (14), PDF downloads (10), CSV import (5/9, 4 skipped due to backend requirement)
+- Artifacts: Test reports and failure screenshots uploaded on failure
+- Test parallelization: 1 worker on CI, 8 locally
+- Health checks ensure backend ready before tests run
+
+### Testing Coverage
+
+- Unit Tests: 482 Vitest tests passing
+- E2E Tests: 62 Playwright tests (98.4% pass rate, 1 skipped)
+- Test Categories:
+  - Theme switching: 11/11 ✓
+  - Expense CRUD: 9/9 ✓
+  - Income CRUD: 10/10 ✓
+  - Reports: 14/14 ✓
+  - PDF Downloads: 10/10 ✓
+  - CSV Import: 5/9 (4 require backend API, deferred)
+
+### Files Modified
+
+**Backend:**
+- `src/version/version.controller.ts` (new)
+- `src/backup/backup.controller.ts` (new)
+- Rate limiting middleware for backup endpoint
+
+**Frontend:**
+- `web/src/components/layout/footer.tsx` (version display)
+- `web/src/features/settings/about/about-page.tsx` (version + update check)
+- `web/src/features/settings/settings-page.tsx` (backup download)
+- `web/src/hooks/use-update-check.ts` (new)
+
+**CI/CD:**
+- `.github/workflows/e2e-tests.yml` (new)
+- `web/e2e/README.md` (documentation)
+
+---
+
 ## Out of Scope (Won't Build)
 
 | Feature                 | Reason                          |

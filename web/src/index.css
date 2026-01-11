@@ -51,3 +51,30 @@ select:focus-visible,
 .animate-slide-in {
   animation: slide-in 0.3s ease-out;
 }
+
+/* Toast progress bar */
+@keyframes toast-progress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+.toast-progress-bar {
+  animation: toast-progress var(--duration) linear forwards;
+  transform-origin: left;
+}
+
+.toast-progress-bar.paused {
+  animation-play-state: paused;
+}
+
+/* Respect prefers-reduced-motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .toast-progress-bar {
+    animation: none;
+    opacity: 0.3;
+  }
+}

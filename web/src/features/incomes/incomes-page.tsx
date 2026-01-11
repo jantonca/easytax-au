@@ -17,7 +17,6 @@ import {
 import { useClients } from '@/hooks/use-clients';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { EmptyState } from '@/components/ui/empty-state';
-import { useToast } from '@/lib/toast-context';
 import { formatCents } from '@/lib/currency';
 import { TableSkeleton } from '@/components/skeletons/table-skeleton';
 
@@ -32,7 +31,6 @@ export function IncomesPage(): ReactElement {
   const { mutate: deleteIncome, isPending: isDeleting } = useDeleteIncome();
   const { mutate: markPaid } = useMarkPaid();
   const { mutate: markUnpaid } = useMarkUnpaid();
-  const { showToast } = useToast();
 
   const [filters, setFilters] = useState<IncomeFiltersValue>({
     clientId: 'all',
@@ -73,22 +71,7 @@ export function IncomesPage(): ReactElement {
 
   function handleTogglePaid(income: IncomeResponseDto): void {
     const mutate = income.isPaid ? markUnpaid : markPaid;
-
-    mutate(income.id, {
-      onSuccess: () => {
-        showToast({
-          title: 'Payment status updated',
-          description: 'The income has been updated successfully.',
-        });
-      },
-      onError: (error) => {
-        console.error('Error toggling paid status:', error);
-        showToast({
-          title: 'Error',
-          description: 'Failed to update payment status. Please try again.',
-        });
-      },
-    });
+    mutate(income.id);
   }
 
   function handleDelete(): void {
@@ -98,18 +81,7 @@ export function IncomesPage(): ReactElement {
 
     deleteIncome(incomeToDelete.id, {
       onSuccess: () => {
-        showToast({
-          title: 'Income deleted',
-          description: 'The income has been removed successfully.',
-        });
         setIncomeToDelete(null);
-      },
-      onError: (error) => {
-        console.error('Error deleting income:', error);
-        showToast({
-          title: 'Error',
-          description: 'Failed to delete income. Please try again.',
-        });
       },
     });
   }

@@ -4,7 +4,7 @@
 
 **Project Status:** Core functionality is production-ready (98% complete, 99/101 tasks done). These enhancements are optional improvements based on user feedback and evolving needs.
 
-**Last Updated:** 2026-01-10
+**Last Updated:** 2026-01-11 (5 tasks promoted to NEXT-TASKS.md for v1.2.0)
 
 ---
 
@@ -33,11 +33,12 @@
 
 ## 🎨 UX Polish & Interactions
 
-### Toast Notification Enhancements
+### Toast Notification Enhancements ⬆️ **PROMOTED TO v1.2.0**
 
 **Priority:** 🟡 Medium
 **Estimated Effort:** 3-4 hours
 **Context:** Auto-dismiss implemented in commit `ca6324b`
+**Status:** Moved to NEXT-TASKS.md on 2026-01-11
 
 **Features:**
 
@@ -85,10 +86,11 @@
 
 ---
 
-### Keyboard Shortcuts for Common Actions
+### Keyboard Shortcuts for Common Actions ⬆️ **PROMOTED TO v1.2.0**
 
 **Priority:** 🟡 Medium
 **Estimated Effort:** 4-5 hours
+**Status:** Moved to NEXT-TASKS.md on 2026-01-11
 
 **Description:**
 Add keyboard shortcuts beyond basic navigation for power users.
@@ -176,10 +178,11 @@ Modal-based editing provides full CRUD functionality with simpler implementation
 
 ---
 
-### Bulk Operations
+### Bulk Operations ⬆️ **PROMOTED TO v1.2.0**
 
 **Priority:** 🟡 Medium
 **Estimated Effort:** 5-6 hours
+**Status:** Moved to NEXT-TASKS.md on 2026-01-11
 
 **Description:**
 Allow selecting multiple rows for batch operations.
@@ -203,10 +206,11 @@ Allow selecting multiple rows for batch operations.
 
 ---
 
-### CSV Template Downloads
+### CSV Template Downloads ⬆️ **PROMOTED TO v1.2.0**
 
 **Priority:** 🟢 Low
 **Estimated Effort:** 2-3 hours
+**Status:** Moved to NEXT-TASKS.md on 2026-01-11
 
 **Description:**
 Provide downloadable CSV templates with example data.
@@ -360,10 +364,11 @@ Attach receipt/invoice images to expenses and incomes.
 
 ---
 
-### Advanced Filtering
+### Advanced Filtering ⬆️ **PROMOTED TO v1.2.0**
 
 **Priority:** 🟡 Medium
 **Estimated Effort:** 6-8 hours
+**Status:** Moved to NEXT-TASKS.md on 2026-01-11
 
 **Description:**
 More sophisticated filtering beyond current date range and dropdowns.

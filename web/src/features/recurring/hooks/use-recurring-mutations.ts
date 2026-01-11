@@ -63,9 +63,64 @@ export function useDeleteRecurring(): UseMutationResult<void, Error, string> {
 
   return useMutation<void, Error, string>({
     mutationFn: deleteRecurringExpense,
-    onSuccess: () => {
+    onSuccess: (_, deletedId) => {
+      // Get the deleted recurring expense from cache before invalidation
+      const recurring = queryClient.getQueryData<RecurringExpenseResponseDto[]>([
+        'recurring-expenses',
+      ]);
+      const deletedRecurring = recurring?.find((r) => r.id === deletedId);
+
       void queryClient.invalidateQueries({ queryKey: ['recurring-expenses'] });
-      showToast({ title: 'Recurring expense deleted successfully' });
+
+      if (!deletedRecurring) {
+        showToast({ title: 'Recurring expense deleted', variant: 'success' });
+        return;
+      }
+
+      // Show undo toast with 8-second window
+      showToast({
+        title: 'Recurring expense deleted',
+        description: deletedRecurring.name || undefined,
+        variant: 'success',
+        duration: 8000,
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            // Recreate the recurring expense by calling the create API
+            const restoreData: CreateRecurringExpenseDto = {
+              name: deletedRecurring.name,
+              description: deletedRecurring.description,
+              amountCents: deletedRecurring.amountCents,
+              gstCents: deletedRecurring.gstCents,
+              bizPercent: deletedRecurring.bizPercent,
+              providerId: deletedRecurring.providerId,
+              categoryId: deletedRecurring.categoryId,
+              schedule: deletedRecurring.schedule,
+              dayOfMonth: deletedRecurring.dayOfMonth,
+              startDate: deletedRecurring.startDate,
+              endDate: deletedRecurring.endDate,
+              isActive: deletedRecurring.isActive,
+            };
+
+            createRecurringExpense(restoreData)
+              .then(() => {
+                void queryClient.invalidateQueries({ queryKey: ['recurring-expenses'] });
+                showToast({
+                  title: 'Recurring expense restored',
+                  variant: 'success',
+                  duration: 3000,
+                });
+              })
+              .catch(() => {
+                showToast({
+                  title: 'Failed to restore recurring expense',
+                  variant: 'error',
+                  duration: 5000,
+                });
+              });
+          },
+        },
+      });
     },
     onError: (error: Error) => {
       const errorMessage = getErrorMessage(error, 'delete recurring expense');

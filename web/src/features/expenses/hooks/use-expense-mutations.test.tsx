@@ -231,7 +231,7 @@ describe('useDeleteExpense', () => {
     (toastContext.useToast as Mock).mockReturnValue(mockToast);
   });
 
-  it('shows success toast with correct message on successful deletion', async () => {
+  it('shows success toast when expense not in cache', async () => {
     (apiClient.apiClient.delete as Mock).mockResolvedValue(undefined);
 
     const { result } = renderHook(() => useDeleteExpense(), { wrapper });
@@ -240,7 +240,7 @@ describe('useDeleteExpense', () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(mockToast.showToast).toHaveBeenCalledWith({ title: 'Expense deleted successfully' });
+    expect(mockToast.showToast).toHaveBeenCalledWith({ title: 'Expense deleted', variant: 'success' });
   });
 
   it('shows generic error toast on 500 server error', async () => {

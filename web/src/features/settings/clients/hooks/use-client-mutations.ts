@@ -55,11 +55,65 @@ export function useDeleteClient(): UseMutationResult<void, unknown, string> {
 
   return useMutation<void, unknown, string>({
     mutationFn: async (id: string) => apiClient.delete<void>(`/clients/${id}`),
-    onSuccess: async () => {
+    onSuccess: async (_, deletedId) => {
+      // Get the deleted client from cache before invalidation
+      const clients = queryClient.getQueryData<ClientDto[]>(['clients']);
+      const deletedClient = clients?.find((c) => c.id === deletedId);
+
       await queryClient.invalidateQueries({ queryKey: ['clients'] });
       // Also invalidate incomes since they contain client info
       await queryClient.invalidateQueries({ queryKey: ['incomes'] });
-      showToast({ title: 'Client deleted successfully' });
+
+      if (!deletedClient) {
+        showToast({ title: 'Client deleted', variant: 'success' });
+        return;
+      }
+
+      // Show undo toast with 8-second window
+      showToast({
+        title: 'Client deleted',
+        description: deletedClient.name || undefined,
+        variant: 'success',
+        duration: 8000,
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            // Recreate the client by calling the create API
+            const restoreData: {
+              name: string;
+              isPsiEligible: boolean;
+              abn?: string;
+            } = {
+              name: deletedClient.name,
+              isPsiEligible: deletedClient.isPsiEligible,
+            };
+
+            // Only include optional fields if they have values
+            if (deletedClient.abn) {
+              restoreData.abn = deletedClient.abn;
+            }
+
+            apiClient
+              .post('/clients', restoreData)
+              .then(() => {
+                void queryClient.invalidateQueries({ queryKey: ['clients'] });
+                void queryClient.invalidateQueries({ queryKey: ['incomes'] });
+                showToast({
+                  title: 'Client restored',
+                  variant: 'success',
+                  duration: 3000,
+                });
+              })
+              .catch(() => {
+                showToast({
+                  title: 'Failed to restore client',
+                  variant: 'error',
+                  duration: 5000,
+                });
+              });
+          },
+        },
+      });
     },
     onError: (error: unknown) => {
       const errorMessage = getErrorMessage(error, 'delete client');

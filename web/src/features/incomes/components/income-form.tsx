@@ -7,7 +7,6 @@ import { formatCents, parseCurrency } from '@/lib/currency';
 import type { IncomeFormValues } from '@/features/incomes/schemas/income.schema';
 import { incomeFormSchema } from '@/features/incomes/schemas/income.schema';
 import { useCreateIncome, useUpdateIncome } from '@/features/incomes/hooks/use-income-mutations';
-import { useToast } from '@/lib/toast-context';
 import { ClientSelect } from './client-select';
 
 interface IncomeFormProps {
@@ -61,7 +60,6 @@ export function IncomeForm({
 
   const { mutate: createIncome, isPending: isCreating } = useCreateIncome();
   const { mutate: updateIncome, isPending: isUpdating } = useUpdateIncome();
-  const { showToast } = useToast();
 
   const submitting = isSubmitting || isCreating || isUpdating;
 
@@ -133,18 +131,7 @@ export function IncomeForm({
         { id: incomeId, data: payload },
         {
           onSuccess: () => {
-            showToast({
-              title: 'Income updated',
-              description: 'The income has been updated successfully.',
-            });
             onSuccess?.();
-          },
-          onError: (error) => {
-            console.error('Error updating income:', error);
-            showToast({
-              title: 'Error',
-              description: 'Failed to update income. Please try again.',
-            });
           },
         },
       );
@@ -153,20 +140,9 @@ export function IncomeForm({
         { data: payload },
         {
           onSuccess: () => {
-            showToast({
-              title: 'Income created',
-              description: 'The income has been saved successfully.',
-            });
             reset();
             setIsGstManuallyEdited(false); // Reset GST auto-calc for next form
             onSuccess?.();
-          },
-          onError: (error) => {
-            console.error('Error creating income:', error);
-            showToast({
-              title: 'Error',
-              description: 'Failed to save income. Please try again.',
-            });
           },
         },
       );

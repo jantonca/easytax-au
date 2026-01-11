@@ -8,7 +8,6 @@ import {
   useCreateClient,
   useUpdateClient,
 } from '@/features/settings/clients/hooks/use-client-mutations';
-import { useToast } from '@/lib/toast-context';
 
 interface ClientFormProps {
   initialValues?: ClientDto;
@@ -41,7 +40,6 @@ export function ClientForm({ initialValues, clientId, onSuccess }: ClientFormPro
 
   const { mutate: createClient, isPending: isCreating } = useCreateClient();
   const { mutate: updateClient, isPending: isUpdating } = useUpdateClient();
-  const { showToast } = useToast();
 
   const submitting = isSubmitting || isCreating || isUpdating;
 
@@ -65,18 +63,7 @@ export function ClientForm({ initialValues, clientId, onSuccess }: ClientFormPro
         { id: clientId, data: payload },
         {
           onSuccess: () => {
-            showToast({
-              title: 'Client updated',
-              description: 'The client has been updated successfully.',
-            });
             onSuccess?.();
-          },
-          onError: (error) => {
-            console.error('Error updating client:', error);
-            showToast({
-              title: 'Error',
-              description: 'Failed to update client. Please try again.',
-            });
           },
         },
       );
@@ -85,19 +72,8 @@ export function ClientForm({ initialValues, clientId, onSuccess }: ClientFormPro
         { data: payload },
         {
           onSuccess: () => {
-            showToast({
-              title: 'Client created',
-              description: 'The client has been saved successfully.',
-            });
             reset();
             onSuccess?.();
-          },
-          onError: (error) => {
-            console.error('Error creating client:', error);
-            showToast({
-              title: 'Error',
-              description: 'Failed to save client. Please try again.',
-            });
           },
         },
       );

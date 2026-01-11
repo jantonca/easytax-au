@@ -9,7 +9,6 @@ import {
   useCreateProvider,
   useUpdateProvider,
 } from '@/features/settings/providers/hooks/use-provider-mutations';
-import { useToast } from '@/lib/toast-context';
 
 interface ProviderFormProps {
   categories: CategoryDto[];
@@ -50,7 +49,6 @@ export function ProviderForm({
 
   const { mutate: createProvider, isPending: isCreating } = useCreateProvider();
   const { mutate: updateProvider, isPending: isUpdating } = useUpdateProvider();
-  const { showToast } = useToast();
 
   const submitting = isSubmitting || isCreating || isUpdating;
 
@@ -90,18 +88,7 @@ export function ProviderForm({
         { id: providerId, data: payload },
         {
           onSuccess: () => {
-            showToast({
-              title: 'Provider updated',
-              description: 'The provider has been updated successfully.',
-            });
             onSuccess?.();
-          },
-          onError: (error) => {
-            console.error('Error updating provider:', error);
-            showToast({
-              title: 'Error',
-              description: 'Failed to update provider. Please try again.',
-            });
           },
         },
       );
@@ -110,19 +97,8 @@ export function ProviderForm({
         { data: payload },
         {
           onSuccess: () => {
-            showToast({
-              title: 'Provider created',
-              description: 'The provider has been saved successfully.',
-            });
             reset();
             onSuccess?.();
-          },
-          onError: (error) => {
-            console.error('Error creating provider:', error);
-            showToast({
-              title: 'Error',
-              description: 'Failed to save provider. Please try again.',
-            });
           },
         },
       );

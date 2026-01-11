@@ -8,7 +8,6 @@ import {
   useCreateCategory,
   useUpdateCategory,
 } from '@/features/settings/categories/hooks/use-category-mutations';
-import { useToast } from '@/lib/toast-context';
 
 interface CategoryFormProps {
   initialValues?: CategoryDto;
@@ -47,7 +46,6 @@ export function CategoryForm({
 
   const { mutate: createCategory, isPending: isCreating } = useCreateCategory();
   const { mutate: updateCategory, isPending: isUpdating } = useUpdateCategory();
-  const { showToast } = useToast();
 
   const submitting = isSubmitting || isCreating || isUpdating;
 
@@ -73,18 +71,7 @@ export function CategoryForm({
         { id: categoryId, data: payload },
         {
           onSuccess: () => {
-            showToast({
-              title: 'Category updated',
-              description: 'The category has been updated successfully.',
-            });
             onSuccess?.();
-          },
-          onError: (error) => {
-            console.error('Error updating category:', error);
-            showToast({
-              title: 'Error',
-              description: 'Failed to update category. Please try again.',
-            });
           },
         },
       );
@@ -93,19 +80,8 @@ export function CategoryForm({
         { data: payload },
         {
           onSuccess: () => {
-            showToast({
-              title: 'Category created',
-              description: 'The category has been saved successfully.',
-            });
             reset();
             onSuccess?.();
-          },
-          onError: (error) => {
-            console.error('Error creating category:', error);
-            showToast({
-              title: 'Error',
-              description: 'Failed to save category. Please try again.',
-            });
           },
         },
       );

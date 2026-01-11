@@ -50,18 +50,6 @@ export function RecurringPage(): JSX.Element {
     deleteRecurring(deletingRecurring.id, {
       onSuccess: () => {
         setDeletingRecurring(null);
-        showToast({
-          title: 'Success',
-          description: 'Recurring expense deleted successfully',
-          variant: 'success',
-        });
-      },
-      onError: () => {
-        showToast({
-          title: 'Error',
-          description: 'Failed to delete recurring expense',
-          variant: 'error',
-        });
       },
     });
   };

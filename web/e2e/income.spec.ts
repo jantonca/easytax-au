@@ -251,7 +251,7 @@ test.describe('Income CRUD Flow', () => {
     await expect(page.getByRole('alertdialog')).not.toBeVisible();
 
     // Verify toast notification
-    await expect(page.getByText(/income deleted successfully/i)).toBeVisible();
+    await expect(page.getByText(/income deleted/i)).toBeVisible();
 
     // Note: Old test data may still be visible, toast confirms deletion worked
   });

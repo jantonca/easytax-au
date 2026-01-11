@@ -255,7 +255,7 @@ test.describe('Expense CRUD Flow', () => {
     await expect(page.getByRole('alertdialog')).not.toBeVisible();
 
     // Verify toast notification
-    await expect(page.getByText(/expense deleted successfully/i)).toBeVisible();
+    await expect(page.getByText(/expense deleted/i)).toBeVisible();
 
     // Verify at least one expense was deleted (count should decrease)
     // Note: There may be old rows from previous test runs, so we can't guarantee zero matches

@@ -59,9 +59,59 @@ export function useDeleteExpense(): UseMutationResult<void, unknown, string> {
 
   return useMutation<void, unknown, string>({
     mutationFn: async (id: string) => apiClient.delete<void>(`/expenses/${id}`),
-    onSuccess: async () => {
+    onSuccess: async (_, deletedId) => {
+      // Get the deleted expense from cache before invalidation
+      const expenses = queryClient.getQueryData<ExpenseResponseDto[]>(['expenses']);
+      const deletedExpense = expenses?.find((e) => e.id === deletedId);
+
       await queryClient.invalidateQueries({ queryKey: ['expenses'] });
-      showToast({ title: 'Expense deleted successfully' });
+
+      if (!deletedExpense) {
+        showToast({ title: 'Expense deleted', variant: 'success' });
+        return;
+      }
+
+      // Show undo toast with 8-second window
+      showToast({
+        title: 'Expense deleted',
+        description: deletedExpense.description || undefined,
+        variant: 'success',
+        duration: 8000,
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            // Recreate the expense by calling the create API
+            const restoreData = {
+              date: deletedExpense.date,
+              description: deletedExpense.description,
+              amountCents: deletedExpense.amountCents,
+              gstCents: deletedExpense.gstCents,
+              providerId: deletedExpense.provider.id,
+              categoryId: deletedExpense.category.id,
+              bizPercent: deletedExpense.bizPercent,
+              ...(deletedExpense.fileRef && { fileRef: deletedExpense.fileRef }),
+            };
+
+            apiClient
+              .post('/expenses', restoreData)
+              .then(() => {
+                void queryClient.invalidateQueries({ queryKey: ['expenses'] });
+                showToast({
+                  title: 'Expense restored',
+                  variant: 'success',
+                  duration: 3000,
+                });
+              })
+              .catch(() => {
+                showToast({
+                  title: 'Failed to restore expense',
+                  variant: 'error',
+                  duration: 5000,
+                });
+              });
+          },
+        },
+      });
     },
     onError: (error: unknown) => {
       const errorMessage = getErrorMessage(error, 'delete expense');

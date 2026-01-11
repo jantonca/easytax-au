@@ -64,9 +64,64 @@ export function useDeleteCategory(): UseMutationResult<void, unknown, string> {
 
   return useMutation<void, unknown, string>({
     mutationFn: async (id: string) => apiClient.delete<void>(`/categories/${id}`),
-    onSuccess: async () => {
+    onSuccess: async (_, deletedId) => {
+      // Get the deleted category from cache before invalidation
+      const categories = queryClient.getQueryData<CategoryDto[]>(['categories']);
+      const deletedCategory = categories?.find((c) => c.id === deletedId);
+
       await queryClient.invalidateQueries({ queryKey: ['categories'] });
-      showToast({ title: 'Category deleted successfully' });
+
+      if (!deletedCategory) {
+        showToast({ title: 'Category deleted', variant: 'success' });
+        return;
+      }
+
+      // Show undo toast with 8-second window
+      showToast({
+        title: 'Category deleted',
+        description: deletedCategory.name || undefined,
+        variant: 'success',
+        duration: 8000,
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            // Recreate the category by calling the create API
+            const restoreData: {
+              name: string;
+              basLabel: string;
+              isDeductible: boolean;
+              description?: string;
+            } = {
+              name: deletedCategory.name,
+              basLabel: deletedCategory.basLabel,
+              isDeductible: deletedCategory.isDeductible,
+            };
+
+            // Only include optional fields if they have values
+            if (deletedCategory.description) {
+              restoreData.description = deletedCategory.description;
+            }
+
+            apiClient
+              .post('/categories', restoreData)
+              .then(() => {
+                void queryClient.invalidateQueries({ queryKey: ['categories'] });
+                showToast({
+                  title: 'Category restored',
+                  variant: 'success',
+                  duration: 3000,
+                });
+              })
+              .catch(() => {
+                showToast({
+                  title: 'Failed to restore category',
+                  variant: 'error',
+                  duration: 5000,
+                });
+              });
+          },
+        },
+      });
     },
     onError: (error: unknown) => {
       const errorMessage = getErrorMessage(error, 'delete category');

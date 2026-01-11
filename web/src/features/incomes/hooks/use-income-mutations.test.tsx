@@ -222,7 +222,10 @@ describe('useDeleteIncome', () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(mockToast.showToast).toHaveBeenCalledWith({ title: 'Income deleted successfully' });
+    expect(mockToast.showToast).toHaveBeenCalledWith({
+      title: 'Income deleted',
+      variant: 'success',
+    });
   });
 
   it('shows generic error toast on 500 server error', async () => {

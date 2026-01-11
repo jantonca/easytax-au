@@ -249,4 +249,256 @@ describe('ToastProvider', () => {
       // No errors expected
     });
   });
+
+  describe('Pause and Resume functionality', () => {
+    it('pauses toast timer and calculates remaining duration correctly', () => {
+      const { result } = renderHook(() => useToast(), { wrapper });
+
+      act(() => {
+        result.current.showToast({ title: 'Pausable toast', duration: 5000 });
+      });
+
+      expect(result.current.toasts).toHaveLength(1);
+      const toast = result.current.toasts[0];
+      if (!toast) throw new Error('Expected toast');
+
+      // Wait 2 seconds, then pause
+      act(() => {
+        vi.advanceTimersByTime(2000);
+      });
+
+      // Toast should still be visible
+      expect(result.current.toasts).toHaveLength(1);
+
+      // Pause the toast
+      act(() => {
+        result.current.pauseToast(toast.id);
+      });
+
+      // Wait 5 more seconds while paused - toast should still be visible
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+
+      expect(result.current.toasts).toHaveLength(1);
+    });
+
+    it('resumes toast timer with remaining duration', () => {
+      const { result } = renderHook(() => useToast(), { wrapper });
+
+      act(() => {
+        result.current.showToast({ title: 'Pausable toast', duration: 5000 });
+      });
+
+      const toast = result.current.toasts[0];
+      if (!toast) throw new Error('Expected toast');
+
+      // Wait 2 seconds
+      act(() => {
+        vi.advanceTimersByTime(2000);
+      });
+
+      // Pause the toast
+      act(() => {
+        result.current.pauseToast(toast.id);
+      });
+
+      // Wait 5 seconds while paused
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+
+      expect(result.current.toasts).toHaveLength(1);
+
+      // Resume the toast
+      act(() => {
+        result.current.resumeToast(toast.id);
+      });
+
+      // Wait 2.9 seconds (total elapsed: 2 + 2.9 = 4.9s) - should still be visible
+      act(() => {
+        vi.advanceTimersByTime(2900);
+      });
+
+      expect(result.current.toasts).toHaveLength(1);
+
+      // Wait 0.1 more second (total: 5s) - should be dismissed
+      act(() => {
+        vi.advanceTimersByTime(100);
+      });
+
+      expect(result.current.toasts).toHaveLength(0);
+    });
+
+    it('ignores pause if toast is already paused', () => {
+      const { result } = renderHook(() => useToast(), { wrapper });
+
+      act(() => {
+        result.current.showToast({ title: 'Toast', duration: 5000 });
+      });
+
+      const toast = result.current.toasts[0];
+      if (!toast) throw new Error('Expected toast');
+
+      // Pause twice - should not cause errors
+      act(() => {
+        result.current.pauseToast(toast.id);
+        result.current.pauseToast(toast.id);
+      });
+
+      expect(result.current.toasts).toHaveLength(1);
+    });
+
+    it('ignores resume if toast is not paused', () => {
+      const { result } = renderHook(() => useToast(), { wrapper });
+
+      act(() => {
+        result.current.showToast({ title: 'Toast', duration: 5000 });
+      });
+
+      const toast = result.current.toasts[0];
+      if (!toast) throw new Error('Expected toast');
+
+      // Resume without pausing first - should not cause errors
+      act(() => {
+        result.current.resumeToast(toast.id);
+      });
+
+      // Should auto-dismiss normally after 5 seconds
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+
+      expect(result.current.toasts).toHaveLength(0);
+    });
+
+    it('handles multiple pause/resume cycles', () => {
+      const { result } = renderHook(() => useToast(), { wrapper });
+
+      act(() => {
+        result.current.showToast({ title: 'Toast', duration: 10000 });
+      });
+
+      const toast = result.current.toasts[0];
+      if (!toast) throw new Error('Expected toast');
+
+      // Wait 2s, pause, wait 3s, resume
+      act(() => {
+        vi.advanceTimersByTime(2000);
+        result.current.pauseToast(toast.id);
+        vi.advanceTimersByTime(3000);
+        result.current.resumeToast(toast.id);
+      });
+
+      // Wait 4s, pause, wait 2s, resume
+      act(() => {
+        vi.advanceTimersByTime(4000);
+        result.current.pauseToast(toast.id);
+        vi.advanceTimersByTime(2000);
+        result.current.resumeToast(toast.id);
+      });
+
+      // Total elapsed: 2 + 4 = 6s, remaining: 4s
+      // Wait 3.9s - should still be visible
+      act(() => {
+        vi.advanceTimersByTime(3900);
+      });
+
+      expect(result.current.toasts).toHaveLength(1);
+
+      // Wait 0.1s more (total: 10s) - should be dismissed
+      act(() => {
+        vi.advanceTimersByTime(100);
+      });
+
+      expect(result.current.toasts).toHaveLength(0);
+    });
+  });
+
+  describe('Stacking limit (max 5 toasts)', () => {
+    it('enforces max 5 toast limit', () => {
+      const { result } = renderHook(() => useToast(), { wrapper });
+
+      // Add 7 toasts
+      act(() => {
+        for (let i = 0; i < 7; i++) {
+          result.current.showToast({ title: `Toast ${i}`, duration: undefined });
+        }
+      });
+
+      // Should only have 5
+      expect(result.current.toasts).toHaveLength(5);
+    });
+
+    it('dismisses oldest toast when limit exceeded (FIFO)', () => {
+      const { result } = renderHook(() => useToast(), { wrapper });
+
+      // Add 7 toasts
+      act(() => {
+        for (let i = 0; i < 7; i++) {
+          result.current.showToast({ title: `Toast ${i}`, duration: undefined });
+        }
+      });
+
+      // First two should be dismissed (FIFO)
+      expect(result.current.toasts[0]?.title).toBe('Toast 2');
+      expect(result.current.toasts[4]?.title).toBe('Toast 6');
+    });
+
+    it('maintains stacking limit with auto-dismiss', () => {
+      const { result } = renderHook(() => useToast(), { wrapper });
+
+      // Add 5 toasts with staggered durations
+      act(() => {
+        result.current.showToast({ title: 'Toast 0', duration: 2000 });
+        result.current.showToast({ title: 'Toast 1', duration: 6000 });
+        result.current.showToast({ title: 'Toast 2', duration: 6000 });
+        result.current.showToast({ title: 'Toast 3', duration: 6000 });
+        result.current.showToast({ title: 'Toast 4', duration: 6000 });
+      });
+
+      expect(result.current.toasts).toHaveLength(5);
+      expect(result.current.toasts[0]?.title).toBe('Toast 0');
+
+      // Wait for Toast 0 to auto-dismiss (2000ms)
+      act(() => {
+        vi.advanceTimersByTime(2000);
+      });
+
+      // Should now have 4 (Toast 0 auto-dismissed)
+      expect(result.current.toasts).toHaveLength(4);
+      expect(result.current.toasts[0]?.title).toBe('Toast 1');
+
+      // Add one more toast (should not exceed 5 total)
+      act(() => {
+        result.current.showToast({ title: 'Toast 5', duration: 6000 });
+      });
+
+      expect(result.current.toasts).toHaveLength(5);
+      expect(result.current.toasts[0]?.title).toBe('Toast 1');
+      expect(result.current.toasts[4]?.title).toBe('Toast 5');
+    });
+
+    it('allows adding more toasts after some are dismissed', () => {
+      const { result } = renderHook(() => useToast(), { wrapper });
+
+      // Add 5 toasts (at limit)
+      act(() => {
+        for (let i = 0; i < 5; i++) {
+          result.current.showToast({ title: `Toast ${i}`, duration: undefined });
+        }
+      });
+
+      expect(result.current.toasts).toHaveLength(5);
+
+      // Add one more (should dismiss Toast 0)
+      act(() => {
+        result.current.showToast({ title: 'Toast 5', duration: undefined });
+      });
+
+      expect(result.current.toasts).toHaveLength(5);
+      expect(result.current.toasts[0]?.title).toBe('Toast 1');
+      expect(result.current.toasts[4]?.title).toBe('Toast 5');
+    });
+  });
 });

@@ -9,7 +9,6 @@ import { useProviders } from '@/hooks/use-providers';
 import { useCategories } from '@/hooks/use-categories';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { EmptyState } from '@/components/ui/empty-state';
-import { useToast } from '@/lib/toast-context';
 import { SettingsTabs } from '@/features/settings/components/settings-tabs';
 import { TableSkeleton } from '@/components/skeletons/table-skeleton';
 
@@ -22,7 +21,6 @@ export function ProvidersPage(): ReactElement {
   const [providerToDelete, setProviderToDelete] = useState<ProviderDto | null>(null);
 
   const { mutate: deleteProvider, isPending: isDeleting } = useDeleteProvider();
-  const { showToast } = useToast();
 
   function handleDelete(): void {
     if (!providerToDelete) {
@@ -31,18 +29,7 @@ export function ProvidersPage(): ReactElement {
 
     deleteProvider(providerToDelete.id, {
       onSuccess: () => {
-        showToast({
-          title: 'Provider deleted',
-          description: 'The provider has been removed successfully.',
-        });
         setProviderToDelete(null);
-      },
-      onError: (error) => {
-        console.error('Error deleting provider:', error);
-        showToast({
-          title: 'Error',
-          description: 'Failed to delete provider. Please try again.',
-        });
       },
     });
   }

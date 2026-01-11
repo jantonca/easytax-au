@@ -8,7 +8,6 @@ import { useDeleteCategory } from '@/features/settings/categories/hooks/use-cate
 import { useCategories } from '@/hooks/use-categories';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { EmptyState } from '@/components/ui/empty-state';
-import { useToast } from '@/lib/toast-context';
 import { SettingsTabs } from '@/features/settings/components/settings-tabs';
 import { TableSkeleton } from '@/components/skeletons/table-skeleton';
 
@@ -24,7 +23,6 @@ export function CategoriesPage(): ReactElement {
   const [categoryToDelete, setCategoryToDelete] = useState<CategoryDto | null>(null);
 
   const { mutate: deleteCategory, isPending: isDeleting } = useDeleteCategory();
-  const { showToast } = useToast();
 
   function handleDelete(): void {
     if (!categoryToDelete) {
@@ -33,18 +31,7 @@ export function CategoriesPage(): ReactElement {
 
     deleteCategory(categoryToDelete.id, {
       onSuccess: () => {
-        showToast({
-          title: 'Category deleted',
-          description: 'The category has been removed successfully.',
-        });
         setCategoryToDelete(null);
-      },
-      onError: (error) => {
-        console.error('Error deleting category:', error);
-        showToast({
-          title: 'Error',
-          description: 'Failed to delete category. Please try again.',
-        });
       },
     });
   }

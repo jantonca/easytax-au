@@ -9,7 +9,6 @@ import { useClients } from '@/hooks/use-clients';
 import { useIncomes } from '@/features/incomes/hooks/use-incomes';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { EmptyState } from '@/components/ui/empty-state';
-import { useToast } from '@/lib/toast-context';
 import { SettingsTabs } from '@/features/settings/components/settings-tabs';
 import { TableSkeleton } from '@/components/skeletons/table-skeleton';
 
@@ -22,7 +21,6 @@ export function ClientsPage(): ReactElement {
   const [clientToDelete, setClientToDelete] = useState<ClientDto | null>(null);
 
   const { mutate: deleteClient, isPending: isDeleting } = useDeleteClient();
-  const { showToast } = useToast();
 
   function handleDelete(): void {
     if (!clientToDelete) {
@@ -31,18 +29,7 @@ export function ClientsPage(): ReactElement {
 
     deleteClient(clientToDelete.id, {
       onSuccess: () => {
-        showToast({
-          title: 'Client deleted',
-          description: 'The client has been removed successfully.',
-        });
         setClientToDelete(null);
-      },
-      onError: (error) => {
-        console.error('Error deleting client:', error);
-        showToast({
-          title: 'Error',
-          description: 'Failed to delete client. Please try again.',
-        });
       },
     });
   }
