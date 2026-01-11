@@ -1,111 +1,375 @@
-# Frontend Patterns & Conventions
+# Implementation Patterns & Code Conventions
 
 ## Overview
 
-This document describes implementation patterns extracted from production code in the EasyTax-AU web application. These patterns represent battle-tested solutions to common frontend challenges.
+This document contains battle-tested code patterns for EasyTax-AU. Each pattern includes:
+- **Rule**: The principle to follow
+- **Code**: Working implementation example
+- **Reference**: Links to related documentation
 
-For system architecture and tech stack information, see `ARCHITECTURE.md`.
-For troubleshooting common issues, see `TROUBLESHOOTING.md`.
+**How to use this file:**
+- AI agents: Use grep or search to jump directly to `# [Pattern Name]` sections
+- Developers: Copy-paste code snippets as starting templates
+
+For system architecture, see `ARCHITECTURE.md`.
+For troubleshooting, see `TROUBLESHOOTING.md`.
 
 ---
 
-## CSV Import Pattern
+## Backend Patterns
 
-**Context:** Bulk import of expenses and incomes from bank exports and spreadsheets.
+### [Currency & Math] Pattern
 
-**Key Files:**
-- `web/src/features/import/unified-import-page.tsx`
-- `web/src/features/import/utils/detect-csv-type.ts`
-- `web/src/features/import/components/smart-file-dropzone.tsx`
+**Rule**: Store all currency as **integers in cents**. Use `decimal.js` for calculations to avoid floating-point errors.
 
-### Auto-Detection Logic
-
-The CSV type detector analyzes file headers to determine whether the file contains expenses or incomes:
-
+**Code:**
 ```typescript
-// detectCsvType() utility
-// Expense detection: Requires "amount" + ("description" OR "date")
-// Income detection: Requires ("client" OR "invoice") + ("subtotal" OR "total")
+import Decimal from 'decimal.js';
+
+// Calculate GST-inclusive total
+const subtotal = new Decimal('100.00');
+const gst = subtotal.times('0.10');  // 10% GST
+const total = subtotal.plus(gst);    // $110.00
+
+// Store as integers (cents)
+expense.amount_cents = total.times(100).toNumber();  // 11000
+expense.gst_cents = gst.times(100).toNumber();       // 1000
 ```
 
-**Supported Formats:**
-- CommBank exports
-- Amex exports
-- Generic CSV (custom format)
+**Display Logic** (Frontend):
+```typescript
+// Import from shared utility
+import { formatCents } from '@/lib/currency';
 
-**Implementation Details:**
-- Case-insensitive header matching
-- Handles various column name variations
-- Falls back to "unknown" if pattern doesn't match
+// Display: $110.00
+// Stored in DB: 11000 (cents)
+const display = formatCents(expense.amount_cents);
+```
 
-### Inline Entity Creation
+**Why:** JavaScript floats have precision errors (`0.1 + 0.2 !== 0.3`). Storing as cents (integers) ensures exact calculations for financial data.
 
-**Problem:** User drops CSV with unknown provider/client names → validation errors → workflow interruption.
-
-**Solution:** Create missing entities inline without leaving the import workflow.
-
-**Flow:**
-1. CSV preview detects missing provider/client errors
-2. "Create Provider/Client" buttons appear next to error messages
-3. Modal dialogs open with pre-filled names from CSV data
-4. User edits and saves
-5. Preview automatically re-runs to show successful matches
-
-**Key Components:**
-- `CreateProviderModal` - Pre-fills name, sets safe defaults (domestic: 10% GST)
-- `CreateClientModal` - Pre-fills name, sets safe defaults (PSI eligible: false)
-
-**UX Benefits:**
-- No context switching
-- Maintains import flow
-- Reduces friction for new users
-
-### Preview vs. Import Endpoints
-
-**Architecture:**
-- `/import/expenses/preview` → `dryRun: true` (no database save)
-- `/import/expenses` → `dryRun: false` (actual import with save)
-
-**Rationale:** NestJS `@Transform` decorators don't work with multipart/form-data. Instead of fighting the framework, we use separate endpoints with hardcoded boolean values. See `TROUBLESHOOTING.md` for details.
-
-**Testing Strategy:**
-- Preview endpoint: Verify no database writes occur
-- Import endpoint: Verify records are created and returned
+**Reference:** `docs/core/ATO-LOGIC.md` for GST calculation rules.
 
 ---
 
-## Searchable Dropdown Pattern (ARIA Combobox)
+### [Entity Structure] Pattern
 
-**Context:** Select providers, categories, and clients from filterable dropdowns.
+**Rule**: Each backend module follows a standardized directory structure.
 
-**Key Files:**
-- `web/src/features/expenses/components/provider-select.tsx`
-- `web/src/features/incomes/components/client-select.tsx`
+**Code:**
+```
+src/modules/expenses/
+├── dto/
+│   ├── create-expense.dto.ts
+│   └── update-expense.dto.ts
+├── entities/
+│   └── expense.entity.ts
+├── expenses.controller.ts
+├── expenses.service.ts
+└── expenses.module.ts
+```
 
-### Implementation
+**Controller Example:**
+```typescript
+@Controller('expenses')
+export class ExpensesController {
+  constructor(private readonly expensesService: ExpensesService) {}
+
+  @Get()
+  findAll(): Promise<Expense[]> {
+    return this.expensesService.findAll();
+  }
+
+  @Post()
+  create(@Body() createExpenseDto: CreateExpenseDto): Promise<Expense> {
+    return this.expensesService.create(createExpenseDto);
+  }
+}
+```
+
+**Service Example:**
+```typescript
+@Injectable()
+export class ExpensesService {
+  constructor(
+    @InjectRepository(Expense)
+    private expenseRepo: Repository<Expense>,
+  ) {}
+
+  findAll(): Promise<Expense[]> {
+    return this.expenseRepo.find({ order: { date: 'DESC' } });
+  }
+}
+```
+
+**Reference:** `docs/core/ARCHITECTURE.md#backend-modules`
+
+---
+
+### [Encrypted Columns] Pattern
+
+**Rule**: Use `EncryptedColumnTransformer` for sensitive data. Encryption happens at the application layer (TypeORM).
+
+**Encrypted Fields:**
+- `clients.name`, `clients.abn`
+- `expenses.description`
+- `incomes.description`
+
+**Code:**
+```typescript
+import { EncryptedColumnTransformer } from '@/common/transformers/encrypted-column.transformer';
+
+@Entity('expenses')
+export class Expense {
+  @Column({
+    transformer: new EncryptedColumnTransformer(),
+  })
+  description: string;  // Encrypted in DB, decrypted in app
+}
+```
+
+**How It Works:**
+1. On `save()`: Plaintext → Encrypted (stored in DB)
+2. On `find()`: Encrypted → Plaintext (returned to app)
+
+**Security Note:** Encryption key must be in environment variable (`ENCRYPTION_KEY`). Never commit to git.
+
+**Reference:** `docs/core/SECURITY.md#field-level-encryption`
+
+---
+
+### [GST Auto-Calculation] Pattern
+
+**Rule**: GST is auto-calculated based on provider type. International providers are GST-free.
+
+**Code:**
+```typescript
+// In expenses.service.ts
+async create(createExpenseDto: CreateExpenseDto): Promise<Expense> {
+  const provider = await this.providerRepo.findOne({
+    where: { id: createExpenseDto.providerId },
+  });
+
+  const expense = new Expense();
+  expense.amount_cents = createExpenseDto.amountCents;
+
+  // Auto-calculate GST
+  if (provider.is_international) {
+    expense.gst_cents = 0;  // GST-free
+  } else {
+    const amount = new Decimal(expense.amount_cents).div(100);
+    const gst = amount.div(11);  // Reverse GST (amount / 11)
+    expense.gst_cents = gst.times(100).toNumber();
+  }
+
+  return this.expenseRepo.save(expense);
+}
+```
+
+**GST Formulas:**
+- **GST-Inclusive → GST**: `amount / 11`
+- **GST-Exclusive → Total**: `amount * 1.10`
+
+**Reference:** `docs/core/ATO-LOGIC.md#gst-calculations`
+
+---
+
+### [BAS Module] Pattern
+
+**Rule**: Avoid circular dependencies. Inject repositories directly, not services.
+
+**Code:**
+```typescript
+// ✅ CORRECT - Inject repositories directly
+@Injectable()
+export class BasService {
+  constructor(
+    @InjectRepository(Expense)
+    private expenseRepo: Repository<Expense>,
+    @InjectRepository(Income)
+    private incomeRepo: Repository<Income>,
+  ) {}
+
+  async calculateG1(): Promise<number> {
+    const incomes = await this.incomeRepo.find();
+    return incomes.reduce((sum, i) => sum + i.gst_cents, 0);
+  }
+}
+```
+
+```typescript
+// ❌ WRONG - Don't inject full services (causes circular deps)
+@Injectable()
+export class BasService {
+  constructor(
+    private expensesService: ExpensesService,  // Bad! Creates circular dependency
+  ) {}
+}
+```
+
+**Why:** `ExpensesService` might inject `BasService` for reporting, creating a cycle. Repositories are side-effect-free and don't create cycles.
+
+**Reference:** `docs/core/TROUBLESHOOTING.md#circular-dependencies`
+
+---
+
+### [Multipart Boolean] Pattern
+
+**Rule**: NestJS `@Transform` decorators don't work reliably with multipart/form-data. Use **separate endpoints** with hardcoded boolean values.
+
+**Problem:**
+```typescript
+// ❌ WRONG - @Transform may fail with multipart uploads
+export class CsvImportDto {
+  @Transform(({ value }) => value === 'true')
+  dryRun?: boolean;  // May receive 'false' string and convert to true!
+}
+```
+
+**Solution:**
+```typescript
+// ✅ CORRECT - Separate endpoints with hardcoded values
+@Post('import/expenses/preview')
+@UseInterceptors(FileInterceptor('file'))
+async previewImport(@UploadedFile() file: Express.Multer.File, @Body() dto: CsvImportDto) {
+  const options = this.buildOptions({ ...dto, dryRun: true });  // Hardcoded
+  return this.service.importFromBuffer(file.buffer, options);
+}
+
+@Post('import/expenses')
+@UseInterceptors(FileInterceptor('file'))
+async actualImport(@UploadedFile() file: Express.Multer.File, @Body() dto: CsvImportDto) {
+  const options = this.buildOptions({ ...dto, dryRun: false });  // Hardcoded
+  return this.service.importFromBuffer(file.buffer, options);
+}
+```
+
+**Real-World Usage:**
+- Expense import: `/import/expenses/preview` (dry run) vs `/import/expenses` (actual)
+- Income import: `/import/incomes/preview` (dry run) vs `/import/incomes` (actual)
+
+**Reference:** `src/modules/csv-import/csv-import.controller.ts` (lines ~137, ~229, ~380)
+
+**Troubleshooting:** See `docs/core/TROUBLESHOOTING.md#nestjs-multipart-booleans`
+
+---
+
+## Frontend Patterns
+
+### [Data Fetching] Pattern
+
+**Rule**: Use TanStack Query (v5) for all API calls. Invalidate queries on mutation success.
+
+**Query Hook:**
+```typescript
+import { useQuery } from '@tanstack/react-query';
+
+export function useExpenses(filters?: ExpenseFilters) {
+  return useQuery({
+    queryKey: ['expenses', filters],
+    queryFn: () => apiClient.get('/expenses', { params: filters }),
+  });
+}
+```
+
+**Mutation Hook:**
+```typescript
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+export function useCreateExpense() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateExpenseDto) => apiClient.post('/expenses', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      toast({ title: 'Expense created', variant: 'success' });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Failed to create expense',
+        description: error.message,
+        variant: 'error'
+      });
+    },
+  });
+}
+```
+
+**Query Keys Convention:**
+```typescript
+['expenses']           // List all expenses
+['expenses', id]       // Single expense by ID
+['providers']          // List all providers
+['import-jobs']        // List import jobs
+```
+
+**Why:** Hierarchical keys enable precise cache invalidation. Deleting an expense invalidates both `['expenses']` and `['expenses', id]`.
+
+**Real-World Usage:** `web/src/features/expenses/hooks/use-expense-mutations.ts`
+
+---
+
+### [Form Validation] Pattern
+
+**Rule**: Use Zod schemas with React Hook Form for type-safe validation.
+
+**Schema Definition:**
+```typescript
+import { z } from 'zod';
+
+export const expenseFormSchema = z.object({
+  description: z.string().min(1, 'Description is required'),
+  amount: z.string().refine(
+    (val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0,
+    'Amount must be a positive number'
+  ),
+  providerId: z.number().min(1, 'Provider is required'),
+  date: z.string().min(1, 'Date is required'),
+  bizPercent: z.number().min(0).max(100).optional(),
+});
+
+export type ExpenseFormData = z.infer<typeof expenseFormSchema>;
+```
+
+**Form Integration:**
+```typescript
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+const { handleSubmit, register, formState: { errors } } = useForm<ExpenseFormData>({
+  resolver: zodResolver(expenseFormSchema),
+  defaultValues: {
+    description: '',
+    bizPercent: 100,
+  },
+});
+
+const onSubmit = (data: ExpenseFormData) => {
+  createExpense(data);
+};
+```
+
+**Error Display:**
+```tsx
+{errors.description && (
+  <p className="text-sm text-red-600">{errors.description.message}</p>
+)}
+```
+
+---
+
+### [Searchable Dropdown] Pattern
+
+**Rule**: Use custom ARIA combobox with client-side filtering and search highlighting.
 
 **Features:**
-- Client-side filtering (fast for <100 items)
-- Search term highlighting with `<mark>` tag
 - Alphabetical sorting (A-Z)
+- Search term highlighting with `<mark>` tag
+- Keyboard navigation (Arrow Up/Down, Enter, Escape, Tab)
 - Empty states ("No providers available", "No provider found")
 - Mobile-optimized with touch-friendly targets
-- Dark mode support
 
-**Why Custom Component:** Built instead of using shadcn/ui Combobox to achieve exact UX requirements: inline search field, client-side filtering with highlighting, seamless React Hook Form integration.
-
-### Keyboard Navigation
-
-| Key | Action |
-|-----|--------|
-| Arrow Up/Down | Navigate options |
-| Enter | Select highlighted option |
-| Escape | Close dropdown |
-| Tab | Move to next form field (closes dropdown) |
-
-### Accessibility
-
-**ARIA Attributes:**
+**ARIA Structure:**
 ```tsx
 <input
   role="combobox"
@@ -125,18 +389,12 @@ The CSV type detector analyzes file headers to determine whether the file contai
     role="option"
     aria-selected={isSelected}
   >
-    {/* Content */}
+    <mark>{highlightedText}</mark>
   </li>
 </ul>
 ```
 
-**Screen Reader Support:**
-- Announces number of options available
-- Announces highlighted option on arrow key navigation
-- Announces selection on Enter
-
-### React Hook Form Integration
-
+**React Hook Form Integration:**
 ```typescript
 const { setValue, watch } = useForm();
 
@@ -147,19 +405,17 @@ const { setValue, watch } = useForm();
 />
 ```
 
-**Key Point:** Use `setValue()` with `shouldValidate: true` to trigger validation on selection.
+**Why Custom Component:** Built instead of using shadcn/ui Combobox to achieve exact UX requirements: inline search field, client-side filtering with highlighting, seamless React Hook Form integration.
+
+**Real-World Usage:**
+- `web/src/features/expenses/components/provider-select.tsx`
+- `web/src/features/incomes/components/client-select.tsx`
 
 ---
 
-## Pagination Pattern
+### [Pagination] Pattern
 
-**Context:** All list views (expenses, incomes, providers, categories, clients, import jobs).
-
-**Key Files:**
-- `web/src/features/expenses/components/expenses-table.tsx`
-- `web/src/features/incomes/components/incomes-table.tsx`
-
-### Client-Side Implementation
+**Rule**: Client-side pagination with 25 items per page. Hide controls if fewer than 25 items.
 
 **Specifications:**
 - 25 items per page (consistent across all tables)
@@ -167,16 +423,10 @@ const { setValue, watch } = useForm();
 - Sort preservation across page navigation
 - Current page resets to 1 when filters change
 
-**Why Client-Side:** Backend doesn't support pagination parameters yet. Acceptable for <1000 records and provides instant navigation without API calls.
-
-**When to Migrate to Server-Side:** If any list exceeds 1000 items or if initial page load becomes slow.
-
-### UI Components
-
-**Pagination Controls:**
+**UI Implementation:**
 ```tsx
 <div className="flex items-center justify-between">
-  <div className="text-sm text-gray-600">
+  <div className="text-sm text-gray-600" aria-live="polite" aria-atomic="true">
     Showing {startIndex + 1}-{endIndex} of {totalItems}
   </div>
   <div className="flex items-center gap-2">
@@ -199,40 +449,58 @@ const { setValue, watch } = useForm();
 </div>
 ```
 
-### ARIA Labels
+**Why Client-Side:** Backend doesn't support pagination parameters yet. Acceptable for <1000 records and provides instant navigation without API calls.
 
-**Required Attributes:**
-- `aria-label="Go to previous page"` on Previous button
-- `aria-label="Go to next page"` on Next button
-- Live region for "Showing X-Y of Z" (announces changes to screen readers)
-- `disabled` attribute on buttons when on first/last pages
+**When to Migrate to Server-Side:** If any list exceeds 1000 items or initial page load becomes slow.
 
-**Testing Checklist:**
-- [ ] Pagination controls hide when <25 items
-- [ ] Previous disabled on page 1
-- [ ] Next disabled on last page
-- [ ] Correct item range displayed
-- [ ] Sort order preserved across page changes
+**Real-World Usage:**
+- `web/src/features/expenses/components/expenses-table.tsx`
+- `web/src/features/incomes/components/incomes-table.tsx`
 
 ---
 
-## Modal Form Pattern
+### [CSV Import] Pattern
 
-**Context:** All create/edit forms (expenses, incomes, providers, categories, clients).
+**Context:** Bulk import of expenses and incomes from bank exports and spreadsheets.
 
-**Key Files:**
-- `web/src/features/expenses/components/expense-form.tsx`
-- `web/src/features/incomes/components/income-form.tsx`
+**Auto-Detection Logic:**
+```typescript
+// detectCsvType() utility
+// Expense detection: Requires "amount" + ("description" OR "date")
+// Income detection: Requires ("client" OR "invoice") + ("subtotal" OR "total")
+```
 
-### Structure
+**Supported Formats:**
+- CommBank exports
+- Amex exports
+- Generic CSV (custom format)
 
-**Stack:**
-- React Hook Form for form state
-- Zod for schema validation
-- TanStack Query mutations for API calls
-- Toast notifications for feedback
+**Inline Entity Creation Flow:**
+1. CSV preview detects missing provider/client errors
+2. "Create Provider/Client" buttons appear next to error messages
+3. Modal dialogs open with pre-filled names from CSV data
+4. User edits and saves
+5. Preview automatically re-runs to show successful matches
 
-**Example:**
+**Key Components:**
+- `CreateProviderModal` - Pre-fills name, sets safe defaults (domestic: 10% GST)
+- `CreateClientModal` - Pre-fills name, sets safe defaults (PSI eligible: false)
+
+**Architecture:**
+- `/import/expenses/preview` → `dryRun: true` (no database save)
+- `/import/expenses` → `dryRun: false` (actual import with save)
+
+**Reference:** See `[Multipart Boolean] Pattern` for implementation details.
+
+**Real-World Usage:** `web/src/features/import/unified-import-page.tsx`
+
+---
+
+### [Modal Form] Pattern
+
+**Rule**: Use React Hook Form + Zod + TanStack Query mutations + Toast notifications.
+
+**Structure:**
 ```tsx
 const formSchema = z.object({
   description: z.string().min(1, 'Description is required'),
@@ -252,22 +520,37 @@ const onSubmit = (data) => {
       onClose();
     },
     onError: (error) => {
-      toast({ title: 'Failed to create expense', description: error.message, variant: 'error' });
+      toast({
+        title: 'Failed to create expense',
+        description: error.message,
+        variant: 'error'
+      });
     },
   });
 };
 ```
 
-### Optimistic UI Updates
+**Auto-Focus Pattern:**
+```tsx
+<input
+  {...register('description')}
+  autoFocus  // Auto-focus first field on modal open
+/>
+```
 
-**Pattern:** Show immediate feedback while API request is pending.
+**Accessibility Note:** Auto-focus is acceptable in modals because the modal is a new context. Avoid auto-focus on page load.
+
+**Real-World Usage:**
+- `web/src/features/expenses/components/expense-form.tsx`
+- `web/src/features/incomes/components/income-form.tsx`
+
+---
+
+### [Optimistic UI] Pattern
+
+**Rule**: Show immediate feedback while API request is pending. Rollback on error.
 
 **Implementation:**
-1. Call mutation with `onMutate` callback
-2. Update cache optimistically
-3. If mutation fails, rollback cache changes
-4. Show toast on success/error
-
 ```typescript
 const { mutate } = useDeleteExpense({
   onMutate: async (id) => {
@@ -288,6 +571,7 @@ const { mutate } = useDeleteExpense({
   onError: (err, id, context) => {
     // Rollback on error
     queryClient.setQueryData(['expenses'], context.previous);
+    toast({ title: 'Failed to delete expense', variant: 'error' });
   },
   onSettled: () => {
     // Refetch to sync with server
@@ -296,92 +580,69 @@ const { mutate } = useDeleteExpense({
 });
 ```
 
-### Error Handling
-
-**Field-Level Errors:** Display below input fields using React Hook Form's `formState.errors`.
-
-**API Errors:** Show in toast notifications with descriptive messages.
-
-```tsx
-{errors.description && (
-  <p className="text-sm text-red-600">{errors.description.message}</p>
-)}
-```
-
-### Auto-Focus
-
-**UX Pattern:** When modal opens, focus the first input field automatically.
-
-```tsx
-<input
-  {...register('description')}
-  autoFocus
-/>
-```
-
-**Accessibility Note:** Auto-focus is acceptable in modals because the modal is a new context. Avoid auto-focus on page load.
+**Why:** Provides instant feedback. If deletion fails, the UI reverts to the previous state.
 
 ---
 
-## Data Fetching Conventions
+### [Toast Notification] Pattern
 
-**Context:** All API interactions using TanStack Query.
+**Rule**: Use toast notifications for all mutations and important events.
 
-**Key Files:**
-- `web/src/lib/query-client.ts`
-- `web/src/features/*/hooks/use-*-query.ts`
-
-### Query Keys
-
-**Format:** `['entity', ...params]`
-
-**Examples:**
+**Usage:**
 ```typescript
-['expenses']           // List all expenses
-['expenses', id]       // Single expense by ID
-['providers']          // List all providers
-['categories']         // List all categories
-['import-jobs']        // List import jobs
-```
+import { useToast } from '@/lib/toast-context';
 
-**Rationale:** Hierarchical structure allows precise cache invalidation. Deleting an expense invalidates `['expenses']` and `['expenses', id]`.
+const { toast } = useToast();
 
-### Mutation Returns
+// Success
+toast({
+  title: 'Expense created',
+  variant: 'success',  // Auto-dismisses after 4s
+});
 
-**Convention:** All mutations return the updated entity for cache updates.
+// Error
+toast({
+  title: 'Failed to save expense',
+  description: 'Database connection error. Please try again.',
+  variant: 'error',  // Auto-dismisses after 8s
+});
 
-**Example:**
-```typescript
-// Backend controller
-@Post()
-create(@Body() dto: CreateExpenseDto): Promise<Expense> {
-  return this.expensesService.create(dto);
-}
-
-// Frontend mutation
-const { mutate } = useMutation({
-  mutationFn: (data) => apiClient.post('/expenses', data),
-  onSuccess: (newExpense) => {
-    // TanStack Query can update cache directly
-    queryClient.setQueryData(['expenses', newExpense.id], newExpense);
-    queryClient.invalidateQueries(['expenses']); // Refresh list
-  },
+// With undo action
+toast({
+  title: 'Expense deleted',
+  variant: 'success',
+  action: <button onClick={handleUndo}>Undo</button>,
 });
 ```
 
-**Benefits:**
-- Optimistic updates
-- No unnecessary refetches
-- Cache stays synchronized
+**Variants:**
+| Variant | Duration | Use Case |
+|---------|----------|----------|
+| `success` | 4s | Successful mutations |
+| `default` | 5s | Info messages |
+| `error` | 8s | Error messages (longer to read) |
 
-### Loading States
+**Features:**
+- Auto-Dismiss with variant-specific durations
+- Pause on Hover (timer pauses on mouse hover)
+- Progress Bar (visual indicator of auto-dismiss countdown)
+- Stacking Limit (maximum 5 toasts, oldest removed when exceeded)
+- Undo Actions (8-second window for deletion rollback)
 
-**Pattern Hierarchy:**
+**Real-World Usage:** `web/src/components/ui/toast-provider.tsx`
+
+---
+
+### [Loading States] Pattern
+
+**Rule**: Use skeleton components for initial loads, inline loaders for filtering, optimistic updates for mutations.
+
+**Hierarchy:**
 1. **Initial Load:** Show skeleton components (not spinners)
 2. **Pagination/Filtering:** Show inline loaders
 3. **Mutations:** Show optimistic updates + toast on completion
 
-**Skeleton Components:**
+**Skeleton Example:**
 ```tsx
 {isLoading ? (
   <TableSkeleton columns={5} rows={10} />
@@ -394,12 +655,11 @@ const { mutate } = useMutation({
 
 ---
 
-## Component Organization
+### [Component Organization] Pattern
 
-**Convention:** Feature-based structure, not type-based.
+**Rule**: Feature-based structure, not type-based.
 
-### Directory Structure
-
+**Directory Structure:**
 ```
 web/src/features/
 ├── expenses/
@@ -415,27 +675,17 @@ web/src/features/
 │       └── expense.schema.ts      # Zod validation
 ```
 
-### Naming Conventions
+**Naming Conventions:**
+- **Files:** kebab-case (`expense-form.tsx`, `use-expenses-query.ts`)
+- **Components:** PascalCase (`ExpenseForm`, `ExpensesTable`)
+- **Hooks:** camelCase with `use` prefix (`useExpenses()`, `useCreateExpense()`)
+- **Test Files:** Co-located (`expense-form.tsx` + `expense-form.test.tsx`)
 
-**Files:** kebab-case
-- `expense-form.tsx`
-- `use-expenses-query.ts`
+---
 
-**Components:** PascalCase
-- `ExpenseForm`
-- `ExpensesTable`
+### [Type Safety] Pattern
 
-**Hooks:** camelCase with `use` prefix
-- `useExpenses()`
-- `useCreateExpense()`
-
-**Test Files:** Co-located with component
-- `expense-form.tsx`
-- `expense-form.test.tsx`
-
-### Types
-
-**Convention:** Import from `@shared/types`, never duplicate.
+**Rule**: Import from `@shared/types`, never duplicate.
 
 ```typescript
 // ❌ Don't duplicate types
@@ -449,130 +699,25 @@ interface Expense {
 import type { Expense } from '@shared/types';
 ```
 
-**Rationale:** Single source of truth. Types are generated from OpenAPI spec, ensuring frontend/backend alignment.
+**Type Generation:**
+```bash
+# Run after backend schema changes
+pnpm run generate:types
+```
+
+**Why:** Single source of truth. Types are generated from OpenAPI spec, ensuring frontend/backend alignment.
+
+**Dependency Rule:** If `SCHEMA.md` or a backend entity changes, you **MUST** run `pnpm run generate:types` before touching frontend code.
+
+**Reference:** `docs/core/TROUBLESHOOTING.md#type-drift`
 
 ---
 
-## Form Validation Pattern
-
-**Stack:** React Hook Form + Zod
-
-### Schema Definition
-
-```typescript
-import { z } from 'zod';
-
-export const expenseFormSchema = z.object({
-  description: z.string().min(1, 'Description is required'),
-  amount: z.string().refine(
-    (val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0,
-    'Amount must be a positive number'
-  ),
-  providerId: z.number().min(1, 'Provider is required'),
-  date: z.string().min(1, 'Date is required'),
-  bizPercent: z.number().min(0).max(100).optional(),
-});
-
-export type ExpenseFormData = z.infer<typeof expenseFormSchema>;
-```
-
-### Form Component
-
-```typescript
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-
-const { handleSubmit, register, formState: { errors } } = useForm<ExpenseFormData>({
-  resolver: zodResolver(expenseFormSchema),
-  defaultValues: {
-    description: '',
-    bizPercent: 100,
-  },
-});
-```
-
-### Validation Timing
-
-- **On Submit:** Always validate (default behavior)
-- **On Blur:** For long forms with complex validation
-- **On Change:** For fields with interdependencies
-
-**Example:**
-```typescript
-const form = useForm({
-  mode: 'onBlur', // Validate on blur
-  reValidateMode: 'onChange', // Re-validate on change after first submit
-});
-```
-
----
-
-## Toast Notification Pattern
-
-**Context:** User feedback for all mutations and important events.
-
-**Key Files:**
-- `web/src/components/ui/toast-provider.tsx`
-- `web/src/lib/toast-context.ts`
-
-### Usage
-
-```typescript
-import { useToast } from '@/lib/toast-context';
-
-const { toast } = useToast();
-
-// Success
-toast({
-  title: 'Expense created',
-  variant: 'success', // Auto-dismisses after 4s
-});
-
-// Error
-toast({
-  title: 'Failed to save expense',
-  description: 'Database connection error. Please try again.',
-  variant: 'error', // Auto-dismisses after 8s
-});
-
-// With undo action
-toast({
-  title: 'Expense deleted',
-  variant: 'success',
-  action: (
-    <button onClick={handleUndo}>Undo</button>
-  ),
-});
-```
-
-### Variants
-
-| Variant | Duration | Use Case |
-|---------|----------|----------|
-| `success` | 4s | Successful mutations |
-| `default` | 5s | Info messages |
-| `error` | 8s | Error messages (longer to read) |
-
-### Features
-
-**Auto-Dismiss:** Toasts automatically dismiss based on variant duration.
-
-**Pause on Hover:** Timer pauses when user hovers over toast, resumes on mouse leave.
-
-**Progress Bar:** Visual indicator showing time until auto-dismiss.
-
-**Stacking Limit:** Maximum 5 toasts visible. Oldest is removed when limit exceeded.
-
-**Undo Actions:** 8-second window to restore deleted items.
-
----
-
-## Testing Conventions
+### [Testing] Pattern
 
 **Framework:** Vitest + React Testing Library
 
-### Test Structure
-
+**Test Structure:**
 ```typescript
 describe('ExpenseForm', () => {
   it('renders form fields correctly', () => {
@@ -598,20 +743,17 @@ describe('ExpenseForm', () => {
     expect(onSubmit).toHaveBeenCalledWith({
       description: 'Office supplies',
       amount: 100,
-      // ...
     });
   });
 });
 ```
 
-### Coverage Targets
-
-- **Critical Paths:** 80%+ (forms, API calls, calculations)
+**Coverage Targets:**
+- **Critical Paths:** 80%+ (forms, API calls, tax calculations)
 - **UI Components:** 60%+ (visual components, layout)
 - **Utilities:** 90%+ (pure functions, helpers)
 
-### Mocking API Calls
-
+**Mocking API Calls:**
 ```typescript
 import { vi } from 'vitest';
 import { apiClient } from '@/lib/api-client';
@@ -634,11 +776,9 @@ describe('useExpenses', () => {
 
 ---
 
-## Accessibility Patterns
+### [Accessibility] Pattern
 
-### Focus Management
-
-**Modal Dialogs:**
+**Focus Management:**
 - Trap focus within modal when open
 - Return focus to trigger element on close
 - Auto-focus first interactive element
@@ -648,7 +788,7 @@ describe('useExpenses', () => {
 - Skip links for main content
 - Escape key closes modals and dropdowns
 
-### ARIA Labels
+**ARIA Labels:**
 
 **Icon Buttons:**
 ```tsx
@@ -670,19 +810,15 @@ describe('useExpenses', () => {
 </div>
 ```
 
-### Color Contrast
-
-**Standard:** WCAG AA compliant (4.5:1 for normal text)
-
-**Testing:** Use browser DevTools to verify contrast ratios.
+**Color Contrast:**
+- **Standard:** WCAG AA compliant (4.5:1 for normal text)
+- **Testing:** Use browser DevTools to verify contrast ratios
 
 ---
 
-## Performance Optimization
+### [Performance] Pattern
 
-### Code Splitting
-
-**Route-Based:**
+**Code Splitting (Route-Based):**
 ```typescript
 import { lazy } from 'react';
 
@@ -694,10 +830,7 @@ const ExpensesPage = lazy(() => import('./features/expenses/expenses-page'));
 - Faster time to interactive
 - Better caching
 
-### Memo and Callback Hooks
-
-**Use Sparingly:** Only when profiling shows performance issues.
-
+**Memoization:**
 ```typescript
 // ❌ Don't memoize everything
 const MemoizedComponent = React.memo(SimpleComponent);
@@ -709,13 +842,7 @@ const sortedExpenses = useMemo(
 );
 ```
 
-### Bundle Size Monitoring
-
-**Tools:**
-- Vite build analyzer
-- Bundle Buddy
-
-**Target:** <250KB gzipped for initial bundle
+**Bundle Size Target:** <250KB gzipped for initial bundle
 
 ---
 
@@ -725,4 +852,4 @@ const sortedExpenses = useMemo(
 - **Troubleshooting:** See `TROUBLESHOOTING.md` for common issues
 - **Australian Tax Rules:** See `ATO-LOGIC.md` for GST/BAS calculations
 - **Database Schema:** See `SCHEMA.md` for entity relationships
-
+- **Security:** See `SECURITY.md` for encryption and key management

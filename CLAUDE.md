@@ -1,88 +1,95 @@
-# 🤖 CLAUDE.md | Project Intelligence & Agent Directives
+# 🤖 CLAUDE.md | CLI Workflow & Commands
 
 ## 🎯 Role & Persona
 
-You act as an expert senior front-end developer. You must follow the **Collaboration Protocol** in `.github/copilot-instructions.md`, specifically the **"Propose, Justify, Recommend"** framework for all architectural decisions.
+Expert Full Stack Developer. Follow the **"Propose, Justify, Recommend"** framework for all architectural decisions.
 
-## 🏗 Architecture & Stack
+---
 
-- **Monorepo:** Managed via `pnpm`. `/web` (React/Next.js) and `/shared` (logic/types).
-- **Type System:** Strict TypeScript. **Never duplicate types**; import from `@shared/types`.
-- **Data:** All currency amounts MUST be **integers in cents**. Use `formatCents()` for display logic.
-- **Styling:** Tailwind CSS following "Vibe Coding" rules (Atomic components, accessible, performant).
+## 🛠 TDD Workflow
 
-## 🛠 Mandatory Workflow (TDD)
+**Never skip tests. This is the mandatory sequence:**
 
-1. **Planning (Opus):** Analyze `NEXT-TASKS.md` and `.github/copilot-instructions.md` to define the sub-task.
-2. **Test First (Sonnet):** Create/update `.test.ts/tsx` before implementation.
-   - Run `pnpm --filter web test [path]` to verify failure.
-3. **Implementation:** Write minimal code to pass tests. Follow **Security First** and **A11y** principles.
-4. **Verification:** Run `pnpm --filter web lint` and `pnpm --filter web test`.
-5. **Vibe Check:** Self-audit against the **Pre-Submission Checklist** in `copilot-instructions.md`.
-6. **Documentation:** Update `.md` files and use **Conventional Commits** for git.
+1. **Plan**: Analyze `NEXT-TASKS.md` for current task
+2. **Test**: Write `.test.ts/.tsx` first
+3. **Run**: `pnpm --filter web test [path]` (verify failure)
+4. **Build**: Minimal code to pass test
+5. **Verify**: `pnpm --filter web lint && pnpm --filter web test`
 
-## 💻 CLI & Commands
+**Coverage Targets**:
+- Critical paths (tax calculations, mutations): 80%+
+- UI components: 60%+
+- Pure functions: 90%+
 
-Use these via the `Bash` tool. Preferred aliases:
+---
 
-- **Test:** `pnpm --filter web test` (or `/test`)
-- **Lint:** `pnpm --filter web lint` (or `/lint`)
-- **Format:** `pnpm --filter web format`
-- **Build:** `pnpm --filter web build`
+## 💻 CLI Commands
 
-## ⚠️ Guardrails
+**Frontend:**
+- **Test**: `pnpm --filter web test [path]`
+- **Lint**: `pnpm --filter web lint`
+- **Build**: `pnpm --filter web build`
+- **Dev**: `pnpm --filter web dev`
 
-- **No `any`:** Forbidden.
-- **No `console.log`:** Remove before completion.
-- **Optimistic UI:** Mandatory for mutations with rollback logic.
-- **Accessibility:** Mandatory ARIA labels and semantic HTML.
-- **Security:** Sanitize all inputs; no hardcoded secrets.
+**Backend:**
+- **Test**: `pnpm run test`
+- **Lint**: `pnpm run lint`
+- **Build**: `pnpm run build`
+- **Dev**: `pnpm run start:dev`
 
-## 📚 Documentation Structure (Tiered for AI Efficiency)
+**Types:**
+- **Generate**: `pnpm run generate:types` (run after Schema/Entity changes)
 
-**⭐ PRIORITY FILES (Read First):**
+---
 
-- `NEXT-TASKS.md`: Upcoming tasks for next release (active backlog)
-- `docs/core/ATO-LOGIC.md`: **CRITICAL** - Australian tax rules (prevents US tax hallucinations)
-- `.github/copilot-instructions.md`: Detailed UI/UX and Collaboration protocol
+## ⚠️ Quick Guardrails
 
-**🏗 CORE DOCUMENTATION (Reference as Needed):**
+**Code Quality:**
+- No `any`, no `console.log`
+- Currency as cents (integers)
+- Types from `@shared/types`
 
-- `docs/core/ARCHITECTURE.md`: System design and tech stack
-- `docs/core/PATTERNS.md`: Implementation patterns and conventions
-- `docs/core/TROUBLESHOOTING.md`: Common issues and solutions
-- `docs/core/SCHEMA.md`: Database structure and entity relationships
-- `docs/core/SECURITY.md`: Encryption, key management, security protocols
-- `docs/core/BACKUP.md`: Infrastructure and backup procedures
+**Workflow:**
+- TDD: Tests first, implementation second
+- Type Generation: Run `pnpm run generate:types` after backend schema changes
+- No US tax terms (IRS, sales tax, W-2, 1040, April 15)
 
-**🔮 PLANNING (Active Backlog):**
+**Domain:**
+- Australian FY: July 1 - June 30
+- GST: 10% (not "sales tax")
+- BAS reporting (not "IRS")
 
-- `NEXT-TASKS.md`: v1.2.0 UX Enhancements (current sprint)
-- `docs/FUTURE-ENHANCEMENTS.md`: Deferred features (living backlog)
+---
 
-**📦 ARCHIVE (Read-Only History):**
+## 📚 Documentation Triggers
 
-- `docs/archive/v1.0-CHANGELOG.md`: MVP release (backend + frontend)
-- `docs/archive/v1.1-CHANGELOG.md`: System management features
+When you encounter these tasks, read the corresponding file **first**:
 
-**⚠️ IMPORTANT RULES:**
+| Task | Read This First | Search Anchor Example |
+|------|----------------|----------------------|
+| Tax/GST/BAS calculations | `docs/core/ATO-LOGIC.md` | Entire file (critical) |
+| Code patterns & examples | `docs/core/PATTERNS.md` | `#currency-math`, `#data-fetching` |
+| System design questions | `docs/core/ARCHITECTURE.md` | `#backend-modules`, `#frontend-structure` |
+| Framework bugs/workarounds | `docs/core/TROUBLESHOOTING.md` | `#nestjs-multipart-booleans`, `#circular-dependencies` |
+| Database queries | `docs/core/SCHEMA.md` | `#entity-relationships` |
+| Security/encryption | `docs/core/SECURITY.md` | `#field-level-encryption` |
 
-1. **Always check `docs/core/ATO-LOGIC.md`** before implementing tax/GST/BAS calculations
-2. **Never use US tax terminology** (IRS, sales tax, W-2, Form 1040, April 15)
-3. **Never assume calendar year** - Australian FY is July 1 - June 30
-4. **Focus on `NEXT-TASKS.md`** - ignore completed tasks in `docs/archive/`
-5. **AI AGENTS: Only read archive files if user explicitly asks "What shipped in v1.0?"**
+**Search Anchor Usage**: Use grep or Ctrl+F to jump to specific sections (e.g., `grep "# \[Currency"` or search for `#currency-math`).
 
-## 🎯 Common Prompts
+**Archive Rule**: Only read `docs/archive/` if user explicitly asks "What shipped in v1.0?" or "Show me v1.1 changes."
 
-### For Discovery
+---
 
-"Review NEXT-TASKS.md. Recommend the next task and justify the priority."
+## 🎯 Example Prompts
+
+### For Task Discovery
+> "Review NEXT-TASKS.md. Recommend the next task and justify the priority."
 
 ### For Complex Features
-
-"I need to implement [X]. Use EnterPlanMode to propose an approach that considers SCHEMA.md and ATO-LOGIC.md."
+> "I need to implement [X]. Use EnterPlanMode to propose an approach that considers SCHEMA.md and ATO-LOGIC.md."
 
 ### For Debugging
+> "Investigate why [X] fails. Check SCHEMA.md for data assumptions and TROUBLESHOOTING.md for known issues before proposing a fix."
 
-"Investigate why [X] fails. Check SCHEMA.md for data assumptions before proposing a fix."
+### For Code Patterns
+> "I need to add a new searchable dropdown. Show me the pattern from PATTERNS.md#searchable-dropdown."
