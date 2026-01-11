@@ -12,7 +12,7 @@
 
 | Task | Effort | Priority | Status |
 |------|--------|----------|--------|
-| **Toast Notification Enhancements** - Progress bar, pause on hover, stacking, undo | 3-4 hours | 🟡 MEDIUM | ⬜ Todo |
+| **Toast Notification Enhancements** - Progress bar, pause on hover, stacking, undo | 3-4 hours | 🟡 MEDIUM | ✅ Done |
 | **Keyboard Shortcuts** - Power user shortcuts (⌘N, ⌘I, etc.) | 4-5 hours | 🟡 MEDIUM | ⬜ Todo |
 | **Bulk Operations** - Multi-select for batch delete/export/categorize | 5-6 hours | 🟡 MEDIUM | ⬜ Todo |
 | **CSV Template Downloads** - Downloadable templates with examples | 2-3 hours | 🟢 LOW | ⬜ Todo |

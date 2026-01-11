@@ -33,27 +33,27 @@
 
 ## 🎨 UX Polish & Interactions
 
-### Toast Notification Enhancements ⬆️ **PROMOTED TO v1.2.0**
+### Toast Notification Enhancements ✅ **COMPLETED**
 
 **Priority:** 🟡 Medium
 **Estimated Effort:** 3-4 hours
 **Context:** Auto-dismiss implemented in commit `ca6324b`
-**Status:** Moved to NEXT-TASKS.md on 2026-01-11
+**Status:** Completed on 2026-01-11 (moved to NEXT-TASKS.md and implemented)
 
 **Features:**
 
-- [ ] **Progress bar** showing time until auto-dismiss
+- [x] **Progress bar** showing time until auto-dismiss
   - Thin bar at bottom of toast that drains over duration
   - Visual indicator of remaining time
   - CSS animation with `animation-duration` matching toast duration
-- [ ] **Pause on hover** to prevent auto-dismiss when reading
+- [x] **Pause on hover** to prevent auto-dismiss when reading
   - Common UX pattern in toast libraries
   - Resume timer on mouse leave
   - Clear/resume setTimeout on mouse events
-- [ ] **Toast stacking limit** (max 5 visible)
+- [x] **Toast stacking limit** (max 5 visible)
   - Auto-dismiss oldest when limit exceeded
   - Prevent UI clutter during bulk operations
-- [ ] **Undo action** for destructive toasts
+- [x] **Undo action** for destructive toasts
   - "Expense deleted. [Undo]" button
   - 8-second window to restore
   - Keep deleted item in memory for duration, then commit
