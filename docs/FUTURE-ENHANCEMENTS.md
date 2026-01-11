@@ -149,7 +149,7 @@ Add keyboard shortcuts beyond basic navigation for power users.
 
 **Priority:** 🟢 Low (Explicitly Deferred)
 **Estimated Effort:** 8-10 hours (complex UX)
-**Original Task:** TASKS-FRONTEND.md line 405
+**Reference:** See PATTERNS.md for inline editing implementation patterns
 
 **Description:**
 Edit expense/income fields directly in the table without opening modal.
@@ -238,7 +238,7 @@ Provide downloadable CSV templates with example data.
 
 **Priority:** 🔴 High (Deferred for now as we don't currently have access to screen reader software,)
 **Estimated Effort:** 4-6 hours (manual QA)
-**Original Task:** TASKS-FRONTEND.md line 1078
+**Reference:** See v1.0-CHANGELOG.md for existing implementation patterns
 **Dependencies:** Access to NVDA (Windows) or VoiceOver (macOS)
 
 **Description:**
@@ -477,7 +477,7 @@ Export data to popular accounting formats (Xero, MYOB, QuickBooks).
 - PDF Downloads: 10/10 ✓
 - CSV Import: 5/9 (4 require backend API)
 
-**Reference:** TASKS-FRONTEND.md line 1135, web/e2e/README.md
+**Reference:** web/e2e/README.md
 
 ---
 
@@ -598,7 +598,7 @@ Wait for React Router v7 stable release and migration guide.
 - [ ] Contributing guide (CONTRIBUTING.md)
 - [ ] Code style guide (covered in CLAUDE.md and copilot-instructions.md)
 - [ ] Component architecture patterns (covered in ARCHITECTURE.md)
-- [ ] Testing guidelines (covered in TASKS-FRONTEND.md)
+- [ ] Testing guidelines (see PATTERNS.md for conventions)
 - [ ] PR template
 - [ ] Issue templates
 
@@ -672,7 +672,7 @@ Wait for React Router v7 stable release and migration guide.
 **Process:**
 
 1. Review enhancements quarterly
-2. Promote high-priority items to TASKS-FRONTEND.md when ready to implement
+2. Promote high-priority items to NEXT-TASKS.md when ready to implement
 3. Archive completed items
 4. Re-prioritize based on usage patterns and pain points
 
@@ -684,6 +684,6 @@ Wait for React Router v7 stable release and migration guide.
 - **User experience** (daily use for 3-6 months) will drive prioritization
 - **Effort estimates** are rough approximations
 - **Dependencies** should be resolved before starting tasks
-- **Reference TASKS-FRONTEND.md** for implementation patterns and completed examples
+- **Reference PATTERNS.md** for implementation patterns and conventions
 
 **Questions or suggestions?** Add items to this document via pull request or create an issue for discussion.

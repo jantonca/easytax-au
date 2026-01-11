@@ -331,16 +331,20 @@ test('creates expense when form is submitted', async () => {
 
 ## Documentation References
 
-| Document            | Purpose                                         |
-| ------------------- | ----------------------------------------------- |
-| `SCHEMA.md`         | Entity definitions, relationships, SQL examples |
-| `ARCHITECTURE.md`   | Module structure, tech stack, patterns          |
-| `ROADMAP.md`        | MVP scope, phases, definition of done           |
-| `SECURITY.md`       | Encryption rules, public repo guidelines        |
-| `BACKUP.md`         | 3-2-1 backup strategy                           |
-| `TASKS.md`          | Backend development tasks                       |
-| `TASKS-FRONTEND.md` | Frontend development tasks                      |
-| `README.md`         |                                                 |
+| Document                         | Purpose                                         |
+| -------------------------------- | ----------------------------------------------- |
+| `NEXT-TASKS.md`                  | Current sprint tasks (v1.2.0)                   |
+| `docs/core/SCHEMA.md`            | Entity definitions, relationships, SQL examples |
+| `docs/core/ARCHITECTURE.md`      | Module structure, tech stack                    |
+| `docs/core/PATTERNS.md`          | Implementation patterns and conventions         |
+| `docs/core/TROUBLESHOOTING.md`   | Common issues and solutions                     |
+| `docs/core/ATO-LOGIC.md`         | Australian tax rules and calculations           |
+| `docs/core/SECURITY.md`          | Encryption rules, public repo guidelines        |
+| `docs/core/BACKUP.md`            | 3-2-1 backup strategy                           |
+| `docs/FUTURE-ENHANCEMENTS.md`    | Deferred features (living backlog)              |
+| `docs/archive/v1.0-CHANGELOG.md` | MVP release summary                             |
+| `docs/archive/v1.1-CHANGELOG.md` | System management release summary               |
+| `README.md`                      | Project setup and overview                      |
 
 ---
 

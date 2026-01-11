@@ -395,9 +395,14 @@ Documentation is organized into three tiers to separate active development from 
 
 | Document                                                                   | Purpose                                                |
 | -------------------------------------------------------------------------- | ------------------------------------------------------ |
-| [docs/archive/TASKS-FRONTEND.md](docs/archive/TASKS-FRONTEND.md)           | Completed frontend checklist & implementation patterns |
-| [docs/archive/TASKS-DONE.md](docs/archive/TASKS-DONE.md)                   | Completed backend checklist                            |
-| [docs/archive/ROADMAP-DONE.md](docs/archive/ROADMAP-DONE.md)               | Historical project roadmap and MVP scope               |
-| [docs/archive/FUTURE-ENHANCEMENTS.md](docs/archive/FUTURE-ENHANCEMENTS.md) | Deferred features and ideas bucket                     |
+| [NEXT-TASKS.md](NEXT-TASKS.md)                                             | Current sprint tasks (v1.2.0 UX Enhancements)          |
+| [docs/core/ARCHITECTURE.md](docs/core/ARCHITECTURE.md)                     | System design and tech stack                           |
+| [docs/core/PATTERNS.md](docs/core/PATTERNS.md)                             | Implementation patterns and conventions                |
+| [docs/core/TROUBLESHOOTING.md](docs/core/TROUBLESHOOTING.md)               | Common issues and solutions                            |
+| [docs/core/ATO-LOGIC.md](docs/core/ATO-LOGIC.md)                           | Australian tax rules and GST calculations              |
+| [docs/core/SCHEMA.md](docs/core/SCHEMA.md)                                 | Database structure and entity relationships            |
+| [docs/FUTURE-ENHANCEMENTS.md](docs/FUTURE-ENHANCEMENTS.md)                 | Deferred features (living backlog)                     |
+| [docs/archive/v1.0-CHANGELOG.md](docs/archive/v1.0-CHANGELOG.md)           | MVP release summary                                    |
+| [docs/archive/v1.1-CHANGELOG.md](docs/archive/v1.1-CHANGELOG.md)           | System management release summary                      |
 
 **Note:** The tiered structure reduces AI context bloat by ~80%, focusing agents on active work in `NEXT-TASKS.md` and critical tax logic in `docs/core/ATO-LOGIC.md`.

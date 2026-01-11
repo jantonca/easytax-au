@@ -29,7 +29,7 @@
 
 ## Completed Releases
 
-- **v1.1.0** (2026-01-10): System Management Features - See [ROADMAP-DONE.md Phase 6](docs/archive/ROADMAP-DONE.md#phase-6-system-management-features-v110---100-complete)
+- **v1.1.0** (2026-01-10): System Management Features - See [v1.1-CHANGELOG.md](docs/archive/v1.1-CHANGELOG.md)
 
 ---
 
@@ -88,7 +88,7 @@ See [FUTURE-ENHANCEMENTS.md](docs/archive/FUTURE-ENHANCEMENTS.md) for additional
 
 ## What's Already Done
 
-See [TASKS-FRONTEND.md](TASKS-FRONTEND.md) for the complete task breakdown with ✅ status indicators.
+See [v1.0-CHANGELOG.md](docs/archive/v1.0-CHANGELOG.md) for the complete MVP release summary.
 
 **Highlights:**
 - Phase F1 (Scaffold): 100% (22/22 tasks)
