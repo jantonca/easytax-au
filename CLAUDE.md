@@ -49,18 +49,21 @@ Use these via the `Bash` tool. Preferred aliases:
 **🏗 CORE DOCUMENTATION (Reference as Needed):**
 
 - `docs/core/ARCHITECTURE.md`: System design and tech stack
+- `docs/core/PATTERNS.md`: Implementation patterns and conventions
+- `docs/core/TROUBLESHOOTING.md`: Common issues and solutions
 - `docs/core/SCHEMA.md`: Database structure and entity relationships
 - `docs/core/SECURITY.md`: Encryption, key management, security protocols
 - `docs/core/BACKUP.md`: Infrastructure and backup procedures
 
-**📦 ARCHIVE (Historical - Ignore Unless Explicitly Asked):**
+**🔮 PLANNING (Active Backlog):**
 
-- `docs/archive/TASKS-DONE.md`: Completed backend tasks (95% done)
-- `docs/archive/TASKS-FRONTEND.md`: Completed frontend tasks (94% done)
-- `docs/archive/ROADMAP-DONE.md`: Historical progress tracking
-- `docs/archive/COMPLETED-ENHANCEMENTS.md`: Completed features beyond MVP
-- `docs/archive/FUTURE-ENHANCEMENTS.md`: Deferred features
-- `docs/archive/CHANGELOG-*.md`: Historical change logs
+- `NEXT-TASKS.md`: v1.2.0 UX Enhancements (current sprint)
+- `docs/FUTURE-ENHANCEMENTS.md`: Deferred features (living backlog)
+
+**📦 ARCHIVE (Read-Only History):**
+
+- `docs/archive/v1.0-CHANGELOG.md`: MVP release (backend + frontend)
+- `docs/archive/v1.1-CHANGELOG.md`: System management features
 
 **⚠️ IMPORTANT RULES:**
 
@@ -68,6 +71,7 @@ Use these via the `Bash` tool. Preferred aliases:
 2. **Never use US tax terminology** (IRS, sales tax, W-2, Form 1040, April 15)
 3. **Never assume calendar year** - Australian FY is July 1 - June 30
 4. **Focus on `NEXT-TASKS.md`** - ignore completed tasks in `docs/archive/`
+5. **AI AGENTS: Only read archive files if user explicitly asks "What shipped in v1.0?"**
 
 ## 🎯 Common Prompts
 

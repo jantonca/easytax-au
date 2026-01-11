@@ -1,5 +1,15 @@
 # Architecture: EasyTax-AU
 
+## Overview
+
+This document describes the system architecture, tech stack, and module organization of EasyTax-AU.
+
+**Related Documentation:**
+- **Implementation Patterns:** See `PATTERNS.md` for frontend conventions (pagination, searchable dropdowns, forms, data fetching)
+- **Troubleshooting:** See `TROUBLESHOOTING.md` for common issues and solutions
+- **Australian Tax Rules:** See `ATO-LOGIC.md` for GST/BAS calculation logic
+- **Database Schema:** See `SCHEMA.md` for entity relationships
+
 ## System Overview
 
 ```
