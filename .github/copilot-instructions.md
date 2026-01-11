@@ -28,8 +28,9 @@
 ### 📋 Active Work
 
 - **Current tasks**: See `NEXT-TASKS.md` in project root
-- **Core docs**: `docs/core/` (ARCHITECTURE.md, SCHEMA.md, ATO-LOGIC.md, SECURITY.md)
-- **Ignore**: `docs/archive/` (historical, completed tasks)
+- **Core docs**: `docs/core/` (ARCHITECTURE.md, PATTERNS.md, TROUBLESHOOTING.md, SCHEMA.md, ATO-LOGIC.md, SECURITY.md)
+- **Planning docs**: `docs/FUTURE-ENHANCEMENTS.md` (living backlog of deferred features)
+- **Ignore**: `docs/archive/` (read-only changelogs for v1.0 and v1.1)
 
 ### 🧪 Mandatory TDD Workflow
 
@@ -198,16 +199,27 @@ This governs how we handle common development tasks.
 ### 🏗️ Core Documentation (Reference as Needed)
 
 - **`docs/core/ARCHITECTURE.md`**: System design and tech stack
+- **`docs/core/PATTERNS.md`**: Implementation patterns and conventions (pagination, forms, dropdowns)
+- **`docs/core/TROUBLESHOOTING.md`**: Common issues and solutions (NestJS gotchas, CSV validation)
 - **`docs/core/SCHEMA.md`**: Database structure and entity relationships
 - **`docs/core/SECURITY.md`**: Encryption, key management, security protocols
 
-### 📦 Archive (Ignore Unless Explicitly Asked)
+### 🔮 Planning Documentation (Active Backlog)
 
-- **`docs/archive/`**: Historical completed tasks and old roadmaps
+- **`NEXT-TASKS.md`**: Current sprint tasks (v1.2.0 UX Enhancements)
+- **`docs/FUTURE-ENHANCEMENTS.md`**: Deferred features (living backlog)
+
+### 📦 Archive (Read-Only History)
+
+- **`docs/archive/v1.0-CHANGELOG.md`**: MVP release summary (backend + frontend)
+- **`docs/archive/v1.1-CHANGELOG.md`**: System management features summary
+- **AI Note**: Only read archive files if user explicitly asks "What shipped in v1.0?"
 
 ### 💡 When to Consult Documentation
 
 - **Tax/GST/BAS calculations**: Read `docs/core/ATO-LOGIC.md` first
+- **Implementation patterns**: Check `docs/core/PATTERNS.md` for established conventions
+- **Common issues**: Review `docs/core/TROUBLESHOOTING.md` before debugging
 - **Database queries**: Check `docs/core/SCHEMA.md` for entity relationships
 - **New features**: Review `NEXT-TASKS.md` for context and dependencies
 - **Security concerns**: Reference `docs/core/SECURITY.md` for encryption patterns
