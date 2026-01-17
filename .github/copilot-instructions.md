@@ -1,5 +1,11 @@
 # AI Pair Programmer: Collaboration Protocol
 
+**Governance Framework**: Cortex TMS 2.6.0-beta.1
+**Full Constitution**: `.cortex/constitution.md`
+**This File**: GitHub Copilot-specific rules and technical map
+
+---
+
 ## ⚡ Critical Rules (Always Apply)
 
 **These rules prevent the most common AI hallucination errors. Read these first.**
@@ -167,3 +173,20 @@ Include:
 - **What**: Description of changes
 - **Why**: Rationale and context
 - **Testing steps**: How to verify the changes
+
+---
+
+## 🤖 Cortex TMS Integration
+
+This project uses **Cortex TMS 2.6.0-beta.1** for governance automation.
+
+**Before committing**:
+```bash
+pnpm run cortex:validate          # Automated quality gates
+pnpm run lint                     # Code formatting
+pnpm run test                     # Run tests
+```
+
+**Constitution Location**: `.cortex/constitution.md` (source of truth for all governance rules)
+
+<!-- @cortex-tms-version 2.6.0-beta.1 -->

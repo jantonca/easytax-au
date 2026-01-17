@@ -251,3 +251,9 @@ If it returns a line number, the anchor exists.
 
 **Status**: ✅ Migration Complete
 **Next Steps**: Use the Context Reset Prompt in your next AI session
+
+---
+
+**Migration to Cortex TMS 2.6.0-beta.1**: 2026-01-17
+See: MIGRATION-PLAN-cortex-tms.md
+

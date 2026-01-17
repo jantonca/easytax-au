@@ -1,0 +1,33 @@
+{
+  "version": "1.0.0",
+  "scope": "standard",
+  "paths": {
+    "docs": "docs/core",
+    "tasks": "NEXT-TASKS.md",
+    "archive": "docs/archive",
+    "constitution": ".cortex/constitution.md",
+    "glossary": ".cortex/glossary.md",
+    "patterns": ".cortex/patterns.md"
+  },
+  "limits": {},
+  "validation": {
+    "ignorePatterns": [],
+    "ignoreFiles": [
+      "NEXT-TASKS.md",
+      "docs/core/PATTERNS.md",
+      "docs/core/ATO-LOGIC.md",
+      "docs/core/ARCHITECTURE.md",
+      "docs/core/TROUBLESHOOTING.md",
+      "docs/core/SCHEMA.md",
+      "docs/core/SECURITY.md",
+      "docs/core/BACKUP.md"
+    ]
+  },
+  "metadata": {
+    "created": "2026-01-17T00:00:00.000Z",
+    "projectName": "easytax-au",
+    "description": "Australian sole trader tax management application",
+    "migrationFrom": "proto-cortex (Instruction Layering v2.0)",
+    "migrationDate": "2026-01-17"
+  }
+}
