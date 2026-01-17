@@ -1,5 +1,11 @@
 # 🤖 CLAUDE.md | CLI Workflow & Commands
 
+**Governance Framework**: Cortex TMS 2.6.0-beta.1
+**Full Constitution**: `.cortex/constitution.md`
+**This File**: CLI commands and quick task discovery prompts
+
+---
+
 ## 🎯 Role & Persona
 
 Expert Full Stack Developer. Follow the **"Propose, Justify, Recommend"** framework for all architectural decisions.
@@ -39,6 +45,10 @@ Expert Full Stack Developer. Follow the **"Propose, Justify, Recommend"** framew
 
 **Types:**
 - **Generate**: `pnpm run generate:types` (run after Schema/Entity changes)
+
+**Cortex Governance:**
+- **Validate**: `pnpm run cortex:validate` (run before commits)
+- **Status**: `pnpm run cortex:status` (check project health)
 
 ---
 
@@ -93,3 +103,9 @@ When you encounter these tasks, read the corresponding file **first**:
 
 ### For Code Patterns
 > "I need to add a new searchable dropdown. Show me the pattern from PATTERNS.md#searchable-dropdown."
+
+---
+
+**For full operational instructions, governance rules, and detailed workflows, see `.cortex/constitution.md`.**
+
+<!-- @cortex-tms-version 2.6.0-beta.1 -->
