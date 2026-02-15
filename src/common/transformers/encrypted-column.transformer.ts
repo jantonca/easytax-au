@@ -1,5 +1,6 @@
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 import { ValueTransformer } from 'typeorm';
+import { Logger } from '@nestjs/common';
 
 /**
  * AES-256-GCM encryption transformer for TypeORM columns.
@@ -29,6 +30,7 @@ export class EncryptedColumnTransformer implements ValueTransformer {
   private readonly algorithm = 'aes-256-gcm';
   private readonly ivLength = 12; // GCM recommended IV length
   private readonly authTagLength = 16;
+  private readonly logger = new Logger(EncryptedColumnTransformer.name);
 
   /**
    * Gets the encryption key from environment variables.
@@ -87,6 +89,13 @@ export class EncryptedColumnTransformer implements ValueTransformer {
     const parts = value.split(':');
     if (parts.length !== 3) {
       // Value is not encrypted (legacy data or plain text)
+      // Log warning for security audit trail
+      this.logger.warn(
+        `Encountered unencrypted data (expected format: iv:authTag:ciphertext). ` +
+          `This may indicate legacy plaintext data or data corruption. ` +
+          `Value length: ${value.length} chars. ` +
+          `Consider migrating to encrypted format.`,
+      );
       return value;
     }
 

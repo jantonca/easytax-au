@@ -157,7 +157,10 @@ describe('CsvImportService', () => {
       expect(row.expenseData?.gstCents).toBe(1000);
     });
 
-    it('should apply business percentage to amounts', async () => {
+    it('should store FULL amounts with bizPercent (not pre-adjusted)', async () => {
+      // REGRESSION TEST for P0 audit bug: bizPercent double-application
+      // CSV import should store FULL amounts, with bizPercent applied only at query time
+      // This matches the manual expense creation pattern
       const csv = `Date,Item,Total,GST,Biz%,Category
 2025-07-15,iiNet,$100.00,$9.09,50,Internet`;
 
@@ -165,8 +168,15 @@ describe('CsvImportService', () => {
 
       expect(result.successCount).toBe(1);
       const row = result.rows[0];
-      expect(row.expenseData?.amountCents).toBe(5000); // 50% of 10000
-      expect(row.expenseData?.bizPercent).toBe(50);
+
+      // Should store FULL amounts (not pre-adjusted by bizPercent)
+      expect(row.expenseData?.amountCents).toBe(10000); // Full $100.00
+      expect(row.expenseData?.gstCents).toBe(909); // Full $9.09
+      expect(row.expenseData?.bizPercent).toBe(50); // 50% business use
+
+      // Note: bizPercent is applied at query time in BAS/Reports services
+      // This ensures consistency with manually-created expenses
+      // BAS query: FLOOR(gstCents * bizPercent / 100) = FLOOR(909 * 50 / 100) = 454 cents
     });
 
     it('should fail for unknown providers', async () => {
