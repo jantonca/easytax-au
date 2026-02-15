@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { DollarSign } from 'lucide-react';
 import type { IncomeResponseDto } from '@/lib/api-client';
 import { IncomesTable } from '@/features/incomes/components/incomes-table';
@@ -24,6 +25,7 @@ export function IncomesPage(): ReactElement {
   const { data: incomes, isLoading: incomesLoading, isError: incomesError } = useIncomes();
   const { data: clients = [] } = useClients();
 
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [incomeToEdit, setIncomeToEdit] = useState<IncomeResponseDto | null>(null);
   const [incomeToDelete, setIncomeToDelete] = useState<IncomeResponseDto | null>(null);
@@ -31,6 +33,17 @@ export function IncomesPage(): ReactElement {
   const { mutate: deleteIncome, isPending: isDeleting } = useDeleteIncome();
   const { mutate: markPaid } = useMarkPaid();
   const { mutate: markUnpaid } = useMarkUnpaid();
+
+  // Open create modal if ?new=true in URL (from keyboard shortcut)
+  useEffect(() => {
+    if (searchParams.get('new') === 'true') {
+      // Intentionally setting state in effect to respond to URL changes
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Opening modal from URL param
+      setIsCreateOpen(true);
+      // Remove the query param to clean up the URL
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const [filters, setFilters] = useState<IncomeFiltersValue>({
     clientId: 'all',

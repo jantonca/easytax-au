@@ -26,10 +26,10 @@ export function Layout(): ReactElement {
 
   useGlobalShortcuts({
     onNewExpense: () => {
-      void navigate('/expenses/new');
+      void navigate('/expenses?new=true');
     },
     onNewIncome: () => {
-      void navigate('/incomes/new');
+      void navigate('/incomes?new=true');
     },
     onImport: () => {
       void navigate('/import');

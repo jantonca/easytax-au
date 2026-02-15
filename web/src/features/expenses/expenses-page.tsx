@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Receipt } from 'lucide-react';
 import type { ExpenseResponseDto } from '@/lib/api-client';
 import { ExpensesTable } from '@/features/expenses/components/expenses-table';
@@ -22,11 +23,23 @@ export function ExpensesPage(): ReactElement {
   const { data: providers = [] } = useProviders();
   const { data: categories = [] } = useCategories();
 
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [expenseToEdit, setExpenseToEdit] = useState<ExpenseResponseDto | null>(null);
   const [expenseToDelete, setExpenseToDelete] = useState<ExpenseResponseDto | null>(null);
 
   const { mutate: deleteExpense, isPending: isDeleting } = useDeleteExpense();
+
+  // Open create modal if ?new=true in URL (from keyboard shortcut)
+  useEffect(() => {
+    if (searchParams.get('new') === 'true') {
+      // Intentionally setting state in effect to respond to URL changes
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Opening modal from URL param
+      setIsCreateOpen(true);
+      // Remove the query param to clean up the URL
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const [filters, setFilters] = useState<ExpenseFiltersValue>({
     providerId: 'all',
