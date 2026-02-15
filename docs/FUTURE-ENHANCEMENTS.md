@@ -2,9 +2,9 @@
 
 **Purpose:** This document tracks features, improvements, and nice-to-have enhancements that are not critical for the current production release but would improve the user experience in future iterations.
 
-**Project Status:** v1.3.0 in progress (3/4 features complete). v1.2.0 audit remediation complete. These enhancements are optional improvements based on user feedback and audit findings.
+**Project Status:** v1.3.0 in progress (3/4 features + 2 bonus P2 items complete). v1.2.0 audit remediation complete. These enhancements are optional improvements based on user feedback and audit findings.
 
-**Last Updated:** 2026-02-16 (v1.3.0 items marked complete, archived to v1.3-CHANGELOG.md)
+**Last Updated:** 2026-02-16 (Completed P2-1 and P2-2 quick wins)
 
 ---
 
@@ -41,36 +41,41 @@ These items were identified during the audit process as potential enhancements b
 
 ---
 
-### P2-1: Rounding Standardization
+### ✅ P2-1: Rounding Standardization (COMPLETED 2026-02-16)
 
-**Current State:** MoneyService uses `Decimal.round()` (round half-up) while BAS/Reports SQL uses `FLOOR()` (round down).
+~~**Current State:** MoneyService uses `Decimal.round()` (round half-up) while BAS/Reports SQL uses `FLOOR()` (round down).~~
 
-**Impact:** Maximum 1 cent per transaction drift. Over many transactions, creates systematic 0-1 cent under-claim in SQL (taxpayer-safe direction).
+**Status:** ✅ **COMPLETE** (Commit `17aae96`)
 
-**Recommendation:** Standardize on FLOOR in both paths for consistency and tax-conservatism. Alternatively, document the intentional use of FLOOR in SQL as the authoritative calculation method.
+**What Changed:**
+- MoneyService.applyBizPercent() now uses `.floor()` instead of `.round()`
+- Updated JSDoc to document FLOOR rounding behavior and tax-conservative rationale
+- Added test case demonstrating FLOOR vs ROUND difference
+- All 38 MoneyService tests passing
 
-**Files:**
-- `src/common/services/money.service.ts` (line 111)
-- `src/modules/bas/bas.service.ts` (line 192)
-- `src/modules/reports/reports.service.ts` (line 172)
+**Impact:** Tax-conservative calculations, full consistency between MoneyService and SQL queries
 
-**Effort:** 1-2 hours
+**Actual Effort:** ~15 minutes
 
 ---
 
-### P2-2: BAS G10/G11 Fields
+### ✅ P2-2: BAS G10/G11 Fields (COMPLETED 2026-02-16)
 
-**Current State:** BAS DTO only returns Simpler BAS fields (G1, 1A, 1B, Net GST). Full BAS reporters need G10/G11.
+~~**Current State:** BAS DTO only returns Simpler BAS fields (G1, 1A, 1B, Net GST). Full BAS reporters need G10/G11.~~
 
-**Context:** This is a deliberate scope decision (Simpler BAS only). The data is available via the Reports service (categories have `basLabel` field, seeder creates "Capital Purchases" with `basLabel: 'G10'`).
+**Status:** ✅ **COMPLETE** (Commit `2b82b4e`)
 
-**Recommendation:** Add optional G10/G11 fields to BAS DTO, populated from the category basLabel grouping that already exists in the Reports service.
+**What Changed:**
+- Added `g10CapitalPurchasesCents` field to BasSummaryDto
+- Added `g11NonCapitalPurchasesCents` field to BasSummaryDto
+- Implemented `calculatePurchasesByBasLabel()` service method
+- Added 10 comprehensive test cases (all passing)
+- G10: Sum of expense.total_cents WHERE category.basLabel = 'G10' (capital purchases > $1,000)
+- G11: Sum of expense.total_cents WHERE category.basLabel = 'G11' (non-capital purchases < $1,000)
 
-**Files:**
-- `src/modules/bas/dto/bas-summary.dto.ts`
-- `src/modules/bas/bas.service.ts`
+**Impact:** Full BAS support (vs Simpler BAS only), enables proper G10/G11 reporting to ATO
 
-**Effort:** 2-3 hours
+**Actual Effort:** ~30 minutes
 
 ---
 

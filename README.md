@@ -1,6 +1,6 @@
 # EasyTax-AU 🇦🇺
 
-A modular financial engine for Australian freelancers. Automates Simpler BAS, GST reconciliation, and deduction tracking.
+A modular financial engine for Australian freelancers. Automates BAS reporting (Simpler & Full BAS), GST reconciliation, and deduction tracking.
 
 ## Technical Goals
 
@@ -231,7 +231,7 @@ docker compose up -d --build
 
 ### Dashboard
 
-- **Current BAS Period Summary**: G1 (Total Sales), 1A (GST Collected), 1B (GST Paid), Net GST Payable/Refund
+- **Current BAS Period Summary**: G1 (Total Sales), 1A (GST Collected), 1B (GST Paid), G10 (Capital Purchases), G11 (Non-Capital Purchases), Net GST Payable/Refund
 - **Recent Expenses**: Latest 10 expense entries sorted by date
 - **Upcoming Recurring Expenses**: Due recurring templates with color-coded status
 - **Quick Actions**: Fast access to add expenses and incomes
@@ -262,7 +262,9 @@ docker compose up -d --build
 ### BAS Reporting
 
 - **Quarterly Summaries**: View BAS for any quarter with automatic period calculation
-- **PDF Export**: Download BAS reports with all required ATO fields (G1, 1A, 1B)
+- **Full BAS Support**: Simpler BAS (G1, 1A, 1B) + Full BAS fields (G10, G11)
+- **Accounting Basis**: Choose between Cash (paid income only) or Accrual (all income)
+- **PDF Export**: Download BAS reports with all required ATO fields
 - **Record Counts**: See how many income and expense records contribute to each BAS period
 
 ![BAS Report](docs/screenshots/bas-report.png)

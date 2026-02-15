@@ -1,10 +1,10 @@
 # NEXT: Upcoming Tasks
 
-**Status:** v1.3.0 nearly complete (3/4 features done). Only Advanced Filtering remains.
+**Status:** v1.3.0 nearly complete (3/4 features done) + 2 bonus P2 items completed.
 
 **Purpose:** Track upcoming tasks for the next release.
 
-**Last Updated:** 2026-02-16 (Archived completed v1.3.0 tasks)
+**Last Updated:** 2026-02-16 (Completed P2-1 & P2-2 quick wins)
 
 ---
 
@@ -21,16 +21,19 @@ With v1.3.0 nearly complete, here are the recommended options for what to tackle
 
 ---
 
-### Option B: Quick Wins (Audit P2 Items)
-High-value, low-effort improvements from audit recommendations:
+### Option B: Quick Wins (Audit P2 Items) ✅ COMPLETE
 
-| Task | Effort | Priority | Impact |
-|------|--------|----------|--------|
-| **P2-1: Rounding Standardization** | 1-2 hours | 🟡 MEDIUM | Consistency & tax-conservatism |
-| **P2-2: BAS G10/G11 Fields** | 2-3 hours | 🟡 MEDIUM | Full BAS support (vs Simpler BAS) |
+~~High-value, low-effort improvements from audit recommendations.~~
 
-**Benefits:** Small, focused improvements with immediate value
-**Details:** See [FUTURE-ENHANCEMENTS.md](docs/FUTURE-ENHANCEMENTS.md#audit-identified-enhancements-p2)
+| Task | Status | Commit | Actual Time |
+|------|--------|--------|-------------|
+| **P2-1: Rounding Standardization** | ✅ Done | `17aae96` | ~15 min |
+| **P2-2: BAS G10/G11 Fields** | ✅ Done | `2b82b4e` | ~30 min |
+
+**Total Effort:** 45 minutes (well under 3-5 hour estimate!)
+
+**Completed:** 2026-02-16
+**Impact:** Tax-conservative calculations, Full BAS support, MoneyService ↔ SQL consistency
 
 ---
 
@@ -58,13 +61,13 @@ Larger features that significantly extend functionality:
 4. Moderate effort (6-8 hours)
 5. Builds on existing filter infrastructure
 
-**Alternative:** If you prefer quick wins, do **P2-1** (1-2 hours) + **P2-2** (2-3 hours) = 3-5 hours total for two solid improvements.
+**Alternative Completed:** ~~Option B (P2-1 + P2-2)~~ ✅ Done in 45 minutes!
 
 ---
 
 ## 📋 v1.3.0 Status
 
-**Progress:** 3 of 4 complete (75%) | **See:** [v1.3-CHANGELOG.md](docs/archive/v1.3-CHANGELOG.md)
+**Progress:** 3 of 4 complete (75%) + 2 bonus P2 items | **See:** [v1.3-CHANGELOG.md](docs/archive/v1.3-CHANGELOG.md)
 
 | Task | Status |
 |------|--------|
@@ -72,6 +75,8 @@ Larger features that significantly extend functionality:
 | CSV Template Downloads | ✅ Done |
 | Bulk Operations | ✅ Done |
 | Cash vs Accrual BAS | ✅ Done (bonus) |
+| P2-1: Rounding Standardization | ✅ Done (bonus) |
+| P2-2: BAS G10/G11 Fields | ✅ Done (bonus) |
 | **Advanced Filtering** | ⬜ **Remaining** |
 
 ---
