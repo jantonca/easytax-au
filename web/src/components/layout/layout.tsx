@@ -1,23 +1,47 @@
 import type { ReactElement } from 'react';
 import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { useFYInfo } from '@/hooks/use-fy-info';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
+import { useGlobalShortcuts } from '@/hooks/use-global-shortcuts';
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/layout/header';
 import { MobileNav } from '@/components/layout/mobile-nav';
 import { Sidebar } from '@/components/layout/sidebar';
 import { CommandPalette } from '@/components/layout/command-palette';
+import { KeyboardShortcutsHelp } from '@/components/keyboard-shortcuts-help';
 import { Footer } from '@/components/layout/footer';
 
 export function Layout(): ReactElement {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isShortcutsHelpOpen, setIsShortcutsHelpOpen] = useState(false);
 
   const fyInfo = useFYInfo();
+  const navigate = useNavigate();
 
   useKeyboardShortcuts({
     'mod+k': () => setIsCommandPaletteOpen((open) => !open),
+  });
+
+  useGlobalShortcuts({
+    onNewExpense: () => {
+      void navigate('/expenses/new');
+    },
+    onNewIncome: () => {
+      void navigate('/incomes/new');
+    },
+    onImport: () => {
+      void navigate('/import');
+    },
+    onHelp: () => setIsShortcutsHelpOpen((open) => !open),
+    onSearch: () => {
+      // Focus search input if present on current page
+      const searchInput = document.querySelector('input[type="search"]') as HTMLInputElement;
+      if (searchInput) {
+        searchInput.focus();
+      }
+    },
   });
 
   return (
@@ -48,6 +72,10 @@ export function Layout(): ReactElement {
       </div>
 
       <CommandPalette open={isCommandPaletteOpen} onOpenChange={setIsCommandPaletteOpen} />
+      <KeyboardShortcutsHelp
+        open={isShortcutsHelpOpen}
+        onClose={() => setIsShortcutsHelpOpen(false)}
+      />
     </div>
   );
 }
