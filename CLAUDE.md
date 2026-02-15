@@ -84,16 +84,51 @@ When you encounter these tasks, read the corresponding file **first**:
 
 ---
 
+## 🛠️ Custom Skills (Slash Commands)
+
+**Claude Code provides specialized workflow skills for common development tasks:**
+
+| Command | Purpose | When to Use |
+|---------|---------|-------------|
+| `/plan` | Task discovery & prioritization from NEXT-TASKS.md | Start of work session, choosing next task |
+| `/tdd` | Test-driven development workflow | Implementing features (MANDATORY for all development) |
+| `/debug` | Structured debugging with TROUBLESHOOTING.md check | Investigating bugs, errors, test failures |
+| `/review` | 5-pillar code review (compliance, security, quality, architecture, performance) | Before merge, after feature complete |
+| `/audit` | Full codebase health check with formal report | Quarterly audits, pre-release validation |
+| `/deploy` | Deployment guidance for Docker/Proxmox LXC | Deploying to dev/staging/production |
+| `/import-data` | CSV import specialist (high-risk operation) | Implementing/debugging CSV transaction imports |
+| `/schema-change` | Database migration with encryption safety | Any schema/entity changes |
+
+**Orchestrator Prompts** (reference documentation):
+- `docs/prompts/orchestrator.md` - Session initialization & specialist knowledge
+- `docs/prompts/workflow-feature.md` - End-to-end feature development workflow
+- `docs/prompts/workflow-bugfix.md` - Structured bug fix workflow
+- `docs/prompts/quick-reference.md` - One-page cheat sheet
+
+**How to use:**
+- Type `/command` in Claude Code to invoke a skill
+- Skills embed all 5 specialist domains (ATO Compliance, Security, Code Quality, Architecture, Performance)
+- Skills automatically reference relevant documentation (ATO-LOGIC.md, SCHEMA.md, etc.)
+- Skills include Australian domain guardrails and safety checks
+
+---
+
 ## 🎯 Example Prompts
 
 ### For Task Discovery
 > "Review NEXT-TASKS.md. Recommend the next task and justify the priority."
+>
+> Or use: `/plan`
 
 ### For Complex Features
 > "I need to implement [X]. Use EnterPlanMode to propose an approach that considers SCHEMA.md and ATO-LOGIC.md."
+>
+> Then use: `/tdd` to implement with test-first workflow
 
 ### For Debugging
 > "Investigate why [X] fails. Check SCHEMA.md for data assumptions and TROUBLESHOOTING.md for known issues before proposing a fix."
+>
+> Or use: `/debug` for structured debugging workflow
 
 ### For Code Patterns
 > "I need to add a new searchable dropdown. Show me the pattern from PATTERNS.md#searchable-dropdown."
