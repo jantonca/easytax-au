@@ -25,8 +25,3 @@ coverage/
 # Playwright artifacts
 /web/playwright-report/
 /web/test-results/
-
-# Cortex TMS
-.cortex/cache/
-.cortex/.env.local
-.cortex/temp/
