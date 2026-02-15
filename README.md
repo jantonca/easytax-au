@@ -245,6 +245,7 @@ docker compose up -d --build
 - **Business Use Slider**: Visual percentage slider (0-100%) with real-time claimable GST calculation
 - **Filtering & Sorting**: Filter by provider, category, date range; sort by date, amount, provider
 - **CSV Import**: Bulk import with preview, validation, and duplicate detection
+- **Bulk Operations**: Multi-select with checkboxes, shift-click range selection, bulk delete with confirmation, CSV export, and bulk category reassignment
 
 ![Expenses List](docs/screenshots/expenses.png)
 
@@ -254,6 +255,7 @@ docker compose up -d --build
 - **Quick Paid Toggle**: One-click status updates from unpaid to paid
 - **Client Management**: Encrypted client storage with ABN validation and PSI eligibility tracking
 - **Filtering**: Filter by client, paid/unpaid status, and date range
+- **Bulk Operations**: Multi-select with checkboxes, shift-click range selection, bulk delete with confirmation, and CSV export
 
 ![Incomes List](docs/screenshots/incomes.png)
 
