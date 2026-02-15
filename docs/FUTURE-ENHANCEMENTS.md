@@ -2,9 +2,9 @@
 
 **Purpose:** This document tracks features, improvements, and nice-to-have enhancements that are not critical for the current production release but would improve the user experience in future iterations.
 
-**Project Status:** v1.1.0 shipped. Audit remediation in progress (v1.2.0). These enhancements are optional improvements based on user feedback and audit findings.
+**Project Status:** v1.3.0 in progress (3/4 features complete). v1.2.0 audit remediation complete. These enhancements are optional improvements based on user feedback and audit findings.
 
-**Last Updated:** 2026-02-15 (P2 audit items added, completed items marked)
+**Last Updated:** 2026-02-16 (v1.3.0 items marked complete, archived to v1.3-CHANGELOG.md)
 
 ---
 
@@ -147,11 +147,11 @@ These items were identified during the audit process as potential enhancements b
 
 ---
 
-### Keyboard Shortcuts for Common Actions ⬆️ **PROMOTED TO v1.3.0**
+### Keyboard Shortcuts for Common Actions ✅ **COMPLETED**
 
-**Priority:** 🟡 Medium
-**Estimated Effort:** 4-5 hours
-**Status:** Moved to NEXT-TASKS.md (v1.3.0 after audit fixes)
+**Status:** ✅ Shipped in v1.3.0 (2026-02-14)
+**Effort:** 4-5 hours
+**See:** [v1.3-CHANGELOG.md](../archive/v1.3-CHANGELOG.md#1-keyboard-shortcuts-completed-2026-02-14)
 
 **Description:**
 Add keyboard shortcuts beyond basic navigation for power users.
@@ -239,11 +239,11 @@ Modal-based editing provides full CRUD functionality with simpler implementation
 
 ---
 
-### Bulk Operations ⬆️ **PROMOTED TO v1.3.0**
+### Bulk Operations ✅ **COMPLETED**
 
-**Priority:** 🟡 Medium
-**Estimated Effort:** 5-6 hours
-**Status:** Moved to NEXT-TASKS.md (v1.3.0 after audit fixes)
+**Status:** ✅ Shipped in v1.3.0 (2026-02-16)
+**Effort:** 5-6 hours
+**See:** [v1.3-CHANGELOG.md](../archive/v1.3-CHANGELOG.md#3-bulk-operations-completed-2026-02-16)
 
 **Description:**
 Allow selecting multiple rows for batch operations.
@@ -267,11 +267,11 @@ Allow selecting multiple rows for batch operations.
 
 ---
 
-### CSV Template Downloads ⬆️ **PROMOTED TO v1.3.0**
+### CSV Template Downloads ✅ **COMPLETED**
 
-**Priority:** 🟢 Low
-**Estimated Effort:** 2-3 hours
-**Status:** Moved to NEXT-TASKS.md (v1.3.0 after audit fixes)
+**Status:** ✅ Shipped in v1.3.0 (2026-02-14)
+**Effort:** 2-3 hours
+**See:** [v1.3-CHANGELOG.md](../archive/v1.3-CHANGELOG.md#2-csv-template-downloads-completed-2026-02-14)
 
 **Description:**
 Provide downloadable CSV templates with example data.
@@ -403,11 +403,11 @@ Attach receipt/invoice images to expenses and incomes.
 
 ---
 
-### Advanced Filtering ⬆️ **PROMOTED TO v1.3.0**
+### Advanced Filtering 🎯 **NEXT UP (v1.3.0 Final Task)**
 
 **Priority:** 🟡 Medium
 **Estimated Effort:** 6-8 hours
-**Status:** Moved to NEXT-TASKS.md (v1.3.0 after audit fixes)
+**Status:** Remaining task in v1.3.0 (see NEXT-TASKS.md for details)
 
 **Description:**
 More sophisticated filtering beyond current date range and dropdowns.
