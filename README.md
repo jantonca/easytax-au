@@ -318,14 +318,21 @@ EasyTax-AU is fully keyboard accessible. All features can be used without a mous
 
 ### Global Shortcuts
 
-| Shortcut        | Action                         | Context                     |
-| --------------- | ------------------------------ | --------------------------- |
-| `⌘K` / `Ctrl+K` | Open command palette           | Anywhere in the app         |
-| `Escape`        | Close modal/dialog             | When a modal is open        |
-| `Tab`           | Navigate to next element       | Form fields, buttons, links |
-| `Shift+Tab`     | Navigate to previous element   | Form fields, buttons, links |
-| `Enter`         | Submit form or activate button | Forms, buttons              |
-| `Space`         | Toggle checkbox/switch         | Checkboxes, toggles         |
+| Shortcut                     | Action                         | Context                     |
+| ---------------------------- | ------------------------------ | --------------------------- |
+| `⌘K` / `Ctrl+K`              | Open command palette           | Anywhere in the app         |
+| `⌘/` / `Ctrl+/`              | Show keyboard shortcuts help   | Anywhere in the app         |
+| `⌘⌥N` / `Ctrl+Alt+N`         | Create new expense             | Anywhere in the app         |
+| `⌘⌥⇧N` / `Ctrl+Alt+Shift+N` | Create new income              | Anywhere in the app         |
+| `⌘⌥I` / `Ctrl+Alt+I`         | Navigate to import page        | Anywhere in the app         |
+| `⌘F` / `Ctrl+F`              | Focus search/filter input      | When on a page with search  |
+| `Escape`                     | Close modal/dialog             | When a modal is open        |
+| `Tab`                        | Navigate to next element       | Form fields, buttons, links |
+| `Shift+Tab`                  | Navigate to previous element   | Form fields, buttons, links |
+| `Enter`                      | Submit form or activate button | Forms, buttons              |
+| `Space`                      | Toggle checkbox/switch         | Checkboxes, toggles         |
+
+**Note:** On Windows/Linux, use `Ctrl` instead of `⌘` (Command) and `Alt` instead of `⌥` (Option).
 
 ### Navigation
 

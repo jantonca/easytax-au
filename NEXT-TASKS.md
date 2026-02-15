@@ -1,10 +1,10 @@
 # NEXT: Upcoming Tasks
 
-**Status:** v1.3.0 (UX Enhancements) in progress. CSV Template Downloads complete.
+**Status:** v1.3.0 (UX Enhancements) in progress. CSV Template Downloads and Keyboard Shortcuts complete.
 
 **Purpose:** Track upcoming tasks for the next release.
 
-**Last Updated:** 2026-02-15 (CSV Template Downloads completed)
+**Last Updated:** 2026-02-15 (Keyboard Shortcuts completed)
 
 ---
 
@@ -16,15 +16,15 @@
 
 | Task | Effort | Priority | Status |
 |------|--------|----------|--------|
-| **Keyboard Shortcuts** - Power user shortcuts (⌘N, ⌘I, etc.) | 4-5 hours | 🟡 MEDIUM | ⬜ Todo |
-| **Bulk Operations** - Multi-select for batch delete/export/categorize | 5-6 hours | 🟡 MEDIUM | ⬜ Todo |
+| **Keyboard Shortcuts** - Power user shortcuts (Ctrl+Alt+N, Ctrl+Alt+I, etc.) | 4-5 hours | 🟡 MEDIUM | ✅ Done |
 | **CSV Template Downloads** - Downloadable templates with examples | 2-3 hours | 🟢 LOW | ✅ Done |
+| **Bulk Operations** - Multi-select for batch delete/export/categorize | 5-6 hours | 🟡 MEDIUM | ⬜ Todo |
 | **Advanced Filtering** - Saved filters, multi-select, amount ranges | 6-8 hours | 🟡 MEDIUM | ⬜ Todo |
 
 **Implementation Notes:**
-- **Keyboard**: Extend `web/src/hooks/use-keyboard-shortcuts.ts` with ⌘N (new expense), ⌘⇧N (new income), ⌘I (import), ⌘/ (help overlay)
-- **Bulk**: TanStack Table row selection, bulk delete/export/recategorize, "Select all/none/invert" toolbar
+- **Keyboard**: ✅ COMPLETED - Global shortcuts using Ctrl+Alt combinations. See `web/src/hooks/use-global-shortcuts.ts`, `web/src/components/keyboard-shortcuts-help.tsx`. Shortcuts: Ctrl+Alt+N (expense), Ctrl+Alt+Shift+N (income), Ctrl+Alt+I (import), Ctrl+/ (help), Ctrl+K (command palette), Ctrl+F (search)
 - **Templates**: ✅ COMPLETED - Client-side CSV generation (Blob API), example rows for CommBank/Generic/Income formats. See `web/src/features/import/utils/generate-csv-template.ts` and `web/src/features/import/components/csv-template-downloads.tsx`
+- **Bulk**: TanStack Table row selection, bulk delete/export/recategorize, "Select all/none/invert" toolbar
 - **Filtering**: localStorage for saved filters, multi-select dropdowns, amount min/max, quick filters (This month, Last quarter)
 
 ---
