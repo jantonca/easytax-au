@@ -1,4 +1,5 @@
 import { EncryptedColumnTransformer } from './encrypted-column.transformer';
+import { Logger } from '@nestjs/common';
 
 describe('EncryptedColumnTransformer', () => {
   const originalEnv = process.env.ENCRYPTION_KEY;
@@ -91,18 +92,35 @@ describe('EncryptedColumnTransformer', () => {
   });
 
   describe('legacy data handling', () => {
-    it('should return unencrypted data as-is (no colons)', () => {
+    let warnSpy: jest.SpyInstance;
+
+    beforeEach(() => {
+      // Spy on Logger.warn to verify warning is logged
+      warnSpy = jest.spyOn(Logger.prototype, 'warn').mockImplementation();
+    });
+
+    afterEach(() => {
+      warnSpy.mockRestore();
+    });
+
+    it('should return unencrypted data as-is and log warning (no colons)', () => {
       const transformer = new EncryptedColumnTransformer();
       const legacyValue = 'plain text without colons';
 
-      expect(transformer.from(legacyValue)).toBe(legacyValue);
+      const result = transformer.from(legacyValue);
+
+      expect(result).toBe(legacyValue);
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Encountered unencrypted data'));
     });
 
-    it('should return value with single colon as-is', () => {
+    it('should return value with single colon as-is and log warning', () => {
       const transformer = new EncryptedColumnTransformer();
       const legacyValue = 'part1:part2';
 
-      expect(transformer.from(legacyValue)).toBe(legacyValue);
+      const result = transformer.from(legacyValue);
+
+      expect(result).toBe(legacyValue);
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Encountered unencrypted data'));
     });
   });
 

@@ -1,7 +1,6 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
-import Decimal from 'decimal.js';
 import { CsvParserService } from './csv-parser.service';
 import { ProviderMatcherService } from './provider-matcher.service';
 import {
@@ -274,15 +273,14 @@ export class CsvImportService {
       gstCents = this.moneyService.calcGstFromTotal(row.totalCents);
     }
 
-    // Apply business use percentage
+    // Store FULL amounts with bizPercent (applied at query time in BAS/Reports)
+    // This matches the manual expense creation pattern and prevents double-application
     const bizPercent = row.bizPercent;
-    const adjustedAmount = this.applyBizPercent(row.totalCents, bizPercent);
-    const adjustedGst = this.applyBizPercent(gstCents, bizPercent);
 
     const expenseData: Partial<Expense> = {
       date: row.date,
-      amountCents: adjustedAmount,
-      gstCents: adjustedGst,
+      amountCents: row.totalCents,
+      gstCents: gstCents,
       bizPercent: bizPercent,
       providerId: provider.id,
       categoryId: category.id,
@@ -297,14 +295,6 @@ export class CsvImportService {
       categoryName: category.name,
       expenseData,
     };
-  }
-
-  /**
-   * Apply business use percentage to an amount.
-   */
-  private applyBizPercent(amountCents: number, bizPercent: number): number {
-    if (bizPercent === 100) return amountCents;
-    return new Decimal(amountCents).times(bizPercent).dividedBy(100).round().toNumber();
   }
 
   /**
