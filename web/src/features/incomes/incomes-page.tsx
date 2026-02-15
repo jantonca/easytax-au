@@ -20,6 +20,8 @@ import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { EmptyState } from '@/components/ui/empty-state';
 import { formatCents } from '@/lib/currency';
 import { TableSkeleton } from '@/components/skeletons/table-skeleton';
+import { exportIncomesToCsv } from '@/lib/export-csv';
+import { useToast } from '@/lib/toast-context';
 
 export function IncomesPage(): ReactElement {
   const { data: incomes, isLoading: incomesLoading, isError: incomesError } = useIncomes();
@@ -29,10 +31,12 @@ export function IncomesPage(): ReactElement {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [incomeToEdit, setIncomeToEdit] = useState<IncomeResponseDto | null>(null);
   const [incomeToDelete, setIncomeToDelete] = useState<IncomeResponseDto | null>(null);
+  const [bulkDeleteIds, setBulkDeleteIds] = useState<string[]>([]);
 
   const { mutate: deleteIncome, isPending: isDeleting } = useDeleteIncome();
   const { mutate: markPaid } = useMarkPaid();
   const { mutate: markUnpaid } = useMarkUnpaid();
+  const { showToast } = useToast();
 
   // Open create modal if ?new=true in URL (from keyboard shortcut)
   useEffect(() => {
@@ -99,6 +103,50 @@ export function IncomesPage(): ReactElement {
     });
   }
 
+  function handleBulkDelete(ids: string[]): void {
+    setBulkDeleteIds(ids);
+  }
+
+  function confirmBulkDelete(): void {
+    if (bulkDeleteIds.length === 0) {
+      return;
+    }
+
+    // Delete all selected incomes in parallel
+    const deletePromises = bulkDeleteIds.map((id) => {
+      return new Promise<void>((resolve, reject) => {
+        deleteIncome(id, {
+          onSuccess: () => resolve(),
+          onError: (error) => reject(error instanceof Error ? error : new Error('Delete failed')),
+        });
+      });
+    });
+
+    Promise.all(deletePromises)
+      .then(() => {
+        showToast({
+          title: `${bulkDeleteIds.length} income${bulkDeleteIds.length !== 1 ? 's' : ''} deleted`,
+          variant: 'success',
+        });
+        setBulkDeleteIds([]);
+      })
+      .catch(() => {
+        showToast({
+          title: 'Some incomes could not be deleted',
+          variant: 'error',
+        });
+        setBulkDeleteIds([]);
+      });
+  }
+
+  function handleBulkExport(incomesToExport: IncomeResponseDto[]): void {
+    exportIncomesToCsv(incomesToExport);
+    showToast({
+      title: `${incomesToExport.length} income${incomesToExport.length !== 1 ? 's' : ''} exported`,
+      variant: 'success',
+    });
+  }
+
   return (
     <section className="mx-auto flex max-w-5xl flex-col gap-3">
       <header className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
@@ -144,6 +192,8 @@ export function IncomesPage(): ReactElement {
                 onEdit={(income) => setIncomeToEdit(income)}
                 onDelete={(income) => setIncomeToDelete(income)}
                 onTogglePaid={handleTogglePaid}
+                onBulkDelete={handleBulkDelete}
+                onBulkExport={handleBulkExport}
               />
             </>
           )}
@@ -229,6 +279,30 @@ export function IncomesPage(): ReactElement {
             confirmLabel="Delete"
             cancelLabel="Cancel"
             onConfirm={handleDelete}
+            isLoading={isDeleting}
+            variant="danger"
+          />
+
+          <ConfirmationDialog
+            open={bulkDeleteIds.length > 0}
+            onOpenChange={(open) => {
+              if (!open) {
+                setBulkDeleteIds([]);
+              }
+            }}
+            title="Delete incomes"
+            description={
+              <>
+                Are you sure you want to delete{' '}
+                <strong>
+                  {bulkDeleteIds.length} income{bulkDeleteIds.length !== 1 ? 's' : ''}
+                </strong>
+                ? This action cannot be undone.
+              </>
+            }
+            confirmLabel="Delete All"
+            cancelLabel="Cancel"
+            onConfirm={confirmBulkDelete}
             isLoading={isDeleting}
             variant="danger"
           />

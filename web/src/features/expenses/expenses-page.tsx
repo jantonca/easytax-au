@@ -9,14 +9,20 @@ import {
   type ExpenseFiltersValue,
 } from '@/features/expenses/components/expense-filters';
 import { ExpenseForm } from '@/features/expenses/components/expense-form';
+import { BulkCategoryChangeModal } from '@/features/expenses/components/bulk-category-change-modal';
 import { useExpenses } from '@/features/expenses/hooks/use-expenses';
-import { useDeleteExpense } from '@/features/expenses/hooks/use-expense-mutations';
+import {
+  useDeleteExpense,
+  useUpdateExpense,
+} from '@/features/expenses/hooks/use-expense-mutations';
 import { useCategories } from '@/hooks/use-categories';
 import { useProviders } from '@/hooks/use-providers';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { EmptyState } from '@/components/ui/empty-state';
 import { formatCents } from '@/lib/currency';
 import { TableSkeleton } from '@/components/skeletons/table-skeleton';
+import { exportExpensesToCsv } from '@/lib/export-csv';
+import { useToast } from '@/lib/toast-context';
 
 export function ExpensesPage(): ReactElement {
   const { data: expenses, isLoading: expensesLoading, isError: expensesError } = useExpenses();
@@ -27,8 +33,12 @@ export function ExpensesPage(): ReactElement {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [expenseToEdit, setExpenseToEdit] = useState<ExpenseResponseDto | null>(null);
   const [expenseToDelete, setExpenseToDelete] = useState<ExpenseResponseDto | null>(null);
+  const [bulkDeleteIds, setBulkDeleteIds] = useState<string[]>([]);
+  const [bulkCategoryChangeIds, setBulkCategoryChangeIds] = useState<string[]>([]);
 
   const { mutate: deleteExpense, isPending: isDeleting } = useDeleteExpense();
+  const { mutate: updateExpense, isPending: isUpdating } = useUpdateExpense();
+  const { showToast } = useToast();
 
   // Open create modal if ?new=true in URL (from keyboard shortcut)
   useEffect(() => {
@@ -86,6 +96,90 @@ export function ExpensesPage(): ReactElement {
     });
   }
 
+  function handleBulkDelete(ids: string[]): void {
+    setBulkDeleteIds(ids);
+  }
+
+  function confirmBulkDelete(): void {
+    if (bulkDeleteIds.length === 0) {
+      return;
+    }
+
+    // Delete all selected expenses in parallel
+    const deletePromises = bulkDeleteIds.map((id) => {
+      return new Promise<void>((resolve, reject) => {
+        deleteExpense(id, {
+          onSuccess: () => resolve(),
+          onError: (error) => reject(error instanceof Error ? error : new Error('Delete failed')),
+        });
+      });
+    });
+
+    Promise.all(deletePromises)
+      .then(() => {
+        showToast({
+          title: `${bulkDeleteIds.length} expense${bulkDeleteIds.length !== 1 ? 's' : ''} deleted`,
+          variant: 'success',
+        });
+        setBulkDeleteIds([]);
+      })
+      .catch(() => {
+        showToast({
+          title: 'Some expenses could not be deleted',
+          variant: 'error',
+        });
+        setBulkDeleteIds([]);
+      });
+  }
+
+  function handleBulkExport(expensesToExport: ExpenseResponseDto[]): void {
+    exportExpensesToCsv(expensesToExport);
+    showToast({
+      title: `${expensesToExport.length} expense${expensesToExport.length !== 1 ? 's' : ''} exported`,
+      variant: 'success',
+    });
+  }
+
+  function handleBulkCategoryChange(ids: string[]): void {
+    setBulkCategoryChangeIds(ids);
+  }
+
+  function confirmBulkCategoryChange(categoryId: string): void {
+    if (bulkCategoryChangeIds.length === 0 || !categoryId) {
+      return;
+    }
+
+    const updatePromises = bulkCategoryChangeIds.map((id) => {
+      return new Promise<void>((resolve, reject) => {
+        updateExpense(
+          { id, data: { categoryId } },
+          {
+            onSuccess: () => resolve(),
+            onError: (error) => reject(error instanceof Error ? error : new Error('Update failed')),
+          },
+        );
+      });
+    });
+
+    Promise.all(updatePromises)
+      .then(() => {
+        const category = categories.find((c) => c.id === categoryId);
+        showToast({
+          title: `${bulkCategoryChangeIds.length} expense${bulkCategoryChangeIds.length !== 1 ? 's' : ''} updated`,
+          description: category ? `Category changed to ${category.name}` : undefined,
+          variant: 'success',
+        });
+        setBulkCategoryChangeIds([]);
+      })
+      .catch(() => {
+        showToast({
+          title: 'Some expenses could not be updated',
+          variant: 'error',
+        });
+        setBulkCategoryChangeIds([]);
+      });
+  }
+
   return (
     <section className="mx-auto flex max-w-5xl flex-col gap-3">
       <header className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
@@ -135,6 +229,9 @@ export function ExpensesPage(): ReactElement {
                 expenses={filteredExpenses}
                 onEdit={(expense) => setExpenseToEdit(expense)}
                 onDelete={(expense) => setExpenseToDelete(expense)}
+                onBulkDelete={handleBulkDelete}
+                onBulkExport={handleBulkExport}
+                onBulkCategoryChange={handleBulkCategoryChange}
               />
             </>
           )}
@@ -231,6 +328,39 @@ export function ExpensesPage(): ReactElement {
             onConfirm={handleDelete}
             isLoading={isDeleting}
             variant="danger"
+          />
+
+          <ConfirmationDialog
+            open={bulkDeleteIds.length > 0}
+            onOpenChange={(open) => {
+              if (!open) {
+                setBulkDeleteIds([]);
+              }
+            }}
+            title="Delete expenses"
+            description={
+              <>
+                Are you sure you want to delete{' '}
+                <strong>
+                  {bulkDeleteIds.length} expense{bulkDeleteIds.length !== 1 ? 's' : ''}
+                </strong>
+                ? This action cannot be undone.
+              </>
+            }
+            confirmLabel="Delete All"
+            cancelLabel="Cancel"
+            onConfirm={confirmBulkDelete}
+            isLoading={isDeleting}
+            variant="danger"
+          />
+
+          <BulkCategoryChangeModal
+            open={bulkCategoryChangeIds.length > 0}
+            onClose={() => setBulkCategoryChangeIds([])}
+            onConfirm={confirmBulkCategoryChange}
+            categories={categories}
+            selectedCount={bulkCategoryChangeIds.length}
+            isLoading={isUpdating}
           />
         </>
       )}

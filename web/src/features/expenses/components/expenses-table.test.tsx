@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type { ExpenseResponseDto } from '@/lib/api-client';
 import { ExpensesTable } from '@/features/expenses/components/expenses-table';
 
@@ -212,6 +212,268 @@ describe('ExpensesTable', () => {
 
       expect(screen.getByRole('button', { name: /previous page/i })).toHaveAttribute('aria-label');
       expect(screen.getByRole('button', { name: /next page/i })).toHaveAttribute('aria-label');
+    });
+  });
+
+  describe('Bulk Operations', () => {
+    it('shows selection checkboxes when onBulkDelete is provided', () => {
+      const expenses: ExpenseResponseDto[] = [
+        createExpense({ id: 'exp-1', description: 'Test Expense 1' }),
+        createExpense({ id: 'exp-2', description: 'Test Expense 2' }),
+      ];
+
+      const onBulkDelete = vi.fn();
+      render(<ExpensesTable expenses={expenses} onBulkDelete={onBulkDelete} />);
+
+      const checkboxes = screen.getAllByRole('checkbox');
+      expect(checkboxes.length).toBeGreaterThan(0);
+    });
+
+    it('does not show selection checkboxes when onBulkDelete is not provided', () => {
+      const expenses: ExpenseResponseDto[] = [
+        createExpense({ id: 'exp-1', description: 'Test Expense 1' }),
+      ];
+
+      render(<ExpensesTable expenses={expenses} />);
+
+      const checkboxes = screen.queryAllByRole('checkbox');
+      expect(checkboxes).toHaveLength(0);
+    });
+
+    it('selects individual row when checkbox is clicked', async () => {
+      const user = userEvent.setup();
+      const expenses: ExpenseResponseDto[] = [
+        createExpense({ id: 'exp-1', description: 'Test Expense 1' }),
+        createExpense({ id: 'exp-2', description: 'Test Expense 2' }),
+      ];
+
+      const onBulkDelete = vi.fn();
+      render(<ExpensesTable expenses={expenses} onBulkDelete={onBulkDelete} />);
+
+      const checkboxes = screen.getAllByRole('checkbox', { name: /select expense/i });
+      await user.click(checkboxes[0]);
+
+      expect(checkboxes[0]).toBeChecked();
+      expect(checkboxes[1]).not.toBeChecked();
+    });
+
+    it('selects all rows when "Select All" is clicked', async () => {
+      const user = userEvent.setup();
+      const expenses: ExpenseResponseDto[] = [
+        createExpense({ id: 'exp-1', description: 'Test Expense 1' }),
+        createExpense({ id: 'exp-2', description: 'Test Expense 2' }),
+        createExpense({ id: 'exp-3', description: 'Test Expense 3' }),
+      ];
+
+      const onBulkDelete = vi.fn();
+      render(<ExpensesTable expenses={expenses} onBulkDelete={onBulkDelete} />);
+
+      const selectAllButton = screen.getByRole('button', { name: /select all/i });
+      await user.click(selectAllButton);
+
+      const checkboxes = screen.getAllByRole('checkbox', { name: /select expense/i });
+      checkboxes.forEach((checkbox) => {
+        expect(checkbox).toBeChecked();
+      });
+    });
+
+    it('deselects all rows when "Select None" is clicked', async () => {
+      const user = userEvent.setup();
+      const expenses: ExpenseResponseDto[] = [
+        createExpense({ id: 'exp-1', description: 'Test Expense 1' }),
+        createExpense({ id: 'exp-2', description: 'Test Expense 2' }),
+      ];
+
+      const onBulkDelete = vi.fn();
+      render(<ExpensesTable expenses={expenses} onBulkDelete={onBulkDelete} />);
+
+      const selectAllButton = screen.getByRole('button', { name: /select all/i });
+      await user.click(selectAllButton);
+
+      const selectNoneButton = screen.getByRole('button', { name: /select none/i });
+      await user.click(selectNoneButton);
+
+      const checkboxes = screen.getAllByRole('checkbox', { name: /select expense/i });
+      checkboxes.forEach((checkbox) => {
+        expect(checkbox).not.toBeChecked();
+      });
+    });
+
+    it('inverts selection when "Invert" is clicked', async () => {
+      const user = userEvent.setup();
+      const expenses: ExpenseResponseDto[] = [
+        createExpense({ id: 'exp-1', description: 'Test Expense 1' }),
+        createExpense({ id: 'exp-2', description: 'Test Expense 2' }),
+        createExpense({ id: 'exp-3', description: 'Test Expense 3' }),
+      ];
+
+      const onBulkDelete = vi.fn();
+      render(<ExpensesTable expenses={expenses} onBulkDelete={onBulkDelete} />);
+
+      const checkboxes = screen.getAllByRole('checkbox', { name: /select expense/i });
+      await user.click(checkboxes[0]);
+      await user.click(checkboxes[1]);
+
+      const invertButton = screen.getByRole('button', { name: /invert/i });
+      await user.click(invertButton);
+
+      expect(checkboxes[0]).not.toBeChecked();
+      expect(checkboxes[1]).not.toBeChecked();
+      expect(checkboxes[2]).toBeChecked();
+    });
+
+    it('shows selected count in toolbar', async () => {
+      const user = userEvent.setup();
+      const expenses: ExpenseResponseDto[] = [
+        createExpense({ id: 'exp-1', description: 'Test Expense 1' }),
+        createExpense({ id: 'exp-2', description: 'Test Expense 2' }),
+        createExpense({ id: 'exp-3', description: 'Test Expense 3' }),
+      ];
+
+      const onBulkDelete = vi.fn();
+      render(<ExpensesTable expenses={expenses} onBulkDelete={onBulkDelete} />);
+
+      const checkboxes = screen.getAllByRole('checkbox', { name: /select expense/i });
+      await user.click(checkboxes[0]);
+      await user.click(checkboxes[1]);
+
+      expect(screen.getByText(/2 selected/i)).toBeInTheDocument();
+    });
+
+    it('calls onBulkDelete with selected IDs when delete button is clicked', async () => {
+      const user = userEvent.setup();
+      const expenses: ExpenseResponseDto[] = [
+        createExpense({ id: 'exp-1', description: 'Test Expense 1' }),
+        createExpense({ id: 'exp-2', description: 'Test Expense 2' }),
+        createExpense({ id: 'exp-3', description: 'Test Expense 3' }),
+      ];
+
+      const onBulkDelete = vi.fn();
+      render(<ExpensesTable expenses={expenses} onBulkDelete={onBulkDelete} />);
+
+      const checkboxes = screen.getAllByRole('checkbox', { name: /select expense/i });
+      await user.click(checkboxes[0]);
+      await user.click(checkboxes[2]);
+
+      const deleteButton = screen.getByRole('button', { name: /delete selected/i });
+      await user.click(deleteButton);
+
+      expect(onBulkDelete).toHaveBeenCalledWith(['exp-1', 'exp-3']);
+    });
+
+    it('calls onBulkExport with selected expenses when export button is clicked', async () => {
+      const user = userEvent.setup();
+      const expenses: ExpenseResponseDto[] = [
+        createExpense({ id: 'exp-1', description: 'Test Expense 1', amountCents: 5000 }),
+        createExpense({ id: 'exp-2', description: 'Test Expense 2', amountCents: 10000 }),
+      ];
+
+      const onBulkExport = vi.fn();
+      render(<ExpensesTable expenses={expenses} onBulkExport={onBulkExport} />);
+
+      const checkboxes = screen.getAllByRole('checkbox', { name: /select expense/i });
+      await user.click(checkboxes[0]);
+
+      const exportButton = screen.getByRole('button', { name: /export selected/i });
+      await user.click(exportButton);
+
+      expect(onBulkExport).toHaveBeenCalledWith([expenses[0]]);
+    });
+
+    it('calls onBulkCategoryChange with selected IDs and new category when category change is triggered', async () => {
+      const user = userEvent.setup();
+      const expenses: ExpenseResponseDto[] = [
+        createExpense({ id: 'exp-1', description: 'Test Expense 1' }),
+        createExpense({ id: 'exp-2', description: 'Test Expense 2' }),
+      ];
+
+      const onBulkCategoryChange = vi.fn();
+      render(<ExpensesTable expenses={expenses} onBulkCategoryChange={onBulkCategoryChange} />);
+
+      const checkboxes = screen.getAllByRole('checkbox', { name: /select expense/i });
+      await user.click(checkboxes[0]);
+      await user.click(checkboxes[1]);
+
+      const categoryButton = screen.getByRole('button', { name: /change category/i });
+      await user.click(categoryButton);
+
+      expect(onBulkCategoryChange).toHaveBeenCalledWith(['exp-1', 'exp-2']);
+    });
+
+    it('hides bulk action buttons when no rows are selected', () => {
+      const expenses: ExpenseResponseDto[] = [
+        createExpense({ id: 'exp-1', description: 'Test Expense 1' }),
+      ];
+
+      const onBulkDelete = vi.fn();
+      const onBulkExport = vi.fn();
+      render(<ExpensesTable expenses={expenses} onBulkDelete={onBulkDelete} onBulkExport={onBulkExport} />);
+
+      const deleteButton = screen.queryByRole('button', { name: /delete selected/i });
+      const exportButton = screen.queryByRole('button', { name: /export selected/i });
+
+      expect(deleteButton).not.toBeInTheDocument();
+      expect(exportButton).not.toBeInTheDocument();
+    });
+
+    it('shows bulk action toolbar only when rows are selected', async () => {
+      const user = userEvent.setup();
+      const expenses: ExpenseResponseDto[] = [
+        createExpense({ id: 'exp-1', description: 'Test Expense 1' }),
+      ];
+
+      const onBulkDelete = vi.fn();
+      render(<ExpensesTable expenses={expenses} onBulkDelete={onBulkDelete} />);
+
+      expect(screen.queryByText(/selected/i)).not.toBeInTheDocument();
+
+      const checkboxes = screen.getAllByRole('checkbox', { name: /select expense/i });
+      await user.click(checkboxes[0]);
+
+      expect(screen.getByText(/1 selected/i)).toBeInTheDocument();
+    });
+
+    it('supports shift-click for range selection', async () => {
+      const user = userEvent.setup();
+      const expenses: ExpenseResponseDto[] = [
+        createExpense({ id: 'exp-1', description: 'Test Expense 1' }),
+        createExpense({ id: 'exp-2', description: 'Test Expense 2' }),
+        createExpense({ id: 'exp-3', description: 'Test Expense 3' }),
+        createExpense({ id: 'exp-4', description: 'Test Expense 4' }),
+      ];
+
+      const onBulkDelete = vi.fn();
+      render(<ExpensesTable expenses={expenses} onBulkDelete={onBulkDelete} />);
+
+      const checkboxes = screen.getAllByRole('checkbox', { name: /select expense/i });
+      await user.click(checkboxes[0]);
+      await user.keyboard('{Shift>}');
+      await user.click(checkboxes[2]);
+      await user.keyboard('{/Shift}');
+
+      expect(checkboxes[0]).toBeChecked();
+      expect(checkboxes[1]).toBeChecked();
+      expect(checkboxes[2]).toBeChecked();
+      expect(checkboxes[3]).not.toBeChecked();
+    });
+
+    it('clears selection after bulk delete', async () => {
+      const user = userEvent.setup();
+      const expenses: ExpenseResponseDto[] = [
+        createExpense({ id: 'exp-1', description: 'Test Expense 1' }),
+        createExpense({ id: 'exp-2', description: 'Test Expense 2' }),
+      ];
+
+      const onBulkDelete = vi.fn();
+      render(<ExpensesTable expenses={expenses} onBulkDelete={onBulkDelete} />);
+
+      const checkboxes = screen.getAllByRole('checkbox', { name: /select expense/i });
+      await user.click(checkboxes[0]);
+
+      const deleteButton = screen.getByRole('button', { name: /delete selected/i });
+      await user.click(deleteButton);
+
+      expect(screen.queryByText(/selected/i)).not.toBeInTheDocument();
     });
   });
 });

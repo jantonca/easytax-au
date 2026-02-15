@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
 import type { IncomeResponseDto } from '@/lib/api-client';
 import { formatCents, formatDate } from '@/lib/currency';
@@ -10,6 +10,8 @@ interface IncomesTableProps {
   onEdit?: (income: IncomeResponseDto) => void;
   onDelete?: (income: IncomeResponseDto) => void;
   onTogglePaid?: (income: IncomeResponseDto) => void;
+  onBulkDelete?: (ids: string[]) => void;
+  onBulkExport?: (incomes: IncomeResponseDto[]) => void;
 }
 
 type SortColumn = 'date' | 'total' | 'client' | 'paid';
@@ -44,12 +46,18 @@ export function IncomesTable({
   onEdit,
   onDelete,
   onTogglePaid,
+  onBulkDelete,
+  onBulkExport,
 }: IncomesTableProps): ReactElement {
   const [sortBy, setSortBy] = useState<SortColumn>('date');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [lastClickedIndex, setLastClickedIndex] = useState<number | null>(null);
 
   const ITEMS_PER_PAGE = 25;
+
+  const bulkOperationsEnabled = Boolean(onBulkDelete || onBulkExport);
 
   const sorted = useMemo(() => {
     if (incomes.length === 0) {
@@ -129,6 +137,67 @@ export function IncomesTable({
     setCurrentPage((prev) => Math.min(totalPages, prev + 1));
   }
 
+  const handleSelectAll = useCallback((): void => {
+    const allIds = new Set(sorted.map((income) => income.id));
+    setSelectedIds(allIds);
+  }, [sorted]);
+
+  const handleSelectNone = useCallback((): void => {
+    setSelectedIds(new Set());
+  }, []);
+
+  const handleInvert = useCallback((): void => {
+    const allIds = new Set(sorted.map((income) => income.id));
+    const newSelection = new Set<string>();
+    allIds.forEach((id) => {
+      if (!selectedIds.has(id)) {
+        newSelection.add(id);
+      }
+    });
+    setSelectedIds(newSelection);
+  }, [sorted, selectedIds]);
+
+  const handleRowSelect = useCallback(
+    (id: string, index: number, shiftKey: boolean): void => {
+      if (shiftKey && lastClickedIndex !== null) {
+        const start = Math.min(lastClickedIndex, index);
+        const end = Math.max(lastClickedIndex, index);
+        const rangeIds = new Set(selectedIds);
+        for (let i = start; i <= end; i++) {
+          if (paginatedIncomes[i]) {
+            rangeIds.add(paginatedIncomes[i].id);
+          }
+        }
+        setSelectedIds(rangeIds);
+      } else {
+        const newSelection = new Set(selectedIds);
+        if (newSelection.has(id)) {
+          newSelection.delete(id);
+        } else {
+          newSelection.add(id);
+        }
+        setSelectedIds(newSelection);
+      }
+      setLastClickedIndex(index);
+    },
+    [lastClickedIndex, paginatedIncomes, selectedIds],
+  );
+
+  const handleBulkDelete = useCallback((): void => {
+    if (onBulkDelete && selectedIds.size > 0) {
+      onBulkDelete(Array.from(selectedIds));
+      setSelectedIds(new Set());
+      setLastClickedIndex(null);
+    }
+  }, [onBulkDelete, selectedIds]);
+
+  const handleBulkExport = useCallback((): void => {
+    if (onBulkExport && selectedIds.size > 0) {
+      const selectedIncomes = incomes.filter((inc) => selectedIds.has(inc.id));
+      onBulkExport(selectedIncomes);
+    }
+  }, [onBulkExport, selectedIds, incomes]);
+
   if (sorted.length === 0) {
     return (
       <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-4 text-sm text-slate-600 dark:text-slate-400">
@@ -142,15 +211,110 @@ export function IncomesTable({
       aria-label="Incomes"
       className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-4"
     >
-      <div className="mb-3 flex justify-end">
-        <p className="text-[11px] text-slate-500">
-          Sorted by {sortBy === 'date' ? 'date (newest first)' : sortBy}
-        </p>
-      </div>
+      {bulkOperationsEnabled && selectedIds.size > 0 && (
+        <div className="mb-3 flex items-center justify-between rounded border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/40 px-3 py-2">
+          <div className="flex items-center gap-3">
+            <span className="text-[11px] font-medium text-blue-700 dark:text-blue-300">
+              {selectedIds.size} selected
+            </span>
+            <div className="flex gap-1">
+              <button
+                type="button"
+                onClick={handleSelectAll}
+                className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                Select All
+              </button>
+              <span className="text-[11px] text-slate-400">|</span>
+              <button
+                type="button"
+                onClick={handleSelectNone}
+                className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                Select None
+              </button>
+              <span className="text-[11px] text-slate-400">|</span>
+              <button
+                type="button"
+                onClick={handleInvert}
+                className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                Invert
+              </button>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            {onBulkDelete && (
+              <button
+                type="button"
+                onClick={handleBulkDelete}
+                disabled={selectedIds.size === 0}
+                className="inline-flex h-7 items-center rounded border border-red-300 dark:border-red-700 bg-white dark:bg-slate-900 px-3 text-[11px] font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Delete Selected
+              </button>
+            )}
+            {onBulkExport && (
+              <button
+                type="button"
+                onClick={handleBulkExport}
+                disabled={selectedIds.size === 0}
+                className="inline-flex h-7 items-center rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 text-[11px] font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Export Selected
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+      {bulkOperationsEnabled && selectedIds.size === 0 && (
+        <div className="mb-3 flex items-center justify-between">
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={handleSelectAll}
+              className="text-[11px] text-slate-600 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+            >
+              Select All
+            </button>
+            <span className="text-[11px] text-slate-400">|</span>
+            <button
+              type="button"
+              onClick={handleSelectNone}
+              className="text-[11px] text-slate-600 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+            >
+              Select None
+            </button>
+            <span className="text-[11px] text-slate-400">|</span>
+            <button
+              type="button"
+              onClick={handleInvert}
+              className="text-[11px] text-slate-600 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+            >
+              Invert
+            </button>
+          </div>
+          <p className="text-[11px] text-slate-500">
+            Sorted by {sortBy === 'date' ? 'date (newest first)' : sortBy}
+          </p>
+        </div>
+      )}
+      {!bulkOperationsEnabled && (
+        <div className="mb-3 flex justify-end">
+          <p className="text-[11px] text-slate-500">
+            Sorted by {sortBy === 'date' ? 'date (newest first)' : sortBy}
+          </p>
+        </div>
+      )}
       <div className="overflow-x-auto">
         <table className="w-full min-w-[900px] border-collapse text-left text-xs text-slate-700 dark:text-slate-300">
           <thead>
             <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] uppercase tracking-[0.18em] text-slate-500">
+              {bulkOperationsEnabled && (
+                <th scope="col" className="w-8 py-2 pr-2">
+                  <span className="sr-only">Select</span>
+                </th>
+              )}
               <th
                 scope="col"
                 className="py-2 pr-3"
@@ -233,7 +397,7 @@ export function IncomesTable({
             </tr>
           </thead>
           <tbody>
-            {paginatedIncomes.map((income) => {
+            {paginatedIncomes.map((income, index) => {
               const dateLabel = formatDate(String(income.date));
 
               const description = (() => {
@@ -243,12 +407,26 @@ export function IncomesTable({
 
               const invoiceNum = income.invoiceNum || '—';
               const clientName = income.client.name;
+              const isSelected = selectedIds.has(income.id);
 
               return (
                 <tr
                   key={income.id}
                   className="border-b border-slate-200 dark:border-slate-900 last:border-b-0"
                 >
+                  {bulkOperationsEnabled && (
+                    <td className="w-8 py-2 pr-2 align-middle">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={(e) =>
+                          handleRowSelect(income.id, index, Boolean(e.nativeEvent.shiftKey))
+                        }
+                        aria-label={`Select income: ${description}`}
+                        className="h-4 w-4 cursor-pointer rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 dark:border-slate-700 dark:bg-slate-900"
+                      />
+                    </td>
+                  )}
                   <td className="py-2 pr-3 align-middle text-[11px] text-slate-700 dark:text-slate-200">
                     {dateLabel}
                   </td>
