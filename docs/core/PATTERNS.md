@@ -496,6 +496,66 @@ const { setValue, watch } = useForm();
 
 ---
 
+### [CSV Template Export] Pattern
+
+**Rule**: Client-side CSV file generation and download using Blob API. No backend required.
+
+**Use Case:** Provide downloadable CSV templates with example data to help users understand expected import formats.
+
+**Implementation:**
+```typescript
+// 1. Generate CSV content as string
+function generateCsvTemplate(format: string): string {
+  const headers = 'Date,Item,Total,GST,Biz%,Category';
+  const example1 = '15/02/2026,GitHub,29.95,0.00,100,Software';
+  const example2 = '14/02/2026,VentraIP,165.00,15.00,100,Hosting';
+
+  return [headers, example1, example2].join('\n');
+}
+
+// 2. Download CSV file via Blob API
+function downloadCsv(content: string, filename: string): void {
+  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.style.display = 'none';
+
+  document.body.appendChild(link);
+  link.click();
+
+  // Cleanup
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+// 3. Usage in component
+<button onClick={() => {
+  const csv = generateCsvTemplate('commbank');
+  downloadCsv(csv, 'expense-template-commbank.csv');
+}}>
+  Download Template
+</button>
+```
+
+**Best Practices:**
+- **Date Format**: Use DD/MM/YYYY for Australian context (not MM/DD/YYYY)
+- **Currency**: Format as decimal with 2 places (e.g., "165.00" not "16500")
+- **Examples**: Include 2-3 realistic example rows showing different scenarios
+- **GST**: Show both domestic (10% GST) and international (0% GST) examples
+- **Cleanup**: Always call `URL.revokeObjectURL()` to prevent memory leaks
+- **MIME Type**: Use `text/csv;charset=utf-8;` for proper encoding
+
+**Testing Note:** Browser download functionality isn't testable in jsdom. Mock `URL.createObjectURL` in tests and verify Blob creation instead.
+
+**Real-World Usage:**
+- `web/src/features/import/utils/generate-csv-template.ts`
+- `web/src/features/import/components/csv-template-downloads.tsx`
+
+---
+
 ### [Modal Form] Pattern
 
 **Rule**: Use React Hook Form + Zod + TanStack Query mutations + Toast notifications.

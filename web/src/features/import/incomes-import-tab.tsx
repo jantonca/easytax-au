@@ -7,6 +7,7 @@ import { IncomePreviewTable } from './components/income-preview-table';
 import { ImportProgress } from './components/import-progress';
 import { ProgressSteps } from './components/progress-steps';
 import { SummaryStats } from './components/summary-stats';
+import { CsvTemplateDownloads } from './components/csv-template-downloads';
 import { usePreviewIncomeCsvImport } from './hooks/use-income-csv-preview';
 import { useImportIncomeCsv } from './hooks/use-income-csv-import';
 import { Loader2 } from 'lucide-react';
@@ -169,6 +170,9 @@ export function IncomesImportTab(): ReactElement {
       {/* Step Content */}
       {step === 'upload' && (
         <div className="flex flex-col gap-6">
+          {/* CSV Template Downloads */}
+          <CsvTemplateDownloads type="income" />
+
           {/* Source Selection */}
           <div className="rounded-lg border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/40">
             <h2 className="mb-4 text-lg font-medium text-slate-900 dark:text-slate-200">
