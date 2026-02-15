@@ -416,4 +416,204 @@ describe('BasService', () => {
       expect(mockExpenseCreateQueryBuilder).toHaveBeenCalledWith('expense');
     });
   });
+
+  describe('Cash vs Accrual Accounting Basis', () => {
+    beforeEach(() => {
+      // Reset query builder mocks
+      mockIncomeQueryBuilder = createMockQueryBuilder();
+      mockExpenseQueryBuilder = createMockQueryBuilder();
+      mockIncomeCreateQueryBuilder.mockReturnValue(mockIncomeQueryBuilder);
+      mockExpenseCreateQueryBuilder.mockReturnValue(mockExpenseQueryBuilder);
+
+      // Default expense data
+      mockExpenseQueryBuilder.getRawOne.mockResolvedValue({
+        gstPaid: '3000',
+        count: '10',
+      });
+    });
+
+    describe('Accrual Basis (default)', () => {
+      it('should include all income regardless of payment status', async () => {
+        mockIncomeQueryBuilder.getRawOne.mockResolvedValue({
+          totalSales: '220000', // $2,200 total
+          gstCollected: '20000', // $200 GST
+          count: '10',
+        });
+
+        const result = await service.getSummary('Q1', 2025, 'ACCRUAL');
+
+        expect(result.g1TotalSalesCents).toBe(220000);
+        expect(result.label1aGstCollectedCents).toBe(20000);
+        expect(result.incomeCount).toBe(10);
+      });
+
+      it('should not add isPaid filter to income query', async () => {
+        mockIncomeQueryBuilder.getRawOne.mockResolvedValue({
+          totalSales: '110000',
+          gstCollected: '10000',
+          count: '5',
+        });
+
+        await service.getSummary('Q1', 2025, 'ACCRUAL');
+
+        // Verify isPaid filter is NOT added
+        expect(mockIncomeQueryBuilder.andWhere).not.toHaveBeenCalledWith(
+          expect.stringContaining('is_paid'),
+          expect.anything(),
+        );
+      });
+
+      it('should default to accrual when basis parameter is omitted', async () => {
+        mockIncomeQueryBuilder.getRawOne.mockResolvedValue({
+          totalSales: '110000',
+          gstCollected: '10000',
+          count: '5',
+        });
+
+        // Call without basis parameter (should default to ACCRUAL)
+        const result = await service.getSummary('Q1', 2025);
+
+        expect(result.g1TotalSalesCents).toBe(110000);
+        expect(mockIncomeQueryBuilder.andWhere).not.toHaveBeenCalledWith(
+          expect.stringContaining('is_paid'),
+          expect.anything(),
+        );
+      });
+    });
+
+    describe('Cash Basis', () => {
+      it('should only include paid income', async () => {
+        mockIncomeQueryBuilder.getRawOne.mockResolvedValue({
+          totalSales: '110000', // Only paid invoices
+          gstCollected: '10000',
+          count: '4', // 4 paid out of 10 total
+        });
+
+        const result = await service.getSummary('Q1', 2025, 'CASH');
+
+        expect(result.g1TotalSalesCents).toBe(110000);
+        expect(result.label1aGstCollectedCents).toBe(10000);
+        expect(result.incomeCount).toBe(4);
+      });
+
+      it('should add isPaid=true filter to income query', async () => {
+        mockIncomeQueryBuilder.getRawOne.mockResolvedValue({
+          totalSales: '55000',
+          gstCollected: '5000',
+          count: '2',
+        });
+
+        await service.getSummary('Q1', 2025, 'CASH');
+
+        // Verify isPaid filter IS added
+        expect(mockIncomeQueryBuilder.andWhere).toHaveBeenCalledWith('income.is_paid = :isPaid', {
+          isPaid: true,
+        });
+      });
+
+      it('should return zero when all income is unpaid', async () => {
+        mockIncomeQueryBuilder.getRawOne.mockResolvedValue({
+          totalSales: '0',
+          gstCollected: '0',
+          count: '0',
+        });
+
+        const result = await service.getSummary('Q1', 2025, 'CASH');
+
+        expect(result.g1TotalSalesCents).toBe(0);
+        expect(result.label1aGstCollectedCents).toBe(0);
+        expect(result.incomeCount).toBe(0);
+        expect(result.netGstPayableCents).toBe(-3000); // Still owe from expenses
+      });
+
+      it('should handle mixed paid/unpaid scenarios correctly', async () => {
+        // 3 paid invoices totaling $165, 2 unpaid ignored
+        mockIncomeQueryBuilder.getRawOne.mockResolvedValue({
+          totalSales: '165000',
+          gstCollected: '15000',
+          count: '3',
+        });
+
+        const result = await service.getSummary('Q1', 2025, 'CASH');
+
+        expect(result.g1TotalSalesCents).toBe(165000);
+        expect(result.label1aGstCollectedCents).toBe(15000);
+        expect(result.netGstPayableCents).toBe(12000); // $150 GST - $30 expenses
+      });
+    });
+
+    describe('Expenses (not affected by basis)', () => {
+      it('should include all expenses regardless of accounting basis', async () => {
+        mockIncomeQueryBuilder.getRawOne.mockResolvedValue({
+          totalSales: '110000',
+          gstCollected: '10000',
+          count: '5',
+        });
+        mockExpenseQueryBuilder.getRawOne.mockResolvedValue({
+          gstPaid: '4500',
+          count: '15',
+        });
+
+        const resultAccrual = await service.getSummary('Q1', 2025, 'ACCRUAL');
+        const resultCash = await service.getSummary('Q1', 2025, 'CASH');
+
+        // Expenses should be identical in both bases
+        expect(resultAccrual.label1bGstPaidCents).toBe(4500);
+        expect(resultCash.label1bGstPaidCents).toBe(4500);
+        expect(resultAccrual.expenseCount).toBe(15);
+        expect(resultCash.expenseCount).toBe(15);
+      });
+    });
+
+    describe('Case insensitivity', () => {
+      it('should accept lowercase "cash"', async () => {
+        mockIncomeQueryBuilder.getRawOne.mockResolvedValue({
+          totalSales: '110000',
+          gstCollected: '10000',
+          count: '5',
+        });
+
+        await service.getSummary('Q1', 2025, 'cash');
+
+        expect(mockIncomeQueryBuilder.andWhere).toHaveBeenCalledWith('income.is_paid = :isPaid', {
+          isPaid: true,
+        });
+      });
+
+      it('should accept lowercase "accrual"', async () => {
+        mockIncomeQueryBuilder.getRawOne.mockResolvedValue({
+          totalSales: '110000',
+          gstCollected: '10000',
+          count: '5',
+        });
+
+        await service.getSummary('Q1', 2025, 'accrual');
+
+        expect(mockIncomeQueryBuilder.andWhere).not.toHaveBeenCalledWith(
+          expect.stringContaining('is_paid'),
+          expect.anything(),
+        );
+      });
+    });
+
+    describe('Invalid basis parameter', () => {
+      it('should throw BadRequestException for invalid basis', async () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await expect(service.getSummary('Q1', 2025, 'INVALID' as any)).rejects.toThrow(
+          BadRequestException,
+        );
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await expect(service.getSummary('Q1', 2025, 'INVALID' as any)).rejects.toThrow(
+          'Invalid accounting basis "INVALID". Must be CASH or ACCRUAL.',
+        );
+      });
+
+      it('should throw BadRequestException for empty string', async () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await expect(service.getSummary('Q1', 2025, '' as any)).rejects.toThrow(
+          BadRequestException,
+        );
+      });
+    });
+  });
 });

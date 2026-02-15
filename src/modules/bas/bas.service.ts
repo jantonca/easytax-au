@@ -12,6 +12,13 @@ import { MoneyService } from '../../common/services/money.service';
 type Quarter = 'Q1' | 'Q2' | 'Q3' | 'Q4';
 
 /**
+ * Accounting basis for BAS reporting.
+ * - CASH: Only include paid income (income.is_paid = true)
+ * - ACCRUAL: Include all income regardless of payment status
+ */
+export type AccountingBasis = 'CASH' | 'ACCRUAL';
+
+/**
  * Service for generating BAS (Business Activity Statement) summaries.
  *
  * This service calculates:
@@ -46,20 +53,33 @@ export class BasService {
    *
    * @param quarter - The quarter (Q1, Q2, Q3, Q4)
    * @param financialYear - The financial year (e.g., 2025 for FY2025)
+   * @param basis - Accounting basis (CASH or ACCRUAL). Defaults to ACCRUAL.
    * @returns BAS summary with G1, 1A, 1B calculations
-   * @throws BadRequestException if quarter is invalid
+   * @throws BadRequestException if quarter or basis is invalid
    *
    * @example
-   * // Get Q1 FY2025 (July-Sep 2024)
-   * const summary = await basService.getSummary('Q1', 2025);
+   * // Get Q1 FY2025 (July-Sep 2024) on cash basis
+   * const summary = await basService.getSummary('Q1', 2025, 'CASH');
    */
-  async getSummary(quarter: string, financialYear: number): Promise<BasSummaryDto> {
-    // Normalize quarter to uppercase
+  async getSummary(
+    quarter: string,
+    financialYear: number,
+    basis: string = 'ACCRUAL',
+  ): Promise<BasSummaryDto> {
+    // Normalize quarter and basis to uppercase
     const normalizedQuarter = quarter.toUpperCase();
+    const normalizedBasis = basis.toUpperCase() as AccountingBasis;
 
     // Validate quarter
     if (!this.isValidQuarter(normalizedQuarter)) {
       throw new BadRequestException(`Invalid quarter "${quarter}". Must be Q1, Q2, Q3, or Q4.`);
+    }
+
+    // Validate accounting basis
+    if (!this.isValidBasis(normalizedBasis)) {
+      throw new BadRequestException(
+        `Invalid accounting basis "${basis}". Must be CASH or ACCRUAL.`,
+      );
     }
 
     // Get date range for the quarter
@@ -67,7 +87,7 @@ export class BasService {
 
     // Calculate all BAS fields
     const [incomeData, expenseData] = await Promise.all([
-      this.calculateIncomeTotals(start, end),
+      this.calculateIncomeTotals(start, end, normalizedBasis),
       this.calculateExpenseTotals(start, end),
     ]);
 
@@ -96,6 +116,13 @@ export class BasService {
    */
   private isValidQuarter(quarter: string): boolean {
     return ['Q1', 'Q2', 'Q3', 'Q4'].includes(quarter);
+  }
+
+  /**
+   * Validates if a string is a valid accounting basis (already uppercase).
+   */
+  private isValidBasis(basis: string): basis is AccountingBasis {
+    return basis === 'CASH' || basis === 'ACCRUAL';
   }
 
   /**
@@ -147,20 +174,32 @@ export class BasService {
    *
    * @param startDate - Period start date string (YYYY-MM-DD, inclusive)
    * @param endDate - Period end date string (YYYY-MM-DD, inclusive)
+   * @param basis - Accounting basis (CASH = only paid income, ACCRUAL = all income)
    * @returns G1 (total sales), 1A (GST collected), and count
    */
   private async calculateIncomeTotals(
     startDate: string,
     endDate: string,
+    basis: AccountingBasis = 'ACCRUAL',
   ): Promise<{ totalSalesCents: number; gstCollectedCents: number; count: number }> {
-    const result = await this.incomeRepository
+    const query = this.incomeRepository
       .createQueryBuilder('income')
       .select('COALESCE(SUM(income.total_cents), 0)', 'totalSales')
       .addSelect('COALESCE(SUM(income.gst_cents), 0)', 'gstCollected')
       .addSelect('COUNT(income.id)', 'count')
       .where('income.date >= :startDate', { startDate })
-      .andWhere('income.date <= :endDate', { endDate })
-      .getRawOne<{ totalSales: string; gstCollected: string; count: string }>();
+      .andWhere('income.date <= :endDate', { endDate });
+
+    // Cash basis: only include paid income
+    if (basis === 'CASH') {
+      query.andWhere('income.is_paid = :isPaid', { isPaid: true });
+    }
+
+    const result = await query.getRawOne<{
+      totalSales: string;
+      gstCollected: string;
+      count: string;
+    }>();
 
     return {
       totalSalesCents: parseInt(result?.totalSales ?? '0', 10),

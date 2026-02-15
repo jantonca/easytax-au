@@ -1,9 +1,10 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { BasService } from './bas.service';
@@ -80,12 +81,17 @@ export class BasController {
    * - Q3: January - March
    * - Q4: April - June
    *
+   * Accounting Basis:
+   * - CASH: Only includes paid income (income.isPaid = true)
+   * - ACCRUAL: Includes all income regardless of payment status (default)
+   *
    * @param quarter - The quarter (Q1, Q2, Q3, Q4)
    * @param year - The financial year (e.g., 2025 for FY2024-25)
+   * @param basis - Accounting basis (CASH or ACCRUAL, defaults to ACCRUAL)
    * @returns BAS summary with G1, 1A, 1B calculations
    *
    * @example
-   * // Request: GET /bas/Q1/2025
+   * // Request: GET /bas/Q1/2025?basis=CASH
    * // Response:
    * // {
    * //   "quarter": "Q1",
@@ -104,7 +110,7 @@ export class BasController {
   @ApiOperation({
     summary: 'Get BAS summary for a quarter',
     description:
-      'Calculates G1 (total sales), 1A (GST collected), 1B (GST paid) for Australian BAS reporting.',
+      'Calculates G1 (total sales), 1A (GST collected), 1B (GST paid) for Australian BAS reporting. Supports both cash and accrual accounting basis.',
   })
   @ApiParam({ name: 'quarter', description: 'Quarter (Q1, Q2, Q3, Q4)', example: 'Q1' })
   @ApiParam({
@@ -112,12 +118,20 @@ export class BasController {
     description: 'Financial year (e.g., 2025 for FY2024-25)',
     example: '2025',
   })
+  @ApiQuery({
+    name: 'basis',
+    description: 'Accounting basis (CASH or ACCRUAL)',
+    required: false,
+    enum: ['CASH', 'ACCRUAL'],
+    example: 'ACCRUAL',
+  })
   @ApiOkResponse({ description: 'BAS summary for the quarter', type: BasSummaryDto })
-  @ApiBadRequestResponse({ description: 'Invalid quarter format' })
+  @ApiBadRequestResponse({ description: 'Invalid quarter or basis format' })
   async getSummary(
     @Param('quarter') quarter: string,
     @Param('year') year: string,
+    @Query('basis') basis: string = 'ACCRUAL',
   ): Promise<BasSummaryDto> {
-    return this.basService.getSummary(quarter.toUpperCase(), parseInt(year, 10));
+    return this.basService.getSummary(quarter.toUpperCase(), parseInt(year, 10), basis);
   }
 }

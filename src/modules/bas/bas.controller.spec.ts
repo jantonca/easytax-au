@@ -64,29 +64,47 @@ describe('BasController', () => {
       const result = await controller.getSummary('Q1', '2025');
 
       expect(result).toEqual(mockBasSummary);
-      expect(mockGetSummary).toHaveBeenCalledWith('Q1', 2025);
+      expect(mockGetSummary).toHaveBeenCalledWith('Q1', 2025, 'ACCRUAL');
+    });
+
+    it('should default to ACCRUAL basis when not specified', async () => {
+      await controller.getSummary('Q1', '2025');
+
+      expect(mockGetSummary).toHaveBeenCalledWith('Q1', 2025, 'ACCRUAL');
+    });
+
+    it('should accept CASH basis via query parameter', async () => {
+      await controller.getSummary('Q1', '2025', 'CASH');
+
+      expect(mockGetSummary).toHaveBeenCalledWith('Q1', 2025, 'CASH');
+    });
+
+    it('should accept ACCRUAL basis via query parameter', async () => {
+      await controller.getSummary('Q1', '2025', 'ACCRUAL');
+
+      expect(mockGetSummary).toHaveBeenCalledWith('Q1', 2025, 'ACCRUAL');
     });
 
     it('should convert lowercase quarter to uppercase', async () => {
       await controller.getSummary('q1', '2025');
 
-      expect(mockGetSummary).toHaveBeenCalledWith('Q1', 2025);
+      expect(mockGetSummary).toHaveBeenCalledWith('Q1', 2025, 'ACCRUAL');
     });
 
     it('should handle mixed case quarters', async () => {
       await controller.getSummary('q2', '2025');
-      expect(mockGetSummary).toHaveBeenCalledWith('Q2', 2025);
+      expect(mockGetSummary).toHaveBeenCalledWith('Q2', 2025, 'ACCRUAL');
 
       await controller.getSummary('Q3', '2025');
-      expect(mockGetSummary).toHaveBeenCalledWith('Q3', 2025);
+      expect(mockGetSummary).toHaveBeenCalledWith('Q3', 2025, 'ACCRUAL');
     });
 
     it('should parse year string to number', async () => {
       await controller.getSummary('Q1', '2024');
-      expect(mockGetSummary).toHaveBeenCalledWith('Q1', 2024);
+      expect(mockGetSummary).toHaveBeenCalledWith('Q1', 2024, 'ACCRUAL');
 
       await controller.getSummary('Q4', '2030');
-      expect(mockGetSummary).toHaveBeenCalledWith('Q4', 2030);
+      expect(mockGetSummary).toHaveBeenCalledWith('Q4', 2030, 'ACCRUAL');
     });
 
     it('should pass through service errors', async () => {
@@ -98,7 +116,7 @@ describe('BasController', () => {
 
     it.each(['Q1', 'Q2', 'Q3', 'Q4'])('should handle all valid quarters (%s)', async (quarter) => {
       await controller.getSummary(quarter, '2025');
-      expect(mockGetSummary).toHaveBeenCalledWith(quarter, 2025);
+      expect(mockGetSummary).toHaveBeenCalledWith(quarter, 2025, 'ACCRUAL');
     });
 
     it('should return all expected fields in response', async () => {

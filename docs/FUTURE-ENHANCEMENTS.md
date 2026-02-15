@@ -100,19 +100,27 @@ These items were identified during the audit process as potential enhancements b
 
 ---
 
-### P2-5: Cash vs Accrual BAS Basis
+### P2-5: Cash vs Accrual BAS Basis ✅ **COMPLETED**
 
-**Current State:** BAS queries include all income regardless of payment status. Many small AU businesses report on cash basis (only count income when received).
+**Status:** ✅ Implemented (2026-02-15)
 
-**Data Available:** Income entity has an `isPaid` field, so the data exists.
+**Implementation:** Added `AccountingBasis` type ('CASH' | 'ACCRUAL') with optional `basis` query parameter to BAS endpoint.
 
-**Recommendation:** Add a `basAccountingBasis` setting (CASH | ACCRUAL) and filter income queries accordingly in BasService.
+**Details:**
+- CASH basis: Only includes paid income (`isPaid = true`)
+- ACCRUAL basis: Includes all income regardless of payment status (default)
+- API: `GET /bas/:quarter/:year?basis=CASH|ACCRUAL`
+- Backend filters income queries at SQL level for performance
+- 18 comprehensive tests added (16 service + 2 controller)
 
-**Files:**
-- `src/modules/bas/bas.service.ts`
-- Settings page (add basAccountingBasis toggle)
+**Files Modified:**
+- `src/modules/bas/bas.service.ts` - Added AccountingBasis type and filtering logic
+- `src/modules/bas/bas.controller.ts` - Added basis query parameter
+- Tests: `bas.service.spec.ts`, `bas.controller.spec.ts`
 
-**Effort:** 2-3 hours
+**Commit:** (pending)
+
+**Future Enhancement:** Add UI toggle in Settings page for default `basAccountingBasis` preference
 
 ---
 

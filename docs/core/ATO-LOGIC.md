@@ -61,6 +61,63 @@ The following are NOT subject to GST:
 
 ---
 
+## Accounting Basis: Cash vs Accrual
+
+**Purpose:** Australian businesses can report GST on either a cash or accrual basis. This affects **when** you report income in your BAS.
+
+### Cash Basis (When Money is Received)
+
+- **Report income when:** You receive payment from customers
+- **Unpaid invoices:** Do NOT count toward BAS until paid
+- **Example:**
+  ```
+  Invoice #001: $1,100 (inc $100 GST) - Sent Jan 15, Paid Feb 20
+
+  Q3 BAS (Jan-Mar): Report $0 if unpaid by Mar 31
+  Q4 BAS (Apr-Jun): Report $1,100 if paid in Feb (carry forward)
+  ```
+
+### Accrual Basis (When Invoice is Issued)
+
+- **Report income when:** You issue an invoice to customers
+- **Unpaid invoices:** COUNT toward BAS immediately
+- **Example:**
+  ```
+  Invoice #001: $1,100 (inc $100 GST) - Sent Jan 15, Paid Feb 20
+
+  Q3 BAS (Jan-Mar): Report $1,100 (issued in Jan)
+  ```
+
+### Which Should You Use?
+
+| Cash Basis | Accrual Basis |
+|------------|---------------|
+| ✅ Simpler for small businesses | ✅ Required if turnover > $10M |
+| ✅ Better cash flow (defer GST until paid) | ✅ Matches accounting standards |
+| ✅ Less accounting knowledge needed | ✅ More accurate business performance |
+| ❌ Can't use if turnover > $10M/year | ❌ May pay GST before receiving payment |
+
+**ATO Default:** Most small businesses use **cash basis** for simpler BAS reporting.
+
+### How EasyTax-AU Handles This
+
+**API Endpoint:** `GET /bas/:quarter/:year?basis=CASH|ACCRUAL`
+
+- **Default:** `ACCRUAL` (includes all income regardless of payment status)
+- **Cash Basis:** Add `?basis=CASH` to only count paid income (`isPaid = true`)
+- **Expenses:** Not affected by basis (always counted when incurred, per ATO rules)
+
+**Example:**
+```bash
+# Accrual basis (all income)
+GET /bas/Q1/2026?basis=ACCRUAL
+
+# Cash basis (paid income only)
+GET /bas/Q1/2026?basis=CASH
+```
+
+---
+
 ## BAS (Business Activity Statement)
 
 ### Reporting Fields
