@@ -876,6 +876,113 @@ describe('useExpenses', () => {
 
 ---
 
+### [Keyboard Shortcuts] Pattern
+
+**Rule**: Use Ctrl+Alt combinations for action shortcuts to avoid browser conflicts. Disable shortcuts when user is typing in form fields.
+
+**Global Shortcuts Hook:**
+```typescript
+// web/src/hooks/use-global-shortcuts.ts
+import { useEffect } from 'react';
+
+export interface GlobalShortcuts {
+  onNewExpense?: () => void;
+  onNewIncome?: () => void;
+  onImport?: () => void;
+  onHelp?: () => void;
+  onSearch?: () => void;
+}
+
+export function useGlobalShortcuts(shortcuts: GlobalShortcuts): void {
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent): void {
+      // Don't trigger shortcuts when typing in form fields
+      const target = event.target as HTMLElement;
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+
+      const key = event.key.toLowerCase();
+      const isMod = event.metaKey || event.ctrlKey;
+      const isAlt = event.altKey;
+      const isShift = event.shiftKey;
+
+      // Ctrl/Cmd+Alt+N - New Expense
+      if (isMod && isAlt && !isShift && key === 'n' && shortcuts.onNewExpense) {
+        event.preventDefault();
+        shortcuts.onNewExpense();
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [shortcuts]);
+}
+```
+
+**Usage in Layout:**
+```typescript
+// web/src/components/layout/layout.tsx
+import { useNavigate } from 'react-router-dom';
+import { useGlobalShortcuts } from '@/hooks/use-global-shortcuts';
+
+export function Layout(): ReactElement {
+  const navigate = useNavigate();
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
+
+  useGlobalShortcuts({
+    onNewExpense: () => void navigate('/expenses?new=true'),
+    onNewIncome: () => void navigate('/incomes?new=true'),
+    onImport: () => void navigate('/import'),
+    onHelp: () => setIsHelpOpen(true),
+  });
+
+  return (
+    <>
+      {/* Layout content */}
+      <KeyboardShortcutsHelp open={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+    </>
+  );
+}
+```
+
+**Triggering Modals via URL:**
+```typescript
+// web/src/features/expenses/expenses-page.tsx
+import { useSearchParams } from 'react-router-dom';
+
+export function ExpensesPage(): ReactElement {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+
+  // Open modal if ?new=true in URL (from keyboard shortcut)
+  useEffect(() => {
+    if (searchParams.get('new') === 'true') {
+      setIsCreateOpen(true);
+      // Clean up URL
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+}
+```
+
+**Why:**
+- **Ctrl+Alt**: Avoids conflicts with browser shortcuts (Ctrl+N = new window, Ctrl+Shift+N = incognito)
+- **Input exclusion**: Prevents shortcuts from firing while user types
+- **URL params**: Enables deep linking and modal triggering from external navigation
+- **Cross-platform**: Works on Windows (Ctrl), Mac (Cmd), and Linux
+
+**Reference:**
+- `web/src/hooks/use-global-shortcuts.ts`
+- `web/src/hooks/use-global-shortcuts.test.tsx` (19 tests)
+- `web/src/components/keyboard-shortcuts-help.tsx` (help overlay with all shortcuts)
+
+---
+
 ### [Performance] Pattern
 
 **Code Splitting (Route-Based):**

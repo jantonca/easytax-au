@@ -132,12 +132,14 @@ This document describes the system architecture, tech stack, and module organiza
     - Settings: Providers (Store icon), Categories (FolderOpen icon), Clients (Users icon)
   - 9 unit tests covering all variants, accessibility, and keyboard navigation
 - **Layout & navigation:**
-  - `web/src/components/layout/layout.tsx` (visual shell using sidebar, header, mobile nav, command palette)
+  - `web/src/components/layout/layout.tsx` (visual shell using sidebar, header, mobile nav, command palette, global shortcuts)
   - `web/src/components/layout/sidebar.tsx` + `mobile-nav.tsx` (desktop & mobile navigation based on `NAV_ITEMS`)
   - `web/src/components/layout/header.tsx` (displays current FY/Quarter using `useFYInfo`)
   - `web/src/components/layout/command-palette.tsx` (stub modal toggled via ⌘K / Ctrl+K)
+  - `web/src/components/keyboard-shortcuts-help.tsx` (help overlay showing all shortcuts, toggled via ⌘/ / Ctrl+/)
   - `web/src/config/navigation.ts` (central navigation config)
-  - `web/src/hooks/use-keyboard-shortcuts.ts` (keyboard shortcut handling)
+  - `web/src/hooks/use-keyboard-shortcuts.ts` (command palette shortcut: ⌘K)
+  - `web/src/hooks/use-global-shortcuts.ts` (global shortcuts: Ctrl+Alt+N, Ctrl+Alt+Shift+N, Ctrl+Alt+I, Ctrl+/, Ctrl+F)
 - **Testing:**
   - `web/vitest.config.ts` (jsdom env, `@` alias)
   - `web/src/test/setup.ts` (`@testing-library/jest-dom`)
@@ -146,7 +148,9 @@ This document describes the system architecture, tech stack, and module organiza
     - `web/src/lib/api-client.test.ts`
     - `web/src/components/ui/toast-provider.test.tsx`
     - `web/src/lib/fy.test.ts`
-    - `web/src/hooks/use-keyboard-shortcuts.test.tsx`
+    - `web/src/hooks/use-keyboard-shortcuts.test.tsx` (command palette shortcut)
+    - `web/src/hooks/use-global-shortcuts.test.tsx` (global shortcuts - 19 tests)
+    - `web/src/components/keyboard-shortcuts-help.test.tsx` (help overlay - 19 tests)
 
 ### Dashboard (Phase F2.1)
 
