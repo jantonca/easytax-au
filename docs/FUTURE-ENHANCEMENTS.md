@@ -2,9 +2,9 @@
 
 **Purpose:** This document tracks features, improvements, and nice-to-have enhancements that are not critical for the current production release but would improve the user experience in future iterations.
 
-**Project Status:** Core functionality is production-ready (98% complete, 99/101 tasks done). These enhancements are optional improvements based on user feedback and evolving needs.
+**Project Status:** v1.1.0 shipped. Audit remediation in progress (v1.2.0). These enhancements are optional improvements based on user feedback and audit findings.
 
-**Last Updated:** 2026-01-11 (5 tasks promoted to NEXT-TASKS.md for v1.2.0)
+**Last Updated:** 2026-02-15 (P2 audit items added, completed items marked)
 
 ---
 
@@ -19,6 +19,7 @@
 
 ## 📊 Enhancement Categories
 
+- [Audit-Identified Enhancements (P2)](#audit-identified-enhancements-p2)
 - [UX Polish & Interactions](#ux-polish--interactions)
 - [Deferred Features](#deferred-features)
 - [Accessibility](#accessibility)
@@ -31,39 +32,91 @@
 
 ---
 
-## 🎨 UX Polish & Interactions
+## 🔍 Audit-Identified Enhancements (P2)
 
-### Toast Notification Enhancements ✅ **COMPLETED**
+**Source:** Consolidated audit (AUDIT-FINAL-2026-02-15.md)
+**Priority:** 🟡 Medium (nice-to-have improvements, not blockers)
 
-**Priority:** 🟡 Medium
-**Estimated Effort:** 3-4 hours
-**Context:** Auto-dismiss implemented in commit `ca6324b`
-**Status:** Completed on 2026-01-11 (moved to NEXT-TASKS.md and implemented)
-
-**Features:**
-
-- [x] **Progress bar** showing time until auto-dismiss
-  - Thin bar at bottom of toast that drains over duration
-  - Visual indicator of remaining time
-  - CSS animation with `animation-duration` matching toast duration
-- [x] **Pause on hover** to prevent auto-dismiss when reading
-  - Common UX pattern in toast libraries
-  - Resume timer on mouse leave
-  - Clear/resume setTimeout on mouse events
-- [x] **Toast stacking limit** (max 5 visible)
-  - Auto-dismiss oldest when limit exceeded
-  - Prevent UI clutter during bulk operations
-- [x] **Undo action** for destructive toasts
-  - "Expense deleted. [Undo]" button
-  - 8-second window to restore
-  - Keep deleted item in memory for duration, then commit
-
-**Technical Notes:**
-
-- Current implementation: `web/src/components/ui/toast-provider.tsx`
-- Auto-dismiss durations: success (4s), default (5s), error (8s)
+These items were identified during the audit process as potential enhancements but are not critical for production use. They represent opportunities for future refinement.
 
 ---
+
+### P2-1: Rounding Standardization
+
+**Current State:** MoneyService uses `Decimal.round()` (round half-up) while BAS/Reports SQL uses `FLOOR()` (round down).
+
+**Impact:** Maximum 1 cent per transaction drift. Over many transactions, creates systematic 0-1 cent under-claim in SQL (taxpayer-safe direction).
+
+**Recommendation:** Standardize on FLOOR in both paths for consistency and tax-conservatism. Alternatively, document the intentional use of FLOOR in SQL as the authoritative calculation method.
+
+**Files:**
+- `src/common/services/money.service.ts` (line 111)
+- `src/modules/bas/bas.service.ts` (line 192)
+- `src/modules/reports/reports.service.ts` (line 172)
+
+**Effort:** 1-2 hours
+
+---
+
+### P2-2: BAS G10/G11 Fields
+
+**Current State:** BAS DTO only returns Simpler BAS fields (G1, 1A, 1B, Net GST). Full BAS reporters need G10/G11.
+
+**Context:** This is a deliberate scope decision (Simpler BAS only). The data is available via the Reports service (categories have `basLabel` field, seeder creates "Capital Purchases" with `basLabel: 'G10'`).
+
+**Recommendation:** Add optional G10/G11 fields to BAS DTO, populated from the category basLabel grouping that already exists in the Reports service.
+
+**Files:**
+- `src/modules/bas/dto/bas-summary.dto.ts`
+- `src/modules/bas/bas.service.ts`
+
+**Effort:** 2-3 hours
+
+---
+
+### P2-3: GST Treatment Model
+
+**Current State:** Binary model supports only `domestic` (10% GST) vs `international` (0% GST). Does not model GST-free domestic supplies, input-taxed supplies, or mixed-rate scenarios.
+
+**Recommendation:** Add a `gstTreatment` enum to expenses (`TAXABLE | GST_FREE | INPUT_TAXED | OUT_OF_SCOPE`) for future flexibility.
+
+**Context:** Low priority because current binary model is correct for the typical freelancer use case (target user). Only matters for complex supply types.
+
+**Effort:** 4-6 hours (requires schema migration)
+
+---
+
+### P2-4: Authentication System
+
+**Current State:** Entire API has no authentication. By design for LAN deployment (Docker on Proxmox LXC, single user).
+
+**Context:** Not needed for current deployment. Would be a blocker for any internet-facing deployment.
+
+**Recommendation:** If internet exposure is planned, add a simple local-admin auth system (e.g., session-based with a single admin password). Do not over-engineer for a single-user tool.
+
+**Priority:** P2 for current posture (LAN-only). Would be P0 if internet-facing.
+
+**Effort:** 6-8 hours (simple session auth)
+
+---
+
+### P2-5: Cash vs Accrual BAS Basis
+
+**Current State:** BAS queries include all income regardless of payment status. Many small AU businesses report on cash basis (only count income when received).
+
+**Data Available:** Income entity has an `isPaid` field, so the data exists.
+
+**Recommendation:** Add a `basAccountingBasis` setting (CASH | ACCRUAL) and filter income queries accordingly in BasService.
+
+**Files:**
+- `src/modules/bas/bas.service.ts`
+- Settings page (add basAccountingBasis toggle)
+
+**Effort:** 2-3 hours
+
+---
+
+## 🎨 UX Polish & Interactions
 
 ### Loading Skeleton Enhancements
 
@@ -86,11 +139,11 @@
 
 ---
 
-### Keyboard Shortcuts for Common Actions ⬆️ **PROMOTED TO v1.2.0**
+### Keyboard Shortcuts for Common Actions ⬆️ **PROMOTED TO v1.3.0**
 
 **Priority:** 🟡 Medium
 **Estimated Effort:** 4-5 hours
-**Status:** Moved to NEXT-TASKS.md on 2026-01-11
+**Status:** Moved to NEXT-TASKS.md (v1.3.0 after audit fixes)
 
 **Description:**
 Add keyboard shortcuts beyond basic navigation for power users.
@@ -178,11 +231,11 @@ Modal-based editing provides full CRUD functionality with simpler implementation
 
 ---
 
-### Bulk Operations ⬆️ **PROMOTED TO v1.2.0**
+### Bulk Operations ⬆️ **PROMOTED TO v1.3.0**
 
 **Priority:** 🟡 Medium
 **Estimated Effort:** 5-6 hours
-**Status:** Moved to NEXT-TASKS.md on 2026-01-11
+**Status:** Moved to NEXT-TASKS.md (v1.3.0 after audit fixes)
 
 **Description:**
 Allow selecting multiple rows for batch operations.
@@ -206,11 +259,11 @@ Allow selecting multiple rows for batch operations.
 
 ---
 
-### CSV Template Downloads ⬆️ **PROMOTED TO v1.2.0**
+### CSV Template Downloads ⬆️ **PROMOTED TO v1.3.0**
 
 **Priority:** 🟢 Low
 **Estimated Effort:** 2-3 hours
-**Status:** Moved to NEXT-TASKS.md on 2026-01-11
+**Status:** Moved to NEXT-TASKS.md (v1.3.0 after audit fixes)
 
 **Description:**
 Provide downloadable CSV templates with example data.
@@ -278,28 +331,6 @@ Manual testing with assistive technology to ensure full accessibility compliance
 
 ---
 
-### Error Message Improvements ✅ **COMPLETED**
-
-**Priority:** 🟡 Medium
-**Estimated Effort:** 2-3 hours
-**Completed:** 2026-01-10
-**Commit:** `fa6d716`
-
-**Implementation:**
-Added `aria-describedby` associations to 29 form fields across 6 forms to properly announce error messages to screen readers. Implementation follows WCAG 2.1 AA guidelines.
-
-**Files Updated:**
-
-- ✅ `web/src/features/expenses/components/expense-form.tsx` (5 fields)
-- ✅ `web/src/features/incomes/components/income-form.tsx` (5 fields)
-- ✅ `web/src/features/recurring/components/recurring-form.tsx` (11 fields)
-- ✅ `web/src/features/settings/providers/components/provider-form.tsx` (3 fields)
-- ✅ `web/src/features/settings/categories/components/category-form.tsx` (3 fields)
-- ✅ `web/src/features/settings/clients/components/client-form.tsx` (2 fields)
-- ✅ `web/src/features/settings/about/about-page.test.tsx` (test fix)
-
----
-
 ## 📊 Dashboard & Analytics
 
 ### Dashboard Analytics & Insights
@@ -364,11 +395,11 @@ Attach receipt/invoice images to expenses and incomes.
 
 ---
 
-### Advanced Filtering ⬆️ **PROMOTED TO v1.2.0**
+### Advanced Filtering ⬆️ **PROMOTED TO v1.3.0**
 
 **Priority:** 🟡 Medium
 **Estimated Effort:** 6-8 hours
-**Status:** Moved to NEXT-TASKS.md on 2026-01-11
+**Status:** Moved to NEXT-TASKS.md (v1.3.0 after audit fixes)
 
 **Description:**
 More sophisticated filtering beyond current date range and dropdowns.
@@ -451,35 +482,6 @@ Export data to popular accounting formats (Xero, MYOB, QuickBooks).
 ---
 
 ## 🔧 Technical Debt & Infrastructure
-
-### CI/CD Integration for E2E Tests ✅ **COMPLETED**
-
-**Priority:** 🟡 Medium
-**Estimated Effort:** 3-4 hours
-**Completed:** 2026-01-10
-**Workflow:** `.github/workflows/e2e-tests.yml`
-
-**Implementation:**
-
-- ✅ 62 Playwright tests covering critical flows (1 skipped, 98.4% pass rate)
-- ✅ GitHub Actions workflow with PostgreSQL service
-- ✅ Automatic browser dependency installation
-- ✅ Backend auto-start with health checks
-- ✅ Test artifacts upload (reports + screenshots on failure)
-- ✅ Configured test parallelization (1 worker on CI, 8 locally)
-- ✅ Test database auto-seeded on startup
-
-**Test Coverage:**
-- Theme switching: 11/11 ✓
-- Expense CRUD: 9/9 ✓
-- Income CRUD: 10/10 ✓
-- Reports: 14/14 ✓
-- PDF Downloads: 10/10 ✓
-- CSV Import: 5/9 (4 require backend API)
-
-**Reference:** web/e2e/README.md
-
----
 
 ### Migrate to React Router v7
 
