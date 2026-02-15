@@ -93,13 +93,18 @@ export class MoneyService {
    * Applies a business use percentage to an amount.
    * Used for partial deductions (e.g., 50% business use for home internet).
    *
+   * Uses FLOOR rounding (always round down) to match SQL behavior and
+   * ensure tax-conservative calculations. This prevents claiming more
+   * deductions than what the database reports.
+   *
    * @param amountCents - The full amount in cents
    * @param bizPercent - The business use percentage (0-100)
-   * @returns The deductible portion in cents
+   * @returns The deductible portion in cents (rounded DOWN)
    * @throws Error if bizPercent is outside 0-100 range
    *
    * @example
    * applyBizPercent(10000, 50) // $100.00 at 50% = $50.00 = 5000 cents
+   * applyBizPercent(1001, 50.1) // 1001 * 0.501 = 501.501 → FLOOR → 501 cents
    */
   applyBizPercent(amountCents: number, bizPercent: number): number {
     if (bizPercent < 0 || bizPercent > 100) {
@@ -108,7 +113,7 @@ export class MoneyService {
 
     const amount = new Decimal(amountCents);
     const percentage = new Decimal(bizPercent).dividedBy(100);
-    return amount.times(percentage).round().toNumber();
+    return amount.times(percentage).floor().toNumber();
   }
 
   /**

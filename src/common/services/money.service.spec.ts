@@ -89,9 +89,17 @@ describe('MoneyService', () => {
       expect(service.applyBizPercent(10000, 0)).toBe(0);
     });
 
-    it('should handle fractional percentages', () => {
-      // $100 at 33.33% = $33.33 = 3333 cents
+    it('should handle fractional percentages using FLOOR (tax-conservative)', () => {
+      // $100 at 33.33% = $33.33 → FLOOR = 3333 cents (rounds down)
       expect(service.applyBizPercent(10000, 33.33)).toBe(3333);
+    });
+
+    it('should use FLOOR rounding to match BAS/Reports SQL (P2-1)', () => {
+      // Test case where FLOOR vs ROUND differs
+      // 1000 cents * 50.5% = 505 cents (FLOOR)
+      // With old ROUND it would be 505 (happens to be same)
+      // But 1001 * 50.1% = 501.501 → FLOOR = 501, ROUND = 502
+      expect(service.applyBizPercent(1001, 50.1)).toBe(501); // FLOOR result
     });
 
     it('should throw for negative percentage', () => {
