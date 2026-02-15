@@ -346,6 +346,14 @@ describe('BasService', () => {
           gstPaid: '3000',
           count: '5',
         });
+        // Mock G10 and G11 queries
+        const mockG10QueryBuilder = createMockQueryBuilder();
+        const mockG11QueryBuilder = createMockQueryBuilder();
+        mockG10QueryBuilder.getRawOne.mockResolvedValue({ totalPurchases: '550000' });
+        mockG11QueryBuilder.getRawOne.mockResolvedValue({ totalPurchases: '125000' });
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockExpenseQueryBuilder);
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockG10QueryBuilder);
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockG11QueryBuilder);
 
         const result = await service.getSummary('Q1', 2025);
 
@@ -358,9 +366,163 @@ describe('BasService', () => {
           label1aGstCollectedCents: 10000,
           label1bGstPaidCents: 3000,
           netGstPayableCents: 7000,
+          g10CapitalPurchasesCents: 550000,
+          g11NonCapitalPurchasesCents: 125000,
           incomeCount: 2,
           expenseCount: 5,
         });
+      });
+    });
+
+    describe('G10 calculation (capital purchases)', () => {
+      beforeEach(() => {
+        // Mock separate query builders for all 3 expense queries
+        const mockG10QueryBuilder = createMockQueryBuilder();
+        const mockG11QueryBuilder = createMockQueryBuilder();
+        mockG10QueryBuilder.getRawOne.mockResolvedValue({
+          totalPurchases: '550000', // $5,500.00
+        });
+        mockG11QueryBuilder.getRawOne.mockResolvedValue({
+          totalPurchases: '125000',
+        });
+        // Override to return different builders for different queries
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockExpenseQueryBuilder); // 1B
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockG10QueryBuilder); // G10
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockG11QueryBuilder); // G11
+      });
+
+      it('should sum expense total_cents WHERE category.basLabel = G10', async () => {
+        const result = await service.getSummary('Q1', 2025);
+
+        expect(result.g10CapitalPurchasesCents).toBe(550000);
+        expect(mockExpenseCreateQueryBuilder).toHaveBeenCalledTimes(3);
+      });
+
+      it('should join with category table for basLabel filtering', async () => {
+        await service.getSummary('Q1', 2025);
+
+        // Should have called createQueryBuilder 3 times (1B, G10, G11)
+        expect(mockExpenseCreateQueryBuilder).toHaveBeenCalledTimes(3);
+      });
+
+      it('should return 0 when no capital purchases in period', async () => {
+        const mockG10QueryBuilder = createMockQueryBuilder();
+        const mockG11QueryBuilder = createMockQueryBuilder();
+        mockG10QueryBuilder.getRawOne.mockResolvedValue({
+          totalPurchases: '0',
+        });
+        mockG11QueryBuilder.getRawOne.mockResolvedValue({
+          totalPurchases: '125000',
+        });
+        mockExpenseCreateQueryBuilder.mockReset();
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockExpenseQueryBuilder);
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockG10QueryBuilder);
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockG11QueryBuilder);
+
+        const result = await service.getSummary('Q1', 2025);
+        expect(result.g10CapitalPurchasesCents).toBe(0);
+      });
+
+      it('should handle null result from query', async () => {
+        const mockG10QueryBuilder = createMockQueryBuilder();
+        const mockG11QueryBuilder = createMockQueryBuilder();
+        mockG10QueryBuilder.getRawOne.mockResolvedValue(null);
+        mockG11QueryBuilder.getRawOne.mockResolvedValue({
+          totalPurchases: '125000',
+        });
+        mockExpenseCreateQueryBuilder.mockReset();
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockExpenseQueryBuilder);
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockG10QueryBuilder);
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockG11QueryBuilder);
+
+        const result = await service.getSummary('Q1', 2025);
+        expect(result.g10CapitalPurchasesCents).toBe(0);
+      });
+    });
+
+    describe('G11 calculation (non-capital purchases)', () => {
+      beforeEach(() => {
+        // Mock separate query builders for each calculation
+        const mockG10QueryBuilder = createMockQueryBuilder();
+        const mockG11QueryBuilder = createMockQueryBuilder();
+        mockG10QueryBuilder.getRawOne.mockResolvedValue({
+          totalPurchases: '550000',
+        });
+        mockG11QueryBuilder.getRawOne.mockResolvedValue({
+          totalPurchases: '125000', // $1,250.00
+        });
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockExpenseQueryBuilder); // 1B
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockG10QueryBuilder); // G10
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockG11QueryBuilder); // G11
+      });
+
+      it('should sum expense total_cents WHERE category.basLabel = G11', async () => {
+        const result = await service.getSummary('Q1', 2025);
+
+        expect(result.g11NonCapitalPurchasesCents).toBe(125000);
+        expect(mockExpenseCreateQueryBuilder).toHaveBeenCalledTimes(3);
+      });
+
+      it('should join with category table for basLabel filtering', async () => {
+        await service.getSummary('Q1', 2025);
+
+        // Should have called createQueryBuilder 3 times (1B, G10, G11)
+        expect(mockExpenseCreateQueryBuilder).toHaveBeenCalledTimes(3);
+      });
+
+      it('should return 0 when no non-capital purchases in period', async () => {
+        const mockG10QueryBuilder = createMockQueryBuilder();
+        const mockG11QueryBuilder = createMockQueryBuilder();
+        mockG10QueryBuilder.getRawOne.mockResolvedValue({ totalPurchases: '0' });
+        mockG11QueryBuilder.getRawOne.mockResolvedValue({ totalPurchases: '0' });
+        mockExpenseCreateQueryBuilder.mockReset();
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockExpenseQueryBuilder);
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockG10QueryBuilder);
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockG11QueryBuilder);
+
+        const result = await service.getSummary('Q1', 2025);
+        expect(result.g11NonCapitalPurchasesCents).toBe(0);
+      });
+
+      it('should handle null result from query', async () => {
+        const mockG10QueryBuilder = createMockQueryBuilder();
+        const mockG11QueryBuilder = createMockQueryBuilder();
+        mockG10QueryBuilder.getRawOne.mockResolvedValue({ totalPurchases: '0' });
+        mockG11QueryBuilder.getRawOne.mockResolvedValue(null);
+        mockExpenseCreateQueryBuilder.mockReset();
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockExpenseQueryBuilder);
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockG10QueryBuilder);
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockG11QueryBuilder);
+
+        const result = await service.getSummary('Q1', 2025);
+        expect(result.g11NonCapitalPurchasesCents).toBe(0);
+      });
+    });
+
+    describe('Full BAS vs Simpler BAS', () => {
+      beforeEach(() => {
+        // Mock all query builders
+        const mockG10QueryBuilder = createMockQueryBuilder();
+        const mockG11QueryBuilder = createMockQueryBuilder();
+        mockG10QueryBuilder.getRawOne.mockResolvedValue({ totalPurchases: '750000' });
+        mockG11QueryBuilder.getRawOne.mockResolvedValue({ totalPurchases: '220000' });
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockExpenseQueryBuilder);
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockG10QueryBuilder);
+        mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockG11QueryBuilder);
+      });
+
+      it('should include all fields for Full BAS reporting', async () => {
+        const result = await service.getSummary('Q1', 2025);
+
+        // Simpler BAS fields
+        expect(result.g1TotalSalesCents).toBeDefined();
+        expect(result.label1aGstCollectedCents).toBeDefined();
+        expect(result.label1bGstPaidCents).toBeDefined();
+        expect(result.netGstPayableCents).toBeDefined();
+
+        // Full BAS fields (P2-2)
+        expect(result.g10CapitalPurchasesCents).toBe(750000);
+        expect(result.g11NonCapitalPurchasesCents).toBe(220000);
       });
     });
   });

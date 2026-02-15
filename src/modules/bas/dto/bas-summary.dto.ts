@@ -3,10 +3,16 @@ import { ApiProperty } from '@nestjs/swagger';
 /**
  * DTO representing a BAS (Business Activity Statement) summary for a quarter.
  *
- * This contains the key fields needed for Simpler BAS reporting:
+ * This contains fields for both Simpler BAS and Full BAS reporting:
+ *
+ * **Simpler BAS (all businesses):**
  * - G1: Total sales (including GST)
  * - 1A: GST collected on sales
  * - 1B: GST paid on purchases (claimable credits)
+ *
+ * **Full BAS (additional fields):**
+ * - G10: Capital purchases (> $1,000, depreciable assets)
+ * - G11: Non-capital purchases (< $1,000, operating expenses)
  *
  * All monetary values are in **cents** (integers).
  *
@@ -20,7 +26,9 @@ import { ApiProperty } from '@nestjs/swagger';
  *   "g1TotalSalesCents": 1100000,
  *   "label1aGstCollectedCents": 100000,
  *   "label1bGstPaidCents": 50000,
- *   "netGstPayableCents": 50000
+ *   "netGstPayableCents": 50000,
+ *   "g10CapitalPurchasesCents": 750000,
+ *   "g11NonCapitalPurchasesCents": 220000
  * }
  * ```
  */
@@ -87,6 +95,24 @@ export class BasSummaryDto {
    */
   @ApiProperty({ description: 'Net GST payable in cents (negative = refund)', example: 50000 })
   netGstPayableCents: number;
+
+  /**
+   * G10: Capital purchases (Full BAS).
+   * Sum of all expense `total_cents` where category.basLabel = 'G10'
+   * (purchases > $1,000, depreciable assets).
+   * @example 750000 (represents $7,500.00)
+   */
+  @ApiProperty({ description: 'G10: Capital purchases in cents (Full BAS)', example: 750000 })
+  g10CapitalPurchasesCents: number;
+
+  /**
+   * G11: Non-capital purchases (Full BAS).
+   * Sum of all expense `total_cents` where category.basLabel = 'G11'
+   * (operating expenses < $1,000).
+   * @example 220000 (represents $2,200.00)
+   */
+  @ApiProperty({ description: 'G11: Non-capital purchases in cents (Full BAS)', example: 220000 })
+  g11NonCapitalPurchasesCents: number;
 
   /**
    * Number of income records in the period.

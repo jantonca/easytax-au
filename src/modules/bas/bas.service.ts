@@ -86,9 +86,11 @@ export class BasService {
     const { start, end } = this.getQuarterDateRange(normalizedQuarter as Quarter, financialYear);
 
     // Calculate all BAS fields
-    const [incomeData, expenseData] = await Promise.all([
+    const [incomeData, expenseData, g10Data, g11Data] = await Promise.all([
       this.calculateIncomeTotals(start, end, normalizedBasis),
       this.calculateExpenseTotals(start, end),
+      this.calculatePurchasesByBasLabel(start, end, 'G10'),
+      this.calculatePurchasesByBasLabel(start, end, 'G11'),
     ]);
 
     // Net GST = GST Collected (1A) - GST Paid (1B)
@@ -106,6 +108,8 @@ export class BasService {
       label1aGstCollectedCents: incomeData.gstCollectedCents,
       label1bGstPaidCents: expenseData.gstPaidCents,
       netGstPayableCents,
+      g10CapitalPurchasesCents: g10Data.totalPurchasesCents,
+      g11NonCapitalPurchasesCents: g11Data.totalPurchasesCents,
       incomeCount: incomeData.count,
       expenseCount: expenseData.count,
     };
@@ -238,6 +242,39 @@ export class BasService {
     return {
       gstPaidCents: parseInt(result?.gstPaid ?? '0', 10),
       count: parseInt(result?.count ?? '0', 10),
+    };
+  }
+
+  /**
+   * Calculates expense totals for a specific BAS label (G10 or G11).
+   *
+   * Used for Full BAS reporting:
+   * - G10: Capital purchases (> $1,000, depreciable assets)
+   * - G11: Non-capital purchases (< $1,000, operating expenses)
+   *
+   * Formula: SUM(expense.total_cents) WHERE category.basLabel = label
+   *
+   * @param startDate - Period start date string (YYYY-MM-DD, inclusive)
+   * @param endDate - Period end date string (YYYY-MM-DD, inclusive)
+   * @param basLabel - The BAS label to filter by ('G10' or 'G11')
+   * @returns Total purchases for this BAS label
+   */
+  private async calculatePurchasesByBasLabel(
+    startDate: string,
+    endDate: string,
+    basLabel: string,
+  ): Promise<{ totalPurchasesCents: number }> {
+    const result = await this.expenseRepository
+      .createQueryBuilder('expense')
+      .innerJoin('expense.category', 'category')
+      .select('COALESCE(SUM(expense.total_cents), 0)', 'totalPurchases')
+      .where('expense.date >= :startDate', { startDate })
+      .andWhere('expense.date <= :endDate', { endDate })
+      .andWhere('category.bas_label = :basLabel', { basLabel })
+      .getRawOne<{ totalPurchases: string }>();
+
+    return {
+      totalPurchasesCents: parseInt(result?.totalPurchases ?? '0', 10),
     };
   }
 
