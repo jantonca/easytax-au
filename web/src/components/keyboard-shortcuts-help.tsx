@@ -28,9 +28,9 @@ const SHORTCUTS: ShortcutSection[] = [
   {
     title: 'Actions',
     shortcuts: [
-      { key: '⌘N', description: 'New Expense' },
-      { key: '⌘⇧N', description: 'New Income' },
-      { key: '⌘I', description: 'Import CSV' },
+      { key: '⌘⌥N', description: 'New Expense' },
+      { key: '⌘⌥⇧N', description: 'New Income' },
+      { key: '⌘⌥I', description: 'Import CSV' },
       { key: '⌘F', description: 'Focus Search/Filter' },
     ],
   },
@@ -111,7 +111,7 @@ export function KeyboardShortcutsHelp({
         {/* Content */}
         <div className="px-6 py-6">
           <p className="mb-6 text-sm text-slate-600 dark:text-slate-400">
-            Use{' '}
+            On Windows/Linux: Use{' '}
             <kbd className="rounded bg-slate-100 px-2 py-1 text-xs font-semibold dark:bg-slate-800">
               Ctrl
             </kbd>{' '}
@@ -119,7 +119,15 @@ export function KeyboardShortcutsHelp({
             <kbd className="rounded bg-slate-100 px-2 py-1 text-xs font-semibold dark:bg-slate-800">
               ⌘
             </kbd>{' '}
-            on Windows/Linux.
+            and{' '}
+            <kbd className="rounded bg-slate-100 px-2 py-1 text-xs font-semibold dark:bg-slate-800">
+              Alt
+            </kbd>{' '}
+            instead of{' '}
+            <kbd className="rounded bg-slate-100 px-2 py-1 text-xs font-semibold dark:bg-slate-800">
+              ⌥
+            </kbd>
+            .
           </p>
 
           <ul role="list" className="space-y-6">

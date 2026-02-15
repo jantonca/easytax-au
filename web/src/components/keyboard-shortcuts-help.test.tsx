@@ -32,21 +32,21 @@ describe('KeyboardShortcutsHelp', () => {
       render(<KeyboardShortcutsHelp open={true} onClose={vi.fn()} />);
 
       expect(screen.getByText(/new expense/i)).toBeInTheDocument();
-      expect(screen.getByText(/⌘N/i)).toBeInTheDocument();
+      expect(screen.getByText(/⌘⌥N/i)).toBeInTheDocument();
     });
 
     it('displays new income shortcut', () => {
       render(<KeyboardShortcutsHelp open={true} onClose={vi.fn()} />);
 
       expect(screen.getByText(/new income/i)).toBeInTheDocument();
-      expect(screen.getByText(/⌘⇧N/i)).toBeInTheDocument();
+      expect(screen.getByText(/⌘⌥⇧N/i)).toBeInTheDocument();
     });
 
     it('displays import CSV shortcut', () => {
       render(<KeyboardShortcutsHelp open={true} onClose={vi.fn()} />);
 
       expect(screen.getByText(/import csv/i)).toBeInTheDocument();
-      expect(screen.getByText(/⌘I/i)).toBeInTheDocument();
+      expect(screen.getByText(/⌘⌥I/i)).toBeInTheDocument();
     });
 
     it('displays command palette shortcut', () => {
@@ -72,21 +72,24 @@ describe('KeyboardShortcutsHelp', () => {
   });
 
   describe('Platform Detection', () => {
-    it('shows ⌘ symbol for macOS shortcuts', () => {
+    it('shows ⌘ and ⌥ symbols for macOS shortcuts', () => {
       render(<KeyboardShortcutsHelp open={true} onClose={vi.fn()} />);
 
-      // Should show Mac-style command symbol
-      const shortcuts = screen.getAllByText(/⌘/);
-      expect(shortcuts.length).toBeGreaterThan(0);
+      // Should show Mac-style symbols
+      const commandSymbols = screen.getAllByText(/⌘/);
+      expect(commandSymbols.length).toBeGreaterThan(0);
+
+      const optionSymbols = screen.getAllByText(/⌥/);
+      expect(optionSymbols.length).toBeGreaterThan(0);
     });
 
-    it('includes Ctrl alternative for Windows/Linux', () => {
+    it('includes platform guidance for Windows/Linux users', () => {
       render(<KeyboardShortcutsHelp open={true} onClose={vi.fn()} />);
 
-      // Should mention Ctrl as alternative (text is split across elements)
-      expect(screen.getByText(/instead of/i)).toBeInTheDocument();
+      // Should mention Ctrl and Alt equivalents
       expect(screen.getByText(/windows\/linux/i)).toBeInTheDocument();
       expect(screen.getByText('Ctrl')).toBeInTheDocument();
+      expect(screen.getByText('Alt')).toBeInTheDocument();
     });
   });
 
@@ -156,8 +159,9 @@ describe('KeyboardShortcutsHelp', () => {
     it('groups shortcuts by category', () => {
       render(<KeyboardShortcutsHelp open={true} onClose={vi.fn()} />);
 
-      // Should have section headings
-      expect(screen.getByText(/navigation/i)).toBeInTheDocument();
+      // Should have section headings (using getAllByText since "Navigation" appears in help text too)
+      const navigationHeadings = screen.getAllByText(/navigation/i);
+      expect(navigationHeadings.length).toBeGreaterThan(0);
       expect(screen.getByText(/actions/i)).toBeInTheDocument();
     });
   });

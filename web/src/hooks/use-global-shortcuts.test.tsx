@@ -32,28 +32,15 @@ describe('useGlobalShortcuts', () => {
     vi.clearAllMocks();
   });
 
-  describe('Cmd/Ctrl+N - New Expense', () => {
-    it('calls onNewExpense when Cmd+N is pressed (macOS)', () => {
-      const handler = vi.fn();
-      render(<TestComponent onNewExpense={handler} />);
-
-      const event = new KeyboardEvent('keydown', {
-        key: 'n',
-        metaKey: true,
-        bubbles: true,
-      });
-      window.dispatchEvent(event);
-
-      expect(handler).toHaveBeenCalledTimes(1);
-    });
-
-    it('calls onNewExpense when Ctrl+N is pressed (Windows/Linux)', () => {
+  describe('Ctrl/Cmd+Alt+N - New Expense', () => {
+    it('calls onNewExpense when Ctrl+Alt+N is pressed', () => {
       const handler = vi.fn();
       render(<TestComponent onNewExpense={handler} />);
 
       const event = new KeyboardEvent('keydown', {
         key: 'n',
         ctrlKey: true,
+        altKey: true,
         bubbles: true,
       });
       window.dispatchEvent(event);
@@ -61,12 +48,42 @@ describe('useGlobalShortcuts', () => {
       expect(handler).toHaveBeenCalledTimes(1);
     });
 
-    it('does not call onNewExpense when only N is pressed', () => {
+    it('calls onNewExpense when Cmd+Alt+N is pressed (Mac)', () => {
       const handler = vi.fn();
       render(<TestComponent onNewExpense={handler} />);
 
       const event = new KeyboardEvent('keydown', {
         key: 'n',
+        metaKey: true,
+        altKey: true,
+        bubbles: true,
+      });
+      window.dispatchEvent(event);
+
+      expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not call onNewExpense when only Alt+N is pressed', () => {
+      const handler = vi.fn();
+      render(<TestComponent onNewExpense={handler} />);
+
+      const event = new KeyboardEvent('keydown', {
+        key: 'n',
+        altKey: true,
+        bubbles: true,
+      });
+      window.dispatchEvent(event);
+
+      expect(handler).not.toHaveBeenCalled();
+    });
+
+    it('does not call onNewExpense when only Ctrl+N is pressed', () => {
+      const handler = vi.fn();
+      render(<TestComponent onNewExpense={handler} />);
+
+      const event = new KeyboardEvent('keydown', {
+        key: 'n',
+        ctrlKey: true,
         bubbles: true,
       });
       window.dispatchEvent(event);
@@ -75,14 +92,15 @@ describe('useGlobalShortcuts', () => {
     });
   });
 
-  describe('Cmd/Ctrl+Shift+N - New Income', () => {
-    it('calls onNewIncome when Cmd+Shift+N is pressed (macOS)', () => {
+  describe('Ctrl/Cmd+Alt+Shift+N - New Income', () => {
+    it('calls onNewIncome when Ctrl+Alt+Shift+N is pressed', () => {
       const handler = vi.fn();
       render(<TestComponent onNewIncome={handler} />);
 
       const event = new KeyboardEvent('keydown', {
         key: 'N', // Capital N when shift is pressed
-        metaKey: true,
+        ctrlKey: true,
+        altKey: true,
         shiftKey: true,
         bubbles: true,
       });
@@ -91,13 +109,14 @@ describe('useGlobalShortcuts', () => {
       expect(handler).toHaveBeenCalledTimes(1);
     });
 
-    it('calls onNewIncome when Ctrl+Shift+N is pressed (Windows/Linux)', () => {
+    it('calls onNewIncome when Cmd+Alt+Shift+N is pressed (Mac)', () => {
       const handler = vi.fn();
       render(<TestComponent onNewIncome={handler} />);
 
       const event = new KeyboardEvent('keydown', {
         key: 'N',
-        ctrlKey: true,
+        metaKey: true,
+        altKey: true,
         shiftKey: true,
         bubbles: true,
       });
@@ -106,14 +125,15 @@ describe('useGlobalShortcuts', () => {
       expect(handler).toHaveBeenCalledTimes(1);
     });
 
-    it('does not trigger onNewExpense when Cmd+Shift+N is pressed', () => {
+    it('does not trigger onNewExpense when Ctrl+Alt+Shift+N is pressed', () => {
       const expenseHandler = vi.fn();
       const incomeHandler = vi.fn();
       render(<TestComponent onNewExpense={expenseHandler} onNewIncome={incomeHandler} />);
 
       const event = new KeyboardEvent('keydown', {
         key: 'N',
-        metaKey: true,
+        ctrlKey: true,
+        altKey: true,
         shiftKey: true,
         bubbles: true,
       });
@@ -122,16 +142,32 @@ describe('useGlobalShortcuts', () => {
       expect(incomeHandler).toHaveBeenCalledTimes(1);
       expect(expenseHandler).not.toHaveBeenCalled(); // Should NOT trigger expense
     });
+
+    it('does not call onNewIncome when only Alt+Shift+N is pressed', () => {
+      const handler = vi.fn();
+      render(<TestComponent onNewIncome={handler} />);
+
+      const event = new KeyboardEvent('keydown', {
+        key: 'N',
+        altKey: true,
+        shiftKey: true,
+        bubbles: true,
+      });
+      window.dispatchEvent(event);
+
+      expect(handler).not.toHaveBeenCalled();
+    });
   });
 
-  describe('Cmd/Ctrl+I - Import CSV', () => {
-    it('calls onImport when Cmd+I is pressed', () => {
+  describe('Ctrl/Cmd+Alt+I - Import CSV', () => {
+    it('calls onImport when Ctrl+Alt+I is pressed', () => {
       const handler = vi.fn();
       render(<TestComponent onImport={handler} />);
 
       const event = new KeyboardEvent('keydown', {
         key: 'i',
-        metaKey: true,
+        ctrlKey: true,
+        altKey: true,
         bubbles: true,
       });
       window.dispatchEvent(event);
@@ -139,18 +175,33 @@ describe('useGlobalShortcuts', () => {
       expect(handler).toHaveBeenCalledTimes(1);
     });
 
-    it('calls onImport when Ctrl+I is pressed', () => {
+    it('calls onImport when Cmd+Alt+I is pressed (Mac)', () => {
       const handler = vi.fn();
       render(<TestComponent onImport={handler} />);
 
       const event = new KeyboardEvent('keydown', {
         key: 'i',
-        ctrlKey: true,
+        metaKey: true,
+        altKey: true,
         bubbles: true,
       });
       window.dispatchEvent(event);
 
       expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not call onImport when only Alt+I is pressed', () => {
+      const handler = vi.fn();
+      render(<TestComponent onImport={handler} />);
+
+      const event = new KeyboardEvent('keydown', {
+        key: 'i',
+        altKey: true,
+        bubbles: true,
+      });
+      window.dispatchEvent(event);
+
+      expect(handler).not.toHaveBeenCalled();
     });
   });
 
@@ -221,7 +272,8 @@ describe('useGlobalShortcuts', () => {
 
       const event = new KeyboardEvent('keydown', {
         key: 'n',
-        metaKey: true,
+        ctrlKey: true,
+        altKey: true,
         bubbles: true,
       });
 
@@ -244,7 +296,8 @@ describe('useGlobalShortcuts', () => {
 
       const event = new KeyboardEvent('keydown', {
         key: 'n',
-        metaKey: true,
+        ctrlKey: true,
+        altKey: true,
         bubbles: true,
       });
       input.dispatchEvent(event);
@@ -264,7 +317,8 @@ describe('useGlobalShortcuts', () => {
 
       const event = new KeyboardEvent('keydown', {
         key: 'n',
-        metaKey: true,
+        ctrlKey: true,
+        altKey: true,
         bubbles: true,
       });
       textarea.dispatchEvent(event);
@@ -284,7 +338,8 @@ describe('useGlobalShortcuts', () => {
 
       const event = new KeyboardEvent('keydown', {
         key: 'n',
-        metaKey: true,
+        ctrlKey: true,
+        altKey: true,
         bubbles: true,
       });
       window.dispatchEvent(event);

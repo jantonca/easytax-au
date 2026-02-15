@@ -4,11 +4,11 @@ import { useEffect } from 'react';
  * Global keyboard shortcuts configuration
  */
 export interface GlobalShortcuts {
-  /** Cmd/Ctrl+N - Create new expense */
+  /** Ctrl+Alt+N (Cmd+Alt+N on Mac) - Create new expense */
   onNewExpense?: () => void;
-  /** Cmd/Ctrl+Shift+N - Create new income */
+  /** Ctrl+Alt+Shift+N (Cmd+Alt+Shift+N on Mac) - Create new income */
   onNewIncome?: () => void;
-  /** Cmd/Ctrl+I - Navigate to import page */
+  /** Ctrl+Alt+I (Cmd+Alt+I on Mac) - Navigate to import page */
   onImport?: () => void;
   /** Cmd/Ctrl+/ - Show keyboard shortcuts help */
   onHelp?: () => void;
@@ -21,6 +21,9 @@ export interface GlobalShortcuts {
  *
  * Provides application-wide keyboard shortcuts that work anywhere in the app.
  * Shortcuts are automatically disabled when typing in input fields or textareas.
+ *
+ * Uses Ctrl+Alt (Cmd+Alt on Mac) combinations to avoid browser conflicts.
+ * Single modifier shortcuts like Ctrl+N conflict with browser actions.
  *
  * @param shortcuts - Object mapping shortcut keys to handler functions
  *
@@ -43,24 +46,25 @@ export function useGlobalShortcuts(shortcuts: GlobalShortcuts): void {
 
       const key = event.key.toLowerCase();
       const isMod = event.metaKey || event.ctrlKey;
+      const isAlt = event.altKey;
       const isShift = event.shiftKey;
 
-      // Cmd/Ctrl+Shift+N - New Income (check this first before Cmd+N)
-      if (isMod && isShift && key === 'n' && shortcuts.onNewIncome) {
+      // Ctrl/Cmd+Alt+Shift+N - New Income (check this first before Ctrl/Cmd+Alt+N)
+      if (isMod && isAlt && isShift && key === 'n' && shortcuts.onNewIncome) {
         event.preventDefault();
         shortcuts.onNewIncome();
         return;
       }
 
-      // Cmd/Ctrl+N - New Expense
-      if (isMod && !isShift && key === 'n' && shortcuts.onNewExpense) {
+      // Ctrl/Cmd+Alt+N - New Expense
+      if (isMod && isAlt && !isShift && key === 'n' && shortcuts.onNewExpense) {
         event.preventDefault();
         shortcuts.onNewExpense();
         return;
       }
 
-      // Cmd/Ctrl+I - Import CSV
-      if (isMod && key === 'i' && shortcuts.onImport) {
+      // Ctrl/Cmd+Alt+I - Import CSV
+      if (isMod && isAlt && key === 'i' && shortcuts.onImport) {
         event.preventDefault();
         shortcuts.onImport();
         return;
