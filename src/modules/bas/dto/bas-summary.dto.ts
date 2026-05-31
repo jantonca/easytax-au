@@ -98,7 +98,7 @@ export class BasSummaryDto {
 
   /**
    * G10: Capital purchases (Full BAS).
-   * Sum of all expense `total_cents` where category.basLabel = 'G10'
+   * Sum of all expense `amount_cents` where category.basLabel = 'G10'
    * (purchases > $1,000, depreciable assets).
    * @example 750000 (represents $7,500.00)
    */
@@ -107,7 +107,7 @@ export class BasSummaryDto {
 
   /**
    * G11: Non-capital purchases (Full BAS).
-   * Sum of all expense `total_cents` where category.basLabel = 'G11'
+   * Sum of all expense `amount_cents` where category.basLabel = 'G11'
    * (operating expenses < $1,000).
    * @example 220000 (represents $2,200.00)
    */

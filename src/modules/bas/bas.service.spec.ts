@@ -391,7 +391,7 @@ describe('BasService', () => {
         mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockG11QueryBuilder); // G11
       });
 
-      it('should sum expense total_cents WHERE category.basLabel = G10', async () => {
+      it('should sum expense amount_cents WHERE category.basLabel = G10', async () => {
         const result = await service.getSummary('Q1', 2025);
 
         expect(result.g10CapitalPurchasesCents).toBe(550000);
@@ -456,7 +456,7 @@ describe('BasService', () => {
         mockExpenseCreateQueryBuilder.mockReturnValueOnce(mockG11QueryBuilder); // G11
       });
 
-      it('should sum expense total_cents WHERE category.basLabel = G11', async () => {
+      it('should sum expense amount_cents WHERE category.basLabel = G11', async () => {
         const result = await service.getSummary('Q1', 2025);
 
         expect(result.g11NonCapitalPurchasesCents).toBe(125000);

@@ -252,7 +252,7 @@ export class BasService {
    * - G10: Capital purchases (> $1,000, depreciable assets)
    * - G11: Non-capital purchases (< $1,000, operating expenses)
    *
-   * Formula: SUM(expense.total_cents) WHERE category.basLabel = label
+   * Formula: SUM(expense.amount_cents) WHERE category.basLabel = label
    *
    * @param startDate - Period start date string (YYYY-MM-DD, inclusive)
    * @param endDate - Period end date string (YYYY-MM-DD, inclusive)
@@ -267,7 +267,7 @@ export class BasService {
     const result = await this.expenseRepository
       .createQueryBuilder('expense')
       .innerJoin('expense.category', 'category')
-      .select('COALESCE(SUM(expense.total_cents), 0)', 'totalPurchases')
+      .select('COALESCE(SUM(expense.amount_cents), 0)', 'totalPurchases')
       .where('expense.date >= :startDate', { startDate })
       .andWhere('expense.date <= :endDate', { endDate })
       .andWhere('category.bas_label = :basLabel', { basLabel })
