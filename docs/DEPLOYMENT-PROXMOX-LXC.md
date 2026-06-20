@@ -163,6 +163,10 @@ psql -c "GRANT ALL PRIVILEGES ON DATABASE \"easytax-au\" TO easytax;"
 # Grant schema permissions (required for TypeORM)
 psql -d easytax-au -c "GRANT ALL ON SCHEMA public TO easytax;"
 
+# Enable uuid-ossp extension (the schema uses uuid_generate_v4() for primary keys).
+# Run as the postgres superuser so the app never needs extension-creation rights.
+psql -d easytax-au -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
+
 # Exit postgres user
 exit
 ```
@@ -371,7 +375,7 @@ WorkingDirectory=/opt/easytax-au
 EnvironmentFile=/opt/easytax-au/.env
 
 # Node.js is in /usr/bin
-ExecStart=/usr/bin/node dist/main.js
+ExecStart=/usr/bin/node dist/src/main.js
 
 Restart=always
 RestartSec=10
@@ -414,6 +418,13 @@ curl http://localhost:3000/health
 # Expected output:
 # {"status":"ok","database":"connected","timestamp":"2026-01-09T..."}
 ```
+
+> **Database schema (automatic):** On first start the app runs its TypeORM
+> migrations against the empty database (`migrationsRun` is enabled), creating
+> all tables, then seeds default categories and providers. No manual schema
+> step is required. Future updates that add migrations apply them automatically
+> on the next service restart. To inspect or run migrations manually, use
+> `pnpm migration:show` / `pnpm migration:run`.
 
 ### 4.8 Configure nginx for Frontend
 

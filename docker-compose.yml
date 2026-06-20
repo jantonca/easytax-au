@@ -11,6 +11,8 @@ services:
       - '${DB_PORT:-5432}:5432'
     volumes:
       - easytax-au-pgdata:/var/lib/postgresql/data
+      # Enables the uuid-ossp extension on first init (schema uses uuid_generate_v4()).
+      - ./scripts/db-init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${DB_USERNAME:-postgres} -d ${DB_NAME:-easytax-au}']
       interval: 10s

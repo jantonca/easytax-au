@@ -16,6 +16,8 @@ dist/
 # Backups & Logs
 /backups/
 *.sql
+# ...but track committed DB init scripts (not backups/dumps)
+!scripts/db-init/*.sql
 *.gpg
 logs/
 

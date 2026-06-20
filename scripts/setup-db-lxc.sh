@@ -90,7 +90,12 @@ sudo -u postgres psql -c "CREATE USER $DB_USER WITH ENCRYPTED PASSWORD '$DB_PASS
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE \"$DB_NAME\" TO $DB_USER;"
 sudo -u postgres psql -d "$DB_NAME" -c "GRANT ALL ON SCHEMA public TO $DB_USER;"
 
-echo "  ✓ Database and user created"
+# Enable uuid-ossp extension (schema uses uuid_generate_v4() for primary keys).
+# Created here as the postgres superuser so the app never depends on having
+# extension-creation rights at runtime.
+sudo -u postgres psql -d "$DB_NAME" -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";"
+
+echo "  ✓ Database, user, and uuid-ossp extension created"
 
 echo ""
 echo "Step 4/6: Configuring PostgreSQL to accept remote connections..."

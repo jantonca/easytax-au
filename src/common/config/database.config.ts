@@ -1,21 +1,20 @@
 import { registerAs } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { dataSourceOptions } from '../../data-source';
 
 /**
- * Database configuration for PostgreSQL connection.
- * Reads from environment variables with sensible defaults for development.
+ * Database configuration for the NestJS TypeOrmModule.
+ *
+ * Builds on the shared {@link dataSourceOptions} (connection + entities +
+ * migrations) and adds runtime-only concerns. Schema is managed by migrations,
+ * never `synchronize`; `migrationsRun` applies any pending migrations on
+ * startup (safe for this single-instance deployment).
  */
 export default registerAs(
   'database',
   (): TypeOrmModuleOptions => ({
-    type: 'postgres',
-    host: process.env.DB_HOST ?? 'localhost',
-    port: parseInt(process.env.DB_PORT ?? '5432', 10),
-    username: process.env.DB_USERNAME ?? 'postgres',
-    password: process.env.DB_PASSWORD ?? 'postgres',
-    database: process.env.DB_NAME ?? 'easytax-au',
-    entities: [__dirname + '/../../modules/**/*.entity{.ts,.js}'],
-    synchronize: process.env.NODE_ENV !== 'production',
+    ...dataSourceOptions,
+    migrationsRun: true,
     logging: process.env.NODE_ENV === 'development',
   }),
 );
