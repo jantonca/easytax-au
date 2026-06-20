@@ -179,7 +179,7 @@ Group=easytax
 WorkingDirectory=/opt/easytax-au
 EnvironmentFile=/opt/easytax-au/.env
 
-ExecStart=/usr/bin/node dist/main.js
+ExecStart=/usr/bin/node dist/src/main.js
 
 Restart=always
 RestartSec=10

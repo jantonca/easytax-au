@@ -61,7 +61,7 @@ jobs:
         run: |
           echo "Checking build output..."
           ls -la dist/ || echo "dist/ not found"
-          ls -la dist/main.js || echo "main.js not found"
+          ls -la dist/src/main.js || echo "main.js not found"
 
       - name: Start backend
         run: |
