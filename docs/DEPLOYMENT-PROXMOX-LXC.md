@@ -57,7 +57,7 @@ This guide provides the most efficient way to run EasyTax-AU on Proxmox by using
 │  LXC 101: Database      │       │  LXC 102: Application   │
 │  ─────────────────────  │       │  ─────────────────────  │
 │                         │       │                         │
-│  PostgreSQL 15          │◄──────┤  Node.js 20 API         │
+│  PostgreSQL 15          │◄──────┤  Node.js 22 API         │
 │  Port: 5432             │       │  Port: 3000             │
 │  IP: 192.168.1.101      │       │                         │
 │                         │       │  nginx (frontend)       │
@@ -257,17 +257,17 @@ apt update && apt upgrade -y
 # Install required packages
 apt install curl git build-essential nginx postgresql-client -y
 
-# Install Node.js 20 via NodeSource
-curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+# Install Node.js 22 via NodeSource
+curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
 apt install nodejs -y
 
 # Verify Node.js
-node --version  # Should show v20.x
+node --version  # Should show v22.x
 npm --version
 
 # Enable and install pnpm
 corepack enable
-corepack prepare pnpm@latest --activate
+corepack prepare pnpm@11.8.0 --activate
 
 # Verify pnpm
 pnpm --version

@@ -82,9 +82,9 @@ echo "Step 2/10: Installing prerequisites..."
 apt install -y curl git build-essential nginx postgresql-client
 
 echo ""
-echo "Step 3/10: Installing Node.js 20..."
+echo "Step 3/10: Installing Node.js 22..."
 if ! command -v node &> /dev/null; then
-    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
     apt install -y nodejs
     echo "  ✓ Node.js installed"
 else
@@ -95,7 +95,7 @@ echo ""
 echo "Step 4/10: Installing pnpm..."
 if ! command -v pnpm &> /dev/null; then
     corepack enable
-    corepack prepare pnpm@latest --activate
+    corepack prepare pnpm@11.8.0 --activate
     echo "  ✓ pnpm installed ($(pnpm --version))"
 else
     echo "  pnpm already installed ($(pnpm --version))"

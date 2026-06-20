@@ -28,8 +28,8 @@ git clone https://github.com/YOUR_USERNAME/easytax-au.git
 cd easytax-au
 
 # 2. Set up Node.js (via fnm)
-fnm install 20
-fnm use 20
+fnm install 22
+fnm use 22
 
 # 3. Install dependencies
 pnpm install

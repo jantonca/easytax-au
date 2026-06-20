@@ -42,9 +42,9 @@ This document describes the system architecture, tech stack, and module organiza
 
 | Layer               | Technology      | Version        | Notes                            |
 | ------------------- | --------------- | -------------- | -------------------------------- |
-| **Runtime**         | Node.js         | 20 LTS         | Long-term support until Apr 2026 |
+| **Runtime**         | Node.js         | 22 LTS         | Long-term support until Apr 2027 |
 | **Node Manager**    | fnm             | Latest         | Fast Node Manager                |
-| **Package Manager** | pnpm            | 9.x            | Fast, disk-efficient             |
+| **Package Manager** | pnpm            | 11.x           | Fast, disk-efficient             |
 | **Framework**       | NestJS          | 10.x           | Modular Monolith                 |
 | **ORM**             | TypeORM         | 0.3.x          | With custom AES-256 transformers |
 | **Database**        | PostgreSQL      | 15-alpine      | Docker image                     |
@@ -595,9 +595,9 @@ export const apiClient = {
 # Install fnm (Fast Node Manager)
 curl -fsSL https://fnm.vercel.app/install | bash
 
-# Install Node.js 20 LTS
-fnm install 20
-fnm use 20
+# Install Node.js 22 LTS
+fnm install 22
+fnm use 22
 
 # Install pnpm globally
 npm install -g pnpm

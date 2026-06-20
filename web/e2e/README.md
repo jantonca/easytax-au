@@ -126,7 +126,7 @@ Tests assume the following seed data exists:
 
 E2E tests run automatically in CI via `.github/workflows/e2e-tests.yml`:
 - **Triggers**: On pull requests and pushes to main
-- **Environment**: Ubuntu Latest with Node 20, pnpm 10
+- **Environment**: Ubuntu Latest with Node 22, pnpm 11
 - **Database**: PostgreSQL 15 (via GitHub Actions service)
 - **Browser**: Chromium with system dependencies auto-installed
 - **Test execution**: 62 E2E tests (1 skipped) with retries and parallelization
