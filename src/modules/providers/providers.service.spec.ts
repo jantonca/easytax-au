@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { ProvidersService } from './providers.service';
 import { Provider } from './entities/provider.entity';
@@ -9,7 +8,6 @@ import { UpdateProviderDto } from './dto/update-provider.dto';
 
 describe('ProvidersService', () => {
   let service: ProvidersService;
-  let repository: Repository<Provider>;
 
   const mockProvider: Provider = {
     id: '123e4567-e89b-12d3-a456-426614174000',
@@ -52,7 +50,6 @@ describe('ProvidersService', () => {
     }).compile();
 
     service = module.get<ProvidersService>(ProvidersService);
-    repository = module.get<Repository<Provider>>(getRepositoryToken(Provider));
 
     // Reset all mocks before each test
     jest.clearAllMocks();
