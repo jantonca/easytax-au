@@ -6,7 +6,6 @@ import { formatDate } from '@/lib/currency';
 import { CreateClientModal } from './create-client-modal';
 
 type BaseCsvRowResultDto = components['schemas']['CsvRowResultDto'];
-type Client = components['schemas']['Client'];
 
 // Extend CsvRowResultDto to include income-specific fields
 type CsvRowResultDto = BaseCsvRowResultDto & {
@@ -87,7 +86,7 @@ export function IncomePreviewTable({
     setIsModalOpen(true);
   };
 
-  const handleClientCreated = (_client: Client): void => {
+  const handleClientCreated = (): void => {
     setIsModalOpen(false);
     if (onClientCreated) {
       onClientCreated();

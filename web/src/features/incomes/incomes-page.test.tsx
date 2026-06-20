@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 import type { ClientDto, IncomeResponseDto } from '@/lib/api-client';
 import { IncomesPage } from '@/features/incomes/incomes-page';
@@ -99,7 +100,11 @@ describe('IncomesPage', () => {
       mutate: vi.fn(),
     } as unknown as ReturnType<typeof useMarkUnpaid>);
 
-    render(<IncomesPage />);
+    render(
+      <MemoryRouter>
+        <IncomesPage />
+      </MemoryRouter>,
+    );
 
     expect(screen.getByRole('heading', { level: 1, name: 'Incomes' })).toBeInTheDocument();
     expect(screen.getByText('Sorted by date (newest first)')).toBeInTheDocument();
@@ -144,7 +149,11 @@ describe('IncomesPage', () => {
       mutate: vi.fn(),
     } as unknown as ReturnType<typeof useMarkUnpaid>);
 
-    render(<IncomesPage />);
+    render(
+      <MemoryRouter>
+        <IncomesPage />
+      </MemoryRouter>,
+    );
 
     expect(screen.getByLabelText('Loading incomes')).toBeInTheDocument();
   });
@@ -183,7 +192,11 @@ describe('IncomesPage', () => {
       mutate: vi.fn(),
     } as unknown as ReturnType<typeof useMarkUnpaid>);
 
-    render(<IncomesPage />);
+    render(
+      <MemoryRouter>
+        <IncomesPage />
+      </MemoryRouter>,
+    );
 
     expect(
       screen.getByText("We couldn't load your incomes right now. Please try again shortly."),
@@ -224,7 +237,11 @@ describe('IncomesPage', () => {
       mutate: vi.fn(),
     } as unknown as ReturnType<typeof useMarkUnpaid>);
 
-    render(<IncomesPage />);
+    render(
+      <MemoryRouter>
+        <IncomesPage />
+      </MemoryRouter>,
+    );
 
     expect(screen.getByText('No incomes yet')).toBeInTheDocument();
     expect(
@@ -328,7 +345,11 @@ describe('IncomesPage', () => {
       mutate: vi.fn(),
     } as unknown as ReturnType<typeof useMarkUnpaid>);
 
-    render(<IncomesPage />);
+    render(
+      <MemoryRouter>
+        <IncomesPage />
+      </MemoryRouter>,
+    );
 
     // Select Client B in the filter
     await user.selectOptions(screen.getByLabelText('Client'), 'client-b');
@@ -416,7 +437,11 @@ describe('IncomesPage', () => {
       mutate: vi.fn(),
     } as unknown as ReturnType<typeof useMarkUnpaid>);
 
-    render(<IncomesPage />);
+    render(
+      <MemoryRouter>
+        <IncomesPage />
+      </MemoryRouter>,
+    );
 
     // Select "Unpaid only" in the filter
     await user.selectOptions(screen.getByLabelText('Payment status'), 'unpaid');
@@ -464,7 +489,11 @@ describe('IncomesPage', () => {
       mutate: vi.fn(),
     } as unknown as ReturnType<typeof useMarkUnpaid>);
 
-    render(<IncomesPage />);
+    render(
+      <MemoryRouter>
+        <IncomesPage />
+      </MemoryRouter>,
+    );
 
     const addButton = screen.getByRole('button', { name: 'Add income' });
     await user.click(addButton);

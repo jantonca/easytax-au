@@ -12,7 +12,7 @@ import {
 
 interface ProviderFormProps {
   categories: CategoryDto[];
-  initialValues?: ProviderDto;
+  initialValues?: Pick<ProviderDto, 'name' | 'isInternational' | 'defaultCategoryId' | 'abnArn'>;
   providerId?: string;
   onSuccess?: () => void;
 }

@@ -1,14 +1,11 @@
 import type { ReactElement } from 'react';
 import { X } from 'lucide-react';
 import { ClientForm } from '@/features/settings/clients/components/client-form';
-import type { components } from '@shared/types';
-
-type Client = components['schemas']['Client'];
 
 interface CreateClientModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (client: Client) => void;
+  onSuccess: () => void;
   suggestedName?: string;
 }
 
@@ -33,8 +30,8 @@ export function CreateClientModal({
 }: CreateClientModalProps): ReactElement | null {
   if (!isOpen) return null;
 
-  const handleSuccess = (client: Client): void => {
-    onSuccess(client);
+  const handleSuccess = (): void => {
+    onSuccess();
     onClose();
   };
 

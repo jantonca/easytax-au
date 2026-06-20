@@ -1194,7 +1194,7 @@ export interface components {
              * @description Description (decrypted)
              * @example GitHub Copilot subscription
              */
-            description?: Record<string, never>;
+            description?: string;
             /**
              * @description Amount in cents (inc GST)
              * @example 11000
@@ -1219,7 +1219,7 @@ export interface components {
              * @description Receipt file reference
              * @example receipt-github-2024-01.pdf
              */
-            fileRef?: Record<string, never>;
+            fileRef?: string;
             /**
              * @description Provider UUID
              * @example 123e4567-e89b-12d3-a456-426614174000
@@ -1234,7 +1234,7 @@ export interface components {
              * @description Import job UUID (null if manually created)
              * @example null
              */
-            importJobId?: Record<string, never>;
+            importJobId?: string;
             /**
              * @description Financial Year (year in which FY ends)
              * @example 2026
@@ -1457,7 +1457,7 @@ export interface components {
             /** @description Name of recurring expense */
             name: string;
             /** @description Description template */
-            description?: Record<string, never>;
+            description?: string;
             /** @description Amount in cents */
             amountCents: number;
             /** @description GST in cents */
@@ -1476,11 +1476,11 @@ export interface components {
             /** @description Start date */
             startDate: string;
             /** @description End date */
-            endDate?: Record<string, never>;
+            endDate?: string;
             /** @description Whether template is active */
             isActive: boolean;
             /** @description Date of last generated expense */
-            lastGeneratedDate?: Record<string, never>;
+            lastGeneratedDate?: string;
             /** @description Next due date */
             nextDueDate: string;
             /** @description Provider ID */

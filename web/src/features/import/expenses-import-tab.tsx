@@ -237,7 +237,8 @@ export function ExpensesImportTab(): ReactElement {
               if (selectedFile) {
                 previewMutation.mutate({
                   file: selectedFile,
-                  source,
+                  // 'manual' is equivalent to 'custom' for the API
+                  source: source === 'manual' ? 'custom' : source,
                   matchThreshold: 0.6,
                   skipDuplicates: true,
                 });

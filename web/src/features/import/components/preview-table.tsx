@@ -6,7 +6,6 @@ import { formatDate } from '@/lib/currency';
 import { CreateProviderModal } from './create-provider-modal';
 
 type CsvRowResultDto = components['schemas']['CsvRowResultDto'];
-type Provider = components['schemas']['Provider'];
 
 interface PreviewTableProps {
   rows: CsvRowResultDto[];
@@ -76,7 +75,7 @@ export function PreviewTable({
     setIsModalOpen(true);
   };
 
-  const handleProviderCreated = (_provider: Provider): void => {
+  const handleProviderCreated = (): void => {
     setIsModalOpen(false);
     if (onProviderCreated) {
       onProviderCreated();

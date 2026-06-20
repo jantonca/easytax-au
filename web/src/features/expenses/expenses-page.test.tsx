@@ -1,10 +1,14 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CategoryDto, ExpenseResponseDto, ProviderDto } from '@/lib/api-client';
 import { ExpensesPage } from '@/features/expenses/expenses-page';
 import { useExpenses } from '@/features/expenses/hooks/use-expenses';
-import { useDeleteExpense } from '@/features/expenses/hooks/use-expense-mutations';
+import {
+  useDeleteExpense,
+  useUpdateExpense,
+} from '@/features/expenses/hooks/use-expense-mutations';
 import { useCategories } from '@/hooks/use-categories';
 import { useProviders } from '@/hooks/use-providers';
 
@@ -39,8 +43,16 @@ const mockedUseCategories = vi.mocked(
 );
 
 const mockedUseDeleteExpense = vi.mocked(useDeleteExpense);
+const mockedUseUpdateExpense = vi.mocked(useUpdateExpense);
 
 describe('ExpensesPage', () => {
+  beforeEach(() => {
+    mockedUseUpdateExpense.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as unknown as ReturnType<typeof useUpdateExpense>);
+  });
+
   it('renders expenses table rows when data is available', () => {
     const expenses: ExpenseResponseDto[] = [
       {
@@ -85,7 +97,11 @@ describe('ExpensesPage', () => {
       isPending: false,
     } as unknown as ReturnType<typeof useDeleteExpense>);
 
-    render(<ExpensesPage />);
+    render(
+      <MemoryRouter>
+        <ExpensesPage />
+      </MemoryRouter>,
+    );
 
     expect(screen.getByRole('heading', { level: 1, name: 'Expenses' })).toBeInTheDocument();
     expect(screen.getByText('Sorted by date (newest first)')).toBeInTheDocument();
@@ -113,7 +129,11 @@ describe('ExpensesPage', () => {
       isPending: false,
     } as unknown as ReturnType<typeof useDeleteExpense>);
 
-    render(<ExpensesPage />);
+    render(
+      <MemoryRouter>
+        <ExpensesPage />
+      </MemoryRouter>,
+    );
 
     expect(screen.getByLabelText('Loading expenses')).toBeInTheDocument();
   });
@@ -138,7 +158,11 @@ describe('ExpensesPage', () => {
       isPending: false,
     } as unknown as ReturnType<typeof useDeleteExpense>);
 
-    render(<ExpensesPage />);
+    render(
+      <MemoryRouter>
+        <ExpensesPage />
+      </MemoryRouter>,
+    );
 
     expect(
       screen.getByText("We couldn't load your expenses right now. Please try again shortly."),
@@ -165,7 +189,11 @@ describe('ExpensesPage', () => {
       isPending: false,
     } as unknown as ReturnType<typeof useDeleteExpense>);
 
-    render(<ExpensesPage />);
+    render(
+      <MemoryRouter>
+        <ExpensesPage />
+      </MemoryRouter>,
+    );
 
     expect(screen.getByText('No expenses yet')).toBeInTheDocument();
     expect(
@@ -261,7 +289,11 @@ describe('ExpensesPage', () => {
       isPending: false,
     } as unknown as ReturnType<typeof useDeleteExpense>);
 
-    render(<ExpensesPage />);
+    render(
+      <MemoryRouter>
+        <ExpensesPage />
+      </MemoryRouter>,
+    );
 
     // Select Provider B in the filter
     await user.selectOptions(screen.getByLabelText('Provider'), 'prov-b');

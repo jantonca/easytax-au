@@ -39,9 +39,9 @@ export function SmartFileDropzone({
       if (detectedType === 'unknown') {
         showToast({
           title: 'Unable to detect CSV type',
-          message:
+          description:
             'Could not determine if this is an expense or income CSV. Please ensure your file has the correct headers.',
-          type: 'error',
+          variant: 'error',
         });
         // Still allow the user to proceed manually
         onFileSelect(file);
@@ -54,8 +54,8 @@ export function SmartFileDropzone({
 
         showToast({
           title: 'Auto-detected CSV type',
-          message: `This appears to be an ${detectedType} CSV. Redirecting to ${detectedType}s tab...`,
-          type: 'info',
+          description: `This appears to be an ${detectedType} CSV. Redirecting to ${detectedType}s tab...`,
+          variant: 'default',
         });
 
         // Navigate to correct tab after a brief delay for user to see the toast
@@ -74,8 +74,8 @@ export function SmartFileDropzone({
     reader.onerror = (): void => {
       showToast({
         title: 'File read error',
-        message: 'Could not read the CSV file. Please try again.',
-        type: 'error',
+        description: 'Could not read the CSV file. Please try again.',
+        variant: 'error',
       });
     };
 

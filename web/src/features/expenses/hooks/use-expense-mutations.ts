@@ -86,8 +86,8 @@ export function useDeleteExpense(): UseMutationResult<void, unknown, string> {
               description: deletedExpense.description,
               amountCents: deletedExpense.amountCents,
               gstCents: deletedExpense.gstCents,
-              providerId: deletedExpense.provider.id,
-              categoryId: deletedExpense.category.id,
+              providerId: deletedExpense.providerId,
+              categoryId: deletedExpense.categoryId,
               bizPercent: deletedExpense.bizPercent,
               ...(deletedExpense.fileRef && { fileRef: deletedExpense.fileRef }),
             };
