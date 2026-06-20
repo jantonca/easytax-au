@@ -420,7 +420,11 @@ export function IncomesTable({
                         type="checkbox"
                         checked={isSelected}
                         onChange={(e) =>
-                          handleRowSelect(income.id, index, Boolean(e.nativeEvent.shiftKey))
+                          handleRowSelect(
+                            income.id,
+                            index,
+                            Boolean((e.nativeEvent as MouseEvent).shiftKey),
+                          )
                         }
                         aria-label={`Select income: ${description}`}
                         className="h-4 w-4 cursor-pointer rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 dark:border-slate-700 dark:bg-slate-900"

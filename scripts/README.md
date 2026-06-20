@@ -70,7 +70,7 @@ chmod +x /root/setup-app-lxc.sh
 ```
 
 **What it does:**
-- Installs Node.js 20, pnpm, nginx, git
+- Installs Node.js 22, pnpm, nginx, git
 - Clones the repository
 - Builds backend and frontend
 - Creates systemd service
@@ -192,7 +192,7 @@ psql -h 192.168.1.101 -U easytax -d easytax-au
 
 **Full feature list:**
 - ✅ System updates
-- ✅ Node.js 20 installation (via NodeSource)
+- ✅ Node.js 22 installation (via NodeSource)
 - ✅ pnpm installation
 - ✅ nginx installation
 - ✅ Application user creation (`easytax`)
@@ -344,7 +344,7 @@ chmod +x /root/update-app.sh
 **Solution:**
 ```bash
 # Check for Node.js/pnpm issues
-node --version  # Should be v20.x
+node --version  # Should be v22.x
 pnpm --version
 
 # Try manual update

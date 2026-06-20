@@ -35,6 +35,14 @@ Frontend (`web/`):
   backend first**, then run `pnpm run generate:types` (it reads the live
   OpenAPI endpoint at `http://localhost:3000/api/docs-json` → `shared/types`)
   before frontend work.
+- **Migrations (schema is migration-managed):** `synchronize` is **off
+  everywhere** — entity changes do **not** auto-apply. After editing an
+  entity, run `pnpm run migration:generate src/migrations/<Name>` (backend
+  not required; needs a reachable DB), review the generated SQL, and commit
+  it. The app runs pending migrations on startup (`migrationsRun: true`);
+  `pnpm run migration:run` / `migration:revert` / `migration:show` are
+  available for manual control. DB connection config lives in
+  `src/data-source.ts` (shared by the app and the TypeORM CLI).
 - **Australian tax domain (critical):** Australian FY is **July 1 – June 30**
   (not calendar year). GST is **10%** ("GST", never "sales tax"). Reporting
   is **BAS** (never "IRS"). FORBIDDEN US terms: IRS, sales tax, W-2,

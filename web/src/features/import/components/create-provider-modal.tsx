@@ -2,14 +2,11 @@ import type { ReactElement } from 'react';
 import { X, Loader2 } from 'lucide-react';
 import { ProviderForm } from '@/features/settings/providers/components/provider-form';
 import { useCategories } from '@/hooks/use-categories';
-import type { components } from '@shared/types';
-
-type Provider = components['schemas']['Provider'];
 
 interface CreateProviderModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (provider: Provider) => void;
+  onSuccess: () => void;
   suggestedName?: string;
 }
 
@@ -36,8 +33,8 @@ export function CreateProviderModal({
 
   if (!isOpen) return null;
 
-  const handleSuccess = (provider: Provider): void => {
-    onSuccess(provider);
+  const handleSuccess = (): void => {
+    onSuccess();
     onClose();
   };
 

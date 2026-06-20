@@ -82,7 +82,7 @@ scripts/
 ./setup-app-lxc.sh
   ↓
 - System updates
-- Node.js 20 installation (via NodeSource)
+- Node.js 22 installation (via NodeSource)
 - pnpm installation
 - nginx installation
 - User creation

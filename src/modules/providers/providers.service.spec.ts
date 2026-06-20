@@ -50,7 +50,6 @@ describe('ProvidersService', () => {
     }).compile();
 
     service = module.get<ProvidersService>(ProvidersService);
-    repository = module.get<Repository<Provider>>(getRepositoryToken(Provider));
 
     // Reset all mocks before each test
     jest.clearAllMocks();

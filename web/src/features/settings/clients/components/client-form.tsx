@@ -10,7 +10,7 @@ import {
 } from '@/features/settings/clients/hooks/use-client-mutations';
 
 interface ClientFormProps {
-  initialValues?: ClientDto;
+  initialValues?: Pick<ClientDto, 'name' | 'abn' | 'isPsiEligible'>;
   clientId?: string;
   onSuccess?: () => void;
 }

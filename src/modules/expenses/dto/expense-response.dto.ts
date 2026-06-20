@@ -49,6 +49,7 @@ export class ExpenseResponseDto {
   @ApiPropertyOptional({
     description: 'Description (decrypted)',
     example: 'GitHub Copilot subscription',
+    type: String,
   })
   description?: string | null;
 
@@ -94,6 +95,7 @@ export class ExpenseResponseDto {
   @ApiPropertyOptional({
     description: 'Receipt file reference',
     example: 'receipt-github-2024-01.pdf',
+    type: String,
   })
   fileRef?: string | null;
 
@@ -121,6 +123,7 @@ export class ExpenseResponseDto {
   @ApiPropertyOptional({
     description: 'Import job UUID (null if manually created)',
     example: null,
+    type: String,
   })
   importJobId?: string | null;
 

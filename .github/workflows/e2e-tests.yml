@@ -8,8 +8,8 @@ on:
   workflow_dispatch: # Allow manual triggering
 
 env:
-  NODE_VERSION: '20'
-  PNPM_VERSION: '10'
+  NODE_VERSION: '22'
+  PNPM_VERSION: '11.8.0'
 
 jobs:
   e2e-tests:
@@ -61,7 +61,7 @@ jobs:
         run: |
           echo "Checking build output..."
           ls -la dist/ || echo "dist/ not found"
-          ls -la dist/main.js || echo "main.js not found"
+          ls -la dist/src/main.js || echo "main.js not found"
 
       - name: Start backend
         run: |

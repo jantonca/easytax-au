@@ -91,6 +91,7 @@ export function useDeleteRecurring(): UseMutationResult<void, Error, string> {
               name: deletedRecurring.name,
               description: deletedRecurring.description,
               amountCents: deletedRecurring.amountCents,
+              currency: deletedRecurring.currency,
               gstCents: deletedRecurring.gstCents,
               bizPercent: deletedRecurring.bizPercent,
               providerId: deletedRecurring.providerId,

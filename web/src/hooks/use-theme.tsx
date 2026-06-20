@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 
 type Theme = 'light' | 'dark' | 'system';
 
@@ -63,7 +70,7 @@ function applyTheme(effectiveTheme: 'light' | 'dark'): void {
 /**
  * ThemeProvider component that manages theme state and persistence
  */
-export function ThemeProvider({ children }: { children: ReactNode }): JSX.Element {
+export function ThemeProvider({ children }: { children: ReactNode }): ReactElement {
   const [theme, setThemeState] = useState<Theme>(getInitialTheme);
   const [effectiveTheme, setEffectiveTheme] = useState<'light' | 'dark'>(() => {
     const initial = resolveEffectiveTheme(getInitialTheme());

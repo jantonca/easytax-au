@@ -37,10 +37,8 @@ export function RecurringForm({
       ? {
           name: initialValues.name,
           description:
-            initialValues.description &&
-            typeof initialValues.description === 'string' &&
-            (initialValues.description as string).length > 0
-              ? (initialValues.description as string)
+            initialValues.description && initialValues.description.length > 0
+              ? initialValues.description
               : undefined,
           amount: formatCents(initialValues.amountCents),
           gstAmount: formatCents(initialValues.gstCents),
