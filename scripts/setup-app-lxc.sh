@@ -79,7 +79,9 @@ apt update && apt upgrade -y
 
 echo ""
 echo "Step 2/10: Installing prerequisites..."
-apt install -y curl git build-essential nginx postgresql-client
+# sudo is not present in the minimal Debian LXC template but is used below to
+# run build steps as the app user; install it with the other prerequisites.
+apt install -y curl git build-essential nginx postgresql-client sudo
 
 echo ""
 echo "Step 3/10: Installing Node.js 22..."
@@ -210,13 +212,10 @@ rm -f /etc/nginx/sites-enabled/default
 # Create EasyTax-AU nginx config
 cat > /etc/nginx/sites-available/easytax-au << 'EOF'
 # EasyTax-AU nginx Configuration
-
-# Gzip compression
-gzip on;
-gzip_vary on;
-gzip_proxied any;
-gzip_comp_level 6;
-gzip_types text/plain text/css text/xml text/javascript application/json application/javascript application/xml+rss application/rss+xml;
+# Note: gzip is already enabled in the distro's /etc/nginx/nginx.conf (http
+# context). Re-declaring it here, where sites-enabled is also included, makes
+# `nginx -t` fail with "gzip directive is duplicate", so it is intentionally
+# omitted.
 
 server {
     listen 80;
