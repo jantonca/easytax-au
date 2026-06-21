@@ -26,9 +26,9 @@ This guide provides the most efficient way to run EasyTax-AU on Proxmox by using
 **For the fastest setup, use the provided automation scripts:**
 
 1. **Create two LXC containers** in Proxmox (see [Prerequisites](#2-prerequisites) for specs)
-2. **Run database setup:** Copy and run `scripts/setup-db-lxc.sh` in LXC 101
-3. **Run application setup:** Copy and run `scripts/setup-app-lxc.sh` in LXC 102
-4. **Done!** Access the app at `http://192.168.1.102`
+2. **Run database setup:** Copy and run `scripts/setup-db-lxc.sh` in the database LXC
+3. **Run application setup:** Copy and run `scripts/setup-app-lxc.sh` in the application LXC
+4. **Done!** Access the app at `http://<app-lxc-ip>` (e.g. `http://192.168.1.102`)
 
 **Detailed automation guide:** [scripts/README.md](../scripts/README.md)
 
@@ -69,6 +69,10 @@ This guide provides the most efficient way to run EasyTax-AU on Proxmox by using
 └─────────────────────────┘       └─────────────────────────┘
 ```
 
+> CT IDs and IPs above are **examples**. Pick free CT IDs (check `pct list` —
+> `101` is a common default that may already be in use) and use IPs or DHCP
+> reservations that fit your LAN.
+
 ### Why This Approach?
 
 **Performance Benefits:**
@@ -88,16 +92,25 @@ This guide provides the most efficient way to run EasyTax-AU on Proxmox by using
 
 ### On Proxmox Host
 
-- Proxmox VE 7.x or 8.x
-- Ubuntu 22.04 LXC template downloaded
-- Available IP addresses on your LAN (e.g., 192.168.1.101-102)
+- Proxmox VE 7.x, 8.x, or 9.x
+- **Debian 12 LXC template** downloaded (the setup scripts assume the Debian 12
+  default of PostgreSQL 15, matching the `/etc/postgresql/15` paths used
+  throughout this guide)
+- Two **free** CT IDs — check `pct list` first; the IDs `101`/`102` used as
+  examples below may already be taken on your host
+- Available static IP addresses on your LAN (e.g., 192.168.1.101-102), or DHCP
+  reservations
 
-**Download Ubuntu template:**
+**Download the Debian 12 template:**
 ```bash
 # On Proxmox host shell
 pveam update
-pveam download local ubuntu-22.04-standard_22.04-1_amd64.tar.zst
+pveam download local debian-12-standard_12.7-1_amd64.tar.zst
 ```
+
+> **Note on the minimal Debian template:** it ships without `sudo` or `curl`.
+> The automated scripts install these themselves; if you follow the manual
+> steps below, install them where needed (`apt install -y sudo curl`).
 
 ---
 
@@ -106,9 +119,9 @@ pveam download local ubuntu-22.04-standard_22.04-1_amd64.tar.zst
 ### 3.1 Create Database Container
 
 **In Proxmox UI:**
-1. Create CT → Select Ubuntu 22.04 template
+1. Create CT → Select the **Debian 12** template
 2. **Hostname:** `easytax-db`
-3. **CT ID:** 101 (or your preferred ID)
+3. **CT ID:** 101 (example — pick any **free** ID; check `pct list` first)
 4. **Root password:** Set a strong password
 5. **Resources:**
    - CPU: 1 core
@@ -224,9 +237,9 @@ exit
 ### 4.1 Create Application Container
 
 **In Proxmox UI:**
-1. Create CT → Select Ubuntu 22.04 template
+1. Create CT → Select the **Debian 12** template
 2. **Hostname:** `easytax-app`
-3. **CT ID:** 102 (or your preferred ID)
+3. **CT ID:** 102 (example — pick any **free** ID; check `pct list` first)
 4. **Root password:** Set a strong password
 5. **Resources:**
    - CPU: 2 cores
@@ -436,13 +449,9 @@ rm /etc/nginx/sites-enabled/default
 # Create EasyTax-AU nginx config
 cat > /etc/nginx/sites-available/easytax-au << 'EOF'
 # EasyTax-AU nginx Configuration
-
-# Gzip compression
-gzip on;
-gzip_vary on;
-gzip_proxied any;
-gzip_comp_level 6;
-gzip_types text/plain text/css text/xml text/javascript application/json application/javascript application/xml+rss application/rss+xml;
+# Note: gzip is already enabled in Debian's /etc/nginx/nginx.conf (http
+# context). Re-declaring it here makes "nginx -t" fail with a duplicate gzip
+# directive, so it is intentionally omitted.
 
 server {
     listen 80;
@@ -1311,4 +1320,4 @@ vzdump 102 --mode snapshot
 
 ---
 
-**Last Updated:** 2026-01-09
+**Last Updated:** 2026-06-21
