@@ -72,7 +72,9 @@ apt update && apt upgrade -y
 
 echo ""
 echo "Step 2/6: Installing PostgreSQL..."
-apt install -y postgresql postgresql-contrib
+# sudo is not present in the minimal Debian LXC template but is used below to
+# run psql as the postgres user; install it alongside PostgreSQL.
+apt install -y postgresql postgresql-contrib sudo
 
 echo ""
 echo "Step 3/6: Creating database and user..."
