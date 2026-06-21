@@ -84,9 +84,13 @@ sleep 2
 # Create database
 sudo -u postgres createdb "$DB_NAME" 2>/dev/null || echo "  Database already exists"
 
-# Create user with password
-sudo -u postgres psql -c "CREATE USER $DB_USER WITH ENCRYPTED PASSWORD '$DB_PASSWORD';" 2>/dev/null || \
-    sudo -u postgres psql -c "ALTER USER $DB_USER WITH ENCRYPTED PASSWORD '$DB_PASSWORD';"
+# Create user with password.
+# Escape single quotes for the SQL string literal: a quote in the password
+# would otherwise break the statement or alter the SQL run as the postgres
+# superuser. PostgreSQL escapes a single quote by doubling it.
+DB_PASSWORD_SQL=${DB_PASSWORD//\'/\'\'}
+sudo -u postgres psql -c "CREATE USER $DB_USER WITH ENCRYPTED PASSWORD '$DB_PASSWORD_SQL';" 2>/dev/null || \
+    sudo -u postgres psql -c "ALTER USER $DB_USER WITH ENCRYPTED PASSWORD '$DB_PASSWORD_SQL';"
 
 # Grant privileges
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE \"$DB_NAME\" TO $DB_USER;"
@@ -116,8 +120,9 @@ echo "Step 5/6: Configuring client authentication..."
 # Configure pg_hba.conf to allow application LXC
 PG_HBA="/etc/postgresql/15/main/pg_hba.conf"
 
-# Check if rule already exists
-if grep -q "$APP_LXC_IP" "$PG_HBA"; then
+# Check if rule already exists (fixed-string match: an IP's dots are regex
+# metacharacters and could otherwise match a different line and skip the rule)
+if grep -qF "$APP_LXC_IP" "$PG_HBA"; then
     echo "  Authentication rule already exists"
 else
     # Add rule before the first "local" line
