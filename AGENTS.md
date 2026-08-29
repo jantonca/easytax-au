@@ -85,13 +85,11 @@ runs ESLint with `--fix` — it **mutates files**, so it is not a read-only
 check; run it when autofix is acceptable, then inspect the diff.
 Frontend: `pnpm --filter web lint && pnpm --filter web test && pnpm --filter web build`
 (frontend `lint` is `eslint .`, non-mutating).
-Run relevant Playwright e2e for user-facing flows. Inherited rules apply
-primarily to new and changed work.
+Run relevant Playwright e2e for user-facing flows.
 
-## Inherited rules
-Follow:
-- /home/jantonca/Projects/github/jantonca/personal-ai-assistant/templates/core-rules.md
-- /home/jantonca/Projects/github/jantonca/personal-ai-assistant/domains/backend.md
-- /home/jantonca/Projects/github/jantonca/personal-ai-assistant/domains/frontend.md
-
-Project-specific rules above override these.
+## Precedence
+The global safety kernel loads automatically in every session — it needs no
+reference here, and a bullet listing an absolute path does nothing because no
+tool fetches it. Project rules above refine the kernel and cannot weaken its
+secrets, approval or OS rules. They apply primarily to new and changed work,
+not as a mandate to refactor pre-existing code in passing.
