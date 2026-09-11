@@ -1,3 +1,8 @@
+// Guard runs before anything reads application configuration.
+import { assertDisposableDatabaseTarget } from './guards/disposable-db-guard';
+
+assertDisposableDatabaseTarget();
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
@@ -14,6 +19,14 @@ describe('AppController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+  });
+
+  // Every initialized application must be torn down, otherwise the TypeORM
+  // pool can keep the Jest process alive until the job timeout (S05).
+  afterEach(async () => {
+    if (app) {
+      await app.close();
+    }
   });
 
   it('/ (GET)', () => {

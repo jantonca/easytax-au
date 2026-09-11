@@ -1,4 +1,4 @@
-name: E2E Tests
+name: CI
 
 on:
   pull_request:
@@ -12,10 +12,93 @@ env:
   PNPM_VERSION: '11.8.0'
 
 jobs:
+  backend-checks:
+    name: Backend lint, unit tests, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint backend (non-autofix)
+        run: pnpm exec eslint 'src/**/*.ts' 'test/**/*.ts'
+
+      - name: Backend unit tests with coverage
+        run: pnpm run test:cov --runInBand
+
+      - name: Upload backend coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: coverage/
+          retention-days: 7
+
+      - name: Production build
+        run: pnpm run build
+
+      # Fails the job if the entrypoint was not produced; no error masking.
+      - name: Verify backend entrypoint exists
+        run: test -f dist/src/main.js
+
+  frontend-checks:
+    name: Frontend lint, unit tests, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint frontend
+        run: pnpm --filter web lint
+
+      - name: Frontend unit tests (one-shot)
+        run: pnpm --filter web exec vitest run
+        env:
+          CI: true
+
+      - name: Production build
+        run: pnpm --filter web build
+
+      # Fails the job if the bundle was not produced; no error masking.
+      - name: Verify frontend bundle exists
+        run: test -f web/dist/index.html
+
   e2e-tests:
     name: Playwright E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    needs: [backend-checks, frontend-checks]
 
     services:
       postgres:
@@ -57,11 +140,9 @@ jobs:
       - name: Build backend
         run: pnpm build
 
-      - name: Verify build output
-        run: |
-          echo "Checking build output..."
-          ls -la dist/ || echo "dist/ not found"
-          ls -la dist/src/main.js || echo "main.js not found"
+      # Fails the job if the entrypoint was not produced; no error masking.
+      - name: Verify backend entrypoint exists
+        run: test -f dist/src/main.js
 
       - name: Start backend
         run: |
@@ -75,7 +156,9 @@ jobs:
           DB_USERNAME: easytax
           DB_PASSWORD: easytax_dev
           DB_NAME: easytax_au
-          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY || '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef' }}
+          # Synthetic CI-only encryption key literal (never a production
+          # secret; no repository secret is referenced here).
+          ENCRYPTION_KEY: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
 
       - name: Wait for backend to be ready
         run: |
@@ -117,9 +200,72 @@ jobs:
           path: web/test-results/
           retention-days: 7
 
+      # Terminates the backend this job started; "|| true" only tolerates an
+      # already-exited process so cleanup itself never masks failures above.
       - name: Stop backend
         if: always()
         run: |
           if [ -f backend.pid ]; then
-            kill $(cat backend.pid) || true
+            kill "$(cat backend.pid)" || true
           fi
+          sleep 2
+          pkill -f "dist/src/main.js" || true
+
+  backend-integration:
+    name: Backend integration tests (disposable DB)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [backend-checks]
+
+    services:
+      # Dedicated ephemeral database for the jest integration suites; its data
+      # lifecycle is fully separate from the Playwright job's fixtures. The
+      # provisioned name must match DB_NAME below exactly (the suites refuse
+      # non-disposable names).
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: easytax_it
+          POSTGRES_PASSWORD: easytax_it_dev
+          POSTGRES_DB: easytax_it_au_disposable_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # The integration suites (test/bas-payment-date.e2e-spec.ts,
+      # test/multer-hardening.e2e-spec.ts, test/app.e2e-spec.ts) refuse to run
+      # against a database whose name is not marked disposable.
+      - name: Run backend integration tests (one-shot)
+        run: pnpm run test:e2e --runInBand
+        env:
+          NODE_ENV: test
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USERNAME: easytax_it
+          DB_PASSWORD: easytax_it_dev
+          DB_NAME: easytax_it_au_disposable_test
+          # Synthetic CI-only encryption key literal (never a production
+          # secret; no repository secret is referenced here).
+          ENCRYPTION_KEY: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
