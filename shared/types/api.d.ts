@@ -516,7 +516,10 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Mark income as paid */
+        /**
+         * Mark income as paid
+         * @description Marks the income as paid and records the date payment was received (required for cash-basis BAS attribution).
+         */
         patch: operations["IncomesController_markAsPaid"];
         trace?: never;
     };
@@ -807,6 +810,21 @@ export interface components {
              * @example 12
              */
             expenseCount: number;
+            /**
+             * @description Accounting basis (CASH or ACCRUAL)
+             * @example ACCRUAL
+             */
+            basis: string;
+            /**
+             * @description Paid incomes with unknown receipt date (excluded from CASH attribution)
+             * @example 0
+             */
+            unreconciledPaidIncomeCount: number;
+            /**
+             * @description Total in cents of paid incomes with unknown receipt date
+             * @example 0
+             */
+            unreconciledPaidIncomeTotalCents: number;
         };
         CreateCategoryDto: {
             /**
@@ -877,10 +895,10 @@ export interface components {
         };
         CsvImportResponseDto: {
             /**
-             * @description Import job ID for tracking
+             * @description Import job ID for tracking (null for dry-run previews, which persist nothing)
              * @example 123e4567-e89b-12d3-a456-426614174000
              */
-            importJobId: string;
+            importJobId: string | null;
             /**
              * @description Total rows in CSV
              * @example 10
@@ -1015,10 +1033,10 @@ export interface components {
         };
         IncomeCsvImportResponseDto: {
             /**
-             * @description Import job ID for tracking
+             * @description Import job ID for tracking (null for dry-run previews, which persist nothing)
              * @example 123e4567-e89b-12d3-a456-426614174000
              */
-            importJobId: string;
+            importJobId: string | null;
             /**
              * @description Total rows in CSV
              * @example 10
@@ -1194,7 +1212,7 @@ export interface components {
              * @description Description (decrypted)
              * @example GitHub Copilot subscription
              */
-            description?: string;
+            description?: string | null;
             /**
              * @description Amount in cents (inc GST)
              * @example 11000
@@ -1219,7 +1237,7 @@ export interface components {
              * @description Receipt file reference
              * @example receipt-github-2024-01.pdf
              */
-            fileRef?: string;
+            fileRef?: string | null;
             /**
              * @description Provider UUID
              * @example 123e4567-e89b-12d3-a456-426614174000
@@ -1234,7 +1252,7 @@ export interface components {
              * @description Import job UUID (null if manually created)
              * @example null
              */
-            importJobId?: string;
+            importJobId?: string | null;
             /**
              * @description Financial Year (year in which FY ends)
              * @example 2026
@@ -1351,9 +1369,126 @@ export interface components {
              * @default false
              */
             isPaid: boolean;
+            /**
+             * Format: date
+             * @description Date the payment was received (YYYY-MM-DD); required when isPaid is true
+             * @example 2026-07-02
+             */
+            paymentDate?: string | null;
         };
-        Income: Record<string, never>;
-        UpdateIncomeDto: Record<string, never>;
+        IncomeClientDto: {
+            /**
+             * @description Client UUID
+             * @example 123e4567-e89b-12d3-a456-426614174000
+             */
+            id: string;
+            /**
+             * @description Client name (decrypted)
+             * @example Acme Corp
+             */
+            name: string;
+            /**
+             * @description Client ABN (decrypted)
+             * @example 51824753556
+             */
+            abn?: string | null;
+            /**
+             * @description Whether income from this client counts as PSI
+             * @example false
+             */
+            isPsiEligible: boolean;
+            /**
+             * Format: date-time
+             * @description Creation timestamp
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Last update timestamp
+             */
+            updatedAt: string;
+        };
+        IncomeResponseDto: {
+            /**
+             * @description Income UUID
+             * @example 123e4567-e89b-12d3-a456-426614174000
+             */
+            id: string;
+            /**
+             * Format: date
+             * @description Invoice date (date-only, YYYY-MM-DD — PostgreSQL date columns hydrate as plain date strings)
+             * @example 2026-06-30
+             */
+            date: string;
+            /**
+             * @description Your invoice number
+             * @example INV-2026-001
+             */
+            invoiceNum?: string | null;
+            /**
+             * @description Work description (decrypted)
+             * @example Website development
+             */
+            description?: string | null;
+            /**
+             * @description Subtotal in cents (ex GST)
+             * @example 100000
+             */
+            subtotalCents: number;
+            /**
+             * @description GST collected in cents
+             * @example 10000
+             */
+            gstCents: number;
+            /**
+             * @description Total in cents (subtotal + GST)
+             * @example 110000
+             */
+            totalCents: number;
+            /**
+             * @description Whether payment has been received
+             * @example true
+             */
+            isPaid: boolean;
+            /**
+             * Format: date
+             * @description Date the payment was received (date-only, YYYY-MM-DD); null while unpaid and for paid records whose receipt date is not yet reconciled
+             * @example 2026-07-02
+             */
+            paymentDate?: string | null;
+            /**
+             * @description Client UUID
+             * @example 123e4567-e89b-12d3-a456-426614174000
+             */
+            clientId: string;
+            /**
+             * Format: date-time
+             * @description Creation timestamp
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Last update timestamp
+             */
+            updatedAt: string;
+            /** @description The paying client */
+            client: components["schemas"]["IncomeClientDto"];
+        };
+        UpdateIncomeDto: {
+            /**
+             * Format: date
+             * @description Date the payment was received (YYYY-MM-DD). Explicit null on an already-paid income re-enters the "receipt date unknown" state.
+             * @example 2026-07-02
+             */
+            paymentDate?: string | null;
+        };
+        MarkIncomePaidDto: {
+            /**
+             * @description Date the payment was received (YYYY-MM-DD)
+             * @example 2026-07-02
+             */
+            paymentDate: string;
+        };
         CreateProviderDto: {
             /**
              * @description Provider name
@@ -1456,8 +1591,8 @@ export interface components {
             id: string;
             /** @description Name of recurring expense */
             name: string;
-            /** @description Description template */
-            description?: string;
+            /** @description Description template (explicitly null when absent) */
+            description?: string | null;
             /** @description Amount in cents */
             amountCents: number;
             /** @description GST in cents */
@@ -1475,12 +1610,12 @@ export interface components {
             dayOfMonth: number;
             /** @description Start date */
             startDate: string;
-            /** @description End date */
-            endDate?: string;
+            /** @description End date (explicitly null when the template has no end) */
+            endDate?: string | null;
             /** @description Whether template is active */
             isActive: boolean;
-            /** @description Date of last generated expense */
-            lastGeneratedDate?: string;
+            /** @description Date of last generated expense (explicitly null before the first generation) */
+            lastGeneratedDate?: string | null;
             /** @description Next due date */
             nextDueDate: string;
             /** @description Provider ID */
@@ -2767,7 +2902,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Income"][];
+                    "application/json": components["schemas"]["IncomeResponseDto"][];
                 };
             };
         };
@@ -2791,7 +2926,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Income"];
+                    "application/json": components["schemas"]["IncomeResponseDto"];
                 };
             };
         };
@@ -2814,7 +2949,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Income"];
+                    "application/json": components["schemas"]["IncomeResponseDto"];
                 };
             };
             /** @description Income not found */
@@ -2876,7 +3011,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Income"];
+                    "application/json": components["schemas"]["IncomeResponseDto"];
                 };
             };
             /** @description Income not found */
@@ -2898,7 +3033,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarkIncomePaidDto"];
+            };
+        };
         responses: {
             /** @description Income marked as paid */
             200: {
@@ -2906,8 +3045,15 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Income"];
+                    "application/json": components["schemas"]["IncomeResponseDto"];
                 };
+            };
+            /** @description Missing or invalid paymentDate */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Income not found */
             404: {
@@ -2936,7 +3082,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Income"];
+                    "application/json": components["schemas"]["IncomeResponseDto"];
                 };
             };
             /** @description Income not found */

@@ -46,6 +46,10 @@ export function IncomeForm({
           subtotal: formatCents(initialValues.subtotalCents),
           gst: formatCents(initialValues.gstCents),
           isPaid: initialValues.isPaid,
+          wasPaid: initialValues.isPaid,
+          paymentDate: initialValues.paymentDate
+            ? String(initialValues.paymentDate).slice(0, 10)
+            : '',
         }
       : {
           date: '',
@@ -55,8 +59,12 @@ export function IncomeForm({
           subtotal: '',
           gst: '',
           isPaid: false,
+          wasPaid: false,
+          paymentDate: '',
         },
   });
+
+  const isPaidChecked = watch('isPaid') ?? false;
 
   const { mutate: createIncome, isPending: isCreating } = useCreateIncome();
   const { mutate: updateIncome, isPending: isUpdating } = useUpdateIncome();
@@ -108,6 +116,7 @@ export function IncomeForm({
       subtotalCents: number;
       gstCents: number;
       isPaid: boolean;
+      paymentDate?: string | null;
       invoiceNum?: string;
       description?: string;
     } = {
@@ -117,6 +126,15 @@ export function IncomeForm({
       gstCents: gstCurrency.cents,
       isPaid: values.isPaid ?? false, // Default to false if undefined
     };
+
+    // Receipt date: only submitted when the FINAL state is paid and the user
+    // entered one. Unchecking "Mark as paid" hides the field and must NOT
+    // submit the retained date (the server clears the payment date on
+    // unpaid); a legacy paid record with no date stays in its unknown state
+    // unless the user explicitly enters one.
+    if (values.paymentDate && (values.isPaid ?? false)) {
+      payload.paymentDate = values.paymentDate;
+    }
 
     // Only include optional fields if they have values
     if (values.invoiceNum) {
@@ -292,6 +310,37 @@ export function IncomeForm({
           Mark as paid
         </label>
       </div>
+
+      {isPaidChecked && (
+        <div className="flex flex-col gap-1 text-xs text-slate-700 dark:text-slate-200">
+          <label
+            htmlFor="income-paymentDate"
+            className="text-[11px] font-medium text-slate-700 dark:text-slate-300"
+          >
+            Receipt date (required)
+          </label>
+          <input
+            id="income-paymentDate"
+            type="date"
+            className="h-8 rounded-md border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950 px-2 text-xs text-slate-900 dark:text-slate-100"
+            aria-describedby={
+              errors.paymentDate ? 'income-paymentDate-error' : 'income-paymentDate-hint'
+            }
+            {...register('paymentDate')}
+          />
+          <p
+            id="income-paymentDate-hint"
+            className="text-[10px] text-slate-600 dark:text-slate-400"
+          >
+            Cash-basis BAS attributes this income to the quarter in which payment was received.
+          </p>
+          {errors.paymentDate && (
+            <p id="income-paymentDate-error" className="text-[11px] text-red-400">
+              {errors.paymentDate.message}
+            </p>
+          )}
+        </div>
+      )}
 
       <div className="mt-4 flex justify-end gap-2">
         <button

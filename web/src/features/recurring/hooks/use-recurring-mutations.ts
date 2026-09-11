@@ -87,9 +87,11 @@ export function useDeleteRecurring(): UseMutationResult<void, Error, string> {
           label: 'Undo',
           onClick: () => {
             // Recreate the recurring expense by calling the create API
+            // (`?? undefined`: response fields are explicitly null when
+            // absent, while the create DTO takes undefined)
             const restoreData: CreateRecurringExpenseDto = {
               name: deletedRecurring.name,
-              description: deletedRecurring.description,
+              description: deletedRecurring.description ?? undefined,
               amountCents: deletedRecurring.amountCents,
               currency: deletedRecurring.currency,
               gstCents: deletedRecurring.gstCents,
@@ -99,7 +101,7 @@ export function useDeleteRecurring(): UseMutationResult<void, Error, string> {
               schedule: deletedRecurring.schedule,
               dayOfMonth: deletedRecurring.dayOfMonth,
               startDate: deletedRecurring.startDate,
-              endDate: deletedRecurring.endDate,
+              endDate: deletedRecurring.endDate ?? undefined,
               isActive: deletedRecurring.isActive,
             };
 

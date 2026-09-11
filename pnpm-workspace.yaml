@@ -6,3 +6,25 @@ allowBuilds:
   '@scarf/scarf': false
   esbuild: true
   unrs-resolver: true
+overrides:
+  # GHSA-wc9g-mqfw-jrwm and related multipart DoS advisories affect every
+  # multer < 2.3.0. @nestjs/platform-express 11.x exact-pins multer 2.x below
+  # 2.3.0 (2.2.0 as of 11.2.3), so this override forces the patched 2.3.0.
+  # Remove once platform-express declares multer >= 2.3.0.
+  'multer@<2.3.0': 2.3.0
+  # CVE-2026-4800 (GHSA-r5fr-rjxr-66jc): _.template code injection, fixed in
+  # 4.18.0. @nestjs/config exact-pins lodash 4.17.21. Remove once @nestjs/config
+  # declares lodash >= 4.18.0.
+  'lodash@<4.18.0': 4.18.0
+  # GHSA-5c6j-r48x-rmvq / GHSA-qj8w-gfj5-8c6v (script injection), fixed in
+  # 7.0.5. Used only by the @nestjs/cli build chain (dev-only). Remove once
+  # terser-webpack-plugin supports serialize-javascript >= 7.
+  'serialize-javascript@<7.0.5': 7.0.5
+  # GHSA-2g4f-4pwh-qvx6 (ajv) and GHSA-c2c7-rcm5-vvqj / GHSA-3v7f-55p6-f55p
+  # (picomatch ReDoS), fixed in ajv 8.18.0 / picomatch 4.0.4. Only reachable
+  # through the @nestjs/schematics 11.x generator chain (dev-only); the
+  # dependents' declared ranges (^8.17.1 / ^4.0.2) accept these patch releases.
+  # Remove once @nestjs/schematics 11.x ships @angular-devkit/core with the
+  # fixed versions (or on an upgrade to @nestjs/cli 12 / @nestjs/schematics 12).
+  'ajv@>=8 <8.20.0': 8.20.0
+  'picomatch@<4.0.4': 4.0.7

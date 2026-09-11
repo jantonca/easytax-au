@@ -107,8 +107,9 @@ test.describe('PDF Download - BAS Reports', () => {
 
   test('should handle download error gracefully', async ({ page }) => {
 
-    // Intercept PDF download request and return error
-    await page.route('**/reports/bas/**/pdf', (route) => {
+    // Intercept PDF download request and return error (the request URL now
+    // carries the accounting-basis query, so the glob must cover it)
+    await page.route('**/reports/bas/**/pdf*', (route) => {
       route.abort('failed');
     });
 

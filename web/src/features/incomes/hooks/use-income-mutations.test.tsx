@@ -268,6 +268,7 @@ describe('useMarkPaid', () => {
     const mockResponse = {
       id: 'income-123',
       isPaid: true,
+      paymentDate: '2026-07-02',
       date: '2025-01-01',
       subtotalCents: 100000,
       gstCents: 10000,
@@ -279,10 +280,13 @@ describe('useMarkPaid', () => {
 
     const { result } = renderHook(() => useMarkPaid(), { wrapper });
 
-    result.current.mutate('income-123');
+    result.current.mutate({ id: 'income-123', paymentDate: '2026-07-02' });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
+    expect(apiClient.apiClient.patch).toHaveBeenCalledWith('/incomes/income-123/paid', {
+      paymentDate: '2026-07-02',
+    });
     expect(mockToast.showToast).toHaveBeenCalledWith({ title: 'Income marked as paid' });
   });
 
@@ -291,7 +295,7 @@ describe('useMarkPaid', () => {
 
     const { result } = renderHook(() => useMarkPaid(), { wrapper });
 
-    result.current.mutate('income-123');
+    result.current.mutate({ id: 'income-123', paymentDate: '2026-07-02' });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
 

@@ -176,6 +176,9 @@ describe('IncomeForm', () => {
     await user.type(gstInput, '500');
     await user.click(isPaidCheckbox);
 
+    // Marking paid requires an explicit receipt date (M02)
+    await user.type(screen.getByLabelText('Receipt date (required)'), '2025-08-20');
+
     const submitButton = screen.getByRole('button', { name: 'Save income' });
     await user.click(submitButton);
 
@@ -187,12 +190,139 @@ describe('IncomeForm', () => {
           subtotalCents: 500000,
           gstCents: 50000,
           isPaid: true,
+          paymentDate: '2025-08-20',
           invoiceNum: 'INV-2024-001',
           description: 'Web development services',
         },
       },
       expect.any(Object),
     );
+  });
+
+  it('blocks submitting a newly-paid income without a receipt date', async () => {
+    const user = userEvent.setup();
+    const mutate = vi.fn();
+
+    mockedUseCreateIncome.mockReturnValue({
+      mutate,
+      isPending: false,
+    } as unknown as ReturnType<typeof useCreateIncome>);
+
+    mockedUseUpdateIncome.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as unknown as ReturnType<typeof useUpdateIncome>);
+
+    render(<IncomeForm clients={mockClients} />);
+
+    await user.type(screen.getByLabelText('Date'), '2025-08-15');
+    await user.type(screen.getByLabelText('Subtotal (AUD)'), '5000');
+    const gstInput = screen.getByLabelText('GST (AUD)');
+    await user.clear(gstInput);
+    await user.type(gstInput, '500');
+    await user.click(screen.getByLabelText('Mark as paid'));
+
+    await user.click(screen.getByRole('button', { name: 'Save income' }));
+
+    expect(mutate).not.toHaveBeenCalled();
+    expect(
+      await screen.findByText('Receipt date is required when marking as paid'),
+    ).toBeInTheDocument();
+  });
+
+  it('editing a paid income to unpaid omits the retained receipt date (S02)', async () => {
+    const user = userEvent.setup();
+    const mutate = vi.fn();
+
+    mockedUseCreateIncome.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as unknown as ReturnType<typeof useCreateIncome>);
+
+    mockedUseUpdateIncome.mockReturnValue({
+      mutate,
+      isPending: false,
+    } as unknown as ReturnType<typeof useUpdateIncome>);
+
+    const paidIncome = {
+      id: 'paid-1',
+      date: '2026-06-30T00:00:00Z',
+      clientId: '550e8400-e29b-41d4-a716-446655440000',
+      invoiceNum: 'INV-001',
+      description: 'Consulting services',
+      subtotalCents: 100000,
+      gstCents: 10000,
+      totalCents: 110000,
+      isPaid: true,
+      paymentDate: '2026-07-02',
+      createdAt: '2026-06-30T10:30:00Z',
+      updatedAt: '2026-06-30T10:30:00Z',
+      client: { id: '550e8400-e29b-41d4-a716-446655440000', name: 'Acme Corp' },
+    };
+
+    render(
+      <IncomeForm
+        clients={mockClients}
+        initialValues={paidIncome as Parameters<typeof IncomeForm>[0]['initialValues']}
+        incomeId="paid-1"
+      />,
+    );
+
+    // Uncheck "Mark as paid": the date field disappears but RHF retains it —
+    // the payload must NOT include the now-contradictory receipt date.
+    await user.click(screen.getByLabelText('Mark as paid'));
+    await user.click(screen.getByRole('button', { name: 'Update income' }));
+
+    expect(mutate).toHaveBeenCalledTimes(1);
+    const call = mutate.mock.calls[0][0] as { data: Record<string, unknown> };
+    expect(call.data.isPaid).toBe(false);
+    expect(call.data).not.toHaveProperty('paymentDate');
+  });
+
+  it('editing a legacy paid income without entering a date keeps the unknown state (S02)', async () => {
+    const user = userEvent.setup();
+    const mutate = vi.fn();
+
+    mockedUseCreateIncome.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as unknown as ReturnType<typeof useCreateIncome>);
+
+    mockedUseUpdateIncome.mockReturnValue({
+      mutate,
+      isPending: false,
+    } as unknown as ReturnType<typeof useUpdateIncome>);
+
+    const legacyPaid = {
+      id: 'legacy-1',
+      date: '2026-06-30T00:00:00Z',
+      clientId: '550e8400-e29b-41d4-a716-446655440000',
+      description: 'Consulting services',
+      subtotalCents: 100000,
+      gstCents: 10000,
+      totalCents: 110000,
+      isPaid: true,
+      paymentDate: null,
+      createdAt: '2026-06-30T10:30:00Z',
+      updatedAt: '2026-06-30T10:30:00Z',
+      client: { id: '550e8400-e29b-41d4-a716-446655440000', name: 'Acme Corp' },
+    };
+
+    render(
+      <IncomeForm
+        clients={mockClients}
+        initialValues={legacyPaid as Parameters<typeof IncomeForm>[0]['initialValues']}
+        incomeId="legacy-1"
+      />,
+    );
+
+    // Unrelated edit of a legacy paid record must not require a receipt date.
+    await user.click(screen.getByRole('button', { name: 'Update income' }));
+
+    expect(mutate).toHaveBeenCalledTimes(1);
+    const call = mutate.mock.calls[0][0] as { data: Record<string, unknown> };
+    expect(call.data.isPaid).toBe(true);
+    expect(call.data).not.toHaveProperty('paymentDate');
   });
 
   it('auto-selects first client when none selected', async () => {

@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsString,
   IsUUID,
+  Matches,
   MaxLength,
   Min,
 } from 'class-validator';
@@ -101,4 +102,27 @@ export class CreateIncomeDto {
   @IsBoolean({ message: 'isPaid must be a boolean' })
   @IsOptional()
   isPaid?: boolean;
+
+  /**
+   * Date the payment was received (YYYY-MM-DD).
+   * Required when `isPaid` is true — cash-basis BAS attributes income to the
+   * period in which payment was received (ATO cash accounting). Explicit
+   * null is accepted by validation and carries meaning in the update
+   * contract (deliberately re-entering the "receipt date unknown" state);
+   * the service layer rejects null/absent dates where the transition
+   * requires one.
+   */
+  @ApiPropertyOptional({
+    description: 'Date the payment was received (YYYY-MM-DD); required when isPaid is true',
+    example: '2026-07-02',
+    type: String,
+    format: 'date',
+    nullable: true,
+  })
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, {
+    message: 'Payment date must be a date-only string (YYYY-MM-DD)',
+  })
+  @IsDateString({}, { message: 'Payment date must be a valid ISO 8601 date string' })
+  @IsOptional()
+  paymentDate?: string | null;
 }

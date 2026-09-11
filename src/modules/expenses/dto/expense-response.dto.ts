@@ -44,12 +44,14 @@ export class ExpenseResponseDto {
   date!: Date;
 
   /**
-   * Description of what was purchased (decrypted).
+   * Description of what was purchased (decrypted). Explicitly null when the
+   * expense was created without a description.
    */
   @ApiPropertyOptional({
     description: 'Description (decrypted)',
     example: 'GitHub Copilot subscription',
     type: String,
+    nullable: true,
   })
   description?: string | null;
 
@@ -90,12 +92,14 @@ export class ExpenseResponseDto {
   currency!: string;
 
   /**
-   * Optional reference to receipt file.
+   * Optional reference to receipt file. Explicitly null when there is no
+   * receipt file attached.
    */
   @ApiPropertyOptional({
     description: 'Receipt file reference',
     example: 'receipt-github-2024-01.pdf',
     type: String,
+    nullable: true,
   })
   fileRef?: string | null;
 
@@ -118,12 +122,13 @@ export class ExpenseResponseDto {
   categoryId!: string;
 
   /**
-   * Import job UUID (null if manually created).
+   * Import job UUID (explicitly null if manually created).
    */
   @ApiPropertyOptional({
     description: 'Import job UUID (null if manually created)',
     example: null,
     type: String,
+    nullable: true,
   })
   importJobId?: string | null;
 

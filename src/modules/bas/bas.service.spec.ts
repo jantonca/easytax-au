@@ -360,6 +360,7 @@ describe('BasService', () => {
         expect(result).toEqual({
           quarter: 'Q1',
           financialYear: 2025,
+          basis: 'ACCRUAL',
           periodStart: '2024-07-01',
           periodEnd: '2024-09-30',
           g1TotalSalesCents: 110000,
@@ -370,6 +371,8 @@ describe('BasService', () => {
           g11NonCapitalPurchasesCents: 125000,
           incomeCount: 2,
           expenseCount: 5,
+          unreconciledPaidIncomeCount: 0,
+          unreconciledPaidIncomeTotalCents: 0,
         });
       });
     });
@@ -667,10 +670,15 @@ describe('BasService', () => {
 
         await service.getSummary('Q1', 2025, 'CASH');
 
-        // Verify isPaid filter IS added
-        expect(mockIncomeQueryBuilder.andWhere).toHaveBeenCalledWith('income.is_paid = :isPaid', {
+        // Verify isPaid filter IS added (as the base predicate, with the
+        // payment-date range clauses on top)
+        expect(mockIncomeQueryBuilder.where).toHaveBeenCalledWith('income.is_paid = :isPaid', {
           isPaid: true,
         });
+        expect(mockIncomeQueryBuilder.andWhere).toHaveBeenCalledWith(
+          'income.payment_date >= :startDate',
+          { startDate: '2024-07-01' },
+        );
       });
 
       it('should return zero when all income is unpaid', async () => {
@@ -737,7 +745,7 @@ describe('BasService', () => {
 
         await service.getSummary('Q1', 2025, 'cash');
 
-        expect(mockIncomeQueryBuilder.andWhere).toHaveBeenCalledWith('income.is_paid = :isPaid', {
+        expect(mockIncomeQueryBuilder.where).toHaveBeenCalledWith('income.is_paid = :isPaid', {
           isPaid: true,
         });
       });
@@ -776,6 +784,118 @@ describe('BasService', () => {
           BadRequestException,
         );
       });
+    });
+  });
+});
+
+describe('BasService cash-basis payment-date attribution (M02)', () => {
+  let service: BasService;
+  let mockIncomeCreateQueryBuilder: jest.Mock;
+  let mockExpenseCreateQueryBuilder: jest.Mock;
+
+  const createMockQueryBuilder = (): Record<string, jest.Mock> => ({
+    select: jest.fn().mockReturnThis(),
+    addSelect: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    andWhere: jest.fn().mockReturnThis(),
+    innerJoin: jest.fn().mockReturnThis(),
+    getRawOne: jest.fn(),
+  });
+
+  let incomeQueryBuilderUnreconciled: ReturnType<typeof createMockQueryBuilder>;
+  let expenseQueryBuilder: ReturnType<typeof createMockQueryBuilder>;
+
+  beforeEach(async () => {
+    expenseQueryBuilder = createMockQueryBuilder();
+    // First income query = the quarter-attribution query; second = unreconciled totals.
+    const attributionQueryBuilder = createMockQueryBuilder();
+    attributionQueryBuilder.getRawOne.mockResolvedValue({
+      totalSales: '110000',
+      gstCollected: '10000',
+      count: '1',
+    });
+    incomeQueryBuilderUnreconciled = createMockQueryBuilder();
+    incomeQueryBuilderUnreconciled.getRawOne.mockResolvedValue({
+      totalSales: '55000',
+      gstCollected: '5000',
+      count: '2',
+    });
+    mockIncomeCreateQueryBuilder = jest
+      .fn()
+      .mockReturnValueOnce(attributionQueryBuilder)
+      .mockReturnValueOnce(incomeQueryBuilderUnreconciled);
+    mockExpenseCreateQueryBuilder = jest.fn().mockReturnValue(expenseQueryBuilder);
+    expenseQueryBuilder.getRawOne.mockResolvedValue({ gstPaid: '3000', count: '2' });
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        BasService,
+        MoneyService,
+        {
+          provide: getRepositoryToken(Income),
+          useValue: { createQueryBuilder: mockIncomeCreateQueryBuilder },
+        },
+        {
+          provide: getRepositoryToken(Expense),
+          useValue: { createQueryBuilder: mockExpenseCreateQueryBuilder },
+        },
+      ],
+    }).compile();
+
+    service = module.get<BasService>(BasService);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('CASH basis', () => {
+    it('attributes income by payment_date, not invoice date', async () => {
+      const result = await service.getSummary('Q4', 2026, 'CASH');
+
+      const attributionQb = mockIncomeCreateQueryBuilder.mock.results[0].value;
+      expect(attributionQb.where).toHaveBeenCalledWith('income.is_paid = :isPaid', {
+        isPaid: true,
+      });
+      expect(attributionQb.andWhere).toHaveBeenCalledWith('income.payment_date >= :startDate', {
+        startDate: '2026-04-01',
+      });
+      expect(attributionQb.andWhere).toHaveBeenCalledWith('income.payment_date <= :endDate', {
+        endDate: '2026-06-30',
+      });
+      expect(result.basis).toBe('CASH');
+    });
+
+    it('reports unreconciled paid incomes with unknown receipt dates', async () => {
+      const result = await service.getSummary('Q4', 2026, 'CASH');
+
+      expect(result.unreconciledPaidIncomeCount).toBe(2);
+      expect(result.unreconciledPaidIncomeTotalCents).toBe(55000);
+
+      const unreconciledQb = mockIncomeCreateQueryBuilder.mock.results[1].value;
+      expect(unreconciledQb.where).toHaveBeenCalledWith('income.is_paid = :isPaid', {
+        isPaid: true,
+      });
+      expect(unreconciledQb.andWhere).toHaveBeenCalledWith('income.payment_date IS NULL');
+    });
+  });
+
+  describe('ACCRUAL basis', () => {
+    it('keeps invoice-date attribution and never queries payment_date', async () => {
+      const result = await service.getSummary('Q4', 2026, 'ACCRUAL');
+
+      const qb = mockIncomeCreateQueryBuilder.mock.results[0].value;
+      expect(qb.where).toHaveBeenCalledWith('income.date >= :startDate', {
+        startDate: '2026-04-01',
+      });
+      expect(qb.andWhere).not.toHaveBeenCalledWith(
+        'income.payment_date >= :startDate',
+        expect.anything(),
+      );
+      expect(result.basis).toBe('ACCRUAL');
+      expect(result.unreconciledPaidIncomeCount).toBe(0);
+      expect(result.unreconciledPaidIncomeTotalCents).toBe(0);
+      expect(mockIncomeCreateQueryBuilder).toHaveBeenCalledTimes(1);
     });
   });
 });

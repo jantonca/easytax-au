@@ -1,12 +1,15 @@
-# Dependencies
-node_modules
+# Build context: repository root (both Dockerfiles share it)
+# Dependency trees
+**/node_modules
 
-# Build output
-dist
+# Build outputs (rebuilt inside the images)
+**/dist
+**/coverage
 
 # Git
 .git
 .gitignore
+.gitattributes
 
 # IDE
 .vscode
@@ -18,27 +21,29 @@ dist
 *.log
 logs
 
-# Test files
+# Test artifacts and test code (never needed in an image)
 coverage
 *.spec.ts
+*.test.ts
+*.test.tsx
 test
-jest*.json
+web/e2e
+web/test-results
+web/playwright-report
+
+# Environment (never bake secrets; compose provides env_file at runtime)
+.env
+.env.*
+
+# Database volume and local data
+pgdata
+data
 
 # Documentation
 *.md
 !README.md
 
-# Docker
+# Docker files themselves
 Dockerfile
 docker-compose.yml
 .dockerignore
-
-# Environment (should use env_file in compose)
-.env
-.env.*
-
-# Database volume
-pgdata
-
-# Local data (mounted as volume)
-data

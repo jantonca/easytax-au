@@ -4,12 +4,42 @@ import {
   IsOptional,
   IsNumber,
   IsBoolean,
+  IsNotEmpty,
   Min,
   Max,
   ValidateNested,
   IsIn,
 } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
+
+/**
+ * Strict boolean coercion for multipart/JSON payloads.
+ *
+ * Multipart form fields always arrive as strings; JSON bodies may carry real
+ * booleans or strings. Accepted representations are true/1 and false/0/''
+ * (empty string means unchecked checkbox). Anything else is left untouched so
+ * @IsBoolean rejects it with 400 instead of silently coercing to a boolean.
+ *
+ * @Type(() => Object) is required: with the global ValidationPipe's
+ * `enableImplicitConversion`, class-transformer pre-coerces primitives via
+ * Boolean(value) before custom transforms run, so a "false" multipart field
+ * would arrive as true. Declaring an explicit (pass-through) Object type
+ * suppresses that pre-coercion and lets the raw string reach this transform.
+ */
+const parseBoolean = ({ value }: { value: unknown }): unknown => {
+  if (typeof value !== 'string') {
+    return value;
+  }
+  if (value === 'true' || value === '1') return true;
+  if (value === 'false' || value === '0' || value === '') return false;
+  return value;
+};
+
+/** Combines the suppression marker and the strict coercion in one decorator set. */
+export const StrictBoolean = () => (target: object, propertyKey: string) => {
+  Type(() => Object)(target, propertyKey);
+  Transform(parseBoolean, { toClassOnly: true })(target, propertyKey);
+};
 
 /**
  * DTO for column mapping configuration.
@@ -97,15 +127,7 @@ export class CsvImportRequestDto {
     description: 'Skip duplicate expenses',
     default: true,
   })
-  @Transform(
-    ({ value }) => {
-      if (typeof value === 'string') {
-        return value === 'true' || value === '1';
-      }
-      return Boolean(value);
-    },
-    { toClassOnly: true },
-  )
+  @StrictBoolean()
   @IsBoolean()
   @IsOptional()
   skipDuplicates?: boolean;
@@ -114,18 +136,26 @@ export class CsvImportRequestDto {
     description: 'Preview mode - do not create expenses',
     default: false,
   })
-  @Transform(
-    ({ value }) => {
-      if (typeof value === 'string') {
-        return value === 'true' || value === '1';
-      }
-      return Boolean(value);
-    },
-    { toClassOnly: true },
-  )
+  @StrictBoolean()
   @IsBoolean()
   @IsOptional()
   dryRun?: boolean;
+}
+
+/**
+ * DTO for importing expenses from CSV content via a JSON body.
+ *
+ * `content` is declared here (not only in the controller signature) so the
+ * global whitelist keeps it and its string-ness is actually validated.
+ */
+export class CsvImportContentRequestDto extends CsvImportRequestDto {
+  @ApiProperty({
+    description: 'CSV content as string',
+    example: 'Date,Item,Total,GST\n2025-07-15,Internet,$88.00,$8.00',
+  })
+  @IsString()
+  @IsNotEmpty({ message: 'CSV content is required' })
+  content!: string;
 }
 
 /**
@@ -171,10 +201,12 @@ export class CsvRowResultDto {
  */
 export class CsvImportResponseDto {
   @ApiProperty({
-    description: 'Import job ID for tracking',
+    description: 'Import job ID for tracking (null for dry-run previews, which persist nothing)',
     example: '123e4567-e89b-12d3-a456-426614174000',
+    type: String,
+    nullable: true,
   })
-  importJobId!: string;
+  importJobId!: string | null;
 
   @ApiProperty({ description: 'Total rows in CSV', example: 10 })
   totalRows!: number;
@@ -284,15 +316,7 @@ export class IncomeCsvImportRequestDto {
     description: 'Skip duplicate incomes',
     default: true,
   })
-  @Transform(
-    ({ value }) => {
-      if (typeof value === 'string') {
-        return value === 'true' || value === '1';
-      }
-      return Boolean(value);
-    },
-    { toClassOnly: true },
-  )
+  @StrictBoolean()
   @IsBoolean()
   @IsOptional()
   skipDuplicates?: boolean;
@@ -301,17 +325,7 @@ export class IncomeCsvImportRequestDto {
     description: 'Preview mode - do not create incomes',
     default: false,
   })
-  @Transform(
-    ({ value }) => {
-      if (typeof value === 'string') {
-        // Explicitly handle 'false' and '0' as false
-        if (value === 'false' || value === '0' || value === '') return false;
-        return value === 'true' || value === '1';
-      }
-      return Boolean(value);
-    },
-    { toClassOnly: true },
-  )
+  @StrictBoolean()
   @IsBoolean()
   @IsOptional()
   dryRun?: boolean;
@@ -320,18 +334,26 @@ export class IncomeCsvImportRequestDto {
     description: 'Mark all imported incomes as paid',
     default: false,
   })
-  @Transform(
-    ({ value }) => {
-      if (typeof value === 'string') {
-        return value === 'true' || value === '1';
-      }
-      return Boolean(value);
-    },
-    { toClassOnly: true },
-  )
+  @StrictBoolean()
   @IsBoolean()
   @IsOptional()
   markAsPaid?: boolean;
+}
+
+/**
+ * DTO for importing incomes from CSV content via a JSON body.
+ *
+ * `content` is declared here (not only in the controller signature) so the
+ * global whitelist keeps it and its string-ness is actually validated.
+ */
+export class IncomeCsvImportContentRequestDto extends IncomeCsvImportRequestDto {
+  @ApiProperty({
+    description: 'CSV content as string',
+    example: 'Client,Invoice #,Subtotal,GST,Total\nAcme Corp,INV-001,$1000,$100,$1100',
+  })
+  @IsString()
+  @IsNotEmpty({ message: 'CSV content is required' })
+  content!: string;
 }
 
 /**
@@ -383,10 +405,12 @@ export class IncomeCsvRowResultDto {
  */
 export class IncomeCsvImportResponseDto {
   @ApiProperty({
-    description: 'Import job ID for tracking',
+    description: 'Import job ID for tracking (null for dry-run previews, which persist nothing)',
     example: '123e4567-e89b-12d3-a456-426614174000',
+    type: String,
+    nullable: true,
   })
-  importJobId!: string;
+  importJobId!: string | null;
 
   @ApiProperty({ description: 'Total rows in CSV', example: 10 })
   totalRows!: number;

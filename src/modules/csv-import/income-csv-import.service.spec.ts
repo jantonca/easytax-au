@@ -340,6 +340,80 @@ Aida Tomescu,1,$100,$10,$110`;
 
       expect(result.rows[0].incomeData?.isPaid).toBe(false);
     });
+
+    it('marks paid with the receipt-date column when present (M02)', async () => {
+      const csv = `Client,Invoice #,Subtotal,GST,Total,Receipt Date
+Aida Tomescu,1,$100,$10,$110,2026-07-02`;
+
+      const result = await service.importFromString(csv, { markAsPaid: true });
+
+      expect(result.rows[0].incomeData?.isPaid).toBe(true);
+      expect(result.rows[0].incomeData?.paymentDate).toEqual(new Date('2026-07-02T00:00:00.000Z'));
+      expect(result.rows[0].warning).toBeUndefined();
+    });
+
+    it('marks paid without a receipt date as paid with unknown date and a visible warning (M02)', async () => {
+      const csv = `Client,Invoice #,Subtotal,GST,Total
+Aida Tomescu,1,$100,$10,$110`;
+
+      const result = await service.importFromString(csv, { markAsPaid: true });
+
+      expect(result.rows[0].incomeData?.isPaid).toBe(true);
+      expect(result.rows[0].incomeData?.paymentDate).toBeNull();
+      expect(result.rows[0].warning).toContain('receipt date');
+      expect(result.warningCount).toBe(1);
+    });
+
+    it('parses Australian-format receipt dates (M02)', async () => {
+      const csv = `Client,Invoice #,Subtotal,GST,Total,Receipt Date
+Aida Tomescu,1,$100,$10,$110,2/7/2026`;
+
+      const result = await service.importFromString(csv, { markAsPaid: true });
+
+      expect(result.rows[0].incomeData?.paymentDate).toEqual(new Date('2026-07-02T00:00:00.000Z'));
+    });
+
+    it('fails the row instead of rolling over an impossible calendar date (R05)', async () => {
+      const csv = `Client,Invoice #,Subtotal,GST,Total,Receipt Date
+Aida Tomescu,1,$100,$10,$110,2026-06-31`;
+
+      const result = await service.importFromString(csv, { markAsPaid: true });
+
+      expect(result.rows[0].success).toBe(false);
+      expect(result.rows[0].error).toContain('Receipt Date');
+      expect(result.rows[0].incomeData).toBeUndefined();
+    });
+
+    it('fails the row for an impossible Australian-format date (R05)', async () => {
+      const csv = `Client,Invoice #,Subtotal,GST,Total,Receipt Date
+Aida Tomescu,1,$100,$10,$110,31/06/2026`;
+
+      const result = await service.importFromString(csv, { markAsPaid: true });
+
+      expect(result.rows[0].success).toBe(false);
+      expect(result.rows[0].error).toContain('Receipt Date');
+    });
+
+    it('fails the row for a timestamp value in the receipt-date column (R05)', async () => {
+      const csv = `Client,Invoice #,Subtotal,GST,Total,Receipt Date
+Aida Tomescu,1,$100,$10,$110,2026-07-01T00:30:00+10:00`;
+
+      const result = await service.importFromString(csv, { markAsPaid: true });
+
+      expect(result.rows[0].success).toBe(false);
+      expect(result.rows[0].error).toContain('Receipt Date');
+    });
+
+    it('warns that a receipt date is ignored on rows that are not marked paid (M02)', async () => {
+      const csv = `Client,Invoice #,Subtotal,GST,Total,Receipt Date
+Aida Tomescu,1,$100,$10,$110,2026-07-02`;
+
+      const result = await service.importFromString(csv, {});
+
+      expect(result.rows[0].incomeData?.isPaid).toBe(false);
+      expect(result.rows[0].incomeData?.paymentDate).toBeNull();
+      expect(result.rows[0].warning).toContain('ignored');
+    });
   });
 
   describe('empty CSV handling', () => {

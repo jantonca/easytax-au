@@ -28,6 +28,7 @@ import { Client } from '../../clients/entities/client.entity';
 @Index('idx_incomes_date', ['date'])
 @Index('idx_incomes_client', ['clientId'])
 @Index('idx_incomes_is_paid', ['isPaid'])
+@Index('idx_incomes_payment_date', ['paymentDate'])
 export class Income extends BaseEntity {
   /**
    * Invoice date.
@@ -83,6 +84,18 @@ export class Income extends BaseEntity {
    */
   @Column({ name: 'is_paid', type: 'boolean', default: false })
   isPaid!: boolean;
+
+  /**
+   * Date the payment was received (date-only, Australian cash-basis BAS
+   * attribution). Always NULL while the invoice is unpaid.
+   *
+   * `isPaid = true` with `paymentDate = null` means "paid, receipt date not
+   * yet recorded" — a legacy/unknown state that must never be inferred from
+   * the invoice date, timestamps, or the current date. See
+   * docs/core/CASH-BASIS-DESIGN.md.
+   */
+  @Column({ name: 'payment_date', type: 'date', nullable: true })
+  paymentDate?: Date | null;
 
   /**
    * The client who paid for this work.

@@ -463,9 +463,19 @@ export function IncomesTable({
                             ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
                             : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
                         )}
-                        title={income.isPaid ? 'Mark as unpaid' : 'Mark as paid'}
+                        title={
+                          income.isPaid
+                            ? income.paymentDate
+                              ? `Paid on ${String(income.paymentDate).slice(0, 10)} — click to mark as unpaid`
+                              : 'Paid · receipt date unknown (excluded from cash-basis BAS until reconciled) — click to edit'
+                            : 'Mark as paid'
+                        }
                       >
-                        {income.isPaid ? 'Paid' : 'Unpaid'}
+                        {income.isPaid
+                          ? income.paymentDate
+                            ? `Paid ${String(income.paymentDate).slice(0, 10)}`
+                            : 'Paid · no date'
+                          : 'Unpaid'}
                       </button>
                     ) : (
                       <span
@@ -475,6 +485,11 @@ export function IncomesTable({
                             ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
                             : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
                         )}
+                        title={
+                          income.isPaid && !income.paymentDate
+                            ? 'Paid · receipt date unknown (excluded from cash-basis BAS until reconciled)'
+                            : undefined
+                        }
                       >
                         {income.isPaid ? 'Paid' : 'Unpaid'}
                       </span>

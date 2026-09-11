@@ -16,6 +16,7 @@ import { Income } from '../incomes/entities/income.entity';
 import { ImportJob } from '../import-jobs/entities/import-job.entity';
 import { ImportStatus, ImportSource } from '../import-jobs/entities/import-job.entity';
 import { MoneyService } from '../../common/services/money.service';
+import { parseStrictDateOnly } from '../../common/services/au-date';
 
 /**
  * Service for importing incomes from CSV files.
@@ -166,6 +167,21 @@ export class IncomeCsvImportService {
       date = defaultDate || new Date();
     }
 
+    // Parse receipt date (optional; only meaningful when the row is paid).
+    // Strict calendar validation shared with the manual payment-date path:
+    // impossible dates (2026-06-31) and timestamp values fail the row rather
+    // than silently shifting the reporting quarter.
+    let receiptDateError: string | undefined;
+    let receiptDate: Date | undefined;
+    if (mapping.receiptDate && record[mapping.receiptDate]) {
+      const parsed = parseStrictDateOnly(record[mapping.receiptDate]);
+      if (parsed) {
+        receiptDate = parsed;
+      } else {
+        receiptDateError = `Invalid Receipt Date "${record[mapping.receiptDate]}" (expected YYYY-MM-DD or D/M/YYYY)`;
+      }
+    }
+
     return {
       rowNumber,
       clientName,
@@ -177,6 +193,8 @@ export class IncomeCsvImportService {
       totalMatches,
       date,
       description,
+      receiptDate,
+      receiptDateError,
     };
   }
 
@@ -241,14 +259,17 @@ export class IncomeCsvImportService {
       clients.map((c) => ({ id: c.id, name: c.name })),
     );
 
-    // Create import job
-    const importJob = await this.createImportJob(options.source || 'custom', rows.length);
+    // Create import job (dry runs must not persist anything, so the job row
+    // is only created for real imports)
+    const importJob = options.dryRun
+      ? null
+      : await this.createImportJob(options.source || 'custom', rows.length);
 
     const results: IncomeCsvRowResult[] = [];
     const incomesToCreate: Partial<Income>[] = [];
 
     for (const row of rows) {
-      const result = await this.processRow(row, cachedClients, options, importJob.id);
+      const result = await this.processRow(row, cachedClients, options, importJob?.id ?? null);
       results.push(result);
 
       if (result.success && result.incomeData) {
@@ -263,7 +284,7 @@ export class IncomeCsvImportService {
       } catch (error) {
         this.logger.error(`Failed to save incomes:`, error);
         await this.updateImportJobStatus(
-          importJob.id,
+          importJob!.id,
           ImportStatus.FAILED,
           error instanceof Error ? error.message : 'Bulk insert failed',
         );
@@ -291,7 +312,7 @@ export class IncomeCsvImportService {
       .filter((r) => r.success && r.incomeData)
       .reduce((sum, r) => sum + (r.incomeData?.totalCents || 0), 0);
 
-    // Update import job
+    // Update import job (never in dry-run: nothing was persisted)
     const finalStatus =
       failedCount === 0
         ? ImportStatus.COMPLETED
@@ -299,20 +320,22 @@ export class IncomeCsvImportService {
           ? ImportStatus.FAILED
           : ImportStatus.COMPLETED;
 
-    await this.updateImportJob(importJob.id, {
-      status: finalStatus,
-      importedCount: successCount,
-      errorCount: failedCount,
-      completedAt: new Date(),
-    });
+    if (importJob) {
+      await this.updateImportJob(importJob.id, {
+        status: finalStatus,
+        importedCount: successCount,
+        errorCount: failedCount,
+        completedAt: new Date(),
+      });
+    }
 
     const processingTimeMs = Date.now() - startTime;
     this.logger.log(
-      `Income import job ${importJob.id}: ${successCount} success, ${failedCount} failed in ${processingTimeMs}ms`,
+      `Income import job ${importJob?.id ?? 'dry-run'}: ${successCount} success, ${failedCount} failed in ${processingTimeMs}ms`,
     );
 
     return {
-      importJobId: importJob.id,
+      importJobId: importJob?.id ?? null,
       totalRows: rows.length,
       successCount,
       failedCount,
@@ -333,8 +356,19 @@ export class IncomeCsvImportService {
     row: ParsedIncomeCsvRow,
     cachedClients: CachedClient[],
     options: IncomeCsvImportOptions,
-    _importJobId: string,
+    _importJobId: string | null,
   ): Promise<IncomeCsvRowResult> {
+    // Strict receipt-date validation failure fails the row before anything
+    // else: a wrong-but-plausible date would change the reporting quarter.
+    if (row.receiptDateError) {
+      return {
+        rowNumber: row.rowNumber,
+        success: false,
+        error: row.receiptDateError,
+        clientMatch: null,
+      };
+    }
+
     // Match client
     const clientMatch = this.clientMatcher.findBestMatch(
       row.clientName,
@@ -377,6 +411,27 @@ export class IncomeCsvImportService {
       warning = `Total mismatch: CSV shows $${(row.totalCentsFromCsv / 100).toFixed(2)} but Subtotal + GST = $${(row.calculatedTotalCents / 100).toFixed(2)}. Using calculated value.`;
     }
 
+    // Cash-basis BAS attributes income to the period in which payment was
+    // received (ATO cash accounting), so a receipt date is required whenever
+    // a row is marked paid. Rows without one stay paid with an unknown date
+    // and are visibly excluded from CASH attribution until reconciled — see
+    // docs/core/CASH-BASIS-DESIGN.md.
+    const markAsPaid = options.markAsPaid ?? false;
+    let paymentDate: Date | null = null;
+    if (markAsPaid) {
+      if (row.receiptDate) {
+        paymentDate = row.receiptDate;
+      } else {
+        const unreconciledWarning =
+          'Marked paid without a receipt date: excluded from CASH-basis BAS until the receipt date is reconciled';
+        warning = warning ? `${warning} ${unreconciledWarning}` : unreconciledWarning;
+      }
+    } else if (row.receiptDate) {
+      const ignoredWarning =
+        'Receipt date ignored: the row is not marked paid, so no payment date is recorded';
+      warning = warning ? `${warning} ${ignoredWarning}` : ignoredWarning;
+    }
+
     const incomeData: Partial<Income> = {
       date: row.date,
       clientId: clientMatch.clientId,
@@ -385,7 +440,8 @@ export class IncomeCsvImportService {
       subtotalCents: row.subtotalCents,
       gstCents: row.gstCents,
       totalCents: row.calculatedTotalCents, // Use calculated, not CSV value
-      isPaid: options.markAsPaid ?? false,
+      isPaid: markAsPaid,
+      paymentDate,
       // Note: importJobId would require adding the field to Income entity
       // For now, we track via ImportJob.importedCount
     };

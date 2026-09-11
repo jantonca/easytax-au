@@ -72,8 +72,8 @@ export interface CsvRowResult {
  * Result of processing an entire CSV import.
  */
 export interface CsvImportResult {
-  /** Import job ID */
-  importJobId: string;
+  /** Import job ID (null for dry runs, which persist nothing) */
+  importJobId: string | null;
   /** Total rows in CSV (excluding header and empty rows) */
   totalRows: number;
   /** Successfully processed rows */
@@ -160,6 +160,8 @@ export interface IncomeCsvColumnMapping {
   date?: string;
   /** Column name for description (optional) */
   description?: string;
+  /** Column name for the date payment was received (optional) */
+  receiptDate?: string;
 }
 
 /**
@@ -200,6 +202,10 @@ export interface ParsedIncomeCsvRow {
   date?: Date;
   /** Description from CSV (if provided) */
   description?: string;
+  /** Date payment was received (if provided and mapped) */
+  receiptDate?: Date;
+  /** Set when the mapped receipt date failed strict validation (row must fail) */
+  receiptDateError?: string;
 }
 
 /**
@@ -226,8 +232,8 @@ export interface IncomeCsvRowResult {
  * Result of processing an entire income CSV import.
  */
 export interface IncomeCsvImportResult {
-  /** Import job ID */
-  importJobId: string;
+  /** Import job ID (null for dry runs, which persist nothing) */
+  importJobId: string | null;
   /** Total rows in CSV (excluding header and empty rows) */
   totalRows: number;
   /** Successfully processed rows */
@@ -274,7 +280,7 @@ export interface IncomeCsvImportOptions {
  * Predefined column mappings for income CSV sources.
  */
 export const INCOME_CSV_COLUMN_MAPPINGS: Record<string, IncomeCsvColumnMapping> = {
-  /** Custom spreadsheet format (Client, Invoice #, Subtotal, GST, Total, Date, Description) */
+  /** Custom spreadsheet format (Client, Invoice #, Subtotal, GST, Total, Date, Description, Receipt Date) */
   custom: {
     client: 'Client',
     invoiceNum: 'Invoice #',
@@ -283,5 +289,6 @@ export const INCOME_CSV_COLUMN_MAPPINGS: Record<string, IncomeCsvColumnMapping> 
     total: 'Total',
     date: 'Date',
     description: 'Description',
+    receiptDate: 'Receipt Date',
   },
 };

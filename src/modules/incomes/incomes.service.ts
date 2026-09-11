@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
 import { Income } from './entities/income.entity';
@@ -6,6 +6,7 @@ import { CreateIncomeDto } from './dto/create-income.dto';
 import { UpdateIncomeDto } from './dto/update-income.dto';
 import { Client } from '../clients/entities/client.entity';
 import { MoneyService } from '../../common/services/money.service';
+import { australianTodayIso, parseStrictDateOnly } from '../../common/services/au-date';
 
 /**
  * Service for managing Income entities.
@@ -49,6 +50,19 @@ export class IncomesService {
       createIncomeDto.gstCents,
     );
 
+    const isPaid = createIncomeDto.isPaid ?? false;
+    if (isPaid && !createIncomeDto.paymentDate) {
+      throw new BadRequestException(
+        'paymentDate (YYYY-MM-DD) is required when isPaid is true: cash-basis BAS ' +
+          'attributes income to the period in which payment was received',
+      );
+    }
+    if (!isPaid && createIncomeDto.paymentDate !== undefined) {
+      throw new BadRequestException(
+        'paymentDate can only be set on a paid income: mark it paid with a receipt date',
+      );
+    }
+
     const income = this.incomeRepository.create({
       date: new Date(createIncomeDto.date),
       clientId: createIncomeDto.clientId,
@@ -57,7 +71,11 @@ export class IncomesService {
       subtotalCents: createIncomeDto.subtotalCents,
       gstCents: createIncomeDto.gstCents,
       totalCents,
-      isPaid: createIncomeDto.isPaid ?? false,
+      isPaid,
+      paymentDate:
+        isPaid && createIncomeDto.paymentDate
+          ? this.parseDateOnly(createIncomeDto.paymentDate)
+          : null,
     });
 
     const saved = await this.incomeRepository.save(income);
@@ -148,10 +166,18 @@ export class IncomesService {
    *
    * If `subtotalCents` or `gstCents` changes, `totalCents` is recalculated.
    *
+   * Payment-date rules (see docs/core/CASH-BASIS-DESIGN.md):
+   * - newly marking an income paid requires a `paymentDate`;
+   * - `paymentDate` on an unpaid income (or `isPaid: false` with a date) is a
+   *   contradictory state and is rejected;
+   * - `isPaid: false` clears `paymentDate`;
+   * - an already-paid income may keep `paymentDate` null until reconciled.
+   *
    * @param id - The income UUID
    * @param updateIncomeDto - The fields to update
    * @returns The updated income
    * @throws NotFoundException if income or client not found
+   * @throws BadRequestException for contradictory paid/paymentDate payloads
    */
   async update(id: string, updateIncomeDto: UpdateIncomeDto): Promise<Income> {
     const income = await this.findOne(id);
@@ -172,8 +198,40 @@ export class IncomesService {
       delete updateIncomeDto.date;
     }
 
-    // Apply updates
-    Object.assign(income, updateIncomeDto);
+    // Payment-date cross-field validation and application. `paymentDate` is
+    // destructured up-front and removed from the spread payload so
+    // Object.assign cannot overwrite the entity with a raw string.
+    const { paymentDate, ...rest } = updateIncomeDto;
+    const willBePaid = updateIncomeDto.isPaid ?? income.isPaid;
+
+    if (paymentDate !== undefined && paymentDate !== null && !willBePaid) {
+      throw new BadRequestException(
+        'paymentDate cannot be set on an unpaid income: mark it paid with a receipt date',
+      );
+    }
+
+    // Newly marking an income paid requires a REAL receipt date. An explicit
+    // null does not satisfy this: DTO validation cannot catch it (class
+    // validator's @IsOptional skips null), so the transition rule is enforced
+    // here. An already-paid income MAY receive paymentDate null — that
+    // deliberately re-enters the documented "receipt date unknown" state and
+    // drops a captured date (see docs/core/CASH-BASIS-DESIGN.md).
+    const newlyMarkedPaid = willBePaid && !income.isPaid;
+    if (newlyMarkedPaid && (paymentDate === undefined || paymentDate === null)) {
+      throw new BadRequestException(
+        'paymentDate (YYYY-MM-DD) is required when marking an income as paid: ' +
+          'cash-basis BAS attributes income to the period in which payment was received',
+      );
+    }
+
+    Object.assign(income, rest);
+
+    if (paymentDate !== undefined) {
+      income.paymentDate = paymentDate === null ? null : this.parseDateOnly(paymentDate);
+    }
+    if (updateIncomeDto.isPaid === false) {
+      income.paymentDate = null;
+    }
 
     // Recalculate total if subtotal or GST changed
     income.totalCents = this.moneyService.addAmounts(income.subtotalCents, income.gstCents);
@@ -208,16 +266,33 @@ export class IncomesService {
   /**
    * Marks an income as paid.
    *
+   * Cash-basis BAS attributes income to the period in which payment was
+   * received, so a receipt date is mandatory — no date is ever inferred from
+   * the invoice date or the current date.
+   *
    * @param id - The income UUID
+   * @param paymentDate - The date payment was received (YYYY-MM-DD)
    * @returns The updated income
    * @throws NotFoundException if income doesn't exist
+   * @throws BadRequestException if paymentDate is missing or invalid
    */
-  async markAsPaid(id: string): Promise<Income> {
-    return this.update(id, { isPaid: true });
+  async markAsPaid(id: string, paymentDate?: string): Promise<Income> {
+    if (!paymentDate) {
+      throw new BadRequestException(
+        'paymentDate (YYYY-MM-DD) is required when marking an income as paid: ' +
+          'cash-basis BAS attributes income to the period in which payment was received',
+      );
+    }
+    // Validate the date early so the payload error does not depend on the
+    // income currently being unpaid.
+    this.parseDateOnly(paymentDate);
+    return this.update(id, { isPaid: true, paymentDate });
   }
 
   /**
    * Marks an income as unpaid.
+   *
+   * Clearing the payment status also clears the recorded receipt date.
    *
    * @param id - The income UUID
    * @returns The updated income
@@ -225,5 +300,29 @@ export class IncomesService {
    */
   async markAsUnpaid(id: string): Promise<Income> {
     return this.update(id, { isPaid: false });
+  }
+
+  /**
+   * Parses a strict date-only string (YYYY-MM-DD) into a UTC-midnight Date.
+   *
+   * Rejects anything that is not exactly YYYY-MM-DD, any impossible calendar
+   * date, and any date after the current Australian business day (Australia/
+   * Sydney — a 07:00 Sydney receipt on July 1 is June 30 in UTC and must not
+   * be rejected as "future"). Shared with the CSV import path via
+   * `parseStrictDateOnly`.
+   */
+  private parseDateOnly(value: string): Date {
+    const date = parseStrictDateOnly(value);
+    if (!date) {
+      throw new BadRequestException(
+        `paymentDate "${value}" must be a valid date-only ISO string (YYYY-MM-DD)`,
+      );
+    }
+    if (value > australianTodayIso()) {
+      throw new BadRequestException(
+        `paymentDate "${value}" is in the future; a payment cannot be received after today`,
+      );
+    }
+    return date;
   }
 }

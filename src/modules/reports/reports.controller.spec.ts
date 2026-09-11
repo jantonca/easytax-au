@@ -48,14 +48,19 @@ describe('ReportsController', () => {
   const mockBasSummary: BasSummaryDto = {
     quarter: 'Q1',
     financialYear: 2026,
+    basis: 'ACCRUAL',
     periodStart: '2025-07-01',
     periodEnd: '2025-09-30',
     g1TotalSalesCents: 1100000,
     label1aGstCollectedCents: 100000,
     label1bGstPaidCents: 50000,
     netGstPayableCents: 50000,
+    g10CapitalPurchasesCents: 750000,
+    g11NonCapitalPurchasesCents: 220000,
     incomeCount: 5,
     expenseCount: 12,
+    unreconciledPaidIncomeCount: 0,
+    unreconciledPaidIncomeTotalCents: 0,
   };
 
   const mockPdfBuffer = Buffer.from('mock-pdf-content');
@@ -204,10 +209,10 @@ describe('ReportsController', () => {
       basService.getSummary.mockResolvedValue(mockBasSummary);
       pdfService.generateBasPdf.mockResolvedValue(mockPdfBuffer);
 
-      const result = await controller.getBasSummaryPdf('Q1', 2026, mockResponse);
+      const result = await controller.getBasSummaryPdf('Q1', 2026, mockResponse, 'ACCRUAL');
 
       expect(result).toBeInstanceOf(StreamableFile);
-      expect(basService.getSummary).toHaveBeenCalledWith('Q1', 2026);
+      expect(basService.getSummary).toHaveBeenCalledWith('Q1', 2026, 'ACCRUAL');
       expect(pdfService.generateBasPdf).toHaveBeenCalledWith(mockBasSummary);
     });
 
@@ -215,7 +220,7 @@ describe('ReportsController', () => {
       basService.getSummary.mockResolvedValue(mockBasSummary);
       pdfService.generateBasPdf.mockResolvedValue(mockPdfBuffer);
 
-      await controller.getBasSummaryPdf('Q1', 2026, mockResponse);
+      await controller.getBasSummaryPdf('Q1', 2026, mockResponse, 'ACCRUAL');
 
       expect(mockResponse.set).toHaveBeenCalledWith({
         'Content-Type': 'application/pdf',
@@ -228,17 +233,17 @@ describe('ReportsController', () => {
       basService.getSummary.mockResolvedValue(mockBasSummary);
       pdfService.generateBasPdf.mockResolvedValue(mockPdfBuffer);
 
-      await controller.getBasSummaryPdf('q2', 2026, mockResponse);
+      await controller.getBasSummaryPdf('q2', 2026, mockResponse, 'ACCRUAL');
 
-      expect(basService.getSummary).toHaveBeenCalledWith('Q2', 2026);
+      expect(basService.getSummary).toHaveBeenCalledWith('Q2', 2026, 'ACCRUAL');
     });
 
     it('should pass through service errors', async () => {
       basService.getSummary.mockRejectedValue(new BadRequestException('Invalid quarter'));
 
-      await expect(controller.getBasSummaryPdf('Q5', 2026, mockResponse)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        controller.getBasSummaryPdf('Q5', 2026, mockResponse, 'ACCRUAL'),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 });

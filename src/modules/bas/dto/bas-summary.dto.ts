@@ -127,4 +127,33 @@ export class BasSummaryDto {
    */
   @ApiProperty({ description: 'Expense record count', example: 12 })
   expenseCount: number;
+
+  /**
+   * The accounting basis used for this summary.
+   * @example "ACCRUAL"
+   */
+  @ApiProperty({ description: 'Accounting basis (CASH or ACCRUAL)', example: 'ACCRUAL' })
+  basis: string;
+
+  /**
+   * Paid incomes whose receipt date has not been recorded yet. They are
+   * excluded from CASH-basis attribution (the payment period is unknown) and
+   * reported here so a CASH total is never silently incomplete. Always 0 for
+   * ACCRUAL summaries.
+   */
+  @ApiProperty({
+    description: 'Paid incomes with unknown receipt date (excluded from CASH attribution)',
+    example: 0,
+  })
+  unreconciledPaidIncomeCount: number;
+
+  /**
+   * Total (inc GST) of the paid incomes with unknown receipt dates, in cents.
+   * Always 0 for ACCRUAL summaries.
+   */
+  @ApiProperty({
+    description: 'Total in cents of paid incomes with unknown receipt date',
+    example: 0,
+  })
+  unreconciledPaidIncomeTotalCents: number;
 }
