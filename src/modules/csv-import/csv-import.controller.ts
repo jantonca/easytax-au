@@ -7,6 +7,8 @@ import {
   BadRequestException,
   ParseFilePipe,
   MaxFileSizeValidator,
+  HttpCode,
+  HttpStatus,
   Logger,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -16,8 +18,10 @@ import { IncomeCsvImportService } from './income-csv-import.service';
 import { CsvFileValidator } from './validators';
 import {
   CsvImportRequestDto,
+  CsvImportContentRequestDto,
   CsvImportResponseDto,
   IncomeCsvImportRequestDto,
+  IncomeCsvImportContentRequestDto,
   IncomeCsvImportResponseDto,
 } from './dto';
 import {
@@ -133,13 +137,7 @@ Expenses with same date, amount, and provider are considered duplicates.
       throw new BadRequestException('CSV file is required');
     }
 
-    // Fix: Force dryRun to false since Transform decorator converts "false" string incorrectly
-    const normalizedDto = {
-      ...dto,
-      dryRun: false, // Always false for actual imports (preview uses different endpoint)
-    };
-
-    const options = this.buildOptions(normalizedDto);
+    const options = this.buildOptions(dto);
     const result = await this.csvImportService.importFromBuffer(file.buffer, options);
 
     return this.mapToResponse(result);
@@ -185,9 +183,7 @@ Expenses with same date, amount, and provider are considered duplicates.
     description: 'Import completed successfully',
     type: CsvImportResponseDto,
   })
-  async importFromContent(
-    @Body() body: CsvImportRequestDto & { content: string },
-  ): Promise<CsvImportResponseDto> {
+  async importFromContent(@Body() body: CsvImportContentRequestDto): Promise<CsvImportResponseDto> {
     if (!body.content) {
       throw new BadRequestException('CSV content is required');
     }
@@ -213,6 +209,9 @@ Expenses with same date, amount, and provider are considered duplicates.
     description: 'Preview results',
     type: CsvImportResponseDto,
   })
+  // Previews create nothing, so the Nest default POST 201 would be
+  // misleading; the documented and actual status is 200.
+  @HttpCode(HttpStatus.OK)
   async previewImport(
     @UploadedFile(
       new ParseFilePipe({
@@ -236,7 +235,7 @@ Expenses with same date, amount, and provider are considered duplicates.
    * Build import options from DTO.
    */
   private buildOptions(dto: CsvImportRequestDto): CsvImportOptions {
-    // DTO has already been normalized in the controller endpoint
+    // Boolean fields were strictly coerced by the DTO Transform decorators
     return {
       source: dto.source,
       mapping: dto.mapping,
@@ -375,13 +374,7 @@ Incomes with same invoice number OR same date+amount+client are considered dupli
       throw new BadRequestException('CSV file is required');
     }
 
-    // Fix: Force dryRun to false since Transform decorator converts "false" string incorrectly
-    const normalizedDto = {
-      ...dto,
-      dryRun: false, // Always false for actual imports (preview uses different endpoint)
-    };
-
-    const options = this.buildIncomeOptions(normalizedDto);
+    const options = this.buildIncomeOptions(dto);
     const result = await this.incomeCsvImportService.importFromBuffer(file.buffer, options);
 
     return this.mapIncomeToResponse(result);
@@ -419,7 +412,7 @@ Incomes with same invoice number OR same date+amount+client are considered dupli
     type: IncomeCsvImportResponseDto,
   })
   async importIncomesFromContent(
-    @Body() body: IncomeCsvImportRequestDto & { content: string },
+    @Body() body: IncomeCsvImportContentRequestDto,
   ): Promise<IncomeCsvImportResponseDto> {
     if (!body.content) {
       throw new BadRequestException('CSV content is required');
@@ -446,6 +439,9 @@ Incomes with same invoice number OR same date+amount+client are considered dupli
     description: 'Preview results',
     type: IncomeCsvImportResponseDto,
   })
+  // Previews create nothing, so the Nest default POST 201 would be
+  // misleading; the documented and actual status is 200.
+  @HttpCode(HttpStatus.OK)
   async previewIncomeImport(
     @UploadedFile(
       new ParseFilePipe({
@@ -469,7 +465,7 @@ Incomes with same invoice number OR same date+amount+client are considered dupli
    * Build income import options from DTO.
    */
   private buildIncomeOptions(dto: IncomeCsvImportRequestDto): IncomeCsvImportOptions {
-    // DTO Transform decorators have already converted the values
+    // Boolean fields were strictly coerced by the DTO Transform decorators
     return {
       source: dto.source,
       mapping: dto.mapping,

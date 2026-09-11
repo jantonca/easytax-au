@@ -98,8 +98,11 @@ export class CsvImportService {
     const categories = await this.categoryRepo.find();
     const providerNames = providers.map((p) => p.name);
 
-    // Create import job
-    const importJob = await this.createImportJob(options.source || 'custom', rows.length);
+    // Create import job (dry runs must not persist anything, so the job row
+    // is only created for real imports)
+    const importJob = options.dryRun
+      ? null
+      : await this.createImportJob(options.source || 'custom', rows.length);
 
     const results: CsvRowResult[] = [];
     const expensesToCreate: Partial<Expense>[] = [];
@@ -111,7 +114,7 @@ export class CsvImportService {
         providerNames,
         categories,
         options,
-        importJob.id,
+        importJob?.id ?? null,
       );
       results.push(result);
 
@@ -127,7 +130,7 @@ export class CsvImportService {
       } catch (error) {
         // Update import job with error
         await this.updateImportJobStatus(
-          importJob.id,
+          importJob!.id,
           ImportStatus.FAILED,
           error instanceof Error ? error.message : 'Bulk insert failed',
         );
@@ -145,7 +148,7 @@ export class CsvImportService {
       .filter((r) => r.success && r.expenseData)
       .reduce((sum, r) => sum + (r.expenseData?.gstCents || 0), 0);
 
-    // Update import job
+    // Update import job (never in dry-run: nothing was persisted)
     const finalStatus =
       failedCount === 0
         ? ImportStatus.COMPLETED
@@ -153,20 +156,22 @@ export class CsvImportService {
           ? ImportStatus.FAILED
           : ImportStatus.COMPLETED;
 
-    await this.updateImportJob(importJob.id, {
-      status: finalStatus,
-      importedCount: successCount,
-      errorCount: failedCount,
-      completedAt: new Date(),
-    });
+    if (importJob) {
+      await this.updateImportJob(importJob.id, {
+        status: finalStatus,
+        importedCount: successCount,
+        errorCount: failedCount,
+        completedAt: new Date(),
+      });
+    }
 
     const processingTimeMs = Date.now() - startTime;
     this.logger.log(
-      `Import job ${importJob.id}: ${successCount} success, ${failedCount} failed in ${processingTimeMs}ms`,
+      `Import job ${importJob?.id ?? 'dry-run'}: ${successCount} success, ${failedCount} failed in ${processingTimeMs}ms`,
     );
 
     return {
-      importJobId: importJob.id,
+      importJobId: importJob?.id ?? null,
       totalRows: rows.length,
       successCount,
       failedCount,
@@ -187,7 +192,7 @@ export class CsvImportService {
     providerNames: string[],
     categories: Category[],
     options: CsvImportOptions,
-    importJobId: string,
+    importJobId: string | null,
   ): Promise<CsvRowResult> {
     // Match provider
     const providerMatch = this.providerMatcher.findBestMatch(
