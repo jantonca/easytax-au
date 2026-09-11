@@ -12,14 +12,19 @@ describe('BasController', () => {
   const mockBasSummary: BasSummaryDto = {
     quarter: 'Q1',
     financialYear: 2025,
+    basis: 'ACCRUAL',
     periodStart: '2024-07-01',
     periodEnd: '2024-09-30',
     g1TotalSalesCents: 110000,
     label1aGstCollectedCents: 10000,
     label1bGstPaidCents: 3000,
     netGstPayableCents: 7000,
+    g10CapitalPurchasesCents: 550000,
+    g11NonCapitalPurchasesCents: 125000,
     incomeCount: 5,
     expenseCount: 12,
+    unreconciledPaidIncomeCount: 0,
+    unreconciledPaidIncomeTotalCents: 0,
   };
 
   const mockQuarters = [
