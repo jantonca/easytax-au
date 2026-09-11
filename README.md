@@ -157,7 +157,7 @@ For production with HTTPS via Traefik reverse proxy:
 cp .env.example .env
 # Edit .env and set:
 TRAEFIK_ENABLED=true
-TRAEFIK_HOST=easytax.bobeliadesign.com
+TRAEFIK_HOST=easytax.example.com
 DB_PASSWORD=your_secure_password
 ENCRYPTION_KEY=$(openssl rand -hex 32)
 
@@ -173,9 +173,9 @@ docker compose up -d --build
 
 - Frontend container has pre-configured Traefik labels
 - HTTPS redirect is automatic when `TRAEFIK_ENABLED=true`
-- Domain: `easytax.bobeliadesign.com`
+- Domain: `easytax.example.com`
 - TLS certificates managed by Traefik (Let's Encrypt recommended)
-- Access via: `https://easytax.bobeliadesign.com`
+- Access via: `https://easytax.example.com`
 
 #### Environment Variables
 
@@ -205,7 +205,7 @@ docker compose up -d --build
 | ----------------- | -------- | ------------------------- | ----------------------------------------- |
 | `WEB_PORT`        | ❌       | 80                        | Frontend nginx port (Docker only)         |
 | `TRAEFIK_ENABLED` | ❌       | false                     | Enable Traefik reverse proxy integration  |
-| `TRAEFIK_HOST`    | ❌       | easytax.bobeliadesign.com | Domain for Traefik routing (when enabled) |
+| `TRAEFIK_HOST`    | ❌       | easytax.example.com | Domain for Traefik routing (when enabled) |
 
 **Security Notes:**
 
