@@ -14,8 +14,10 @@ import {
 import {
   ApiCreatedResponse,
   ApiNoContentResponse,
+  ApiBadRequestResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiBody,
   ApiOperation,
   ApiParam,
   ApiQuery,
@@ -24,6 +26,8 @@ import {
 import { IncomesService } from './incomes.service';
 import { CreateIncomeDto } from './dto/create-income.dto';
 import { UpdateIncomeDto } from './dto/update-income.dto';
+import { MarkIncomePaidDto } from './dto/mark-income-paid.dto';
+import { IncomeResponseDto } from './dto/income-response.dto';
 import { Income } from './entities/income.entity';
 
 /**
@@ -65,7 +69,7 @@ export class IncomesController {
     summary: 'Create a new income',
     description: 'Creates an income with automatic total calculation (subtotal + GST).',
   })
-  @ApiCreatedResponse({ description: 'Income created successfully', type: Income })
+  @ApiCreatedResponse({ description: 'Income created successfully', type: IncomeResponseDto })
   async create(@Body() createIncomeDto: CreateIncomeDto): Promise<Income> {
     return this.incomesService.create(createIncomeDto);
   }
@@ -93,7 +97,7 @@ export class IncomesController {
   })
   @ApiQuery({ name: 'startDate', required: false, description: 'Start date (YYYY-MM-DD)' })
   @ApiQuery({ name: 'endDate', required: false, description: 'End date (YYYY-MM-DD)' })
-  @ApiOkResponse({ description: 'List of incomes', type: [Income] })
+  @ApiOkResponse({ description: 'List of incomes', type: [IncomeResponseDto] })
   async findAll(
     @Query('clientId') clientId?: string,
     @Query('isPaid') isPaid?: string,
@@ -130,7 +134,7 @@ export class IncomesController {
   @Get(':id')
   @ApiOperation({ summary: 'Get an income by ID' })
   @ApiParam({ name: 'id', description: 'Income UUID' })
-  @ApiOkResponse({ description: 'The income', type: Income })
+  @ApiOkResponse({ description: 'The income', type: IncomeResponseDto })
   @ApiNotFoundResponse({ description: 'Income not found' })
   async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Income> {
     return this.incomesService.findOne(id);
@@ -152,7 +156,7 @@ export class IncomesController {
     description: 'Updates an income. Total is recalculated if subtotal or GST changes.',
   })
   @ApiParam({ name: 'id', description: 'Income UUID' })
-  @ApiOkResponse({ description: 'Income updated successfully', type: Income })
+  @ApiOkResponse({ description: 'Income updated successfully', type: IncomeResponseDto })
   @ApiNotFoundResponse({ description: 'Income not found' })
   async update(
     @Param('id', ParseUUIDPipe) id: string,
@@ -164,21 +168,38 @@ export class IncomesController {
   /**
    * Marks an income as paid.
    *
+   * Cash-basis BAS attributes income to the period in which payment was
+   * received (ATO cash accounting), so the receipt date is mandatory in the
+   * request body.
+   *
    * @route PATCH /incomes/:id/paid
    * @param id - The income UUID
+   * @param markPaidDto - The receipt date (YYYY-MM-DD)
    * @returns The updated income
    */
   @Patch(':id/paid')
-  @ApiOperation({ summary: 'Mark income as paid' })
+  @ApiOperation({
+    summary: 'Mark income as paid',
+    description:
+      'Marks the income as paid and records the date payment was received ' +
+      '(required for cash-basis BAS attribution).',
+  })
   @ApiParam({ name: 'id', description: 'Income UUID' })
-  @ApiOkResponse({ description: 'Income marked as paid', type: Income })
+  @ApiBody({ type: MarkIncomePaidDto })
+  @ApiOkResponse({ description: 'Income marked as paid', type: IncomeResponseDto })
+  @ApiBadRequestResponse({ description: 'Missing or invalid paymentDate' })
   @ApiNotFoundResponse({ description: 'Income not found' })
-  async markAsPaid(@Param('id', ParseUUIDPipe) id: string): Promise<Income> {
-    return this.incomesService.markAsPaid(id);
+  async markAsPaid(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() markPaidDto: MarkIncomePaidDto,
+  ): Promise<Income> {
+    return this.incomesService.markAsPaid(id, markPaidDto.paymentDate);
   }
 
   /**
    * Marks an income as unpaid.
+   *
+   * Also clears the recorded receipt date.
    *
    * @route PATCH /incomes/:id/unpaid
    * @param id - The income UUID
@@ -187,7 +208,7 @@ export class IncomesController {
   @Patch(':id/unpaid')
   @ApiOperation({ summary: 'Mark income as unpaid' })
   @ApiParam({ name: 'id', description: 'Income UUID' })
-  @ApiOkResponse({ description: 'Income marked as unpaid', type: Income })
+  @ApiOkResponse({ description: 'Income marked as unpaid', type: IncomeResponseDto })
   @ApiNotFoundResponse({ description: 'Income not found' })
   async markAsUnpaid(@Param('id', ParseUUIDPipe) id: string): Promise<Income> {
     return this.incomesService.markAsUnpaid(id);

@@ -67,15 +67,20 @@ The following are NOT subject to GST:
 
 ### Cash Basis (When Money is Received)
 
-- **Report income when:** You receive payment from customers
+- **Report income when:** You receive payment from customers (ATO: "You account
+  for the GST payable on the sales you make in the reporting period in which
+  you receive payment for them")
 - **Unpaid invoices:** Do NOT count toward BAS until paid
 - **Example:**
   ```
   Invoice #001: $1,100 (inc $100 GST) - Sent Jan 15, Paid Feb 20
 
-  Q3 BAS (Jan-Mar): Report $0 if unpaid by Mar 31
-  Q4 BAS (Apr-Jun): Report $1,100 if paid in Feb (carry forward)
+  Q3 BAS (Jan-Mar): Report $1,100 (payment received Feb 20)
+  Q4 BAS (Apr-Jun): Report $0 (nothing received in this quarter)
   ```
+- **Partial payments:** Only the GST in the part payment received is reported
+  in that period (ATO cash accounting). EasyTax-AU cannot express partial
+  payments yet — see the limitations in `CASH-BASIS-DESIGN.md`.
 
 ### Accrual Basis (When Invoice is Issued)
 
@@ -103,16 +108,27 @@ The following are NOT subject to GST:
 
 **API Endpoint:** `GET /bas/:quarter/:year?basis=CASH|ACCRUAL`
 
-- **Default:** `ACCRUAL` (includes all income regardless of payment status)
-- **Cash Basis:** Add `?basis=CASH` to only count paid income (`isPaid = true`)
-- **Expenses:** Not affected by basis (always counted when incurred, per ATO rules)
+- **Default:** `ACCRUAL` (all income attributed by invoice date, regardless of
+  payment status)
+- **Cash Basis:** Add `?basis=CASH` to attribute **paid income by the date
+  payment was received** (`paymentDate`), not the invoice date — per ATO cash
+  accounting, GST is reported in the period in which payment is received.
+- **Unreconciled paid income:** paid incomes without a recorded receipt date
+  cannot be attributed to any quarter. They are excluded from CASH totals and
+  reported explicitly via `unreconciledPaidIncomeCount` /
+  `unreconciledPaidIncomeTotalCents` so a CASH total is never silently
+  incomplete. See `CASH-BASIS-DESIGN.md` for the full policy.
+- **Expenses:** Not affected by basis (always counted by expense date — the
+  model has no expense payment tracking; documented limitation).
+- **Marking an income paid requires a receipt date** (`PATCH
+  /incomes/:id/paid` with `{ "paymentDate": "YYYY-MM-DD" }`).
 
 **Example:**
 ```bash
-# Accrual basis (all income)
+# Accrual basis (all income by invoice date)
 GET /bas/Q1/2026?basis=ACCRUAL
 
-# Cash basis (paid income only)
+# Cash basis (paid income by payment date)
 GET /bas/Q1/2026?basis=CASH
 ```
 
@@ -410,5 +426,5 @@ Net GST: $1,800 (you owe ATO)
 
 ---
 
-**Last Updated:** 2026-01-09
+**Last Updated:** 2026-09-11 (cash-basis payment-date semantics per M02)
 **Maintained by:** Project owner (update when ATO rules change)

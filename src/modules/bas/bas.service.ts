@@ -86,11 +86,12 @@ export class BasService {
     const { start, end } = this.getQuarterDateRange(normalizedQuarter as Quarter, financialYear);
 
     // Calculate all BAS fields
-    const [incomeData, expenseData, g10Data, g11Data] = await Promise.all([
+    const [incomeData, expenseData, g10Data, g11Data, unreconciledData] = await Promise.all([
       this.calculateIncomeTotals(start, end, normalizedBasis),
       this.calculateExpenseTotals(start, end),
       this.calculatePurchasesByBasLabel(start, end, 'G10'),
       this.calculatePurchasesByBasLabel(start, end, 'G11'),
+      normalizedBasis === 'CASH' ? this.calculateUnreconciledPaidIncome() : Promise.resolve(null),
     ]);
 
     // Net GST = GST Collected (1A) - GST Paid (1B)
@@ -102,6 +103,7 @@ export class BasService {
     return {
       quarter: normalizedQuarter,
       financialYear,
+      basis: normalizedBasis,
       periodStart: start,
       periodEnd: end,
       g1TotalSalesCents: incomeData.totalSalesCents,
@@ -112,6 +114,8 @@ export class BasService {
       g11NonCapitalPurchasesCents: g11Data.totalPurchasesCents,
       incomeCount: incomeData.count,
       expenseCount: expenseData.count,
+      unreconciledPaidIncomeCount: unreconciledData?.count ?? 0,
+      unreconciledPaidIncomeTotalCents: unreconciledData?.totalSalesCents ?? 0,
     };
   }
 
@@ -176,6 +180,11 @@ export class BasService {
   /**
    * Calculates income totals for BAS G1 and 1A.
    *
+   * - ACCRUAL: attributed by invoice date (`income.date`), all incomes.
+   * - CASH: attributed by payment date (`income.payment_date`), only paid
+   *   incomes with a known receipt date (ATO cash accounting — GST is
+   *   accounted for in the period in which payment is received).
+   *
    * @param startDate - Period start date string (YYYY-MM-DD, inclusive)
    * @param endDate - Period end date string (YYYY-MM-DD, inclusive)
    * @param basis - Accounting basis (CASH = only paid income, ACCRUAL = all income)
@@ -190,13 +199,16 @@ export class BasService {
       .createQueryBuilder('income')
       .select('COALESCE(SUM(income.total_cents), 0)', 'totalSales')
       .addSelect('COALESCE(SUM(income.gst_cents), 0)', 'gstCollected')
-      .addSelect('COUNT(income.id)', 'count')
-      .where('income.date >= :startDate', { startDate })
-      .andWhere('income.date <= :endDate', { endDate });
+      .addSelect('COUNT(income.id)', 'count');
 
-    // Cash basis: only include paid income
+    // Cash basis: only include paid income, attributed by payment date
     if (basis === 'CASH') {
-      query.andWhere('income.is_paid = :isPaid', { isPaid: true });
+      query.where('income.is_paid = :isPaid', { isPaid: true });
+      query.andWhere('income.payment_date >= :startDate', { startDate });
+      query.andWhere('income.payment_date <= :endDate', { endDate });
+    } else {
+      query.where('income.date >= :startDate', { startDate });
+      query.andWhere('income.date <= :endDate', { endDate });
     }
 
     const result = await query.getRawOne<{
@@ -204,6 +216,39 @@ export class BasService {
       gstCollected: string;
       count: string;
     }>();
+
+    return {
+      totalSalesCents: parseInt(result?.totalSales ?? '0', 10),
+      gstCollectedCents: parseInt(result?.gstCollected ?? '0', 10),
+      count: parseInt(result?.count ?? '0', 10),
+    };
+  }
+
+  /**
+   * Totals paid incomes whose receipt date has not been recorded.
+   *
+   * These records cannot be attributed to any quarter on the cash basis
+   * (the payment period is unknown and must never be inferred from the
+   * invoice date), so they are reported separately instead of being silently
+   * omitted. See docs/core/CASH-BASIS-DESIGN.md for the legacy policy.
+   */
+  private async calculateUnreconciledPaidIncome(): Promise<{
+    totalSalesCents: number;
+    gstCollectedCents: number;
+    count: number;
+  }> {
+    const result = await this.incomeRepository
+      .createQueryBuilder('income')
+      .select('COALESCE(SUM(income.total_cents), 0)', 'totalSales')
+      .addSelect('COALESCE(SUM(income.gst_cents), 0)', 'gstCollected')
+      .addSelect('COUNT(income.id)', 'count')
+      .where('income.is_paid = :isPaid', { isPaid: true })
+      .andWhere('income.payment_date IS NULL')
+      .getRawOne<{
+        totalSales: string;
+        gstCollected: string;
+        count: string;
+      }>();
 
     return {
       totalSalesCents: parseInt(result?.totalSales ?? '0', 10),

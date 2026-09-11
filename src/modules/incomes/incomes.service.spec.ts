@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { IncomesService } from './incomes.service';
 import { Income } from './entities/income.entity';
 import { Client } from '../clients/entities/client.entity';
@@ -111,6 +111,7 @@ describe('IncomesService', () => {
         subtotalCents: 50000,
         gstCents: 5000,
         isPaid: true,
+        paymentDate: '2024-01-20',
       };
 
       const paidIncome = {
@@ -411,7 +412,7 @@ describe('IncomesService', () => {
         .mockResolvedValueOnce(paidIncome);
       mockIncomeRepository.save.mockResolvedValue(paidIncome);
 
-      const result = await service.markAsPaid(mockIncome.id);
+      const result = await service.markAsPaid(mockIncome.id, '2024-02-01');
 
       expect(result.isPaid).toBe(true);
     });
@@ -419,8 +420,8 @@ describe('IncomesService', () => {
 
   describe('markAsUnpaid', () => {
     it('should mark income as unpaid', async () => {
-      const paidIncome = { ...mockIncome, isPaid: true };
-      const unpaidIncome = { ...mockIncome, isPaid: false };
+      const paidIncome = { ...mockIncome, isPaid: true, paymentDate: new Date('2024-02-01') };
+      const unpaidIncome = { ...mockIncome, isPaid: false, paymentDate: null };
 
       mockIncomeRepository.findOne
         .mockResolvedValueOnce(paidIncome)
@@ -430,6 +431,229 @@ describe('IncomesService', () => {
       const result = await service.markAsUnpaid(mockIncome.id);
 
       expect(result.isPaid).toBe(false);
+    });
+  });
+
+  describe('payment-date semantics (M02)', () => {
+    describe('create', () => {
+      it('rejects isPaid=true without a payment date', async () => {
+        mockClientRepository.count.mockResolvedValue(1);
+
+        await expect(
+          service.create({
+            date: '2026-06-30',
+            clientId: mockClient.id,
+            subtotalCents: 100000,
+            gstCents: 10000,
+            isPaid: true,
+          }),
+        ).rejects.toThrow(BadRequestException);
+      });
+
+      it('stores the payment date when creating a paid income', async () => {
+        mockClientRepository.count.mockResolvedValue(1);
+        mockIncomeRepository.create.mockImplementation((x) => {
+          return Promise.resolve(x);
+        });
+        mockIncomeRepository.save.mockResolvedValue({});
+        mockIncomeRepository.findOne.mockResolvedValue({ ...mockIncome, isPaid: true });
+
+        await service.create({
+          date: '2026-06-30',
+          clientId: mockClient.id,
+          subtotalCents: 100000,
+          gstCents: 10000,
+          isPaid: true,
+          paymentDate: '2026-07-02',
+        });
+
+        expect(mockIncomeRepository.create).toHaveBeenCalledWith(
+          expect.objectContaining({
+            isPaid: true,
+            paymentDate: new Date('2026-07-02'),
+          }),
+        );
+      });
+
+      it('rejects a future payment date', async () => {
+        await expect(
+          service.create({
+            date: '2026-06-30',
+            clientId: mockClient.id,
+            subtotalCents: 100000,
+            gstCents: 10000,
+            isPaid: true,
+            paymentDate: '9999-01-01',
+          }),
+        ).rejects.toThrow(BadRequestException);
+      });
+    });
+
+    describe('update transitions', () => {
+      it('rejects isPaid=true with no payment date when income is currently unpaid', async () => {
+        mockIncomeRepository.findOne.mockResolvedValue({ ...mockIncome, isPaid: false });
+
+        await expect(service.update(mockIncome.id, { isPaid: true })).rejects.toThrow(
+          BadRequestException,
+        );
+      });
+
+      it('allows isPaid=true without payment date when income is already paid (keeps unknown state)', async () => {
+        mockIncomeRepository.findOne.mockResolvedValue({
+          ...mockIncome,
+          isPaid: true,
+          paymentDate: null,
+        });
+
+        const result = await service.update(mockIncome.id, { isPaid: true });
+
+        expect(result.isPaid).toBe(true);
+      });
+
+      it('sets a payment date on a paid income (reconciliation)', async () => {
+        const unpaid = { ...mockIncome, isPaid: false };
+        mockIncomeRepository.findOne
+          .mockResolvedValueOnce({ ...mockIncome, isPaid: true, paymentDate: null })
+          .mockResolvedValueOnce({ ...mockIncome, isPaid: true });
+
+        await service.update(mockIncome.id, { paymentDate: '2026-07-02' });
+
+        expect(mockIncomeRepository.save).toHaveBeenCalledWith(
+          expect.objectContaining({
+            isPaid: true,
+            paymentDate: new Date('2026-07-02'),
+          }),
+        );
+        void unpaid;
+      });
+
+      it('rejects a payment date on an unpaid income (contradictory)', async () => {
+        mockIncomeRepository.findOne.mockResolvedValue({ ...mockIncome, isPaid: false });
+
+        await expect(service.update(mockIncome.id, { paymentDate: '2026-07-02' })).rejects.toThrow(
+          BadRequestException,
+        );
+      });
+
+      it('rejects isPaid=false with a payment date (contradictory)', async () => {
+        mockIncomeRepository.findOne.mockResolvedValue({ ...mockIncome, isPaid: true });
+
+        await expect(
+          service.update(mockIncome.id, { isPaid: false, paymentDate: '2026-07-02' }),
+        ).rejects.toThrow(BadRequestException);
+      });
+
+      it('rejects newly marking an unpaid income paid with paymentDate null (R04)', async () => {
+        mockIncomeRepository.findOne.mockResolvedValue({ ...mockIncome, isPaid: false });
+
+        await expect(
+          service.update(mockIncome.id, { isPaid: true, paymentDate: null }),
+        ).rejects.toThrow(BadRequestException);
+      });
+
+      it('rejects a paymentDate on an unpaid create payload (R04)', async () => {
+        mockClientRepository.count.mockResolvedValue(1);
+
+        await expect(
+          service.create({
+            date: '2026-06-30',
+            clientId: mockClient.id,
+            subtotalCents: 100000,
+            gstCents: 10000,
+            isPaid: false,
+            paymentDate: '2026-07-02',
+          }),
+        ).rejects.toThrow(BadRequestException);
+      });
+
+      it('allows paymentDate null on an already-paid income (deliberate re-unknown)', async () => {
+        const alreadyPaid = { ...mockIncome, isPaid: true, paymentDate: new Date('2026-07-02') };
+        mockIncomeRepository.findOne
+          .mockResolvedValueOnce(alreadyPaid)
+          .mockResolvedValueOnce({ ...mockIncome, isPaid: true, paymentDate: null });
+
+        const result = await service.update(mockIncome.id, { isPaid: true, paymentDate: null });
+
+        expect(mockIncomeRepository.save).toHaveBeenCalledWith(
+          expect.objectContaining({ isPaid: true, paymentDate: null }),
+        );
+        expect(result.isPaid).toBe(true);
+      });
+
+      it('clears the payment date when marking unpaid', async () => {
+        const paid = { ...mockIncome, isPaid: true, paymentDate: new Date('2026-07-02') };
+        const cleared = { ...mockIncome, isPaid: false, paymentDate: null };
+
+        mockIncomeRepository.findOne.mockResolvedValueOnce(paid).mockResolvedValueOnce(cleared);
+
+        await service.markAsUnpaid(mockIncome.id);
+
+        expect(mockIncomeRepository.save).toHaveBeenCalledWith(
+          expect.objectContaining({ isPaid: false, paymentDate: null }),
+        );
+      });
+    });
+
+    describe('markAsPaid requires a receipt date', () => {
+      it('throws BadRequestException when payment date is missing', async () => {
+        await expect(service.markAsPaid(mockIncome.id)).rejects.toThrow(BadRequestException);
+      });
+
+      it('rejects invalid date strings', async () => {
+        await expect(service.markAsPaid(mockIncome.id, 'not-a-date')).rejects.toThrow(
+          BadRequestException,
+        );
+      });
+
+      it('marks paid with the supplied receipt date', async () => {
+        mockIncomeRepository.findOne
+          .mockResolvedValueOnce({ ...mockIncome, isPaid: false })
+          .mockResolvedValueOnce({ ...mockIncome, isPaid: true });
+        mockIncomeRepository.save.mockImplementation((x) => Promise.resolve(x));
+
+        const result = await service.markAsPaid(mockIncome.id, '2026-07-02');
+
+        expect(mockIncomeRepository.save).toHaveBeenCalledWith(
+          expect.objectContaining({
+            isPaid: true,
+            paymentDate: new Date('2026-07-02'),
+          }),
+        );
+        expect(result.isPaid).toBe(true);
+      });
+
+      it('accepts a receipt date that is today in Sydney but tomorrow in UTC (R07)', async () => {
+        jest.useFakeTimers().setSystemTime(new Date('2026-06-30T15:00:00.000Z'));
+
+        try {
+          mockIncomeRepository.findOne
+            .mockResolvedValueOnce({ ...mockIncome, isPaid: false })
+            .mockResolvedValueOnce({ ...mockIncome, isPaid: true });
+          mockIncomeRepository.save.mockImplementation((x) => Promise.resolve(x));
+
+          // 2026-06-30T15:00Z = 2026-07-01 01:00 Sydney: a July 1 receipt is
+          // today for the business, not the future.
+          await expect(service.markAsPaid(mockIncome.id, '2026-07-01')).resolves.toBeDefined();
+        } finally {
+          jest.useRealTimers();
+        }
+      });
+
+      it('rejects a date after the Australian business day (R07)', async () => {
+        jest.useFakeTimers().setSystemTime(new Date('2026-06-30T15:00:00.000Z'));
+
+        try {
+          await expect(service.markAsPaid(mockIncome.id, '2026-07-02')).rejects.toThrow(/future/);
+        } finally {
+          jest.useRealTimers();
+        }
+      });
+
+      it('rejects impossible calendar dates (R05)', async () => {
+        await expect(service.markAsPaid(mockIncome.id, '2026-06-31')).rejects.toThrow(
+          BadRequestException,
+        );
+      });
     });
   });
 });
