@@ -4,20 +4,42 @@ import { MoneyService } from '../../common/services/money.service';
 import { BasSummaryDto } from '../bas/dto/bas-summary.dto';
 import { FYSummaryDto } from './dto/fy-summary.dto';
 
+/**
+ * Extracts the human-readable text of a (compress: false) pdfkit document:
+ * pdfkit renders text as hex-encoded TJ string runs in the content stream.
+ */
+function pdfText(buf: Buffer): string {
+  const raw = buf.toString('latin1');
+  const parts: string[] = [];
+  for (const match of raw.matchAll(/<([0-9A-Fa-f]+)>/g)) {
+    const hex = match[1];
+    if (hex.length % 2 !== 0) {
+      continue;
+    }
+    parts.push(Buffer.from(hex, 'hex').toString('latin1'));
+  }
+  return parts.join('');
+}
+
 describe('PdfService', () => {
   let service: PdfService;
 
   const mockBasSummary: BasSummaryDto = {
     quarter: 'Q1',
     financialYear: 2026,
+    basis: 'ACCRUAL',
     periodStart: '2025-07-01',
     periodEnd: '2025-09-30',
     g1TotalSalesCents: 1100000,
     label1aGstCollectedCents: 100000,
     label1bGstPaidCents: 50000,
     netGstPayableCents: 50000,
+    g10CapitalPurchasesCents: 750000,
+    g11NonCapitalPurchasesCents: 220000,
     incomeCount: 5,
     expenseCount: 12,
+    unreconciledPaidIncomeCount: 0,
+    unreconciledPaidIncomeTotalCents: 0,
   };
 
   const mockFYSummary: FYSummaryDto = {
@@ -65,6 +87,48 @@ describe('PdfService', () => {
     }).compile();
 
     service = module.get<PdfService>(PdfService);
+  });
+
+  describe('BAS accounting basis and incomplete-data warning (R06)', () => {
+    it('states the accounting basis in the document', async () => {
+      const result = await service.generateBasPdf({
+        ...mockBasSummary,
+        basis: 'ACCRUAL',
+        unreconciledPaidIncomeCount: 0,
+        unreconciledPaidIncomeTotalCents: 0,
+      });
+
+      const text = pdfText(result);
+      expect(text).toContain('Accounting basis: ACCRUAL');
+    });
+
+    it('warns prominently when a CASH summary excludes unreconciled paid incomes', async () => {
+      const result = await service.generateBasPdf({
+        ...mockBasSummary,
+        basis: 'CASH',
+        unreconciledPaidIncomeCount: 2,
+        unreconciledPaidIncomeTotalCents: 55000,
+      });
+
+      const text = pdfText(result);
+      expect(text).toContain('Accounting basis: CASH');
+      expect(text).toContain('Incomplete data: 2 paid income(s) have no recorded receipt date');
+      expect(text).toContain('$550.00');
+      expect(text).toContain('Not included in the totals above');
+    });
+
+    it('does not warn for a complete CASH summary', async () => {
+      const result = await service.generateBasPdf({
+        ...mockBasSummary,
+        basis: 'CASH',
+        unreconciledPaidIncomeCount: 0,
+        unreconciledPaidIncomeTotalCents: 0,
+      });
+
+      const text = pdfText(result);
+      expect(text).toContain('Accounting basis: CASH');
+      expect(text).not.toContain('no recorded receipt date');
+    });
   });
 
   describe('generateBasPdf', () => {

@@ -11,7 +11,11 @@ export class RecurringExpenseResponseDto {
   @ApiProperty({ description: 'Name of recurring expense' })
   name!: string;
 
-  @ApiPropertyOptional({ description: 'Description template', type: String })
+  @ApiPropertyOptional({
+    description: 'Description template (explicitly null when absent)',
+    type: String,
+    nullable: true,
+  })
   description?: string | null;
 
   @ApiProperty({ description: 'Amount in cents' })
@@ -35,13 +39,21 @@ export class RecurringExpenseResponseDto {
   @ApiProperty({ description: 'Start date' })
   startDate!: string;
 
-  @ApiPropertyOptional({ description: 'End date', type: String })
+  @ApiPropertyOptional({
+    description: 'End date (explicitly null when the template has no end)',
+    type: String,
+    nullable: true,
+  })
   endDate?: string | null;
 
   @ApiProperty({ description: 'Whether template is active' })
   isActive!: boolean;
 
-  @ApiPropertyOptional({ description: 'Date of last generated expense', type: String })
+  @ApiPropertyOptional({
+    description: 'Date of last generated expense (explicitly null before the first generation)',
+    type: String,
+    nullable: true,
+  })
   lastGeneratedDate?: string | null;
 
   @ApiProperty({ description: 'Next due date' })

@@ -31,6 +31,7 @@ const PDF_CONFIG = {
     accent: '#3498db',
     border: '#bdc3c7',
     headerBg: '#ecf0f1',
+    warning: '#b45309',
   },
   /** Table configuration */
   table: {
@@ -68,6 +69,10 @@ export class PdfService {
       const doc = new PDFDocument({
         size: 'A4',
         margin: PDF_CONFIG.margin.left,
+        // Uncompressed streams keep the rendered text greppable in the
+        // produced buffer (tested by content assertions); the size cost on a
+        // one-page BAS document is negligible.
+        compress: false,
         info: {
           Title: `BAS Summary ${summary.quarter} FY${summary.financialYear}`,
           Author: 'EasyTax-AU',
@@ -100,6 +105,9 @@ export class PdfService {
       const doc = new PDFDocument({
         size: 'A4',
         margin: PDF_CONFIG.margin.left,
+        // Kept uncompressed for consistency with the BAS document (content
+        // assertions); the size cost is negligible for these reports.
+        compress: false,
         info: {
           Title: `Financial Year Summary FY${summary.financialYear}`,
           Author: 'EasyTax-AU',
@@ -131,6 +139,25 @@ export class PdfService {
       doc,
       `${summary.quarter} FY${summary.financialYear} | ${this.formatDateRange(summary.periodStart, summary.periodEnd)}`,
     );
+    this.renderSubtitle(doc, `Accounting basis: ${summary.basis ?? 'ACCRUAL'}`);
+
+    // Incomplete-data warning for cash-basis summaries with paid incomes whose
+    // receipt date has not been reconciled: without it the PDF would present
+    // reduced totals as complete (see docs/core/CASH-BASIS-DESIGN.md).
+    const unreconciledCount = summary.unreconciledPaidIncomeCount ?? 0;
+    if (unreconciledCount > 0) {
+      const cents = summary.unreconciledPaidIncomeTotalCents ?? 0;
+      doc.moveDown(1);
+      doc
+        .fillColor(PDF_CONFIG.colors.warning)
+        .fontSize(PDF_CONFIG.fontSize.body)
+        .font('Helvetica-Bold')
+        .text(
+          `Incomplete data: ${unreconciledCount} paid income(s) have no recorded receipt date ` +
+            `(${this.formatCents(cents)} including GST). Not included in the totals above; ` +
+            'enter each receipt date to reconcile them into the correct quarter.',
+        );
+    }
 
     doc.moveDown(2);
 
@@ -431,5 +458,16 @@ export class PdfService {
     };
 
     return `${startDate.toLocaleDateString('en-AU', options)} - ${endDate.toLocaleDateString('en-AU', options)}`;
+  }
+
+  /**
+   * Formats an integer-cents amount as an Australian dollar string.
+   * Mirrors the money-handling contract: input is always integer cents.
+   */
+  private formatCents(cents: number): string {
+    return (cents / 100).toLocaleString('en-AU', {
+      style: 'currency',
+      currency: 'AUD',
+    });
   }
 }

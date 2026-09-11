@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, Res, StreamableFile } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Query, Res, StreamableFile } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiProduces } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { ReportsService } from './reports.service';
@@ -140,8 +140,13 @@ export class ReportsController {
     @Param('quarter') quarter: string,
     @Param('year', ParseIntPipe) year: number,
     @Res({ passthrough: true }) res: Response,
+    @Query('basis') basis: string | undefined,
   ): Promise<StreamableFile> {
-    const summary = await this.basService.getSummary(quarter.toUpperCase(), year);
+    const summary = await this.basService.getSummary(
+      quarter.toUpperCase(),
+      year,
+      basis ? basis.toUpperCase() : 'ACCRUAL',
+    );
     const pdfBuffer = await this.pdfService.generateBasPdf(summary);
 
     const filename = `bas-${quarter.toLowerCase()}-fy${year}.pdf`;
