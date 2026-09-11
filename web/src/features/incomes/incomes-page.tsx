@@ -23,6 +23,11 @@ import { TableSkeleton } from '@/components/skeletons/table-skeleton';
 import { exportIncomesToCsv } from '@/lib/export-csv';
 import { useToast } from '@/lib/toast-context';
 
+/** Today's date as YYYY-MM-DD in the Australian business timezone — the suggested receipt date. */
+function todayIsoDate(): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Australia/Sydney' }).format(new Date());
+}
+
 export function IncomesPage(): ReactElement {
   const { data: incomes, isLoading: incomesLoading, isError: incomesError } = useIncomes();
   const { data: clients = [] } = useClients();
@@ -32,6 +37,8 @@ export function IncomesPage(): ReactElement {
   const [incomeToEdit, setIncomeToEdit] = useState<IncomeResponseDto | null>(null);
   const [incomeToDelete, setIncomeToDelete] = useState<IncomeResponseDto | null>(null);
   const [bulkDeleteIds, setBulkDeleteIds] = useState<string[]>([]);
+  const [incomeToMarkPaid, setIncomeToMarkPaid] = useState<IncomeResponseDto | null>(null);
+  const [receiptDate, setReceiptDate] = useState<string>('');
 
   const { mutate: deleteIncome, isPending: isDeleting } = useDeleteIncome();
   const { mutate: markPaid } = useMarkPaid();
@@ -87,8 +94,27 @@ export function IncomesPage(): ReactElement {
   }, [incomes, filters]);
 
   function handleTogglePaid(income: IncomeResponseDto): void {
-    const mutate = income.isPaid ? markUnpaid : markPaid;
-    mutate(income.id);
+    if (income.isPaid) {
+      markUnpaid(income.id);
+      return;
+    }
+    // Cash-basis BAS needs the receipt date: ask for it before marking paid.
+    setReceiptDate(todayIsoDate());
+    setIncomeToMarkPaid(income);
+  }
+
+  function handleConfirmMarkPaid(): void {
+    if (!incomeToMarkPaid || !receiptDate) {
+      return;
+    }
+    markPaid(
+      { id: incomeToMarkPaid.id, paymentDate: receiptDate },
+      {
+        onSuccess: () => {
+          setIncomeToMarkPaid(null);
+        },
+      },
+    );
   }
 
   function handleDelete(): void {
@@ -305,6 +331,39 @@ export function IncomesPage(): ReactElement {
             onConfirm={confirmBulkDelete}
             isLoading={isDeleting}
             variant="danger"
+          />
+
+          <ConfirmationDialog
+            open={incomeToMarkPaid !== null}
+            onOpenChange={(open) => {
+              if (!open) {
+                setIncomeToMarkPaid(null);
+              }
+            }}
+            title="Mark income as paid"
+            description={
+              <>
+                <p className="mb-2">
+                  When was this payment received? Cash-basis BAS attributes the income to the
+                  quarter in which payment was received, so the receipt date is required.
+                </p>
+                <label htmlFor="mark-paid-receipt-date" className="sr-only">
+                  Receipt date
+                </label>
+                <input
+                  id="mark-paid-receipt-date"
+                  type="date"
+                  value={receiptDate}
+                  onChange={(e) => setReceiptDate(e.target.value)}
+                  required
+                  className="w-full rounded-md border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-900 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+                />
+              </>
+            }
+            confirmLabel="Mark as paid"
+            cancelLabel="Cancel"
+            onConfirm={handleConfirmMarkPaid}
+            isLoading={false}
           />
         </>
       )}

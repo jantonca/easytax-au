@@ -134,6 +134,11 @@ export interface IncomeResponseDto {
   gstCents: number;
   totalCents: number;
   isPaid: boolean;
+  /**
+   * Date payment was received (YYYY-MM-DD). Null while unpaid, and null for
+   * paid records whose receipt date has not been reconciled yet.
+   */
+  paymentDate?: string | null;
   createdAt: string;
   updatedAt: string;
   client: {
@@ -166,8 +171,14 @@ export interface VersionResponse {
   environment: string;
 }
 
-export async function getBasSummary(quarter: string, year: number): Promise<BasSummaryDto> {
-  return apiClient.get<BasSummaryDto>(`/bas/${quarter}/${year}`);
+export type AccountingBasis = 'CASH' | 'ACCRUAL';
+
+export async function getBasSummary(
+  quarter: string,
+  year: number,
+  basis: AccountingBasis = 'ACCRUAL',
+): Promise<BasSummaryDto> {
+  return apiClient.get<BasSummaryDto>(`/bas/${quarter}/${year}?basis=${basis}`);
 }
 
 export async function getQuartersForYear(year: number): Promise<QuarterDateRange[]> {

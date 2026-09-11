@@ -121,15 +121,29 @@ test.describe('Income CRUD Flow', () => {
     // Wait for income to appear (use .first() for multiple rows)
     await expect(page.getByText('Test Unpaid Income').first()).toBeVisible();
 
-    // Find the "Unpaid" badge and click it to toggle to Paid
+    // Find the "Unpaid" badge and click it to toggle to Paid.
+    // M02: marking an income paid opens a receipt-date dialog (cash-basis BAS
+    // attributes income to the payment period), it no longer toggles directly.
     const unpaidBadge = page.getByText(/^unpaid$/i).first();
     await unpaidBadge.click();
+
+    const paidDialog = page.getByRole('alertdialog', { name: 'Mark income as paid' });
+    await expect(paidDialog).toBeVisible();
+
+    // The dialog suggests today's receipt date (Australia/Sydney); keep it
+    // and confirm.
+    const receiptInput = paidDialog.locator('#mark-paid-receipt-date');
+    await expect(receiptInput).toBeVisible();
+    await paidDialog.getByRole('button', { name: /mark as paid/i }).click();
 
     // Verify toast notification
     await expect(page.getByText(/income marked as paid/i)).toBeVisible();
 
-    // Verify badge changed to "Paid"
-    await expect(page.getByText(/^paid$/i).first()).toBeVisible();
+    // Verify badge changed to "Paid <receipt date>"
+    const auToday = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Australia/Sydney',
+    }).format(new Date());
+    await expect(page.getByText(`Paid ${auToday}`).first()).toBeVisible();
   });
 
   test('should toggle paid status from paid to unpaid', async ({ page }) => {
@@ -151,14 +165,17 @@ test.describe('Income CRUD Flow', () => {
       await paidCheckbox.check();
     }
 
+    // M02: a newly paid income requires an explicit receipt date in the form
+    await dialog.getByLabel(/receipt date/i).fill(today);
+
     await dialog.getByRole('button', { name: /save income/i }).click();
     await expect(page.getByRole('dialog')).not.toBeVisible();
 
     // Wait for income to appear (use .first() for multiple rows)
     await expect(page.getByText('Test Paid Income').first()).toBeVisible();
 
-    // Find the "Paid" badge and click it to toggle to Unpaid
-    const paidBadge = page.getByText(/^paid$/i).first();
+    // Find the "Paid <date>" badge and click it to toggle to Unpaid
+    const paidBadge = page.getByText(/^paid \d{4}-\d{2}-\d{2}$/i).first();
     await paidBadge.click();
 
     // Verify badge changed to "Unpaid"

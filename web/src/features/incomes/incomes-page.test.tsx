@@ -43,6 +43,23 @@ const mockedUseDeleteIncome = vi.mocked(useDeleteIncome);
 const mockedUseMarkPaid = vi.mocked(useMarkPaid);
 const mockedUseMarkUnpaid = vi.mocked(useMarkUnpaid);
 
+const createIncome = (
+  overrides: Partial<IncomeResponseDto> & { id: string },
+): IncomeResponseDto => ({
+  date: '2026-06-30T00:00:00Z',
+  clientId: 'client-1',
+  invoiceNum: 'INV-001',
+  description: 'Consulting services',
+  subtotalCents: 100000,
+  gstCents: 10000,
+  totalCents: 110000,
+  isPaid: false,
+  createdAt: '2026-06-30T10:30:00Z',
+  updatedAt: '2026-06-30T10:30:00Z',
+  client: { id: 'client-1', name: 'Acme Corp', isPsiEligible: false },
+  ...overrides,
+});
+
 describe('IncomesPage', () => {
   it('renders incomes table rows when data is available', () => {
     const incomes: IncomeResponseDto[] = [
@@ -501,5 +518,117 @@ describe('IncomesPage', () => {
     // Modal should be visible
     expect(screen.getByRole('dialog', { name: 'Add income' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Save income' })).toBeInTheDocument();
+  });
+
+  it('asks for a receipt date before marking an unpaid income as paid (M02)', async () => {
+    const user = userEvent.setup();
+    const markPaid = vi.fn();
+
+    mockedUseIncomes.mockReturnValue({
+      data: [
+        createIncome({ id: 'unpaid-1', isPaid: false }),
+      ],
+      isLoading: false,
+      isError: false,
+    });
+
+    mockedUseClients.mockReturnValue({ data: [] });
+
+    mockedUseCreateIncome.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as unknown as ReturnType<typeof useCreateIncome>);
+
+    mockedUseUpdateIncome.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as unknown as ReturnType<typeof useUpdateIncome>);
+
+    mockedUseDeleteIncome.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as unknown as ReturnType<typeof useDeleteIncome>);
+
+    mockedUseMarkPaid.mockReturnValue({
+      mutate: markPaid,
+    } as unknown as ReturnType<typeof useMarkPaid>);
+
+    mockedUseMarkUnpaid.mockReturnValue({
+      mutate: vi.fn(),
+    } as unknown as ReturnType<typeof useMarkUnpaid>);
+
+    render(
+      <MemoryRouter>
+        <IncomesPage />
+      </MemoryRouter>,
+    );
+
+    // Unpaid badge opens the receipt-date dialog instead of marking paid directly
+    await user.click(screen.getByRole('button', { name: 'Unpaid' }));
+
+    const dialog = screen.getByRole('alertdialog', { name: 'Mark income as paid' });
+    expect(dialog).toBeInTheDocument();
+
+    const dateInput = screen.getByLabelText('Receipt date', { selector: 'input' });
+    expect(dateInput).toHaveValue(
+      new Intl.DateTimeFormat('en-CA', { timeZone: 'Australia/Sydney' }).format(new Date()),
+    );
+
+    await user.clear(dateInput);
+    await user.type(dateInput, '2026-07-02');
+    await user.click(screen.getByRole('button', { name: 'Mark as paid' }));
+
+    expect(markPaid).toHaveBeenCalledTimes(1);
+    expect(markPaid).toHaveBeenCalledWith(
+      { id: 'unpaid-1', paymentDate: '2026-07-02' },
+      expect.any(Object),
+    );
+  });
+
+  it('marks a paid income unpaid directly without a receipt-date dialog (M02)', async () => {
+    const user = userEvent.setup();
+    const markUnpaid = vi.fn();
+
+    mockedUseIncomes.mockReturnValue({
+      data: [createIncome({ id: 'paid-1', isPaid: true, paymentDate: '2026-07-02' })],
+      isLoading: false,
+      isError: false,
+    });
+
+    mockedUseClients.mockReturnValue({ data: [] });
+
+    mockedUseCreateIncome.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as unknown as ReturnType<typeof useCreateIncome>);
+
+    mockedUseUpdateIncome.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as unknown as ReturnType<typeof useUpdateIncome>);
+
+    mockedUseDeleteIncome.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as unknown as ReturnType<typeof useDeleteIncome>);
+
+    mockedUseMarkPaid.mockReturnValue({
+      mutate: vi.fn(),
+    } as unknown as ReturnType<typeof useMarkPaid>);
+
+    mockedUseMarkUnpaid.mockReturnValue({
+      mutate: markUnpaid,
+    } as unknown as ReturnType<typeof useMarkUnpaid>);
+
+    render(
+      <MemoryRouter>
+        <IncomesPage />
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByRole('button', { name: /Paid 2026-07-02/ }));
+
+    expect(markUnpaid).toHaveBeenCalledWith('paid-1');
+    expect(screen.queryByRole('alertdialog', { name: 'Mark income as paid' })).not.toBeInTheDocument();
   });
 });

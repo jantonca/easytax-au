@@ -119,13 +119,19 @@ export function useDeleteIncome(): UseMutationResult<void, unknown, string> {
   });
 }
 
-export function useMarkPaid(): UseMutationResult<IncomeResponseDto, unknown, string> {
+interface MarkPaidVariables {
+  id: string;
+  /** Date the payment was received (YYYY-MM-DD); required by the API */
+  paymentDate: string;
+}
+
+export function useMarkPaid(): UseMutationResult<IncomeResponseDto, unknown, MarkPaidVariables> {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
 
-  return useMutation<IncomeResponseDto, unknown, string>({
-    mutationFn: async (id: string): Promise<IncomeResponseDto> =>
-      apiClient.patch<IncomeResponseDto>(`/incomes/${id}/paid`, {}),
+  return useMutation<IncomeResponseDto, unknown, MarkPaidVariables>({
+    mutationFn: async ({ id, paymentDate }): Promise<IncomeResponseDto> =>
+      apiClient.patch<IncomeResponseDto>(`/incomes/${id}/paid`, { paymentDate }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['incomes'] });
       showToast({ title: 'Income marked as paid' });
