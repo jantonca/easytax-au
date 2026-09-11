@@ -8,33 +8,39 @@ This document contains solutions to recurring technical challenges discovered du
 
 ## NestJS Multipart/Form-Data Boolean Parameters
 
-**Problem:** `@Transform()` decorators don't work for multipart/form-data uploads. Boolean query parameters arrive as strings (`"true"`, `"false"`) and aren't automatically converted.
+**Problem:** Multipart form fields always arrive as strings. With the global
+ValidationPipe's `enableImplicitConversion: true`, class-transformer coerces
+primitives with `Boolean(value)` **before** custom `@Transform()` decorators
+run, so a `"false"` multipart field arrives at the transform as the boolean
+`true`. JSON bodies carry real booleans, so the two transports need one
+coercion that works for both.
 
-**Solution:** Use separate endpoints with hardcoded boolean values instead of relying on query parameters.
+**Solution:** Combine an explicit pass-through `@Type(() => Object)` (which
+suppresses the implicit pre-coercion) with a strict `@Transform` that accepts
+`true/1` and `false/0/''` and leaves anything else untouched so `@IsBoolean`
+rejects it with 400. The shared helper lives in
+`src/modules/csv-import/dto/csv-import.dto.ts` (`parseBoolean` /
+`StrictBoolean`). Dedicated preview endpoints are retained as an explicit
+contract (the request DTO flag is honoured too), and dry runs persist nothing
+(no expenses/incomes/import-job rows).
 
 ```typescript
-// ❌ Don't do this - @Transform doesn't work with multipart
-@Post('import')
-import(@Query('dryRun') dryRun: boolean, @UploadedFile() file: Express.Multer.File) {
-  // dryRun will be a string, not boolean
-}
+// ❌ Don't do this - implicit conversion makes Boolean("false") === true
+dryRun?: boolean; // no @Type marker, no strict transform
 
-// ✅ Do this instead - separate endpoints with explicit values
-@Post('import/preview')
-async preview(@UploadedFile() file: Express.Multer.File) {
-  return this.csvImportService.import(file, true);  // dryRun: true
-}
-
-@Post('import')
-async import(@UploadedFile() file: Express.Multer.File) {
-  return this.csvImportService.import(file, false); // dryRun: false
-}
+// ✅ Do this - suppress implicit conversion, then coerce strictly
+@StrictBoolean() // = @Type(() => Object) + @Transform(parseBoolean)
+@IsBoolean()
+@IsOptional()
+dryRun?: boolean;
 ```
 
-**Reference:** Implementation notes from CSV Import feature (F2.4)
+**Reference:** M04 remediation (docs/audits/MAINTENANCE-REMEDIATION-2026-09.md);
+original CSV Import notes (F2.4)
 
 **Related Files:**
-- `src/modules/csv-import/csv-import.controller.ts`
+- `src/modules/csv-import/dto/csv-import.dto.ts`
+- `src/modules/csv-import/csv-import.controller.spec.ts`
 
 ---
 
@@ -148,22 +154,31 @@ date,description,amount
 
 ## Preview Data Saving to Database
 
-**Problem:** CSV import preview endpoint was saving data to the database instead of just returning a dry-run preview.
+**Problem:** CSV import previews must not create database records. Historically
+the actual-import endpoints also force-overwrote `dryRun` to `false`, and even
+a correctly-flagged dry run still wrote an import-job row.
 
-**Root Cause:** Using the same endpoint for both preview and actual import with a `dryRun` query parameter that wasn't being correctly parsed from multipart/form-data requests.
+**Root Cause:** the `dryRun` boolean was silently coerced (see
+"NestJS Multipart/Form-Data Boolean Parameters" above) and the import services
+created an `ImportJob` unconditionally.
 
-**Solution:** Create separate endpoints for preview and import (see "NestJS Multipart/Form-Data Boolean Parameters" above).
+**Solution:** the import services skip import-job creation entirely when
+`dryRun` is set, so a dry run persists nothing (no expenses, incomes, import
+jobs, or matched entities); the response's `importJobId` is `null` for dry
+runs. Both the dedicated `/preview` endpoints and the `dryRun=true` request
+flag behave identically.
 
 **Verification:**
 ```bash
-# Preview should NOT create database records
+# Preview should NOT create any database records (importJobId comes back null)
 POST /import/expenses/preview
 
-# Actual import SHOULD create database records
+# Actual import SHOULD create records and an import job
 POST /import/expenses
 ```
 
-**Reference:** CSV Import dry-run fix (F2.4)
+**Reference:** CSV Import dry-run fix (F2.4); M04 remediation
+(docs/audits/MAINTENANCE-REMEDIATION-2026-09.md)
 
 ---
 

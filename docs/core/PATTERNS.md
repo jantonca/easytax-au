@@ -215,42 +215,46 @@ export class BasService {
 
 ### [Multipart Boolean] Pattern
 
-**Rule**: NestJS `@Transform` decorators don't work reliably with multipart/form-data. Use **separate endpoints** with hardcoded boolean values.
+**Rule**: With the global ValidationPipe's `enableImplicitConversion: true`,
+class-transformer coerces primitives via `Boolean(value)` **before** custom
+`@Transform` decorators run, so a `"false"` multipart field arrives as `true`.
+Suppress the implicit pre-coercion with `@Type(() => Object)` and coerce
+strictly; do NOT rely on plain boolean fields, and do NOT force-overwrite
+flags in controllers (that is how the dry-run bug happened).
 
 **Problem:**
 ```typescript
-// ❌ WRONG - @Transform may fail with multipart uploads
+// ❌ WRONG - implicit conversion makes Boolean("false") === true
 export class CsvImportDto {
   @Transform(({ value }) => value === 'true')
-  dryRun?: boolean;  // May receive 'false' string and convert to true!
+  dryRun?: boolean;  // 'false' string arrives as true after implicit coercion
 }
 ```
 
 **Solution:**
 ```typescript
-// ✅ CORRECT - Separate endpoints with hardcoded values
-@Post('import/expenses/preview')
-@UseInterceptors(FileInterceptor('file'))
-async previewImport(@UploadedFile() file: Express.Multer.File, @Body() dto: CsvImportDto) {
-  const options = this.buildOptions({ ...dto, dryRun: true });  // Hardcoded
-  return this.service.importFromBuffer(file.buffer, options);
+// ✅ CORRECT - strict coercion via the shared helper
+import { StrictBoolean } from './dto/csv-import.dto';
+
+export class CsvImportDto {
+  @StrictBoolean() // = @Type(() => Object) + @Transform(parseBoolean)
+  @IsBoolean()
+  @IsOptional()
+  dryRun?: boolean;
 }
 
-@Post('import/expenses')
-@UseInterceptors(FileInterceptor('file'))
-async actualImport(@UploadedFile() file: Express.Multer.File, @Body() dto: CsvImportDto) {
-  const options = this.buildOptions({ ...dto, dryRun: false });  // Hardcoded
-  return this.service.importFromBuffer(file.buffer, options);
-}
+// The advertised flag is honoured end to end; dedicated preview endpoints
+// remain as an explicit contract, and dry runs persist nothing.
 ```
 
 **Real-World Usage:**
-- Expense import: `/import/expenses/preview` (dry run) vs `/import/expenses` (actual)
-- Income import: `/import/incomes/preview` (dry run) vs `/import/incomes` (actual)
+- Expense import: `/import/expenses/preview` (dry run) vs `/import/expenses` (actual, honours `dryRun=true` too)
+- Income import: `/import/incomes/preview` (dry run) vs `/import/incomes` (actual, honours `dryRun=true` too)
+- Dry-run responses return `importJobId: null` (nothing is persisted)
 
-**Reference:** `src/modules/csv-import/csv-import.controller.ts` (lines ~137, ~229, ~380)
-
-**Troubleshooting:** See `docs/core/TROUBLESHOOTING.md#nestjs-multipart-booleans`
+**Reference:** `docs/core/TROUBLESHOOTING.md` (NestJS Multipart/Form-Data
+Boolean Parameters); `src/modules/csv-import/dto/csv-import.dto.ts`;
+regression coverage in `src/modules/csv-import/csv-import.controller.spec.ts`
 
 ---
 
@@ -487,8 +491,9 @@ const { setValue, watch } = useForm();
 - `CreateClientModal` - Pre-fills name, sets safe defaults (PSI eligible: false)
 
 **Architecture:**
-- `/import/expenses/preview` → `dryRun: true` (no database save)
-- `/import/expenses` → `dryRun: false` (actual import with save)
+- `/import/expenses/preview` → dry run (no database save, `importJobId: null`)
+- `/import/expenses` → actual import (saves rows and an import job); a
+  `dryRun=true` field is honoured identically
 
 **Reference:** See `[Multipart Boolean] Pattern` for implementation details.
 
