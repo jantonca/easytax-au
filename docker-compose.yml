@@ -48,8 +48,10 @@ services:
 
   easytax-au-web:
     build:
-      context: ./web
-      dockerfile: Dockerfile
+      # Repository-root context: the web build needs the workspace manifests
+      # and shared/types, which live outside web/.
+      context: .
+      dockerfile: web/Dockerfile
       args:
         VITE_API_URL: /api
     container_name: easytax-au-web
