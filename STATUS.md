@@ -2,12 +2,13 @@
 
 Single source of truth for any agent or human. Read this first.
 
-**Updated:** 2026-09-11
+**Updated:** 2026-09-25
 
 > Note: this file is in a public repo. Private homelab specifics (CT IDs, IPs,
 > hostnames, the internal service domain, secret locations) are intentionally
 > kept out — they live in the gitignored homelab inventory
-> (`personal-ai-assistant/homelab/proxmox.local.md` and `pihole-bobelia.local.md`).
+> (`personal-ai-assistant/homelab/easytax.local.md`, with host context in
+> `proxmox.local.md` and `pihole-bobelia.local.md`).
 
 ## Current state
 **Deployed and live on the Proxmox homelab** (native multi-LXC, no Docker),
@@ -39,35 +40,45 @@ Recent merges to `main`:
   shared types; docs reconciled. Record: `docs/audits/MAINTENANCE-REMEDIATION-2026-09.md`
   (§8 maps every review finding, §9 lists the residual follow-ups).
 
-**The homelab deployment has NOT been updated with PR #6 yet.** The next
-`scripts/update-app.sh` run will apply the `payment_date` migration on startup.
+**The homelab deployment runs `main` (`a15e5f4`) since 2026-09-25** — PRs #4–#7
+are live, and the `AddIncomePaymentDate` migration has been applied. Both CTs were
+backed up first (vzdump + a logical DB dump) and had their Debian packages updated
+in the same window. Existing paid incomes now show as "Paid · no date" and stay
+out of CASH-basis totals until a receipt date is entered per record.
 
 ## Next steps (priority order)
 1. **Authentication (P2-4) + HTTPS-only** — the key remaining milestone, and a
    hard prerequisite before ANY internet exposure. The app is currently no-auth;
    anyone on the LAN can reach it. Scope: app-level auth + force HTTPS. Keep
    LAN-only until this lands.
-2. **Roll PR #6 out to the homelab** — take a verified DB backup on the DB CT
-   first (the migration is additive, but dropping `payment_date` later would
-   lose captured receipt dates), then run `scripts/update-app.sh` on the app CT
-   and confirm `/health` plus the BAS page. Existing paid incomes will show as
-   "Paid · no date" and stay out of CASH-basis totals until a receipt date is
-   entered per record — that reconciliation is a manual, one-time task.
+2. **Enter receipt dates for existing paid incomes** — a manual, one-time data
+   task in the app, needed before preparing the next CASH-basis BAS (Jul–Sep
+   quarter). Until then those incomes are excluded from CASH totals.
 3. **Remediation follow-ups** (non-blocking, from the report §9): LF-only line 13
    in `NEXT-TASKS.md`; compare the parsed date rather than the raw string in the
    future-date check (`incomes.service.ts`); apply the same future-date check to
    CSV receipt dates; UI confirmation before clearing a captured receipt date;
    vitest 4 upgrade (clears the last audit entry); drop the multer override once
    `@nestjs/platform-express` declares ≥ 2.3.0.
+   Deploy scripts, found during the 2026-09-25 rollout: `setup-db-lxc.sh` did not
+   leave the daily `pg_dump` cron entry at the original deploy (cause not
+   identified; the entry was added by hand); `update-app.sh` runs plain
+   `pnpm install` rather than `--frozen-lockfile`, prompts interactively, and is
+   overwritten by its own `git pull` while running.
 4. **Optional: reconcile `docs/DEPLOYMENT.md`** (the Docker Compose path) — still
    references Ubuntu 22.04. The images now build and run (validated in
    disposable containers during PR #6), but the Docker path has never been
    deployed; only worth reconciling if you intend to support it.
 
 ## Operating the deployment
-- Update app to latest: `scripts/update-app.sh` on the app CT (pulls, rebuilds,
-  restarts, health-checks; migrations auto-apply on restart).
-- Backups: weekly vzdump covers both CTs; the DB CT also runs a daily `pg_dump`.
+- Update app to latest: back up both CTs first, then on the app CT stop
+  `easytax-api`, fast-forward to `origin/main`, `pnpm install --frozen-lockfile`,
+  build backend and web, and start the service; migrations auto-apply on start.
+  `scripts/update-app.sh` does the same interactively (see its caveats above).
+  The exact procedure used is in the gitignored homelab inventory.
+- Backups: weekly vzdump covers both CTs; the DB CT also runs a daily `pg_dump`
+  (30-day retention, kept on the CT itself). That cron entry has only existed
+  since 2026-09-25 — before then the weekly vzdump was the only DB backup.
 - The encryption key (decrypts stored PII) is backed up off-box — must never
   change. Connection/host specifics: see the gitignored homelab inventory.
 
