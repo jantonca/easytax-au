@@ -47,7 +47,9 @@ async function bootstrap(): Promise<void> {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  await app.listen(process.env.PORT ?? 3000);
+  // HOST=127.0.0.1 keeps the API reachable only through a reverse proxy on the
+  // same host; the 0.0.0.0 default is what the Docker port mapping needs.
+  await app.listen(process.env.PORT ?? 3000, process.env.HOST ?? '0.0.0.0');
 }
 
 void bootstrap();
