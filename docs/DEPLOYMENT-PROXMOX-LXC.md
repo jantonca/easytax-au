@@ -335,6 +335,8 @@ DB_NAME=easytax-au
 # Application Configuration
 NODE_ENV=production
 PORT=3000
+# Listen on loopback only: nginx is the sole entry point to the API
+HOST=127.0.0.1
 
 # Security Configuration
 ENCRYPTION_KEY=REPLACE_WITH_64_CHAR_HEX_KEY
@@ -472,7 +474,9 @@ server {
         # Remove /api prefix before forwarding
         rewrite ^/api/(.*) /$1 break;
 
-        proxy_pass http://localhost:3000;
+        # 127.0.0.1, not localhost: the API listens on IPv4 loopback only, and
+        # localhost may resolve to ::1 first
+        proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;
 
         # Headers
