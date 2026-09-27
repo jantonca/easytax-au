@@ -410,6 +410,7 @@ Documentation is organized into three tiers to separate active development from 
 | [docs/core/ARCHITECTURE.md](docs/core/ARCHITECTURE.md)                     | System design and tech stack                           |
 | [docs/core/PATTERNS.md](docs/core/PATTERNS.md)                             | Implementation patterns and conventions                |
 | [docs/core/TROUBLESHOOTING.md](docs/core/TROUBLESHOOTING.md)               | Common issues and solutions                            |
+| [docs/core/TESTING.md](docs/core/TESTING.md)                               | Test tiers, disposable-DB runbook, type-check baseline |
 | [docs/core/ATO-LOGIC.md](docs/core/ATO-LOGIC.md)                           | Australian tax rules and GST calculations              |
 | [docs/core/SCHEMA.md](docs/core/SCHEMA.md)                                 | Database structure and entity relationships            |
 | [docs/FUTURE-ENHANCEMENTS.md](docs/FUTURE-ENHANCEMENTS.md)                 | Deferred features (living backlog)                     |

@@ -87,7 +87,7 @@ out of CASH-basis totals until a receipt date is entered per record.
   (note: `pnpm run lint` uses `--fix` and mutates files)
 - Backend integration (`pnpm run test:e2e`): needs a **disposable** Postgres and
   explicit `DB_*` + `NODE_ENV=test`; the suites refuse any DB name without a
-  `test`/`audit` token and wipe all data. Runbook: remediation report §9.
+  `test`/`audit` token and wipe all data. Runbook: `docs/core/TESTING.md`.
 - CI (PR to `main`) runs all of the above plus Playwright; it is the acceptance gate.
 - Web: `pnpm --filter web lint` + `pnpm --filter web exec vitest run` + `pnpm --filter web build`
 - Shell scripts: `bash -n scripts/<name>.sh` (and keep them LF per `.gitattributes`)
