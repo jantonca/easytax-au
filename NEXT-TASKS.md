@@ -135,6 +135,15 @@ verified DB backup and a reviewed migration (`/schema-change`).
   - add a UI confirmation before clearing a captured receipt date;
   - upgrade to vitest 4 (clears the last audit advisory);
   - drop the multer override once `@nestjs/platform-express` requires ≥ 2.3.0.
+- **`.gitignore` line endings:** the file is CRLF and contains a CR-only line
+  that makes `git check-ignore` report any `dir/` path as ignored
+  (`scripts/check-doc-refs.mjs` works around it). Add `.gitignore text eol=lf`
+  to `.gitattributes` and renormalise it.
+- **`/deploy` command:** `.claude/commands/deploy.md` still describes a
+  Docker-oriented flow; rewrite it around the LXC update procedure in `STATUS.md`.
+- **Local blame (per clone):** run
+  `git config blame.ignoreRevsFile .git-blame-ignore-revs` so `git blame`
+  skips the LF-normalisation commit (GitHub already does).
 
 ## Feature backlog (after P0/P1)
 
