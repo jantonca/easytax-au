@@ -1,2 +1,5 @@
 # Shell scripts must use LF endings to run on Linux (CRLF breaks them)
 *.sh text eol=lf
+
+# Markdown uses LF endings (normalised 2026-09-27)
+*.md text eol=lf
