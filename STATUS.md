@@ -37,7 +37,7 @@ Recent merges to `main`:
   (lint/unit/build, guarded backend-integration job, Playwright); CSV `dryRun`
   honoured with zero writes; Docker images rebuilt on the repo-root context and
   validated in disposable containers; nullable response contracts + regenerated
-  shared types; docs reconciled. Record: `docs/audits/MAINTENANCE-REMEDIATION-2026-09.md`
+  shared types; docs reconciled. Record: `docs/archive/maintenance-2026-09/MAINTENANCE-REMEDIATION-2026-09.md`
   (§8 maps every review finding, §9 lists the residual follow-ups).
 
 **The homelab deployment runs `main` (`a15e5f4`) since 2026-09-25** — PRs #4–#7

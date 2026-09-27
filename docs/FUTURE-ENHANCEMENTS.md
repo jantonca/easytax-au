@@ -34,7 +34,7 @@
 
 ## 🔍 Audit-Identified Enhancements (P2)
 
-**Source:** Consolidated audit (AUDIT-FINAL-2026-02-15.md)
+**Source:** Consolidated audit (`docs/archive/audits-2026-02/AUDIT-FINAL-2026-02-15.md`)
 **Priority:** 🟡 Medium (nice-to-have improvements, not blockers)
 
 These items were identified during the audit process as potential enhancements but are not critical for production use. They represent opportunities for future refinement.

@@ -35,7 +35,7 @@ dryRun?: boolean; // no @Type marker, no strict transform
 dryRun?: boolean;
 ```
 
-**Reference:** M04 remediation (docs/audits/MAINTENANCE-REMEDIATION-2026-09.md);
+**Reference:** M04 remediation (docs/archive/maintenance-2026-09/MAINTENANCE-REMEDIATION-2026-09.md);
 original CSV Import notes (F2.4)
 
 **Related Files:**
@@ -178,7 +178,7 @@ POST /import/expenses
 ```
 
 **Reference:** CSV Import dry-run fix (F2.4); M04 remediation
-(docs/audits/MAINTENANCE-REMEDIATION-2026-09.md)
+(docs/archive/maintenance-2026-09/MAINTENANCE-REMEDIATION-2026-09.md)
 
 ---
 
