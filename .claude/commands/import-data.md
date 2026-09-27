@@ -115,7 +115,7 @@ pnpm run test src/modules/csv-import/csv-import.service.spec.ts
 **Test data files:**
 ```bash
 # Create test CSV files
-mkdir -p backend/test/fixtures/csv/
+mkdir -p test/fixtures/csv/   # synthetic data only — never real statements
 # valid-transactions.csv - all correct
 # invalid-gst.csv - wrong GST calculations
 # invalid-dates.csv - bad date formats

@@ -223,7 +223,7 @@ docker compose up -d --build
 
 - [ ] Set strong `DB_PASSWORD` (use password manager)
 - [ ] Generate unique `ENCRYPTION_KEY` (use `openssl rand -hex 32`)
-- [ ] Configure automatic backups for `./pgdata` directory
+- [ ] Configure automatic backups of the `easytax-au-pgdata` volume (see `docs/core/BACKUP.md`)
 - [ ] Set up Traefik with Let's Encrypt for HTTPS
 - [ ] Review firewall rules (only expose port 80/443 via Traefik)
 - [ ] Test backup restoration process

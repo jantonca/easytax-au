@@ -16,7 +16,7 @@ Schema change description: $ARGUMENTS
 - `docs/core/ARCHITECTURE.md` - Database layer patterns
 
 **Understand:**
-- Which fields are encrypted (`@Encrypted()` decorator)
+- Which fields are encrypted (`EncryptedColumnTransformer` on the column)
 - Entity relationships (OneToMany, ManyToOne, ManyToMany)
 - Existing migrations (`src/migrations/`)
 - Type generation workflow
@@ -80,11 +80,10 @@ export class MigrationName1234567890123 implements MigrationInterface {
 // 1. Read encrypted data with entity (auto-decrypts)
 const records = await this.repo.find();
 
-// 2. Modify entity definition (add @Encrypted() to new field)
+// 2. Modify entity definition (encrypted columns are text + transformer)
 @Entity()
 class MyEntity {
-  @Column()
-  @Encrypted()
+  @Column({ type: 'text', transformer: new EncryptedColumnTransformer() })
   newEncryptedField: string;
 }
 
@@ -297,8 +296,10 @@ await queryRunner.query(`
 
 **Steps:**
 1. **Backup database** (MANDATORY)
-2. Add `@Encrypted()` decorator to entity property
-3. **Do NOT generate migration** (encryption happens in app layer)
+2. Add `transformer: new EncryptedColumnTransformer()` to the entity column
+   (encrypted values are stored as `text`; see `docs/core/SECURITY.md`)
+3. Generate a schema migration **only** if the column type changes (e.g. to
+   `text`); the encryption itself happens in the app layer
 4. Create data migration script:
 ```typescript
 // scripts/migrate-encrypted-field.ts
