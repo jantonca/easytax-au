@@ -99,8 +99,10 @@ verified DB backup and a reviewed migration (`/schema-change`).
 
 22. **N06:** fix or remove the unmounted `ImportHistory` component. It calls
     `/import/jobs`, but the backend route is `/import-jobs`.
-23. **Then** `docs/plans/AI-STATEMENT-RECONCILIATION.md`, which depends on
-    item 8 (rollback) and the P0 import fixes.
+23. **Then** [`docs/plans/AI-STATEMENT-RECONCILIATION.md`](docs/plans/AI-STATEMENT-RECONCILIATION.md).
+    It depends on the P0 import fixes (items 4–7) and on N07 (item 10). It
+    creates expenses only, so expense rollback already works; N01 (item 8)
+    matters only if it ever reconciles incomes.
 
 ## P2: Performance and UX correctness
 

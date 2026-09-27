@@ -74,6 +74,7 @@ calculations, mutations) 80%+, UI components 60%+, pure functions 90%+.
 | Running tests / disposable DB | `docs/core/TESTING.md` |
 
 Current deployed state: `STATUS.md`. Active backlog: `NEXT-TASKS.md`.
+Current audits: `docs/audits/`. Proposed feature plans: `docs/plans/`.
 Ignore `docs/archive/` unless explicitly asked about a past version.
 
 ## Tooling

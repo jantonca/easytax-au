@@ -398,6 +398,7 @@ EasyTax-AU is fully keyboard accessible. All features can be used without a mous
 | [STATUS.md](STATUS.md)                                             | **Start Here:** current deployed state and headline next steps |
 | [NEXT-TASKS.md](NEXT-TASKS.md)                                     | Active prioritised backlog (audit remediation, auth, features) |
 | [docs/audits/](docs/audits/)                                       | Current audit cycle (findings referenced by NEXT-TASKS IDs)    |
+| [docs/plans/](docs/plans/)                                         | Proposed feature plans (not yet scheduled work)                |
 | [docs/FUTURE-ENHANCEMENTS.md](docs/FUTURE-ENHANCEMENTS.md)         | Deferred, optional enhancements                                |
 | [AGENTS.md](AGENTS.md)                                             | Project rules for AI agents (Claude Code, OpenCode, Codex)     |
 | [.github/copilot-instructions.md](.github/copilot-instructions.md) | Critical guardrails for GitHub Copilot                         |
