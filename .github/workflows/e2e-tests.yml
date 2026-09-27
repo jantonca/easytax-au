@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Check documentation references
+        run: pnpm run docs:check
+
       - name: Lint backend (non-autofix)
         run: pnpm exec eslint 'src/**/*.ts' 'test/**/*.ts'
 

@@ -7,6 +7,7 @@ TDD rule and coverage targets, see `AGENTS.md`.
 
 | Tier | Command | Needs | Notes |
 |------|---------|-------|-------|
+| Doc references | `pnpm run docs:check` | — | Paths in Markdown links, code spans and code blocks must exist (`docs/archive/` skipped) |
 | Backend lint (non-mutating) | `pnpm exec eslint "src/**/*.ts" "test/**/*.ts"` | — | `pnpm run lint` runs `--fix` and **mutates files** |
 | Backend unit | `pnpm run test` | — | Jest, `rootDir: src`, `*.spec.ts` only |
 | Backend build | `pnpm run build` | — | `tsconfig.build.json` excludes `test/` and `*spec.ts` |
@@ -30,7 +31,8 @@ pre-existing. Any other error is new.
 `.github/workflows/e2e-tests.yml` runs four jobs on PRs to `main`, and CI is
 the acceptance gate:
 
-1. `backend-checks` runs lint, unit tests with coverage and the build.
+1. `backend-checks` runs the doc-reference check, lint, unit tests with coverage
+   and the build.
 2. `frontend-checks` runs lint, vitest and the build.
 3. `backend-integration` runs the integration suites against an ephemeral
    Postgres service.
