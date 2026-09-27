@@ -40,23 +40,24 @@ This document describes the system architecture, tech stack, and module organiza
 
 ## Backend Tech Stack
 
+Exact versions live in `package.json` / `web/package.json`; this table gives majors only.
+
 | Layer               | Technology      | Version        | Notes                            |
 | ------------------- | --------------- | -------------- | -------------------------------- |
-| **Runtime**         | Node.js         | 22 LTS         | Long-term support until Apr 2027 |
-| **Node Manager**    | fnm             | Latest         | Fast Node Manager                |
-| **Package Manager** | pnpm            | 11.x           | Fast, disk-efficient             |
-| **Framework**       | NestJS          | 10.x           | Modular Monolith                 |
+| **Runtime**         | Node.js         | 22 LTS         | Pinned by `.node-version` + `engines` (`>=22 <23`); any version manager |
+| **Package Manager** | pnpm            | 11.x           | `packageManager` field in `package.json` |
+| **Framework**       | NestJS          | 11.x           | Modular Monolith                 |
 | **ORM**             | TypeORM         | 0.3.x          | With custom AES-256 transformers |
-| **Database**        | PostgreSQL      | 15-alpine      | Docker image                     |
+| **Database**        | PostgreSQL      | 15             | Native in the LXC deploy; `15-alpine` image for Docker |
 | **Math**            | decimal.js      | Latest         | All currency/GST calculations    |
 | **Validation**      | class-validator | Latest         | DTO validation with decorators   |
 | **Config**          | @nestjs/config  | Latest         | Environment variable management  |
 | **API Docs**        | @nestjs/swagger | Latest         | Auto-generated OpenAPI docs      |
 | **Encryption**      | Node.js crypto  | Built-in       | AES-256-GCM for sensitive fields |
-| **Testing**         | Jest            | NestJS default | Unit + integration tests         |
+| **Testing**         | Jest            | 30.x           | Unit + integration tests (`docs/core/TESTING.md`) |
 | **Linting**         | ESLint          | 9.x            | Code quality enforcement         |
 | **Formatting**      | Prettier        | 3.x            | Consistent code style            |
-| **Container**       | Docker Compose  | Latest         | Single-host deployment           |
+| **Deployment**      | Proxmox LXC     | —              | Native multi-LXC (live); Docker Compose is an untested alternative |
 
 ---
 
@@ -592,15 +593,12 @@ export const apiClient = {
 ## Prerequisites
 
 ```bash
-# Install fnm (Fast Node Manager)
-curl -fsSL https://fnm.vercel.app/install | bash
+# Node.js 22 (pinned in .node-version); install it with your version manager
+node --version   # must report v22.x
 
-# Install Node.js 22 LTS
-fnm install 22
-fnm use 22
-
-# Install pnpm globally
-npm install -g pnpm
+# pnpm via Corepack (version from package.json "packageManager")
+corepack enable
+pnpm --version
 ```
 
 ### ESLint + Prettier Configuration
