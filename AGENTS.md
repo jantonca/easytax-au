@@ -73,8 +73,8 @@ calculations, mutations) 80%+, UI components 60%+, pure functions 90%+.
 | Framework bugs / workarounds | `docs/core/TROUBLESHOOTING.md` |
 | Running tests / disposable DB | `docs/core/TESTING.md` |
 
-Active work: `NEXT-TASKS.md`. Ignore `docs/archive/` unless explicitly
-asked about a past version.
+Current deployed state: `STATUS.md`. Active backlog: `NEXT-TASKS.md`.
+Ignore `docs/archive/` unless explicitly asked about a past version.
 
 ## Tooling
 Claude Code skills live in `.claude/commands/` (`/plan`, `/tdd`, `/debug`,

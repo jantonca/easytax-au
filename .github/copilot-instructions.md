@@ -43,8 +43,8 @@ pure functions 90%+.
 | Security / encryption | `docs/core/SECURITY.md` |
 | Framework bugs | `docs/core/TROUBLESHOOTING.md` |
 
-Active work: `NEXT-TASKS.md`. Ignore `docs/archive/` unless asked about a
-past version.
+Current state: `STATUS.md`. Active backlog: `NEXT-TASKS.md`. Ignore
+`docs/archive/` unless asked about a past version.
 
 ## ✔️ Project-specific pre-submission checklist
 - [ ] Currency stored as integer cents (not floats/dollars)

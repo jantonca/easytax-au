@@ -388,7 +388,8 @@ Documentation is organized into three tiers to separate active development from 
 
 | Document                                                           | Purpose                                                       |
 | ------------------------------------------------------------------ | ------------------------------------------------------------- |
-| [NEXT-TASKS.md](NEXT-TASKS.md)                                     | **Start Here:** Upcoming tasks and active sprint backlog      |
+| [STATUS.md](STATUS.md)                                             | **Start Here:** current deployed state and headline next steps |
+| [NEXT-TASKS.md](NEXT-TASKS.md)                                     | Active prioritised backlog (audit remediation, auth, features) |
 | [.github/copilot-instructions.md](.github/copilot-instructions.md) | AI agent directives, UI/UX guidelines, and workflow protocols |
 
 ### 🏗 Core Documentation (Technical Reference)
@@ -406,7 +407,6 @@ Documentation is organized into three tiers to separate active development from 
 
 | Document                                                                   | Purpose                                                |
 | -------------------------------------------------------------------------- | ------------------------------------------------------ |
-| [NEXT-TASKS.md](NEXT-TASKS.md)                                             | Current sprint tasks (v1.2.0 UX Enhancements)          |
 | [docs/core/ARCHITECTURE.md](docs/core/ARCHITECTURE.md)                     | System design and tech stack                           |
 | [docs/core/PATTERNS.md](docs/core/PATTERNS.md)                             | Implementation patterns and conventions                |
 | [docs/core/TROUBLESHOOTING.md](docs/core/TROUBLESHOOTING.md)               | Common issues and solutions                            |
