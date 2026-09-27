@@ -103,7 +103,7 @@ pnpm --filter web dev    # http://localhost:5173
 || `pnpm run test` | Run backend unit tests |
 || `pnpm run test:cov` | Run backend tests with coverage report |
 || `pnpm run test:e2e` | Run backend end-to-end tests |
-|| `pnpm run lint` | Run backend ESLint |
+|| `pnpm run lint` | Run backend ESLint with `--fix` (mutates files) |
 || `pnpm run format` | Run Prettier on backend source |
 || `pnpm run generate:types` | Generate shared API types to `shared/types/api.d.ts` |
 
@@ -114,7 +114,7 @@ pnpm --filter web dev    # http://localhost:5173
 | Method                    | Best For                       | Efficiency                  | Guide                                                                |
 | ------------------------- | ------------------------------ | --------------------------- | -------------------------------------------------------------------- |
 | **Multi-LXC (Native)** ⭐ | Proxmox users                  | Most efficient (~1.5GB RAM) | **[docs/DEPLOYMENT-PROXMOX-LXC.md](docs/DEPLOYMENT-PROXMOX-LXC.md)** |
-| **Docker Compose**        | Portability, non-Proxmox hosts | Good (~3GB RAM)             | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)                             |
+| **Docker Compose**        | Portability, non-Proxmox hosts | Good (~3GB RAM)             | [docs/DEPLOYMENT-DOCKER.md](docs/DEPLOYMENT-DOCKER.md) (unverified) |
 
 **Recommended:** Use Multi-LXC deployment if running on Proxmox for better performance and resource usage.
 
@@ -123,6 +123,11 @@ pnpm --filter web dev    # http://localhost:5173
 ### Docker Deployment (Full Stack)
 
 For Docker-based deployment (VMs, cloud servers, or non-Proxmox environments):
+
+> ⚠️ **Unverified path.** The Docker setup has never been used for a real
+> deployment. Its frontend build uses `VITE_API_URL=/api`, which the API
+> client currently rejects (I05 in `NEXT-TASKS.md`). See
+> [docs/DEPLOYMENT-DOCKER.md](docs/DEPLOYMENT-DOCKER.md).
 
 #### Standard Deployment (HTTP)
 
@@ -218,7 +223,7 @@ docker compose up -d --build
 
 - [ ] Set strong `DB_PASSWORD` (use password manager)
 - [ ] Generate unique `ENCRYPTION_KEY` (use `openssl rand -hex 32`)
-- [ ] Configure automatic backups for `./pgdata` directory
+- [ ] Configure automatic backups of the `easytax-au-pgdata` volume (see `docs/core/BACKUP.md`)
 - [ ] Set up Traefik with Let's Encrypt for HTTPS
 - [ ] Review firewall rules (only expose port 80/443 via Traefik)
 - [ ] Test backup restoration process
@@ -382,38 +387,49 @@ EasyTax-AU is fully keyboard accessible. All features can be used without a mous
 
 ## 📚 Documentation
 
-Documentation is organized into three tiers to separate active development from historical context.
+**Read in this order:** `STATUS.md` (current state), then `NEXT-TASKS.md`
+(backlog), then the core doc for your task. Agents follow `AGENTS.md`.
+`docs/archive/` is history only.
 
-### ⭐ Active Development
+### ⭐ Active Work
 
-| Document                                                           | Purpose                                                       |
-| ------------------------------------------------------------------ | ------------------------------------------------------------- |
-| [NEXT-TASKS.md](NEXT-TASKS.md)                                     | **Start Here:** Upcoming tasks and active sprint backlog      |
-| [.github/copilot-instructions.md](.github/copilot-instructions.md) | AI agent directives, UI/UX guidelines, and workflow protocols |
+| Document                                                           | Purpose                                                        |
+| ------------------------------------------------------------------ | -------------------------------------------------------------- |
+| [STATUS.md](STATUS.md)                                             | **Start Here:** current deployed state and headline next steps |
+| [NEXT-TASKS.md](NEXT-TASKS.md)                                     | Active prioritised backlog (audit remediation, auth, features) |
+| [docs/audits/](docs/audits/)                                       | Current audit cycle (findings referenced by NEXT-TASKS IDs)    |
+| [docs/plans/](docs/plans/)                                         | Proposed feature plans (not yet scheduled work)                |
+| [docs/FUTURE-ENHANCEMENTS.md](docs/FUTURE-ENHANCEMENTS.md)         | Deferred, optional enhancements                                |
+| [AGENTS.md](AGENTS.md)                                             | Project rules for AI agents (Claude Code, OpenCode, Codex)     |
+| [.github/copilot-instructions.md](.github/copilot-instructions.md) | Critical guardrails for GitHub Copilot                         |
 
 ### 🏗 Core Documentation (Technical Reference)
 
-| Document                                               | Purpose                                                          |
-| ------------------------------------------------------ | ---------------------------------------------------------------- |
-| [docs/core/ATO-LOGIC.md](docs/core/ATO-LOGIC.md)       | **CRITICAL:** Australian tax rules, GST calculations, BAS labels |
-| [docs/core/ARCHITECTURE.md](docs/core/ARCHITECTURE.md) | System design, module structure, and tech stack                  |
-| [docs/core/SCHEMA.md](docs/core/SCHEMA.md)             | Database entities, relationships, and encryption specs           |
-| [docs/core/SECURITY.md](docs/core/SECURITY.md)         | Encryption implementation, key management, and data sovereignty  |
-| [docs/core/BACKUP.md](docs/core/BACKUP.md)             | 3-2-1 backup strategy and recovery procedures                    |
-| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)               | Docker deployment guide                                          |
+| Document                                                     | Purpose                                                          |
+| ------------------------------------------------------------ | ---------------------------------------------------------------- |
+| [docs/core/ATO-LOGIC.md](docs/core/ATO-LOGIC.md)             | **CRITICAL:** Australian tax rules, GST calculations, BAS labels |
+| [docs/core/CASH-BASIS-DESIGN.md](docs/core/CASH-BASIS-DESIGN.md) | Cash-basis BAS and income payment dates                      |
+| [docs/core/ARCHITECTURE.md](docs/core/ARCHITECTURE.md)       | System design, module structure, and tech stack                  |
+| [docs/core/PATTERNS.md](docs/core/PATTERNS.md)               | Implementation patterns and conventions                          |
+| [docs/core/SCHEMA.md](docs/core/SCHEMA.md)                   | Database tables, indexes and constraints (from the migrations)   |
+| [docs/core/SECURITY.md](docs/core/SECURITY.md)               | Encryption implementation, key management, and data sovereignty  |
+| [docs/core/TESTING.md](docs/core/TESTING.md)                 | Test tiers, disposable-DB runbook, type-check baseline           |
+| [docs/core/TROUBLESHOOTING.md](docs/core/TROUBLESHOOTING.md) | Framework bugs and known workarounds                             |
+| [docs/core/BACKUP.md](docs/core/BACKUP.md)                   | Backups that actually run, their gaps, and restore               |
+
+### 🚀 Deployment
+
+| Document                                                             | Purpose                                         |
+| -------------------------------------------------------------------- | ----------------------------------------------- |
+| [docs/DEPLOYMENT-PROXMOX-LXC.md](docs/DEPLOYMENT-PROXMOX-LXC.md)     | Native multi-LXC deployment (the live path)     |
+| [scripts/README.md](scripts/README.md)                               | LXC setup/update scripts and their known issues |
+| [docs/DEPLOYMENT-DOCKER.md](docs/DEPLOYMENT-DOCKER.md)               | Docker Compose deployment (unverified)          |
 
 ### 📦 Archive (Historical)
 
-| Document                                                                   | Purpose                                                |
-| -------------------------------------------------------------------------- | ------------------------------------------------------ |
-| [NEXT-TASKS.md](NEXT-TASKS.md)                                             | Current sprint tasks (v1.2.0 UX Enhancements)          |
-| [docs/core/ARCHITECTURE.md](docs/core/ARCHITECTURE.md)                     | System design and tech stack                           |
-| [docs/core/PATTERNS.md](docs/core/PATTERNS.md)                             | Implementation patterns and conventions                |
-| [docs/core/TROUBLESHOOTING.md](docs/core/TROUBLESHOOTING.md)               | Common issues and solutions                            |
-| [docs/core/ATO-LOGIC.md](docs/core/ATO-LOGIC.md)                           | Australian tax rules and GST calculations              |
-| [docs/core/SCHEMA.md](docs/core/SCHEMA.md)                                 | Database structure and entity relationships            |
-| [docs/FUTURE-ENHANCEMENTS.md](docs/FUTURE-ENHANCEMENTS.md)                 | Deferred features (living backlog)                     |
-| [docs/archive/v1.0-CHANGELOG.md](docs/archive/v1.0-CHANGELOG.md)           | MVP release summary                                    |
-| [docs/archive/v1.1-CHANGELOG.md](docs/archive/v1.1-CHANGELOG.md)           | System management release summary                      |
-
-**Note:** The tiered structure reduces AI context bloat by ~80%, focusing agents on active work in `NEXT-TASKS.md` and critical tax logic in `docs/core/ATO-LOGIC.md`.
+| Document                                                         | Purpose                                            |
+| ---------------------------------------------------------------- | -------------------------------------------------- |
+| [docs/archive/](docs/archive/)                                   | Release changelogs, past audits, completed work    |
+| [docs/archive/v1.0-CHANGELOG.md](docs/archive/v1.0-CHANGELOG.md) | MVP release summary                                |
+| [docs/archive/v1.1-CHANGELOG.md](docs/archive/v1.1-CHANGELOG.md) | System management release summary                  |
+| [docs/archive/v1.3-CHANGELOG.md](docs/archive/v1.3-CHANGELOG.md) | UX enhancements release (in progress)              |

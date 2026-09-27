@@ -1,7 +1,7 @@
 # /plan - Task Discovery & Prioritization
 
 ## Purpose
-Analyze `NEXT-TASKS.md` and `FUTURE-ENHANCEMENTS.md` to recommend the next highest-priority task with justification.
+Analyze `NEXT-TASKS.md` and `docs/FUTURE-ENHANCEMENTS.md` to recommend the next highest-priority task with justification.
 
 ## Context
 User arguments: $ARGUMENTS
@@ -10,8 +10,8 @@ User arguments: $ARGUMENTS
 
 ### 1. Read Task Files
 - Read `NEXT-TASKS.md` (current sprint/version tasks)
-- Read `FUTURE-ENHANCEMENTS.md` (backlog ideas)
-- Read `docs/archive/CHANGELOG.md` (understand what's shipped)
+- Read `docs/FUTURE-ENHANCEMENTS.md` (backlog ideas)
+- Read `STATUS.md` and `docs/archive/v1.*-CHANGELOG.md` (understand what's shipped)
 
 ### 2. Analyze Current State
 - Check git status for work-in-progress
@@ -50,7 +50,7 @@ Use `/tdd` to implement with test-first workflow
 - **Never** recommend tasks with unresolved blockers
 - **Prefer** compliance/security tasks over features when both are P1
 - **Flag** if NEXT-TASKS.md is empty or outdated
-- **Check** for P0/P1 items in recent audit reports (`docs/reports/audit/`)
+- **Check** for P0/P1 items in recent audit reports (`docs/audits/`)
 
 ## Australian Domain Context
 - Tax year = July 1 - June 30

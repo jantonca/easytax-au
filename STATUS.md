@@ -1,8 +1,8 @@
 # Project Status & Next Steps
 
-Single source of truth for any agent or human. Read this first.
+Current deployed state — read this first. The prioritised backlog is `NEXT-TASKS.md`.
 
-**Updated:** 2026-09-25
+**Updated:** 2026-09-27
 
 > Note: this file is in a public repo. Private homelab specifics (CT IDs, IPs,
 > hostnames, the internal service domain, secret locations) are intentionally
@@ -37,7 +37,7 @@ Recent merges to `main`:
   (lint/unit/build, guarded backend-integration job, Playwright); CSV `dryRun`
   honoured with zero writes; Docker images rebuilt on the repo-root context and
   validated in disposable containers; nullable response contracts + regenerated
-  shared types; docs reconciled. Record: `docs/audits/MAINTENANCE-REMEDIATION-2026-09.md`
+  shared types; docs reconciled. Record: `docs/archive/maintenance-2026-09/MAINTENANCE-REMEDIATION-2026-09.md`
   (§8 maps every review finding, §9 lists the residual follow-ups).
 
 **The homelab deployment runs `main` (`a15e5f4`) since 2026-09-25** — PRs #4–#7
@@ -46,35 +46,25 @@ backed up first (vzdump + a logical DB dump) and had their Debian packages updat
 in the same window. Existing paid incomes now show as "Paid · no date" and stay
 out of CASH-basis totals until a receipt date is entered per record.
 
-## Next steps (priority order)
-1. **Authentication (P2-4) + HTTPS-only** — the key remaining milestone, and a
-   hard prerequisite before ANY internet exposure. The app is currently no-auth;
-   anyone on the LAN can reach it. Scope: app-level auth + force HTTPS. Keep
-   LAN-only until this lands.
-2. **Enter receipt dates for existing paid incomes** — a manual, one-time data
-   task in the app, needed before preparing the next CASH-basis BAS (Jul–Sep
-   quarter). Until then those incomes are excluded from CASH totals.
-3. **Remediation follow-ups** (non-blocking, from the report §9): LF-only line 13
-   in `NEXT-TASKS.md`; compare the parsed date rather than the raw string in the
-   future-date check (`incomes.service.ts`); apply the same future-date check to
-   CSV receipt dates; UI confirmation before clearing a captured receipt date;
-   vitest 4 upgrade (clears the last audit entry); drop the multer override once
-   `@nestjs/platform-express` declares ≥ 2.3.0.
-   Deploy scripts, found during the 2026-09-25 rollout: `setup-db-lxc.sh` did not
-   leave the daily `pg_dump` cron entry at the original deploy (cause not
-   identified; the entry was added by hand); `update-app.sh` runs plain
-   `pnpm install` rather than `--frozen-lockfile`, prompts interactively, and is
-   overwritten by its own `git pull` while running.
-4. **Optional: reconcile `docs/DEPLOYMENT.md`** (the Docker Compose path) — still
-   references Ubuntu 22.04. The images now build and run (validated in
-   disposable containers during PR #6), but the Docker path has never been
-   deployed; only worth reconciling if you intend to support it.
+## Next steps
+The prioritised backlog is `NEXT-TASKS.md`. Headlines:
+1. **P0 — live deployment safety:** verify the live frontend against the
+   `VITE_API_URL=/api` defect before the next `update-app.sh` run, then fix
+   API-URL resolution everywhere (audit findings C01/I05/N05).
+2. **P0 — stop financial data corruption:** income-edit GST, CSV import
+   parsing/duplicates/rollback, recurring generation, undo and CSV export
+   (2026-09-26 audits in `docs/audits/`).
+3. **P1 — tax model and authentication:** GST registration profile, FY report
+   rebuild, BAS labelling, PSI; app-level auth + HTTPS-only before ANY
+   internet exposure. The app is currently no-auth — keep it LAN-only.
+4. **Owner data task:** enter receipt dates for existing paid incomes before
+   the next CASH-basis BAS (they are excluded from CASH totals until then).
 
 ## Operating the deployment
 - Update app to latest: back up both CTs first, then on the app CT stop
   `easytax-api`, fast-forward to `origin/main`, `pnpm install --frozen-lockfile`,
   build backend and web, and start the service; migrations auto-apply on start.
-  `scripts/update-app.sh` does the same interactively (see its caveats above).
+  `scripts/update-app.sh` does the same interactively (see its caveats in `NEXT-TASKS.md`).
   The exact procedure used is in the gitignored homelab inventory.
 - Backups: weekly vzdump covers both CTs; the DB CT also runs a daily `pg_dump`
   (30-day retention, kept on the CT itself). That cron entry has only existed
@@ -87,7 +77,7 @@ out of CASH-basis totals until a receipt date is entered per record.
   (note: `pnpm run lint` uses `--fix` and mutates files)
 - Backend integration (`pnpm run test:e2e`): needs a **disposable** Postgres and
   explicit `DB_*` + `NODE_ENV=test`; the suites refuse any DB name without a
-  `test`/`audit` token and wipe all data. Runbook: remediation report §9.
+  `test`/`audit` token and wipe all data. Runbook: `docs/core/TESTING.md`.
 - CI (PR to `main`) runs all of the above plus Playwright; it is the acceptance gate.
 - Web: `pnpm --filter web lint` + `pnpm --filter web exec vitest run` + `pnpm --filter web build`
 - Shell scripts: `bash -n scripts/<name>.sh` (and keep them LF per `.gitattributes`)

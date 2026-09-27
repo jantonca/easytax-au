@@ -1,73 +1,87 @@
-# 3-2-1 Backup Plan
+# Backup & Restore
 
-1. **Local (Hot):** Hourly ZFS snapshots on the Proxmox host.
-2. **Local (Cold):** Nightly encrypted `pg_dump` saved to `/backups`.
-3. **Offsite:** Use **Restic** to sync the `/backups` and `/data` folders to **Backblaze B2** (Encrypted).
+**Updated:** 2026-09-27. This describes what actually runs; the live
+specifics (CT IDs, hosts, off-box key location) are in the gitignored homelab
+inventory referenced from `STATUS.md`.
 
-## UI-Based Backup Export (New)
+## What runs today (Proxmox LXC deployment)
 
-**Location:** Settings → About page
+| Layer | What | Where | Retention |
+|-------|------|-------|-----------|
+| Container | Weekly Proxmox `vzdump` of both CTs (DB + app) | Proxmox backup storage | Per the host's vzdump job |
+| Database | Daily `pg_dump` at 02:00 via `/root/backup-database.sh` (cron) | `/root/backups/easytax-db-*.sql.gz` **on the DB CT itself** | 30 days |
+| Pre-change | Manual vzdump + logical dump before updates or migrations | as above | ad hoc |
+| Encryption key | `ENCRYPTION_KEY` backed up off-box | see homelab inventory | must never change |
 
-The application now provides a user-friendly backup export feature:
+**Gaps:**
 
-- **Access:** Navigate to Settings → About → "Database Backup" section
-- **Format:** Complete SQL dump (pg_dump format)
-- **Rate Limiting:** 3 exports per 5 minutes (prevents abuse)
-- **Countdown Timer:** Shows remaining time when rate limited
-- **Persistence:** Rate limit persists across page refreshes
-- **Deployment Support:** Works with both Docker and bare-metal deployments
+- **No offsite copy.** The daily dumps live on the same CT they protect, so
+  they only guard against logical errors, not loss of the CT or host.
+- **Cron not created at deploy.** `setup-db-lxc.sh` is meant to install the
+  cron entry, but at the original deploy it didn't (cause unknown). The entry
+  has existed only since 2026-09-25, when it was added by hand. Check with
+  `crontab -l` on the DB CT.
+- **Restores are untested.** No restore test has been recorded; see
+  Verification.
+- **Key is essential.** A dump without the encryption key cannot decrypt the
+  encrypted columns (client names/ABNs, descriptions). Amounts and dates are
+  stored in plaintext.
 
-**Usage:**
-1. Click "Export Backup" button
-2. SQL file downloads automatically: `easytax-au-backup-YYYY-MM-DD.sql`
-3. Restore with: `psql -U postgres easytax-au < backup.sql`
+Setup details: `docs/DEPLOYMENT-PROXMOX-LXC.md` §7.
 
-**Rate Limit Behavior:**
-- After 3 exports, button shows countdown timer (e.g., "Wait 4:32")
-- Button is disabled until countdown expires
-- Timer persists even if you refresh the page
+## UI-Based Backup Export
 
-**Technical Details:**
-- Endpoint: `GET /backup/export`
-- Uses Docker detection via `IS_DOCKER` environment variable
-- Docker: `docker exec easytax-au-db pg_dump`
-- Bare-metal: Direct `pg_dump` command
-- Rate limiting: `@nestjs/throttler` (3 per 5 min window)
+**Location:** Settings → About → "Database Backup". The page calls
+`GET /backup/export`, which returns a complete SQL dump
+(`easytax-au-backup-YYYY-MM-DD.sql`) and is rate limited to 3 exports per 5
+minutes.
 
-## Database Storage
+- **Bare-metal / LXC:** runs `pg_dump` directly using the `DB_*` settings.
+- **Docker (`IS_DOCKER=true`):** runs `docker exec easytax-au-db pg_dump`. This
+  is **broken** in the shipped Docker images, which have no Docker CLI or
+  socket (I06 in `NEXT-TASKS.md`).
+- **Security:** the endpoint is unauthenticated. Anyone who can reach the API
+  can download the whole database (C02). Keep the app LAN-only until
+  authentication lands.
 
-**Docker Named Volume:** The Postgres database uses a Docker named volume (`easytax-au-pgdata`) for persistent storage. This approach:
-- ✅ **Protects against accidental deletion** (immune to `git clean -xfd`)
-- ✅ **Better performance** on non-Linux hosts
-- ✅ **Explicit lifecycle** - requires `docker volume rm easytax-au-pgdata` to delete
+## Restore
 
-### Managing Database Volumes
-
-**Backup database:**
 ```bash
-# Method 1: pg_dump (recommended)
+# LXC: restore a daily dump into an EMPTY database (take a fresh dump first)
+gunzip -c /root/backups/easytax-db-YYYYMMDD-HHMMSS.sql.gz | su - postgres -c "psql easytax-au"
+
+# UI export (plain SQL)
+psql -U postgres easytax-au < easytax-au-backup-YYYY-MM-DD.sql
+```
+
+After a restore, start the API with the **same** `ENCRYPTION_KEY`. Pending
+migrations apply on start (`migrationsRun: true`).
+
+## Docker Compose deployment (untested path)
+
+The Compose file keeps Postgres data in the named volume `easytax-au-pgdata`,
+which `git clean` cannot delete; only `docker volume rm easytax-au-pgdata`
+removes it.
+
+```bash
+# Backup
 docker exec easytax-au-db pg_dump -U postgres easytax-au > backup-$(date +%Y%m%d-%H%M%S).sql
+docker run --rm -v easytax-au-pgdata:/data -v "$(pwd)":/backup alpine tar czf /backup/pgdata-backup.tar.gz -C /data .
 
-# Method 2: Full volume backup
-docker run --rm -v easytax-au-pgdata:/data -v $(pwd):/backup alpine tar czf /backup/pgdata-backup.tar.gz -C /data .
-```
-
-**Restore database:**
-```bash
-# Method 1: From pg_dump
+# Restore
 docker exec -i easytax-au-db psql -U postgres easytax-au < backup.sql
-
-# Method 2: From volume backup
 docker volume create easytax-au-pgdata
-docker run --rm -v easytax-au-pgdata:/data -v $(pwd):/backup alpine tar xzf /backup/pgdata-backup.tar.gz -C /data
-```
-
-**List and inspect volumes:**
-```bash
-docker volume ls
-docker volume inspect easytax-au-pgdata
+docker run --rm -v easytax-au-pgdata:/data -v "$(pwd)":/backup alpine tar xzf /backup/pgdata-backup.tar.gz -C /data
 ```
 
 ## Verification
 
-Test restore every quarter by spinning up a dummy LXC and running `scripts/restore.sh`.
+Test a restore at least quarterly and before any schema migration:
+
+1. Restore the latest dump into a disposable database. `docs/core/TESTING.md`
+   describes how to start one.
+2. Start the API against it with the production key.
+3. Confirm the record counts and that encrypted fields decrypt.
+
+There is no automated restore script yet. Record each test in the homelab
+inventory.

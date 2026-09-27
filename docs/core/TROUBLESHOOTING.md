@@ -35,7 +35,7 @@ dryRun?: boolean; // no @Type marker, no strict transform
 dryRun?: boolean;
 ```
 
-**Reference:** M04 remediation (docs/audits/MAINTENANCE-REMEDIATION-2026-09.md);
+**Reference:** M04 remediation (docs/archive/maintenance-2026-09/MAINTENANCE-REMEDIATION-2026-09.md);
 original CSV Import notes (F2.4)
 
 **Related Files:**
@@ -178,7 +178,7 @@ POST /import/expenses
 ```
 
 **Reference:** CSV Import dry-run fix (F2.4); M04 remediation
-(docs/audits/MAINTENANCE-REMEDIATION-2026-09.md)
+(docs/archive/maintenance-2026-09/MAINTENANCE-REMEDIATION-2026-09.md)
 
 ---
 
@@ -315,24 +315,32 @@ const { setValue, formState: { errors } } = useForm();
 
 **Problem:** JavaScript Date objects use calendar year (Jan-Dec), but Australian financial year runs July-June.
 
-**Solution:** Use helper functions that account for FY offset.
+**Solution:** Use the existing FY helpers. The FY number is the calendar year
+in which the FY **ends**, so FY2026 runs from 1 Jul 2025 to 30 Jun 2026.
 
 ```typescript
 // ❌ Don't use calendar year
-const year = new Date().getFullYear(); // 2024
+const year = new Date().getFullYear();
 
-// ✅ Use FY helper
-import { getFY } from './utils/fy-helper';
-const fy = getFY(new Date()); // "2024-2025" for dates Jul 2024 - Jun 2025
+// ✅ Backend: inject FYService (src/common/services/fy.service.ts)
+constructor(private readonly fyService: FYService) {}
+this.fyService.getFYFromDate(new Date('2025-07-01')); // 2026
+this.fyService.getFYInfo(new Date('2025-08-15'));
+// { financialYear: 2026, quarter: 'Q1', fyLabel: 'FY2026', quarterLabel: 'Q1 FY2026' }
+
+// ✅ Frontend: web/src/lib/fy.ts (same semantics)
+import { getFYFromDate, getFYInfo } from '@/lib/fy';
 ```
 
-**Common Pitfall:** Assuming April 15 tax deadline (US) instead of July 1 - June 30 (Australia).
+**Common Pitfall:** Assuming a calendar-year tax period. The Australian FY runs
+from 1 July to 30 June, and BAS quarters are Q1 Jul–Sep through Q4 Apr–Jun.
 
 **Reference:** See `docs/core/ATO-LOGIC.md` for full Australian tax rules.
 
 **Related Files:**
-- `src/common/utils/fy-helper.ts`
-- `src/common/utils/fy-helper.spec.ts`
+- `src/common/services/fy.service.ts` (+ `fy.service.spec.ts`)
+- `web/src/lib/fy.ts` (+ `fy.test.ts`)
+- `web/src/hooks/use-fy-info.ts`
 
 ---
 

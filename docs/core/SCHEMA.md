@@ -5,6 +5,15 @@
 All monetary values are stored as **integers in cents** to avoid floating-point errors.
 Sensitive fields use **AES-256-GCM encryption** via TypeORM column transformers.
 
+**Source of truth:** the migrations in `src/migrations/`, which are
+`1781938771544-InitialSchema` and `1789113727162-AddIncomePaymentDate`.
+`synchronize` is off, so the entities only describe the schema. This document
+summarises it (verified against the migrations 2026-09-27). If the two
+disagree, the migrations win.
+
+Every table has `id` (UUID, `uuid_generate_v4()`), `created_at` and
+`updated_at` (`TIMESTAMP WITH TIME ZONE`, default `now()`).
+
 ---
 
 ## Entity Relationship Diagram
@@ -22,24 +31,24 @@ Sensitive fields use **AES-256-GCM encryption** via TypeORM column transformers.
         ▲                                         │
         │ default_category_id (FK)                │
         │                                         │
-┌─────────────────┐                     ┌─────────────────┐
-│    Providers    │                     │    Expenses     │
-├─────────────────┤                     ├─────────────────┤
-│ id (PK)         │◄────────────────────│ provider_id(FK) │
-│ name            │                     │ category_id(FK) │──┘
-│ is_international│                     │ id (PK)         │
-│ default_cat_id  │──┘                  │ date            │
-│ abn_arn         │                     │ description 🔒  │
-└─────────────────┘                     │ amount_cents    │
+┌─────────────────┐                     ┌─────────────────┐     ┌─────────────────┐
+│    Providers    │                     │    Expenses     │     │   Import Jobs   │
+├─────────────────┤                     ├─────────────────┤     ├─────────────────┤
+│ id (PK)         │◄────────────────────│ provider_id(FK) │     │ id (PK)         │
+│ name            │                     │ category_id(FK) │──┘  │ filename        │
+│ is_international│                     │ import_job_id   │────►│ source / status │
+│ default_cat_id  │──┘                  │ id (PK)         │     │ row counters    │
+│ abn_arn         │                     │ date            │     └─────────────────┘
+└─────────────────┘                     │ description 🔒  │
+                                        │ amount_cents    │
                                         │ gst_cents       │
-                                        │ biz_percent     │
-┌─────────────────┐                     │ currency        │
-│     Clients     │                     │ file_ref        │
-├─────────────────┤                     │ created_at      │
-│ id (PK)         │◄────────┐           │ updated_at      │
-│ name 🔒         │         │           └─────────────────┘
-│ abn 🔒          │         │
-│ is_psi_eligible │         │
+┌─────────────────┐                     │ biz_percent     │
+│     Clients     │                     │ currency        │
+├─────────────────┤                     │ file_ref        │
+│ id (PK)         │◄────────┐           └─────────────────┘
+│ name 🔒         │         │
+│ abn 🔒          │         │           Recurring Expenses → Providers,
+│ is_psi_eligible │         │           Categories (templates; see below)
 └─────────────────┘         │
                             │
                   ┌─────────────────┐
@@ -54,8 +63,7 @@ Sensitive fields use **AES-256-GCM encryption** via TypeORM column transformers.
                   │ gst_cents       │
                   │ total_cents     │
                   │ is_paid         │
-                  │ created_at      │
-                  │ updated_at      │
+                  │ payment_date    │
                   └─────────────────┘
 
 🔒 = AES-256-GCM Encrypted Column
@@ -64,6 +72,8 @@ Sensitive fields use **AES-256-GCM encryption** via TypeORM column transformers.
 ---
 
 ## Table Definitions
+
+`created_at`/`updated_at` are omitted from the tables below; see Overview.
 
 ### Categories
 
@@ -74,23 +84,17 @@ Maps expense types to ATO BAS labels.
 | `id`            | UUID         | No       | Primary key                         |
 | `name`          | VARCHAR(100) | No       | e.g., "Software", "Internet", "VPN" |
 | `bas_label`     | VARCHAR(10)  | No       | ATO label: "1B", "G10", etc.        |
-| `is_deductible` | BOOLEAN      | No       | Can this be claimed? Default: true  |
+| `is_deductible` | BOOLEAN      | No       | Default: true                       |
 | `description`   | TEXT         | Yes      | Optional notes                      |
-| `created_at`    | TIMESTAMP    | No       | Auto-set                            |
-| `updated_at`    | TIMESTAMP    | No       | Auto-updated                        |
 
-**Seed Data:**
+**Seed data:** `src/modules/categories/categories.seeder.ts` creates 14 default
+categories. Twelve operating categories are labelled `1B`, `Capital Purchases`
+is `G10`, and `Non-Deductible` is `N/A`. The seeder only runs on an empty
+table.
 
-```
-| name       | bas_label | is_deductible |
-|------------|-----------|---------------|
-| Software   | 1B        | true          |
-| Hosting    | 1B        | true          |
-| Internet   | 1B        | true          |
-| VPN        | 1B        | true          |
-| Hardware   | 1B        | true          |
-| Office     | 1B        | true          |
-```
+> Known issue (T08, `NEXT-TASKS.md`): `ATO-LOGIC.md` maps operating categories
+> to **G11**, but the seeder labels them `1B`, so they are excluded from the
+> G11 total.
 
 ---
 
@@ -98,17 +102,15 @@ Maps expense types to ATO BAS labels.
 
 Vendors you pay for business expenses.
 
-| Column                | Type         | Nullable | Description                |
-| --------------------- | ------------ | -------- | -------------------------- |
-| `id`                  | UUID         | No       | Primary key                |
-| `name`                | VARCHAR(100) | No       | e.g., "GitHub", "VentraIP" |
-| `is_international`    | BOOLEAN      | No       | true = GST-Free            |
-| `default_category_id` | UUID (FK)    | Yes      | Auto-assigns category      |
-| `abn_arn`             | VARCHAR(20)  | Yes      | Australian Business Number |
-| `created_at`          | TIMESTAMP    | No       | Auto-set                   |
-| `updated_at`          | TIMESTAMP    | No       | Auto-updated               |
+| Column                | Type         | Nullable | Description                              |
+| --------------------- | ------------ | -------- | ---------------------------------------- |
+| `id`                  | UUID         | No       | Primary key                              |
+| `name`                | VARCHAR(100) | No       | e.g., "GitHub", "VentraIP"               |
+| `is_international`    | BOOLEAN      | No       | true = no claimable GST. Default: false  |
+| `default_category_id` | UUID (FK)    | Yes      | → categories, `ON DELETE SET NULL`       |
+| `abn_arn`             | VARCHAR(20)  | Yes      | Australian Business / Registered Number  |
 
-**Seed Data:**
+**Seed Data** (`src/modules/providers/providers.seeder.ts`):
 
 ```
 | name              | is_international | category    |
@@ -131,14 +133,12 @@ Vendors you pay for business expenses.
 
 People/companies who pay you (for freelance income).
 
-| Column            | Type         | Nullable | Encrypted  | Description                    |
-| ----------------- | ------------ | -------- | ---------- | ------------------------------ |
-| `id`              | UUID         | No       | No         | Primary key                    |
-| `name`            | VARCHAR(255) | No       | **Yes** 🔒 | Client name                    |
-| `abn`             | VARCHAR(20)  | Yes      | **Yes** 🔒 | Their ABN                      |
-| `is_psi_eligible` | BOOLEAN      | No       | No         | Personal Services Income rules |
-| `created_at`      | TIMESTAMP    | No       | No         | Auto-set                       |
-| `updated_at`      | TIMESTAMP    | No       | No         | Auto-updated                   |
+| Column            | Type    | Nullable | Encrypted  | Description                    |
+| ----------------- | ------- | -------- | ---------- | ------------------------------ |
+| `id`              | UUID    | No       | No         | Primary key                    |
+| `name`            | TEXT    | No       | **Yes** 🔒 | Client name                    |
+| `abn`             | TEXT    | Yes      | **Yes** 🔒 | Their ABN                      |
+| `is_psi_eligible` | BOOLEAN | No       | No         | Default: false. Not yet used by reports |
 
 ---
 
@@ -146,25 +146,24 @@ People/companies who pay you (for freelance income).
 
 Core ledger for business purchases.
 
-| Column         | Type         | Nullable | Encrypted  | Description            |
-| -------------- | ------------ | -------- | ---------- | ---------------------- |
-| `id`           | UUID         | No       | No         | Primary key            |
-| `date`         | DATE         | No       | No         | Transaction date       |
-| `description`  | VARCHAR(500) | Yes      | **Yes** 🔒 | What was purchased     |
-| `amount_cents` | INTEGER      | No       | No         | Total amount in cents  |
-| `gst_cents`    | INTEGER      | No       | No         | GST component in cents |
-| `biz_percent`  | INTEGER      | No       | No         | Business use % (1-100) |
-| `provider_id`  | UUID (FK)    | No       | No         | Links to Provider      |
-| `category_id`  | UUID (FK)    | No       | No         | Links to Category      |
-| `currency`     | VARCHAR(3)   | No       | No         | Default: "AUD"         |
-| `file_ref`     | VARCHAR(255) | Yes      | No         | Receipt filename       |
-| `created_at`   | TIMESTAMP    | No       | No         | Auto-set               |
-| `updated_at`   | TIMESTAMP    | No       | No         | Auto-updated           |
+| Column          | Type         | Nullable | Encrypted  | Description                                 |
+| --------------- | ------------ | -------- | ---------- | ------------------------------------------- |
+| `id`            | UUID         | No       | No         | Primary key                                 |
+| `date`          | DATE         | No       | No         | Transaction date                            |
+| `description`   | TEXT         | Yes      | **Yes** 🔒 | What was purchased                          |
+| `amount_cents`  | INTEGER      | No       | No         | Total amount in cents (GST-inclusive)       |
+| `gst_cents`     | INTEGER      | No       | No         | GST component in cents                      |
+| `biz_percent`   | INTEGER      | No       | No         | Business use %. Default: 100                |
+| `currency`      | VARCHAR(3)   | No       | No         | Default: "AUD"                              |
+| `file_ref`      | VARCHAR(255) | Yes      | No         | Receipt filename (reference only)           |
+| `provider_id`   | UUID (FK)    | No       | No         | → providers, `ON DELETE RESTRICT`           |
+| `category_id`   | UUID (FK)    | No       | No         | → categories, `ON DELETE RESTRICT`          |
+| `import_job_id` | UUID (FK)    | Yes      | No         | → import_jobs, `ON DELETE SET NULL`; set by CSV import, used by rollback |
 
-**Calculated Fields (in service layer):**
+**Calculated at query time (BAS/reports):**
 
-- `claimable_gst = gst_cents * (biz_percent / 100)`
-- `net_amount = amount_cents - gst_cents`
+- claimable GST = `FLOOR(gst_cents * biz_percent / 100)`, domestic providers only
+- `biz_percent` is **not** applied to `amount_cents` in any report (T01)
 
 ---
 
@@ -172,19 +171,70 @@ Core ledger for business purchases.
 
 Revenue from freelance work.
 
-| Column           | Type         | Nullable | Encrypted  | Description         |
-| ---------------- | ------------ | -------- | ---------- | ------------------- |
-| `id`             | UUID         | No       | No         | Primary key         |
-| `date`           | DATE         | No       | No         | Invoice date        |
-| `client_id`      | UUID (FK)    | No       | No         | Links to Client     |
-| `invoice_num`    | VARCHAR(50)  | Yes      | No         | Your invoice number |
-| `description`    | VARCHAR(500) | Yes      | **Yes** 🔒 | Work description    |
-| `subtotal_cents` | INTEGER      | No       | No         | Amount before GST   |
-| `gst_cents`      | INTEGER      | No       | No         | GST collected       |
-| `total_cents`    | INTEGER      | No       | No         | subtotal + gst      |
-| `is_paid`        | BOOLEAN      | No       | No         | Payment received?   |
-| `created_at`     | TIMESTAMP    | No       | No         | Auto-set            |
-| `updated_at`     | TIMESTAMP    | No       | No         | Auto-updated        |
+| Column           | Type        | Nullable | Encrypted  | Description                                  |
+| ---------------- | ----------- | -------- | ---------- | -------------------------------------------- |
+| `id`             | UUID        | No       | No         | Primary key                                  |
+| `date`           | DATE        | No       | No         | Invoice date                                 |
+| `client_id`      | UUID (FK)   | No       | No         | → clients, `ON DELETE RESTRICT`              |
+| `invoice_num`    | VARCHAR(50) | Yes      | No         | Your invoice number                          |
+| `description`    | TEXT        | Yes      | **Yes** 🔒 | Work description                             |
+| `subtotal_cents` | INTEGER     | No       | No         | Amount before GST                            |
+| `gst_cents`      | INTEGER     | No       | No         | GST collected                                |
+| `total_cents`    | INTEGER     | No       | No         | subtotal + gst                               |
+| `is_paid`        | BOOLEAN     | No       | No         | Payment received? Default: false             |
+| `payment_date`   | DATE        | Yes      | No         | Receipt date; drives CASH-basis BAS (see `CASH-BASIS-DESIGN.md`). Required by the API when `is_paid`; legacy paid rows may be NULL |
+
+There is no `import_job_id` on incomes, so income imports cannot be rolled back
+(N01, `NEXT-TASKS.md`).
+
+---
+
+### Import Jobs
+
+One row per CSV import, used for tracking and rollback.
+
+| Column           | Type         | Nullable | Description                                                    |
+| ---------------- | ------------ | -------- | -------------------------------------------------------------- |
+| `id`             | UUID         | No       | Primary key                                                    |
+| `filename`       | VARCHAR(255) | No       | Generated name (`import-<timestamp>.csv`)                      |
+| `source`         | ENUM         | No       | `commbank`, `nab`, `westpac`, `anz`, `manual`, `other`. Default: `manual` |
+| `status`         | ENUM         | No       | `pending`, `completed`, `rolled_back`, `failed`. Default: `pending` |
+| `total_rows`     | INTEGER      | No       | Rows that survived parsing (not raw file rows). Default: 0     |
+| `imported_count` | INTEGER      | No       | Default: 0                                                     |
+| `skipped_count`  | INTEGER      | No       | Default: 0                                                     |
+| `error_count`    | INTEGER      | No       | Default: 0                                                     |
+| `completed_at`   | TIMESTAMPTZ  | Yes      | When processing or rollback finished                           |
+| `error_message`  | TEXT         | Yes      | Failure detail                                                 |
+
+Dry runs create no import job.
+
+---
+
+### Recurring Expenses
+
+Templates for generating regular expenses (generation is triggered manually via
+`POST /recurring-expenses/generate`).
+
+| Column                | Type         | Nullable | Encrypted  | Description                   |
+| --------------------- | ------------ | -------- | ---------- | ----------------------------- |
+| `id`                  | UUID         | No       | No         | Primary key                   |
+| `name`                | VARCHAR(100) | No       | No         | Template name (e.g., "iinet") |
+| `description`         | TEXT         | Yes      | **Yes** 🔒 | Description for expenses      |
+| `amount_cents`        | INTEGER      | No       | No         | Amount in cents               |
+| `gst_cents`           | INTEGER      | No       | No         | GST in cents (0 if intl)      |
+| `biz_percent`         | INTEGER      | No       | No         | Business use %. Default: 100  |
+| `currency`            | VARCHAR(3)   | No       | No         | Default: "AUD"                |
+| `schedule`            | ENUM         | No       | No         | `monthly`, `quarterly`, `yearly`. Default: `monthly` |
+| `day_of_month`        | INTEGER      | No       | No         | Day to generate. Default: 1   |
+| `start_date`          | DATE         | No       | No         | When to start generating      |
+| `end_date`            | DATE         | Yes      | No         | When to stop generating       |
+| `is_active`           | BOOLEAN      | No       | No         | Can pause/resume              |
+| `last_generated_date` | DATE         | Yes      | No         | Last expense created          |
+| `next_due_date`       | DATE         | No       | No         | Next generation date          |
+| `provider_id`         | UUID (FK)    | No       | No         | → providers, `ON DELETE RESTRICT` |
+| `category_id`         | UUID (FK)    | No       | No         | → categories, `ON DELETE RESTRICT` |
+
+Generated expenses carry no reference back to their template (see I01).
 
 ---
 
@@ -199,6 +249,7 @@ CREATE INDEX idx_expenses_import_job ON expenses(import_job_id);
 CREATE INDEX idx_incomes_date ON incomes(date);
 CREATE INDEX idx_incomes_client ON incomes(client_id);
 CREATE INDEX idx_incomes_is_paid ON incomes(is_paid);
+CREATE INDEX idx_incomes_payment_date ON incomes(payment_date);  -- AddIncomePaymentDate
 
 -- Provider lookups
 CREATE INDEX idx_providers_international ON providers(is_international);
@@ -216,77 +267,50 @@ CREATE INDEX idx_recurring_expenses_next_due ON recurring_expenses(next_due_date
 
 ---
 
-## Recurring Expenses
-
-Templates for automatically generating regular expenses.
-
-| Column                | Type         | Nullable | Encrypted  | Description                   |
-| --------------------- | ------------ | -------- | ---------- | ----------------------------- |
-| `id`                  | UUID         | No       | No         | Primary key                   |
-| `name`                | VARCHAR(100) | No       | No         | Template name (e.g., "iinet") |
-| `description`         | TEXT         | Yes      | **Yes** 🔒 | Description for expenses      |
-| `amount_cents`        | INTEGER      | No       | No         | Amount in cents               |
-| `gst_cents`           | INTEGER      | No       | No         | GST in cents (0 if intl)      |
-| `biz_percent`         | INTEGER      | No       | No         | Business use % (0-100)        |
-| `currency`            | VARCHAR(3)   | No       | No         | Default: "AUD"                |
-| `schedule`            | ENUM         | No       | No         | monthly/quarterly/yearly      |
-| `day_of_month`        | INTEGER      | No       | No         | Day to generate (1-28)        |
-| `start_date`          | DATE         | No       | No         | When to start generating      |
-| `end_date`            | DATE         | Yes      | No         | When to stop generating       |
-| `is_active`           | BOOLEAN      | No       | No         | Can pause/resume              |
-| `last_generated_date` | DATE         | Yes      | No         | Last expense created          |
-| `next_due_date`       | DATE         | No       | No         | Next generation date          |
-| `provider_id`         | UUID (FK)    | No       | No         | Links to Provider             |
-| `category_id`         | UUID (FK)    | No       | No         | Links to Category             |
-| `created_at`          | TIMESTAMP    | No       | No         | Auto-set                      |
-| `updated_at`          | TIMESTAMP    | No       | No         | Auto-updated                  |
-
----
-
 ## Constraints
 
-```sql
--- Ensure valid percentages
-ALTER TABLE expenses ADD CONSTRAINT chk_biz_percent
-  CHECK (biz_percent >= 0 AND biz_percent <= 100);
+**The database has no CHECK constraints.** Only primary keys, NOT NULL and
+the foreign keys listed above exist. These rules are enforced only by DTO
+validation and service code, never by the database:
 
--- Ensure positive amounts
-ALTER TABLE expenses ADD CONSTRAINT chk_amount_positive
-  CHECK (amount_cents >= 0);
-ALTER TABLE expenses ADD CONSTRAINT chk_gst_positive
-  CHECK (gst_cents >= 0);
+- valid ranges for `biz_percent`;
+- non-negative amounts;
+- GST no greater than the amount;
+- receipt-date rules.
 
--- GST cannot exceed amount
-ALTER TABLE expenses ADD CONSTRAINT chk_gst_lte_amount
-  CHECK (gst_cents <= amount_cents);
-```
+Anything that bypasses the service layer is unchecked. This includes CSV
+import paths that build entities directly (for example N03: a non-numeric
+business-use value parses to `NaN`).
 
 ---
 
 ## BAS Query Examples
 
+These mirror `src/modules/bas/bas.service.ts`. The code is authoritative.
+
 ### Label 1B - GST Paid (Claimable Credits)
 
 ```sql
-SELECT
-  SUM(
-    CASE
-      WHEN p.is_international = false
-      THEN e.gst_cents * e.biz_percent / 100
-      ELSE 0
-    END
-  ) AS gst_credits_cents
+SELECT COALESCE(SUM(FLOOR(e.gst_cents * e.biz_percent / 100)), 0) AS gst_credits_cents
 FROM expenses e
 JOIN providers p ON e.provider_id = p.id
-WHERE e.date BETWEEN '2024-07-01' AND '2024-09-30';  -- Q1 FY2025
+WHERE p.is_international = false
+  AND e.date BETWEEN '2025-07-01' AND '2025-09-30';  -- Q1 FY2026
 ```
 
 ### Label G1 & 1A - Sales & GST Collected
 
 ```sql
-SELECT
-  SUM(total_cents) AS g1_total_sales_cents,
-  SUM(gst_cents) AS label_1a_gst_collected_cents
+-- ACCRUAL: attributed by invoice date
+SELECT SUM(total_cents) AS g1_total_sales_cents,
+       SUM(gst_cents)   AS label_1a_gst_collected_cents
 FROM incomes
-WHERE date BETWEEN '2024-07-01' AND '2024-09-30';  -- Q1 FY2025
+WHERE date BETWEEN '2025-07-01' AND '2025-09-30';
+
+-- CASH: paid incomes attributed by receipt date; paid rows with
+-- payment_date IS NULL are reported separately as unreconciled
+SELECT SUM(total_cents), SUM(gst_cents)
+FROM incomes
+WHERE is_paid = true
+  AND payment_date BETWEEN '2025-07-01' AND '2025-09-30';
 ```

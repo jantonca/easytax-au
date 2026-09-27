@@ -45,7 +45,7 @@ Files to review: $ARGUMENTS
 
 **Field-Level Encryption:**
 - [ ] PII encrypted at rest (ABN, business name if sensitive)
-- [ ] Encrypted fields use `@Encrypted()` decorator
+- [ ] Encrypted fields use `transformer: new EncryptedColumnTransformer()` on a `text` column
 - [ ] No plaintext sensitive data in logs
 
 **Input Validation:**

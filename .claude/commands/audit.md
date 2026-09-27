@@ -11,7 +11,7 @@ Audit scope: $ARGUMENTS (default: full codebase)
 ### 1. Pre-Audit Setup
 **Read existing audit reports:**
 ```bash
-ls -lh docs/reports/audit/
+ls -lh docs/audits/
 ```
 
 **Check current version:**
@@ -33,8 +33,8 @@ ls -lh docs/reports/audit/
 **Scan files:**
 ```bash
 # Find all tax calculation files
-grep -r "gst" backend/src/ web/src/ --include="*.ts" --include="*.tsx"
-grep -r "BAS" backend/src/ web/src/ --include="*.ts" --include="*.tsx"
+grep -r "gst" src/ web/src/ --include="*.ts" --include="*.tsx"
+grep -r "BAS" src/ web/src/ --include="*.ts" --include="*.tsx"
 ```
 
 **Audit checklist:**
@@ -54,10 +54,10 @@ grep -r "BAS" backend/src/ web/src/ --include="*.ts" --include="*.tsx"
 **Scan files:**
 ```bash
 # Check for hardcoded secrets
-grep -r "password\|secret\|api_key" backend/src/ web/src/ --include="*.ts" --include="*.tsx"
+grep -r "password\|secret\|api_key" src/ web/src/ --include="*.ts" --include="*.tsx"
 
 # Check encrypted fields
-grep -r "@Encrypted" backend/src/entities/
+grep -rn "EncryptedColumnTransformer" src/modules/*/entities/
 ```
 
 **Audit checklist:**
@@ -102,7 +102,7 @@ pnpm run test --coverage
 **Scan structure:**
 ```bash
 # Backend modules
-tree -L 2 backend/src/
+tree -L 2 src/
 
 # Frontend structure
 tree -L 3 web/src/
@@ -123,10 +123,10 @@ tree -L 3 web/src/
 **Scan for anti-patterns:**
 ```bash
 # N+1 queries
-grep -r "\.map.*await" backend/src/ --include="*.ts"
+grep -r "\.map.*await" src/ --include="*.ts"
 
 # Missing pagination
-grep -r "\.find({" backend/src/ --include="*.ts"
+grep -r "\.find({" src/ --include="*.ts"
 ```
 
 **Audit checklist:**
@@ -144,8 +144,8 @@ grep -r "\.find({" backend/src/ --include="*.ts"
 
 **Create report file:**
 ```bash
-# Filename: docs/reports/audit/vX.Y.Z-audit-YYYY-MM-DD.md
-# Example: docs/reports/audit/v1.3.0-audit-2026-02-15.md
+# Filename: docs/audits/AUDIT-<SOURCE>-YYYY-MM-DD.md  (SOURCE = auditing agent/tool)
+# Example: docs/audits/AUDIT-CODEX-2026-09-26.md
 ```
 
 ## Output Format
@@ -290,7 +290,7 @@ grep -r "\.find({" backend/src/ --include="*.ts"
 
 ## Guardrails
 - **NEVER** mark audit as PASS if any P0 issues exist
-- **ALWAYS** save report to `docs/reports/audit/` with version + date
+- **ALWAYS** save report to `docs/audits/` as `AUDIT-<SOURCE>-YYYY-MM-DD.md`; move superseded audit cycles to `docs/archive/`
 - **ALWAYS** compare with previous audit if one exists
 - **FLAG** if test coverage drops below targets
 - **FLAG** if P0 count increases since last audit

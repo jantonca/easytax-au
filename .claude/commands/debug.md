@@ -43,7 +43,7 @@ pnpm run start:dev
 **Check layers from UI down:**
 1. **Frontend (web/src/)**: Component logic, state management
 2. **API Layer**: Network requests, error handling
-3. **Backend (backend/src/)**: Controllers, services, validation
+3. **Backend (src/)**: Controllers, services, validation
 4. **Database**: Entity definitions, migrations, queries
 5. **Environment**: `.env` variables, Docker config
 

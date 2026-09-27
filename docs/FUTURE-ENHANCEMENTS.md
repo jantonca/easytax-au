@@ -2,9 +2,9 @@
 
 **Purpose:** This document tracks features, improvements, and nice-to-have enhancements that are not critical for the current production release but would improve the user experience in future iterations.
 
-**Project Status:** v1.3.0 in progress (3/4 features + 2 bonus P2 items complete). v1.2.0 audit remediation complete. These enhancements are optional improvements based on user feedback and audit findings.
+**Project Status:** see `STATUS.md` (current state) and `NEXT-TASKS.md` (active backlog). Audit remediation from `docs/audits/` and authentication come before anything here. Completed items are moved to `docs/archive/completed-enhancements.md`.
 
-**Last Updated:** 2026-02-16 (Completed P2-1 and P2-2 quick wins)
+**Last Updated:** 2026-09-27 (completed items archived; statuses re-pointed at NEXT-TASKS.md)
 
 ---
 
@@ -13,7 +13,7 @@
 - After 3-6 months of daily use to identify pain points
 - When specific features are repeatedly requested
 - When technical debt becomes a blocker
-- When dependencies are updated (e.g., React Router v7 stable)
+- When major dependencies are updated
 
 ---
 
@@ -34,48 +34,10 @@
 
 ## 🔍 Audit-Identified Enhancements (P2)
 
-**Source:** Consolidated audit (AUDIT-FINAL-2026-02-15.md)
+**Source:** Consolidated audit (`docs/archive/audits-2026-02/AUDIT-FINAL-2026-02-15.md`)
 **Priority:** 🟡 Medium (nice-to-have improvements, not blockers)
 
 These items were identified during the audit process as potential enhancements but are not critical for production use. They represent opportunities for future refinement.
-
----
-
-### ✅ P2-1: Rounding Standardization (COMPLETED 2026-02-16)
-
-~~**Current State:** MoneyService uses `Decimal.round()` (round half-up) while BAS/Reports SQL uses `FLOOR()` (round down).~~
-
-**Status:** ✅ **COMPLETE** (Commit `17aae96`)
-
-**What Changed:**
-- MoneyService.applyBizPercent() now uses `.floor()` instead of `.round()`
-- Updated JSDoc to document FLOOR rounding behavior and tax-conservative rationale
-- Added test case demonstrating FLOOR vs ROUND difference
-- All 38 MoneyService tests passing
-
-**Impact:** Tax-conservative calculations, full consistency between MoneyService and SQL queries
-
-**Actual Effort:** ~15 minutes
-
----
-
-### ✅ P2-2: BAS G10/G11 Fields (COMPLETED 2026-02-16)
-
-~~**Current State:** BAS DTO only returns Simpler BAS fields (G1, 1A, 1B, Net GST). Full BAS reporters need G10/G11.~~
-
-**Status:** ✅ **COMPLETE** (Commit `2b82b4e`)
-
-**What Changed:**
-- Added `g10CapitalPurchasesCents` field to BasSummaryDto
-- Added `g11NonCapitalPurchasesCents` field to BasSummaryDto
-- Implemented `calculatePurchasesByBasLabel()` service method
-- Added 10 comprehensive test cases (all passing)
-- G10: Sum of expense.total_cents WHERE category.basLabel = 'G10' (capital purchases > $1,000)
-- G11: Sum of expense.total_cents WHERE category.basLabel = 'G11' (non-capital purchases < $1,000)
-
-**Impact:** Full BAS support (vs Simpler BAS only), enables proper G10/G11 reporting to ATO
-
-**Actual Effort:** ~30 minutes
 
 ---
 
@@ -88,6 +50,8 @@ These items were identified during the audit process as potential enhancements b
 **Context:** Low priority because current binary model is correct for the typical freelancer use case (target user). Only matters for complex supply types.
 
 **Effort:** 4-6 hours (requires schema migration)
+
+**2026-09 update:** the 2026-09-26 audits (T02, GST eligibility limitation) make this part of the P1 "business tax profile" work in `NEXT-TASKS.md`; it is no longer low priority for non-GST-registered users.
 
 ---
 
@@ -103,29 +67,7 @@ These items were identified during the audit process as potential enhancements b
 
 **Effort:** 6-8 hours (simple session auth)
 
----
-
-### P2-5: Cash vs Accrual BAS Basis ✅ **COMPLETED**
-
-**Status:** ✅ Implemented (2026-02-15)
-
-**Implementation:** Added `AccountingBasis` type ('CASH' | 'ACCRUAL') with optional `basis` query parameter to BAS endpoint.
-
-**Details:**
-- CASH basis: Only includes paid income (`isPaid = true`)
-- ACCRUAL basis: Includes all income regardless of payment status (default)
-- API: `GET /bas/:quarter/:year?basis=CASH|ACCRUAL`
-- Backend filters income queries at SQL level for performance
-- 18 comprehensive tests added (16 service + 2 controller)
-
-**Files Modified:**
-- `src/modules/bas/bas.service.ts` - Added AccountingBasis type and filtering logic
-- `src/modules/bas/bas.controller.ts` - Added basis query parameter
-- Tests: `bas.service.spec.ts`, `bas.controller.spec.ts`
-
-**Commit:** (pending)
-
-**Future Enhancement:** Add UI toggle in Settings page for default `basAccountingBasis` preference
+**2026-09 update:** promoted: authentication is the top security item in `NEXT-TASKS.md` (P1), with `/backup/export` the highest-value endpoint to protect.
 
 ---
 
@@ -149,40 +91,6 @@ These items were identified during the audit process as potential enhancements b
 - [ ] Shimmer effect instead of pulse animation (more modern)
 - [ ] Skeleton variants for forms and modals
 - [ ] Progressive loading (show skeleton for first 200ms, then spinner if still loading)
-
----
-
-### Keyboard Shortcuts for Common Actions ✅ **COMPLETED**
-
-**Status:** ✅ Shipped in v1.3.0 (2026-02-14)
-**Effort:** 4-5 hours
-**See:** [v1.3-CHANGELOG.md](../archive/v1.3-CHANGELOG.md#1-keyboard-shortcuts-completed-2026-02-14)
-
-**Description:**
-Add keyboard shortcuts beyond basic navigation for power users.
-
-**Proposed Shortcuts:**
-
-- [ ] `Cmd/Ctrl + N` - New expense
-- [ ] `Cmd/Ctrl + Shift + N` - New income
-- [ ] `Cmd/Ctrl + I` - Import CSV
-- [ ] `Cmd/Ctrl + /` - Show keyboard shortcuts help
-- [ ] `E` - Edit selected row (in tables)
-- [ ] `Del` - Delete selected row (with confirmation)
-- [ ] `Cmd/Ctrl + F` - Focus search/filter
-- [ ] `Cmd/Ctrl + S` - Save form (in modals)
-
-**Technical Notes:**
-
-- Use `mousetrap` or native `keydown` event listeners
-- Show shortcuts in tooltips
-- Add shortcuts overlay (triggered by `Cmd/Ctrl + /`)
-- Respect OS conventions (Cmd on Mac, Ctrl on Windows/Linux)
-
-**Implementation:**
-
-- Current: `web/src/hooks/use-keyboard-shortcuts.ts` (⌘K only)
-- Expand to global shortcut registry
 
 ---
 
@@ -241,60 +149,6 @@ Modal-based editing provides full CRUD functionality with simpler implementation
 
 - `web/src/features/expenses/components/expenses-table.tsx`
 - `web/src/features/incomes/components/incomes-table.tsx`
-
----
-
-### Bulk Operations ✅ **COMPLETED**
-
-**Status:** ✅ Shipped in v1.3.0 (2026-02-16)
-**Effort:** 5-6 hours
-**See:** [v1.3-CHANGELOG.md](../archive/v1.3-CHANGELOG.md#3-bulk-operations-completed-2026-02-16)
-
-**Description:**
-Allow selecting multiple rows for batch operations.
-
-**Features:**
-
-- [ ] Multi-select checkboxes in expense/income tables
-- [ ] Bulk delete with confirmation
-  - "Delete 5 selected expenses?"
-  - Show total amounts affected
-- [ ] Bulk export to CSV
-- [ ] Bulk category reassignment (expenses only)
-- [ ] "Select all" / "Select none" / "Invert selection"
-
-**Technical Notes:**
-
-- TanStack Table supports row selection out of the box
-- Use Shift+Click for range selection
-- Show selected count in toolbar
-- Disable during mutations
-
----
-
-### CSV Template Downloads ✅ **COMPLETED**
-
-**Status:** ✅ Shipped in v1.3.0 (2026-02-14)
-**Effort:** 2-3 hours
-**See:** [v1.3-CHANGELOG.md](../archive/v1.3-CHANGELOG.md#2-csv-template-downloads-completed-2026-02-14)
-
-**Description:**
-Provide downloadable CSV templates with example data.
-
-**Templates:**
-
-- [ ] Expense import template (CommBank format)
-- [ ] Expense import template (Generic format)
-- [ ] Income import template
-- [ ] Provider bulk import template
-- [ ] Client bulk import template
-
-**Technical Notes:**
-
-- Generate client-side (no backend needed)
-- Use `js-file-download` or Blob API
-- Include header row + 2-3 example rows
-- Add download buttons to import pages
 
 ---
 
@@ -408,11 +262,11 @@ Attach receipt/invoice images to expenses and incomes.
 
 ---
 
-### Advanced Filtering 🎯 **NEXT UP (v1.3.0 Final Task)**
+### Advanced Filtering
 
 **Priority:** 🟡 Medium
 **Estimated Effort:** 6-8 hours
-**Status:** Remaining task in v1.3.0 (see NEXT-TASKS.md for details)
+**Status:** Last open v1.3.0 item; deferred until audit remediation and auth land (see NEXT-TASKS.md)
 
 **Description:**
 More sophisticated filtering beyond current date range and dropdowns.
@@ -495,25 +349,6 @@ Export data to popular accounting formats (Xero, MYOB, QuickBooks).
 ---
 
 ## 🔧 Technical Debt & Infrastructure
-
-### Migrate to React Router v7
-
-**Priority:** 🟢 Low
-**Estimated Effort:** 4-6 hours (when v7 stable)
-**Context:** Currently on React Router v6
-
-**Tasks:**
-
-- [ ] Upgrade to React Router v7
-- [ ] Migrate to new data loading patterns (if applicable)
-- [ ] Update tests
-- [ ] Verify all routes work
-- [ ] Update documentation
-
-**Notes:**
-Wait for React Router v7 stable release and migration guide.
-
----
 
 ### Performance Optimization
 
@@ -695,7 +530,7 @@ Wait for React Router v7 stable release and migration guide.
 
 ## 📌 Notes
 
-- **All enhancements are optional** - Core functionality is production-ready (98%)
+- **All enhancements are optional** - correctness gaps found by the 2026-09-26 audits are tracked in `NEXT-TASKS.md`, not here
 - **User experience** (daily use for 3-6 months) will drive prioritization
 - **Effort estimates** are rough approximations
 - **Dependencies** should be resolved before starting tasks

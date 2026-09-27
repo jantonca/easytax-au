@@ -152,3 +152,142 @@ Add UI toggle in Settings page for default `basAccountingBasis` preference.
 ---
 
 **Last Updated:** 2026-02-15
+
+---
+
+# Completed Enhancements (Archived 2026-09-27)
+
+Moved from FUTURE-ENHANCEMENTS.md during the 2026-09 docs reorganisation.
+P2-5 (Cash vs Accrual) was already recorded above and was removed there.
+
+## ✅ P2-1: Rounding Standardization (COMPLETED 2026-02-16)
+
+~~**Current State:** MoneyService uses `Decimal.round()` (round half-up) while BAS/Reports SQL uses `FLOOR()` (round down).~~
+
+**Status:** ✅ **COMPLETE** (Commit `17aae96`)
+
+**What Changed:**
+- MoneyService.applyBizPercent() now uses `.floor()` instead of `.round()`
+- Updated JSDoc to document FLOOR rounding behavior and tax-conservative rationale
+- Added test case demonstrating FLOOR vs ROUND difference
+- All 38 MoneyService tests passing
+
+**Impact:** Tax-conservative calculations, full consistency between MoneyService and SQL queries
+
+**Actual Effort:** ~15 minutes
+
+---
+
+## ✅ P2-2: BAS G10/G11 Fields (COMPLETED 2026-02-16)
+
+~~**Current State:** BAS DTO only returns Simpler BAS fields (G1, 1A, 1B, Net GST). Full BAS reporters need G10/G11.~~
+
+**Status:** ✅ **COMPLETE** (Commit `2b82b4e`)
+
+**What Changed:**
+- Added `g10CapitalPurchasesCents` field to BasSummaryDto
+- Added `g11NonCapitalPurchasesCents` field to BasSummaryDto
+- Implemented `calculatePurchasesByBasLabel()` service method
+- Added 10 comprehensive test cases (all passing)
+- G10: Sum of expense.total_cents WHERE category.basLabel = 'G10' (capital purchases > $1,000)
+- G11: Sum of expense.total_cents WHERE category.basLabel = 'G11' (non-capital purchases < $1,000)
+
+**Impact:** Full BAS support (vs Simpler BAS only), enables proper G10/G11 reporting to ATO
+
+**Actual Effort:** ~30 minutes
+
+---
+
+## Keyboard Shortcuts for Common Actions ✅ **COMPLETED**
+
+**Status:** ✅ Shipped in v1.3.0 (2026-02-14)
+**Effort:** 4-5 hours
+**See:** [v1.3-CHANGELOG.md](v1.3-CHANGELOG.md#1-keyboard-shortcuts-completed-2026-02-14)
+
+**Description:**
+Add keyboard shortcuts beyond basic navigation for power users.
+
+**Proposed Shortcuts:**
+
+- [ ] `Cmd/Ctrl + N` - New expense
+- [ ] `Cmd/Ctrl + Shift + N` - New income
+- [ ] `Cmd/Ctrl + I` - Import CSV
+- [ ] `Cmd/Ctrl + /` - Show keyboard shortcuts help
+- [ ] `E` - Edit selected row (in tables)
+- [ ] `Del` - Delete selected row (with confirmation)
+- [ ] `Cmd/Ctrl + F` - Focus search/filter
+- [ ] `Cmd/Ctrl + S` - Save form (in modals)
+
+**Technical Notes:**
+
+- Use `mousetrap` or native `keydown` event listeners
+- Show shortcuts in tooltips
+- Add shortcuts overlay (triggered by `Cmd/Ctrl + /`)
+- Respect OS conventions (Cmd on Mac, Ctrl on Windows/Linux)
+
+**Implementation:**
+
+- Current: `web/src/hooks/use-keyboard-shortcuts.ts` (⌘K only)
+- Expand to global shortcut registry
+
+---
+
+## Bulk Operations ✅ **COMPLETED**
+
+**Status:** ✅ Shipped in v1.3.0 (2026-02-16)
+**Effort:** 5-6 hours
+**See:** [v1.3-CHANGELOG.md](v1.3-CHANGELOG.md#3-bulk-operations-completed-2026-02-16)
+
+**Description:**
+Allow selecting multiple rows for batch operations.
+
+**Features:**
+
+- [ ] Multi-select checkboxes in expense/income tables
+- [ ] Bulk delete with confirmation
+  - "Delete 5 selected expenses?"
+  - Show total amounts affected
+- [ ] Bulk export to CSV
+- [ ] Bulk category reassignment (expenses only)
+- [ ] "Select all" / "Select none" / "Invert selection"
+
+**Technical Notes:**
+
+- TanStack Table supports row selection out of the box
+- Use Shift+Click for range selection
+- Show selected count in toolbar
+- Disable during mutations
+
+---
+
+## CSV Template Downloads ✅ **COMPLETED**
+
+**Status:** ✅ Shipped in v1.3.0 (2026-02-14)
+**Effort:** 2-3 hours
+**See:** [v1.3-CHANGELOG.md](v1.3-CHANGELOG.md#2-csv-template-downloads-completed-2026-02-14)
+
+**Description:**
+Provide downloadable CSV templates with example data.
+
+**Templates:**
+
+- [ ] Expense import template (CommBank format)
+- [ ] Expense import template (Generic format)
+- [ ] Income import template
+- [ ] Provider bulk import template
+- [ ] Client bulk import template
+
+**Technical Notes:**
+
+- Generate client-side (no backend needed)
+- Use `js-file-download` or Blob API
+- Include header row + 2-3 example rows
+- Add download buttons to import pages
+
+---
+
+## ✅ React Router v7 (removed from backlog 2026-09-27)
+
+The web app has used `react-router-dom` v7 since commit `bd219c2` (2026-01-01); the "Migrate to React Router v7" backlog item was stale.
+
+---

@@ -92,7 +92,7 @@ class CsvTransactionDto {
 
 **Unit tests (.spec.ts):**
 ```bash
-pnpm run test backend/src/import/import.service.spec.ts
+pnpm run test src/modules/csv-import/csv-import.service.spec.ts
 ```
 
 **Test cases:**
@@ -115,7 +115,7 @@ pnpm run test backend/src/import/import.service.spec.ts
 **Test data files:**
 ```bash
 # Create test CSV files
-mkdir -p backend/test/fixtures/csv/
+mkdir -p test/fixtures/csv/   # synthetic data only — never real statements
 # valid-transactions.csv - all correct
 # invalid-gst.csv - wrong GST calculations
 # invalid-dates.csv - bad date formats
@@ -260,11 +260,11 @@ date,description,amount,gst_treatment,transaction_type,is_capital
 ---
 
 ## Implementation Files
-- Backend DTO: `backend/src/import/dto/csv-transaction.dto.ts`
-- Backend Service: `backend/src/import/import.service.ts`
-- Backend Tests: `backend/src/import/import.service.spec.ts`
-- Frontend Component: `web/src/components/import/CsvImport.tsx`
-- Frontend Tests: `web/src/components/import/CsvImport.test.tsx`
+- Backend DTO: `src/modules/csv-import/dto/<name>.dto.ts`
+- Backend Service: `src/modules/csv-import/<name>.service.ts`
+- Backend Tests: `src/modules/csv-import/<name>.service.spec.ts`
+- Frontend Component: `web/src/features/import/components/<component>.tsx`
+- Frontend Tests: `web/src/features/import/components/<component>.test.tsx`
 
 ---
 

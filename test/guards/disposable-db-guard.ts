@@ -18,7 +18,7 @@
  *
  * This is a configuration check, not proof of infrastructure isolation; the
  * operator is still responsible for pointing DB_* at a disposable instance
- * (see docs/audits/MAINTENANCE-REMEDIATION-2026-09.md section 9).
+ * (see docs/core/TESTING.md).
  */
 const requiredEnv = (name: string): string => {
   const value = process.env[name];
@@ -26,7 +26,7 @@ const requiredEnv = (name: string): string => {
     throw new Error(
       `[disposable-db-guard] ${name} must be set explicitly. ` +
         'These suites refuse to run with ambient application configuration. ' +
-        'See docs/audits/MAINTENANCE-REMEDIATION-2026-09.md section 9.',
+        'See docs/core/TESTING.md.',
     );
   }
   return value;
