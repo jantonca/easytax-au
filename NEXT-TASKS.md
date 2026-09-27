@@ -126,7 +126,7 @@ verified DB backup and a reviewed migration (`/schema-change`).
     running.
 - **I06:** the Docker `/backup/export` has no Docker CLI or socket in the API
   image; use a PostgreSQL client against the DB service instead. The Docker
-  deployment path has never been deployed (see `docs/DEPLOYMENT.md`).
+  deployment path has never been deployed (see `docs/DEPLOYMENT-DOCKER.md`).
 - **Remediation follow-ups (2026-09):**
   - compare parsed dates, not raw strings, in the income future-date check;
   - apply the same check to CSV receipt dates;

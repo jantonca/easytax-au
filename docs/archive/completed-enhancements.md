@@ -285,3 +285,9 @@ Provide downloadable CSV templates with example data.
 - Add download buttons to import pages
 
 ---
+
+## ✅ React Router v7 (removed from backlog 2026-09-27)
+
+The web app has used `react-router-dom` v7 since commit `bd219c2` (2026-01-01); the "Migrate to React Router v7" backlog item was stale.
+
+---

@@ -13,7 +13,7 @@
 - After 3-6 months of daily use to identify pain points
 - When specific features are repeatedly requested
 - When technical debt becomes a blocker
-- When dependencies are updated (e.g., React Router v7 stable)
+- When major dependencies are updated
 
 ---
 
@@ -349,25 +349,6 @@ Export data to popular accounting formats (Xero, MYOB, QuickBooks).
 ---
 
 ## 🔧 Technical Debt & Infrastructure
-
-### Migrate to React Router v7
-
-**Priority:** 🟢 Low
-**Estimated Effort:** 4-6 hours (when v7 stable)
-**Context:** Currently on React Router v6
-
-**Tasks:**
-
-- [ ] Upgrade to React Router v7
-- [ ] Migrate to new data loading patterns (if applicable)
-- [ ] Update tests
-- [ ] Verify all routes work
-- [ ] Update documentation
-
-**Notes:**
-Wait for React Router v7 stable release and migration guide.
-
----
 
 ### Performance Optimization
 

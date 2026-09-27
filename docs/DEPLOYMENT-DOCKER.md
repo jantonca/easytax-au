@@ -1,4 +1,16 @@
-# Production Deployment Guide
+# Docker Compose Deployment Guide
+
+> **Status (2026-09-27): unverified alternative path.** The live deployment is
+> native multi-LXC (`docs/DEPLOYMENT-PROXMOX-LXC.md`). This guide has never
+> been used for a real deployment, and it predates the 2026-09 fixes. The
+> images were only validated in disposable containers. Known defects:
+>
+> - **The frontend's API calls fail with the `/api` base this setup bakes in**
+>   (I05). Most calls throw before any request is sent.
+> - **`/backup/export` cannot work in the API image** (I06).
+> - **Host OS references (Ubuntu 22.04) are stale.**
+>
+> See `NEXT-TASKS.md` before relying on it.
 
 **Target Environment:** Proxmox LXC container
 **Deployment Method:** Docker Compose

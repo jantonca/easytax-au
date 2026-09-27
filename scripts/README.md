@@ -2,6 +2,21 @@
 
 This directory contains automation scripts for deploying and managing EasyTax-AU on Proxmox LXC containers.
 
+> **Known issues (found in the 2026-09-25 rollout; tracked in `NEXT-TASKS.md`):**
+>
+> - **`setup-db-lxc.sh`:** did not leave the daily `pg_dump` cron entry at the
+>   original deploy, and the cause was not identified. Verify with `crontab -l`
+>   on the DB container.
+> - **`update-app.sh`:**
+>   - runs plain `pnpm install` instead of `--frozen-lockfile`;
+>   - prompts interactively;
+>   - is overwritten by its own `git pull` while running.
+>
+>   `STATUS.md` → "Operating the deployment" describes the manual update
+>   procedure used instead.
+>
+> CT IDs and IPs below are examples only.
+
 ---
 
 ## Available Scripts
@@ -19,8 +34,8 @@ This directory contains automation scripts for deploying and managing EasyTax-AU
 ### Prerequisites
 
 1. **Two LXC containers created** in Proxmox:
-   - LXC 101 (Database): Ubuntu 22.04, 1 CPU, 1GB RAM, Static IP `192.168.1.101`
-   - LXC 102 (Application): Ubuntu 22.04, 2 CPU, 2GB RAM, Static IP `192.168.1.102`
+   - LXC 101 (Database): Debian 12, 1 CPU, 1GB RAM, Static IP `192.168.1.101`
+   - LXC 102 (Application): Debian 12, 2 CPU, 2GB RAM, Static IP `192.168.1.102`
 
 2. **Both containers started** and accessible via SSH
 
