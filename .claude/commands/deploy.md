@@ -11,14 +11,15 @@ Deployment target: $ARGUMENTS (dev / staging / production)
 ### 1. Pre-Deployment Checklist
 
 **Read deployment docs:**
-- `docs/core/DEPLOYMENT.md` (if exists, check first)
+- `docs/DEPLOYMENT-PROXMOX-LXC.md` - the live deployment path
+- `STATUS.md` - current deployed state and operating notes
 - `docs/core/BACKUP.md` - Understand backup/recovery strategy
 
 **Verify readiness:**
 - [ ] All tests pass: `pnpm --filter web test && pnpm run test`
-- [ ] Linting passes: `pnpm --filter web lint && pnpm run lint`
+- [ ] Linting passes: `pnpm --filter web lint && pnpm exec eslint "src/**/*.ts" "test/**/*.ts"` (`pnpm run lint` autofixes)
 - [ ] Build succeeds: `pnpm --filter web build && pnpm run build`
-- [ ] Latest audit report reviewed (check `docs/reports/audit/`)
+- [ ] Latest audit reports reviewed (`docs/audits/`) and P0 items in `NEXT-TASKS.md` checked
 - [ ] No P0 or P1 issues unresolved
 - [ ] Database migrations tested (if any)
 
@@ -181,8 +182,8 @@ systemctl restart easytax-backend easytax-web
 
 **Update deployment log:**
 ```bash
-# Create entry in deployment log (if exists)
-# Or add note to CHANGELOG.md
+# Record a public-safe summary in STATUS.md;
+# host-specific details go in the gitignored homelab inventory
 ```
 
 **Record:**

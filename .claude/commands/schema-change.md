@@ -18,7 +18,7 @@ Schema change description: $ARGUMENTS
 **Understand:**
 - Which fields are encrypted (`@Encrypted()` decorator)
 - Entity relationships (OneToMany, ManyToOne, ManyToMany)
-- Existing migrations (`backend/src/migrations/`)
+- Existing migrations (`src/migrations/`)
 - Type generation workflow
 
 ### 2. Plan Schema Change
@@ -182,10 +182,10 @@ cd backend && pnpm run build
 **Search for affected code:**
 ```bash
 # Find all references to changed field
-grep -r "oldFieldName" backend/src/ web/src/ --include="*.ts" --include="*.tsx"
+grep -r "oldFieldName" src/ web/src/ --include="*.ts" --include="*.tsx"
 
 # Find all uses of entity
-grep -r "EntityName" backend/src/ web/src/ --include="*.ts" --include="*.tsx"
+grep -r "EntityName" src/ web/src/ --include="*.ts" --include="*.tsx"
 ```
 
 **Update:**
@@ -287,7 +287,7 @@ await queryRunner.query(`
 **Considerations:**
 - Consider soft-delete first (rename to `deprecated_field`, drop later)
 - Check for any serialized/JSON data referencing field
-- Document in CHANGELOG.md
+- Record it in the PR description and, once deployed, in `STATUS.md`
 
 ---
 
@@ -386,7 +386,7 @@ class MyEntity {
 ---
 
 ## Migration File
-**Path:** `backend/src/migrations/1234567890123-MigrationName.ts`
+**Path:** `src/migrations/1234567890123-MigrationName.ts`
 
 **SQL (up):**
 ```sql
@@ -427,9 +427,9 @@ ALTER TABLE "my_table" DROP COLUMN "new_field";
 
 ## Related Code Updates
 **Files modified:**
-- `backend/src/dto/my.dto.ts` - Updated DTO
-- `web/src/components/MyComponent.tsx` - Updated frontend
-- `backend/src/my/my.service.spec.ts` - Updated tests
+- `src/modules/<module>/dto/<name>.dto.ts` - Updated DTO
+- `web/src/features/<feature>/components/<component>.tsx` - Updated frontend
+- `src/modules/<module>/<module>.service.spec.ts` - Updated tests
 
 ---
 
@@ -456,7 +456,7 @@ ALTER TABLE "my_table" DROP COLUMN "new_field";
 
 ## Documentation Updates
 - [ ] Update `docs/core/SCHEMA.md` with new entity structure
-- [ ] Update `CHANGELOG.md` with migration details
+- [ ] Record the migration in the PR description and `STATUS.md` (after deploy)
 - [ ] Update API docs (if endpoints changed)
 ```
 

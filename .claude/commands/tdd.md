@@ -19,14 +19,14 @@ Task description: $ARGUMENTS
 
 **Frontend (web/src/):**
 ```bash
-# Create .test.tsx file next to component
-touch web/src/components/[Component].test.tsx
+# Create .test.tsx next to the component (usually web/src/features/<feature>/...)
+touch web/src/features/<feature>/components/<component>.test.tsx
 ```
 
-**Backend (backend/src/):**
+**Backend (src/):**
 ```bash
-# Create .spec.ts file next to service/controller
-touch backend/src/[module]/[file].spec.ts
+# Create .spec.ts next to the service/controller
+touch src/modules/<module>/<file>.spec.ts
 ```
 
 **Test structure:**
