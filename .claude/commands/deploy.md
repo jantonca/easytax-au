@@ -19,7 +19,7 @@ Deployment target: $ARGUMENTS (dev / staging / production)
 - [ ] All tests pass: `pnpm --filter web test && pnpm run test`
 - [ ] Linting passes: `pnpm --filter web lint && pnpm exec eslint "src/**/*.ts" "test/**/*.ts"` (`pnpm run lint` autofixes)
 - [ ] Build succeeds: `pnpm --filter web build && pnpm run build`
-- [ ] Latest audit reports reviewed (`docs/audits/`) and P0 items in `NEXT-TASKS.md` checked
+- [ ] Latest audit reports reviewed (`docs/audits/`) and P0 tasks in bosun (project `easytax-au`) checked
 - [ ] No P0 or P1 issues unresolved
 - [ ] Database migrations tested (if any)
 

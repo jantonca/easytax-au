@@ -92,7 +92,7 @@ categories. Twelve operating categories are labelled `1B`, `Capital Purchases`
 is `G10`, and `Non-Deductible` is `N/A`. The seeder only runs on an empty
 table.
 
-> Known issue (T08, `NEXT-TASKS.md`): `ATO-LOGIC.md` maps operating categories
+> Known issue (T08, tracked in bosun): `ATO-LOGIC.md` maps operating categories
 > to **G11**, but the seeder labels them `1B`, so they are excluded from the
 > G11 total.
 
@@ -185,7 +185,7 @@ Revenue from freelance work.
 | `payment_date`   | DATE        | Yes      | No         | Receipt date; drives CASH-basis BAS (see `CASH-BASIS-DESIGN.md`). Required by the API when `is_paid`; legacy paid rows may be NULL |
 
 There is no `import_job_id` on incomes, so income imports cannot be rolled back
-(N01, `NEXT-TASKS.md`).
+(N01, tracked in bosun).
 
 ---
 

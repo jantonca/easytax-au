@@ -43,7 +43,7 @@ pure functions 90%+.
 | Security / encryption | `docs/core/SECURITY.md` |
 | Framework bugs | `docs/core/TROUBLESHOOTING.md` |
 
-Current state: `STATUS.md`. Active backlog: `NEXT-TASKS.md`. Ignore
+Current state: `STATUS.md`. Active backlog: bosun project `easytax-au`. Ignore
 `docs/archive/` unless asked about a past version.
 
 ## ✔️ Project-specific pre-submission checklist

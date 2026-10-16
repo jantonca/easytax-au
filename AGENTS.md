@@ -73,7 +73,7 @@ calculations, mutations) 80%+, UI components 60%+, pure functions 90%+.
 | Framework bugs / workarounds | `docs/core/TROUBLESHOOTING.md` |
 | Running tests / disposable DB | `docs/core/TESTING.md` |
 
-Current deployed state: `STATUS.md`. Active backlog: `NEXT-TASKS.md`.
+Current deployed state: `STATUS.md`. Active backlog: bosun project `easytax-au` (use the `bosun` skill); `NEXT-TASKS.md` is only a pointer plus release history.
 Current audits: `docs/audits/`. Proposed feature plans: `docs/plans/`.
 Ignore `docs/archive/` unless explicitly asked about a past version.
 

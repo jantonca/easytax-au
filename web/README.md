@@ -13,7 +13,7 @@ pnpm workspace; run commands from the repository root:
 
 **Configuration:** `VITE_API_URL` sets the API base (default
 `http://localhost:3000`; see `.env.example`). A relative base such as `/api`
-is currently broken in the main API client (I05 in `NEXT-TASKS.md`).
+is currently broken in the main API client (I05, tracked in bosun).
 
 API types come from `@shared/types`, generated from the backend's OpenAPI spec
 (`pnpm run generate:types`). Never hand-write them.
@@ -22,5 +22,5 @@ API types come from `@shared/types`, generated from the backend's OpenAPI spec
 
 - Rules: `../AGENTS.md`
 - State: `../STATUS.md`
-- Backlog: `../NEXT-TASKS.md`
+- Backlog: bosun project `easytax-au`
 - Testing: `../docs/core/TESTING.md`
