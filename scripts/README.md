@@ -2,7 +2,7 @@
 
 This directory contains automation scripts for deploying and managing EasyTax-AU on Proxmox LXC containers.
 
-> **Known issues (found in the 2026-09-25 rollout; tracked in `NEXT-TASKS.md`):**
+> **Known issues (found in the 2026-09-25 rollout; tracked in bosun):**
 >
 > - **`setup-db-lxc.sh`:** did not leave the daily `pg_dump` cron entry at the
 >   original deploy, and the cause was not identified. Verify with `crontab -l`

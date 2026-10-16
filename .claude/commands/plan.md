@@ -1,7 +1,7 @@
 # /plan - Task Discovery & Prioritization
 
 ## Purpose
-Analyze `NEXT-TASKS.md` and `docs/FUTURE-ENHANCEMENTS.md` to recommend the next highest-priority task with justification.
+Analyze the bosun backlog (project `easytax-au`) and `docs/FUTURE-ENHANCEMENTS.md` to recommend the next highest-priority task with justification.
 
 ## Context
 User arguments: $ARGUMENTS
@@ -9,7 +9,7 @@ User arguments: $ARGUMENTS
 ## Workflow
 
 ### 1. Read Task Files
-- Read `NEXT-TASKS.md` (current sprint/version tasks)
+- Load the `bosun` skill, then call `next_tasks` for project `easytax-au` and `get_task` on the candidates (priority, status, `blocked_reason`, acceptance). `NEXT-TASKS.md` is only a pointer plus release history
 - Read `docs/FUTURE-ENHANCEMENTS.md` (backlog ideas)
 - Read `STATUS.md` and `docs/archive/v1.*-CHANGELOG.md` (understand what's shipped)
 
@@ -29,9 +29,9 @@ User arguments: $ARGUMENTS
 Output format:
 ```markdown
 ## Recommended Task
-**[Task Title from NEXT-TASKS.md]**
+**[Task title, with its bosun task id]**
 
-**Priority**: [P0/P1/P2/P3]
+**Priority**: [P0/P1/P2 from the task title; bosun priority high/normal/low]
 **Estimated Complexity**: [Simple/Moderate/Complex]
 
 ### Justification
@@ -49,7 +49,8 @@ Use `/tdd` to implement with test-first workflow
 ## Guardrails
 - **Never** recommend tasks with unresolved blockers
 - **Prefer** compliance/security tasks over features when both are P1
-- **Flag** if NEXT-TASKS.md is empty or outdated
+- **Flag** if the bosun project has no ready tasks or its tasks look outdated
+- **Never** claim or move a task just because it was recommended; claiming is a separate step
 - **Check** for P0/P1 items in recent audit reports (`docs/audits/`)
 
 ## Australian Domain Context

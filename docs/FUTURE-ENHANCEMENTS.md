@@ -2,7 +2,7 @@
 
 **Purpose:** This document tracks features, improvements, and nice-to-have enhancements that are not critical for the current production release but would improve the user experience in future iterations.
 
-**Project Status:** see `STATUS.md` (current state) and `NEXT-TASKS.md` (active backlog). Audit remediation from `docs/audits/` and authentication come before anything here. Completed items are moved to `docs/archive/completed-enhancements.md`.
+**Project Status:** see `STATUS.md` (current state) and the bosun project `easytax-au` (active backlog). Audit remediation from `docs/audits/` and authentication come before anything here. Completed items are moved to `docs/archive/completed-enhancements.md`.
 
 **Last Updated:** 2026-09-27 (completed items archived; statuses re-pointed at NEXT-TASKS.md)
 
@@ -51,7 +51,7 @@ These items were identified during the audit process as potential enhancements b
 
 **Effort:** 4-6 hours (requires schema migration)
 
-**2026-09 update:** the 2026-09-26 audits (T02, GST eligibility limitation) make this part of the P1 "business tax profile" work in `NEXT-TASKS.md`; it is no longer low priority for non-GST-registered users.
+**2026-09 update:** the 2026-09-26 audits (T02, GST eligibility limitation) make this part of the P1 "business tax profile" work in bosun; it is no longer low priority for non-GST-registered users.
 
 ---
 
@@ -67,7 +67,7 @@ These items were identified during the audit process as potential enhancements b
 
 **Effort:** 6-8 hours (simple session auth)
 
-**2026-09 update:** promoted: authentication is the top security item in `NEXT-TASKS.md` (P1), with `/backup/export` the highest-value endpoint to protect.
+**2026-09 update:** promoted: authentication is the top security item in bosun (P1), with `/backup/export` the highest-value endpoint to protect.
 
 ---
 
@@ -266,7 +266,7 @@ Attach receipt/invoice images to expenses and incomes.
 
 **Priority:** 🟡 Medium
 **Estimated Effort:** 6-8 hours
-**Status:** Last open v1.3.0 item; deferred until audit remediation and auth land (see NEXT-TASKS.md)
+**Status:** Last open v1.3.0 item; deferred until audit remediation and auth land (see the bosun backlog)
 
 **Description:**
 More sophisticated filtering beyond current date range and dropdowns.
@@ -522,7 +522,7 @@ Export data to popular accounting formats (Xero, MYOB, QuickBooks).
 **Process:**
 
 1. Review enhancements quarterly
-2. Promote high-priority items to NEXT-TASKS.md when ready to implement
+2. Promote high-priority items to bosun when ready to implement
 3. Archive completed items
 4. Re-prioritize based on usage patterns and pain points
 
@@ -530,7 +530,7 @@ Export data to popular accounting formats (Xero, MYOB, QuickBooks).
 
 ## 📌 Notes
 
-- **All enhancements are optional** - correctness gaps found by the 2026-09-26 audits are tracked in `NEXT-TASKS.md`, not here
+- **All enhancements are optional** - correctness gaps found by the 2026-09-26 audits are tracked in bosun, not here
 - **User experience** (daily use for 3-6 months) will drive prioritization
 - **Effort estimates** are rough approximations
 - **Dependencies** should be resolved before starting tasks

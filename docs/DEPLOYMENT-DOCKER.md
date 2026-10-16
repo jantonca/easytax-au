@@ -10,7 +10,7 @@
 > - **`/backup/export` cannot work in the API image** (I06).
 > - **Host OS references (Ubuntu 22.04) are stale.**
 >
-> See `NEXT-TASKS.md` before relying on it.
+> See the I06 task in bosun (project `easytax-au`) before relying on it.
 
 **Target Environment:** Proxmox LXC container
 **Deployment Method:** Docker Compose

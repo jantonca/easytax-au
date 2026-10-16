@@ -1,6 +1,6 @@
 # Project Status & Next Steps
 
-Current deployed state — read this first. The prioritised backlog is `NEXT-TASKS.md`.
+Current deployed state — read this first. The prioritised backlog is in bosun (project `easytax-au`).
 
 **Updated:** 2026-09-27
 
@@ -47,7 +47,7 @@ in the same window. Existing paid incomes now show as "Paid · no date" and stay
 out of CASH-basis totals until a receipt date is entered per record.
 
 ## Next steps
-The prioritised backlog is `NEXT-TASKS.md`. Headlines:
+The prioritised backlog is in bosun (project `easytax-au`). Headlines:
 1. **P0 — live deployment safety:** verify the live frontend against the
    `VITE_API_URL=/api` defect before the next `update-app.sh` run, then fix
    API-URL resolution everywhere (audit findings C01/I05/N05).
@@ -64,7 +64,7 @@ The prioritised backlog is `NEXT-TASKS.md`. Headlines:
 - Update app to latest: back up both CTs first, then on the app CT stop
   `easytax-api`, fast-forward to `origin/main`, `pnpm install --frozen-lockfile`,
   build backend and web, and start the service; migrations auto-apply on start.
-  `scripts/update-app.sh` does the same interactively (see its caveats in `NEXT-TASKS.md`).
+  `scripts/update-app.sh` does the same interactively (see the `update-app.sh` task in bosun for its caveats).
   The exact procedure used is in the gitignored homelab inventory.
 - Backups: weekly vzdump covers both CTs; the DB CT also runs a daily `pg_dump`
   (30-day retention, kept on the CT itself). That cron entry has only existed

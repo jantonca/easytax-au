@@ -126,7 +126,7 @@ For Docker-based deployment (VMs, cloud servers, or non-Proxmox environments):
 
 > ⚠️ **Unverified path.** The Docker setup has never been used for a real
 > deployment. Its frontend build uses `VITE_API_URL=/api`, which the API
-> client currently rejects (I05 in `NEXT-TASKS.md`). See
+> client currently rejects (I05, tracked in bosun). See
 > [docs/DEPLOYMENT-DOCKER.md](docs/DEPLOYMENT-DOCKER.md).
 
 #### Standard Deployment (HTTP)
@@ -387,8 +387,8 @@ EasyTax-AU is fully keyboard accessible. All features can be used without a mous
 
 ## 📚 Documentation
 
-**Read in this order:** `STATUS.md` (current state), then `NEXT-TASKS.md`
-(backlog), then the core doc for your task. Agents follow `AGENTS.md`.
+**Read in this order:** `STATUS.md` (current state), then the backlog in bosun
+(project `easytax-au`), then the core doc for your task. Agents follow `AGENTS.md`.
 `docs/archive/` is history only.
 
 ### ⭐ Active Work
@@ -396,8 +396,8 @@ EasyTax-AU is fully keyboard accessible. All features can be used without a mous
 | Document                                                           | Purpose                                                        |
 | ------------------------------------------------------------------ | -------------------------------------------------------------- |
 | [STATUS.md](STATUS.md)                                             | **Start Here:** current deployed state and headline next steps |
-| [NEXT-TASKS.md](NEXT-TASKS.md)                                     | Active prioritised backlog (audit remediation, auth, features) |
-| [docs/audits/](docs/audits/)                                       | Current audit cycle (findings referenced by NEXT-TASKS IDs)    |
+| bosun project `easytax-au`                                         | Active prioritised backlog (use the `bosun` skill)             |
+| [docs/audits/](docs/audits/)                                       | Current audit cycle (findings referenced by bosun task IDs)    |
 | [docs/plans/](docs/plans/)                                         | Proposed feature plans (not yet scheduled work)                |
 | [docs/FUTURE-ENHANCEMENTS.md](docs/FUTURE-ENHANCEMENTS.md)         | Deferred, optional enhancements                                |
 | [AGENTS.md](AGENTS.md)                                             | Project rules for AI agents (Claude Code, OpenCode, Codex)     |

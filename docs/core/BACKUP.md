@@ -39,7 +39,7 @@ minutes.
 - **Bare-metal / LXC:** runs `pg_dump` directly using the `DB_*` settings.
 - **Docker (`IS_DOCKER=true`):** runs `docker exec easytax-au-db pg_dump`. This
   is **broken** in the shipped Docker images, which have no Docker CLI or
-  socket (I06 in `NEXT-TASKS.md`).
+  socket (I06, tracked in bosun).
 - **Security:** the endpoint is unauthenticated. Anyone who can reach the API
   can download the whole database (C02). Keep the app LAN-only until
   authentication lands.
